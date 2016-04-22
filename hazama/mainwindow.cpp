@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <iostream>
+#include <opencv2/core/core.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,8 +25,10 @@ void MainWindow::run()
     std::cout << "Run" << std::endl;
 
     /*Take a picture*/
+    capture();
 
-    /*To vector*/
+    /*Image Recognition*/
+
 
     /*Solve puzzle*/
 
@@ -36,4 +39,9 @@ void MainWindow::run()
 void MainWindow::clickedRunButton()
 {
     run();
+}
+
+void MainWindow::capture()
+{
+
 }

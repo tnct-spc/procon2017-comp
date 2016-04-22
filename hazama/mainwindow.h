@@ -19,6 +19,7 @@ private:
     Ui::MainWindow *ui;
     void init();
     void run();
+    void capture();
 private slots:
     void clickedRunButton();
 };
