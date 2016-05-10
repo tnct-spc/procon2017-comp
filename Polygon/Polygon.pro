@@ -10,7 +10,9 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    polygon.cpp
+    hoge.cpp
+
 
 HEADERS += \
-    polygon.h
+    vector2.h \
+    hoge.h
