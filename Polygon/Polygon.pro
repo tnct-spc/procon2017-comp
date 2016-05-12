@@ -1,7 +1,7 @@
 QT += core
 QT -= gui
 
-CONFIG += c++11
+CONFIG += c++14
 
 TARGET = Polygon
 CONFIG += console
@@ -10,9 +10,13 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    hoge.cpp
-
 
 HEADERS += \
-    vector2.h \
-    hoge.h
+
+LIBS += -lboost_system -lboost_thread
+
+unix {
+    target.path = /usr/local/lib
+    target.extra = ldconfig
+    INSTALLS += target
+}
