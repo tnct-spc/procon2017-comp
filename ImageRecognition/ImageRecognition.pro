@@ -1,16 +1,22 @@
-QT += core
-QT -= gui
+#-------------------------------------------------
+#
+# Project created by QtCreator 2016-05-15T03:12:07
+#
+#-------------------------------------------------
 
-CONFIG += c++11
+QT       += core gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ImageRecognition
-CONFIG += console
-CONFIG -= app_bundle
-
 TEMPLATE = app
 
-SOURCES += main.cpp \
-    imagerecognition.cpp
 
-HEADERS += \
-    imagerecognition.h
+SOURCES += main.cpp\
+        imagerecognition.cpp
+
+HEADERS  += imagerecognition.h
+
+FORMS    += imagerecognition.ui
+
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
