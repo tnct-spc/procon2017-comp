@@ -18,3 +18,5 @@ SOURCES += main.cpp\
 HEADERS  += hazama.h
 
 FORMS    += hazama.ui
+
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`

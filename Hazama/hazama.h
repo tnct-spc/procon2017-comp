@@ -2,6 +2,7 @@
 #define HAZAMA_H
 
 #include <QMainWindow>
+#include <opencv2/core/core.hpp>
 
 namespace Ui {
 class Hazama;
@@ -19,7 +20,7 @@ private:
     Ui::Hazama *ui;
     void init();
     void run();
-    void capture();
+    cv::Mat capture();
 private slots:
     void clickedRunButton();
 };
