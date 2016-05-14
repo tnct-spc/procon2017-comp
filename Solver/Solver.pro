@@ -10,9 +10,9 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    Algorithm/simplealgorithm.cpp \
-    algorithmwrapper.cpp
+    algorithmwrapper.cpp \
+    Algorithm/simplealgorithm.cpp
 
 HEADERS += \
-    Algorithm/simplealgorithm.h \
-    algorithmwrapper.h
+    algorithmwrapper.h \
+    Algorithm/simplealgorithm.h

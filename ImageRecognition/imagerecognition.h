@@ -2,16 +2,10 @@
 #define IMAGERECOGNITION_H
 
 
-class ImageRecognition : public ImageRecognition
+class ImageRecognition
 {
-private:
-    ImageRecognition() = default;
-    ~ImageRecognition() = default;
 public:
-    static ImageRecognition& getInstance(){
-        static ImageRecognition instance;
-        return instance;
-    }
+    ImageRecognition();
 };
 
 #endif // IMAGERECOGNITION_H
