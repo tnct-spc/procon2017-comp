@@ -1,20 +1,26 @@
 #include <QCoreApplication>
-#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/multi_polygon.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/point_xy.hpp> 
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/algorithms/area.hpp>
+#include <boost/geometry.hpp>
 #include <cmath>
 #include <vector>
 #include <iostream>
+namespace bg = boost::geometry;
+typedef boost::geometry::model::d2::point_xy<double> point_xy_t;
+typedef boost::geometry::model::polygon<point_xy_t> polygon_t;
+typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
 
 int main(int argc,char *argv[])
 {
     /*polygon*/
     QCoreApplication a(argc, argv);
-    typedef boost::geometry::model::d2::point_xy<double> point_xy_t;
-    //double型実体のbgm::d2::point_xyの型をpoint_xy_tと書ける
-    typedef boost::geometry::model::polygon<point_xy_t> polygon_t;
-    //point_xy_t型実体のbgm::polygonの型をpolygon_tと書ける
-    point_xy_t x(0,1),y(0,0),z(1,0);
-    polygon_t huga={{x},{y},{z}};
+    std::cout << "Hello,polygon!" << std::endl;
+    polygon_t hoge;
+    std::cout << boost::geometry::area(huga) << std::endl;
+    multi_polygon_t huga;
+    huga.resize(50); //最大50個
+    huga[0] = hoge;
     return a.exec();
 }
