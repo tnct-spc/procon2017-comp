@@ -2,28 +2,24 @@
 
 Field::Field()
 {
-    fieldPiece.resize(50);
-    fieldPieceIteratorEnd = fieldPiece.begin();
+    fieldPiece.reserve(50);
 }
 
 void Field::setFlame(const polygon_t &flame){
     fieldFlame = flame;
 }
 
+void Field::setPiece(const polygon_t &piece,const int &n){
+    fieldPiece.at(n) = piece;
+}
+
 void Field::pushPiece(const polygon_t &piece){
-    *fieldPieceIteratorEnd =  piece;
-    fieldPieceIteratorEnd++;
+    fieldPiece.push_back(piece);
 }
 
 polygon_t Field::popPiece(){
-    try{
-        if (fieldPieceIteratorEnd == fieldPiece.begin()) throw -1;
-    }
-    catch (int a){
-        abort();
-    }
-    fieldPieceIteratorEnd--;
-    polygon_t tmp = *fieldPieceIteratorEnd;
+    polygon_t tmp = fieldPiece.back();
+    fieldPiece.pop_back();
     return tmp;
 }
 
@@ -40,5 +36,5 @@ void Field::printFlame(){
 }
 
 void Field::printPiece(){
-    std::for_each(fieldPiece.begin(),fieldPieceIteratorEnd,[](const polygon_t &a){std::cout << bg::dsv(a) << std::endl;});
+    std::for_each(fieldPiece.begin(),fieldPiece.end(),[](const polygon_t &a){std::cout << bg::dsv(a) << std::endl;});
 }

@@ -14,16 +14,16 @@ class Field
 {
     polygon_t fieldFlame;
     std::vector<polygon_t> fieldPiece;
-    std::vector<polygon_t>::iterator  fieldPieceIteratorEnd; //fieldPieceの末尾を示すirerator
 public:
     Field();
     void setFlame(const polygon_t &flame); //フレーム多角形をセット
+    void setPiece(const polygon_t &piece,const int &n); //ピース多角形をセット(任意)
     void pushPiece(const polygon_t &piece); //ピース多角形をセット（末尾）
     polygon_t popPiece(); //末尾のピース多角形をpop
     polygon_t getPiece(const int &n);
     polygon_t getFlame();
-    void printFlame();
-    void printPiece();
+    void printFlame(); //コンソール
+    void printPiece(); //コンソール
 };
 
 #endif // FIELD_H
