@@ -6,6 +6,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "field.h"
+
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Hazama)
@@ -27,6 +29,8 @@ void Hazama::init()
 void Hazama::run()
 {
     std::cout << "Run" << std::endl;
+
+    Field field;
 
     /*Take a picture*/
 
