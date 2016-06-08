@@ -23,11 +23,11 @@ polygon_t Field::popPiece(){
     return tmp;
 }
 
-polygon_t Field::getFlame(){
+polygon_t Field::getFlame() const{
     return fieldFlame;
 }
 
-polygon_t Field::getPiece(const int &n){
+polygon_t Field::getPiece(const int &n) const{
     return fieldPiece.at(n);
 }
 
