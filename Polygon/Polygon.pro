@@ -10,10 +10,12 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    field.cpp
+    field.cpp \
+    polygonexpansion.cpp
 
 HEADERS += \
-    field.h
+    field.h \
+    polygonexpansion.h
 
 LIBS += -lboost_system -lboost_thread
 
