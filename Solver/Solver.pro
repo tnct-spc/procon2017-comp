@@ -6,6 +6,8 @@
 
 QT       -= gui
 
+CONFIG += c++14
+
 TARGET = Solver
 TEMPLATE = lib
 

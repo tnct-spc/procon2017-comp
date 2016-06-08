@@ -6,6 +6,8 @@
 
 QT       += widgets
 
+CONFIG += c++14
+
 TARGET = DisplayAnswer
 TEMPLATE = lib
 
