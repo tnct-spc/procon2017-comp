@@ -5,15 +5,28 @@
 
 #include "testpolygon.h"
 
+bool Test()
+{
+    TestPolygon test_polygon;
+
+    if(!test_polygon.run()){
+        std::cout<<"*****Polygon error*****"<<std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
 
-    TestPolygon test_polygon;
-
-    std::cout << "ok." << std::endl;
+    if(Test()){
+        std::cout << "ok" << std::endl;
+    }else{
+        std::cout << "error" << std::endl;
+    }
 
     return a.exec();
 }
