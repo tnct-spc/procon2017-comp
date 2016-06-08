@@ -1,16 +1,22 @@
-QT += core
-QT -= gui
+#-------------------------------------------------
+#
+# Project created by QtCreator 2016-06-08T17:48:35
+#
+#-------------------------------------------------
 
-CONFIG += c++11
+QT       += widgets
 
 TARGET = DisplayAnswer
-CONFIG += console
-CONFIG -= app_bundle
+TEMPLATE = lib
 
-TEMPLATE = app
+DEFINES += DISPLAYANSWER_LIBRARY
 
-SOURCES += main.cpp \
-    displayanswer.cpp
+SOURCES += displayanswer.cpp
 
-HEADERS += \
-    displayanswer.h
+HEADERS += displayanswer.h\
+        displayanswer_global.h
+
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
+}

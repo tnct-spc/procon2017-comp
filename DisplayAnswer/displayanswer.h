@@ -1,9 +1,11 @@
 #ifndef DISPLAYANSWER_H
 #define DISPLAYANSWER_H
 
+#include "displayanswer_global.h"
 
-class DisplayAnswer
+class DISPLAYANSWERSHARED_EXPORT DisplayAnswer
 {
+
 public:
     DisplayAnswer();
 };
