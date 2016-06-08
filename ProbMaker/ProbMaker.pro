@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2016-04-18T17:43:16
+# Project created by QtCreator 2016-05-15T00:49:53
 #
 #-------------------------------------------------
 
@@ -8,15 +8,13 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = hazama
+TARGET = ProbMaker
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        probmaker.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += probmaker.h
 
-FORMS    += mainwindow.ui
-
-LIBS+= -lopencv_core
+FORMS    += probmaker.ui

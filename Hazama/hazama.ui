@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>Hazama</class>
+ <widget class="QMainWindow" name="Hazama">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,16 +11,16 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Hazama</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="runButton">
+   <widget class="QPushButton" name="RunButton">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>30</y>
-      <width>311</width>
-      <height>191</height>
+      <x>20</x>
+      <y>10</y>
+      <width>361</width>
+      <height>241</height>
      </rect>
     </property>
     <property name="font">
@@ -55,25 +55,5 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections>
-  <connection>
-   <sender>runButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>clickedRunButton()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>203</x>
-     <y>144</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>261</x>
-     <y>271</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
- <slots>
-  <slot>clickedRunButton()</slot>
- </slots>
+ <connections/>
 </ui>

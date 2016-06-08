@@ -1,8 +1,9 @@
 #ifndef SIMPLEALGORITHM_H
 #define SIMPLEALGORITHM_H
 
+#include "algorithmwrapper.h"
 
-class SimpleAlgorithm : public AlgorithmWarapper
+class SimpleAlgorithm : public AlgorithmWrapper
 {
 public:
     SimpleAlgorithm();
