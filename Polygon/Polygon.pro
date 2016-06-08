@@ -1,24 +1,28 @@
-QT += core
-QT -= gui
+#-------------------------------------------------
+#
+# Project created by QtCreator 2016-06-08T13:38:26
+#
+#-------------------------------------------------
+
+QT       -= gui
 
 CONFIG += c++14
 
 TARGET = Polygon
-CONFIG += console
-CONFIG -= app_bundle
+TEMPLATE = lib
 
-TEMPLATE = app
+DEFINES += POLYGON_LIBRARY
 
-SOURCES += main.cpp \
+SOURCES += polygon.cpp \
     field.cpp
 
-HEADERS += \
+HEADERS += polygon.h\
+        polygon_global.h \
     field.h
 
 LIBS += -lboost_system -lboost_thread
 
 unix {
-    target.path = /usr/local/lib
-    target.extra = ldconfig
+    target.path = /usr/lib
     INSTALLS += target
 }
