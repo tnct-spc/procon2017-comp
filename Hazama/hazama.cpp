@@ -14,6 +14,7 @@ Hazama::Hazama(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->RunButton, &QPushButton::clicked, this, &Hazama::clickedRunButton);
+    connect(ui->UseWebCamera, &QCheckBox::stateChanged, this, &Hazama::checkedWebCameraEnable);
 }
 
 Hazama::~Hazama()
@@ -35,15 +36,26 @@ void Hazama::run()
     /*Take a picture*/
 
     //Capture
-    cv::Mat src = capture();
+    cv::Mat src;
+
+    if(WebcameraEnable){
+       src = capture();
+    }else{
+       //if checkbox(Use Webcamera) isn`t true
+
+
+    }
 
     //Display picture
     cv::namedWindow("picture",CV_WINDOW_AUTOSIZE);
     cv::imshow("picture",src);
+
+    /*
     if ( src.empty() ) {
         std::cerr << "Image can't be loaded!" << std::endl;
     }
 
+    */
     /*Image Recognition*/
 
     /*Solve puzzle*/
@@ -80,4 +92,11 @@ cv::Mat Hazama::capture()
 void Hazama::clickedRunButton()
 {
     run();
+}
+
+void Hazama::checkedWebCameraEnable()
+{
+    std::cout << "checked!" << std::endl;
+
+    WebcameraEnable =  !WebcameraEnable;
 }
