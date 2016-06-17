@@ -13,12 +13,24 @@ TEMPLATE = lib
 
 DEFINES += DISPLAYANSWER_LIBRARY
 
-SOURCES += displayanswer.cpp
+SOURCES += displayanswer.cpp \
+    answerboard.cpp
 
 HEADERS += displayanswer.h\
-        displayanswer_global.h
+        displayanswer_global.h \
+    answerboard.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+FORMS += \
+    answerboard.ui
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
+else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+
+INCLUDEPATH += $$PWD/../Polygon
+DEPENDPATH += $$PWD/../Polygon
