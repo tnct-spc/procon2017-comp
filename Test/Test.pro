@@ -14,13 +14,22 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    testpolygon.cpp
+    testpolygon.cpp \
+    testdisplayanswer.cpp
 
 HEADERS  += mainwindow.h \
-    testpolygon.h
+    testpolygon.h \
+    testdisplayanswer.h
 
 FORMS    += mainwindow.ui
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
 DEPENDPATH += $$PWD/../Polygon
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/release/ -lDisplayAnswer
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/debug/ -lDisplayAnswer
+else:unix: LIBS += -L$$OUT_PWD/../DisplayAnswer/ -lDisplayAnswer
+
+INCLUDEPATH += $$PWD/../DisplayAnswer
+DEPENDPATH += $$PWD/../DisplayAnswer
