@@ -16,6 +16,10 @@ class PolygonExpansion
     std::vector<double> sideAngle;
 public:
     PolygonExpansion();
+    polygon_t &getPolygon();
+    void setPolygon(const polygon_t &pol);
+    void calcSideLength();
+    void calcSideAngle();
 };
 
 #endif // POLYGONEXPANSION_H

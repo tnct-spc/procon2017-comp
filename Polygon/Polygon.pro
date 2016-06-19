@@ -17,10 +17,10 @@ HEADERS += \
     field.h \
     polygonexpansion.h
 
+    target.path = /usr/local/lib
+    target.extra = ldconfig
 LIBS += -lboost_system -lboost_thread
 
 unix {
-    target.path = /usr/local/lib
-    target.extra = ldconfig
     INSTALLS += target
 }

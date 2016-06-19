@@ -20,8 +20,9 @@ public:
     void setPiece(const polygon_t &piece,const int &n); //ピース多角形をセット(任意)
     void pushPiece(const polygon_t &piece); //ピース多角形をセット（末尾）
     polygon_t popPiece(); //末尾のピース多角形をpop
-    polygon_t getPiece(const int &n) const;
-    polygon_t getFlame() const;
+    const polygon_t &getPiece(const int &n) const;
+    const polygon_t &getFlame() const;
+    int pieceSize();
     void printFlame(); //コンソール
     void printPiece(); //コンソール
 };
