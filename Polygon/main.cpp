@@ -18,18 +18,14 @@ int main(int argc,char *argv[])
     polygon_t b,c,d;
     bg::exterior_ring(b) = boost::assign::list_of<point_t>(0, 0)(30, 0)(30,30)(0, 30)(0, 2)(2, 2)(2,28)(28, 28)(28, 2)(0, 2)(0,0);
     bg::exterior_ring(c) = boost::assign::list_of<point_t>(0, 0)(0,1)(1,0)(0,0);
-    Field hoge;
-    hoge.setFlame(b);
-    hoge.pushPiece(c);
-    hoge.setPiece(c,1);
-        std::cout << bg::dsv(hoge.getFlame()) << std::endl;
-        std::cout << bg::dsv(hoge.getPiece(0)) << std::endl;
-        std::cout << hoge.pieceSize() << std::endl;
-    hoge.printFlame();
-    hoge.printPiece();
-    PolygonExpansion pol;
-    pol.setPolygon(c);
-    auto s = pol.getSideAngle();
-    std::for_each(s.begin(),s.end(),[](auto n){std::cout << n << std::endl;});
+    Field f;
+    PolygonExpansion hoge,huga;
+    hoge.setPolygon(b);
+    huga.setPolygon(c);
+    f.setFlame(hoge);
+    f.pushPiece(huga);
+    f.setPiece(huga,1919);
+    f.printFlame();
+    f.printPiece();
     return a.exec();
 }

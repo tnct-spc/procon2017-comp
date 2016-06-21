@@ -15,7 +15,7 @@ class PolygonExpansion
     polygon_t polygon;
     int n; //n角形
     std::vector<double> sideLength;
-    std::vector<double> sideAngle; //未完成
+    std::vector<double> sideAngle;
     void calcSideLength();
     void calcN();
     void calcSideAngle();
