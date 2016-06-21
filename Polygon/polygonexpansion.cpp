@@ -2,8 +2,9 @@
 
 PolygonExpansion::PolygonExpansion()
 {
-    sideLength.reserve(30);
-    sideAngle.reserve(30);
+    //最大32角形
+    sideLength.reserve(32);
+    sideAngle.reserve(32);
 }
 
 polygon_t PolygonExpansion::getPolygon(){
