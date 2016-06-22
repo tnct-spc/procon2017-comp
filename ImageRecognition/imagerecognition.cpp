@@ -1,23 +1,11 @@
-#include "imagerecognition.h"
-#include "ui_imagerecognition.h"
 #include <iostream>
 #include <string>
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-
-ImageRecognition::ImageRecognition(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::ImageRecognition)
-{
-    ui->setupUi(this);
-}
-
-ImageRecognition::~ImageRecognition()
-{
-    delete ui;
-}
+#include "imagerecognition.h"
+#include "ui_imagerecognition.h"
 
 void ImageRecognition::run()
 {

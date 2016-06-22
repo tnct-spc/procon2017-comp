@@ -6,6 +6,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "field.h"
+#include "imagerecognition.h"
+
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Hazama)
@@ -28,6 +31,9 @@ void Hazama::run()
 {
     std::cout << "Run" << std::endl;
 
+    Field field;
+    ImageRecognition imrec;
+
     /*Take a picture*/
 
     //Capture
@@ -41,6 +47,7 @@ void Hazama::run()
     }
 
     /*Image Recognition*/
+    imrec.run();
 
     /*Solve puzzle*/
 

@@ -1,16 +1,36 @@
-QT += core
-QT -= gui
+#-------------------------------------------------
+#
+# Project created by QtCreator 2016-06-08T17:48:35
+#
+#-------------------------------------------------
 
-CONFIG += c++11
+QT       += widgets
+
+CONFIG += c++14
 
 TARGET = DisplayAnswer
-CONFIG += console
-CONFIG -= app_bundle
+TEMPLATE = lib
 
-TEMPLATE = app
+DEFINES += DISPLAYANSWER_LIBRARY
 
-SOURCES += main.cpp \
-    displayanswer.cpp
+SOURCES += displayanswer.cpp \
+    answerboard.cpp
 
-HEADERS += \
-    displayanswer.h
+HEADERS += displayanswer.h\
+        displayanswer_global.h \
+    answerboard.h
+
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
+}
+
+FORMS += \
+    answerboard.ui
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
+else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+
+INCLUDEPATH += $$PWD/../Polygon
+DEPENDPATH += $$PWD/../Polygon

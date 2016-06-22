@@ -1,23 +1,13 @@
 #ifndef IMAGERECOGNITION_H
 #define IMAGERECOGNITION_H
 
-#include <QMainWindow>
+#include "imagerecognition_global.h"
 
-namespace Ui {
-class ImageRecognition;
-}
-
-class ImageRecognition : public QMainWindow
+class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
-    Q_OBJECT
 
 public:
-    explicit ImageRecognition(QWidget *parent = 0);
-    ~ImageRecognition();
     void run();
-
-private:
-    Ui::ImageRecognition *ui;
 };
 
 #endif // IMAGERECOGNITION_H
