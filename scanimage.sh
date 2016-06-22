@@ -18,14 +18,14 @@
 # /usr/local/Brother/sane/setupSaneScan3 -i
 
 
-#このスクリプトが置かれている場所/image下(./image/)にファイルを保存する
+#このスクリプトが置かれている場所/CompImage下(./CompImage/)にファイルを保存する
 #$script_dir_pathが./に相当する
 #SECONDSは時間計測用．BashScriptが起動している間は毎秒1ずつ増える変数
 
 script_dir_path=$(dirname $(readlink -f $0))
 SECONDS=0
-scanimage --format=png --resolution 300 > $script_dir_path/image/dpi300test.png
+scanimage --format=png --resolution 300 > $script_dir_path/CompImage/dpi300test.png
 echo time=$SECONDS
 SECONDS=0
-scanimage --format=png --resolution 600 > $script_dir_path/image/dpi600test.png
+scanimage --format=png --resolution 600 > $script_dir_path/CompImage/dpi600test.png
 echo time=$SECONDS
