@@ -2,12 +2,22 @@
 #define IMAGERECOGNITION_H
 
 #include "imagerecognition_global.h"
+#include "polygonexpansion.h"
+#include <opencv2/core/core.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
 
 public:
     void run();
+
+private:
+    cv::Mat& Preprocessing(std::string path);
+    std::vector<cv::Vec4f>& LineDetection(cv::Mat image);
+    std::vector<PolygonExpansion>& Vectored(std::vector<cv::Vec4f> lines);
 };
 
 #endif // IMAGERECOGNITION_H
