@@ -9,7 +9,6 @@
 *.so
 *.dll
 *.dylib
-*.png
 
 # Qt-es
 
