@@ -1,18 +1,28 @@
-QT += core
-QT -= gui
+#-------------------------------------------------
+#
+# Project created by QtCreator 2016-06-08T17:49:06
+#
+#-------------------------------------------------
 
-CONFIG += c++11
+QT       -= gui
+
+CONFIG += c++14
 
 TARGET = Solver
-CONFIG += console
-CONFIG -= app_bundle
+TEMPLATE = lib
 
-TEMPLATE = app
+DEFINES += SOLVER_LIBRARY
 
-SOURCES += main.cpp \
-    algorithmwrapper.cpp \
+SOURCES += solver.cpp \
+    Algorithm/algorithmwrapper.cpp \
     Algorithm/simplealgorithm.cpp
 
-HEADERS += \
-    algorithmwrapper.h \
+HEADERS += solver.h\
+        solver_global.h \
+    Algorithm/algorithmwrapper.h \
     Algorithm/simplealgorithm.h
+
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
+}

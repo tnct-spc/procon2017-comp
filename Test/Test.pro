@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2016-05-15T00:36:30
+# Project created by QtCreator 2016-06-08T13:46:45
 #
 #-------------------------------------------------
 
@@ -8,18 +8,18 @@ QT       += core gui widgets
 
 CONFIG += c++14
 
-TARGET = Hazama
+TARGET = Test
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        hazama.cpp
+        mainwindow.cpp \
+    testpolygon.cpp
 
-HEADERS  += hazama.h
+HEADERS  += mainwindow.h \
+    testpolygon.h
 
-FORMS    += hazama.ui
-
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+FORMS    += mainwindow.ui
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon

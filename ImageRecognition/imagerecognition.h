@@ -1,9 +1,11 @@
 #ifndef IMAGERECOGNITION_H
 #define IMAGERECOGNITION_H
 
+#include "imagerecognition_global.h"
 
-class ImageRecognition
+class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
+
 public:
     ImageRecognition();
 };

@@ -1,16 +1,24 @@
-QT += core
-QT -= gui
+#-------------------------------------------------
+#
+# Project created by QtCreator 2016-06-08T17:45:38
+#
+#-------------------------------------------------
 
-CONFIG += c++11
+QT       -= gui
+
+CONFIG += c++14
 
 TARGET = ImageRecognition
-CONFIG += console
-CONFIG -= app_bundle
+TEMPLATE = lib
 
-TEMPLATE = app
+DEFINES += IMAGERECOGNITION_LIBRARY
 
-SOURCES += main.cpp \
-    imagerecognition.cpp
+SOURCES += imagerecognition.cpp
 
-HEADERS += \
-    imagerecognition.h
+HEADERS += imagerecognition.h\
+        imagerecognition_global.h
+
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
+}
