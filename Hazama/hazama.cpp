@@ -1,7 +1,8 @@
 #include "hazama.h"
 #include "ui_hazama.h"
-
+#include <unistd.h>
 #include <iostream>
+#include <string>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -34,16 +35,24 @@ void Hazama::run()
     Field field;
 
     /*Take a picture*/
+    char dir[255];
+    getcwd(dir,255);
+    std::cout<<"Current Directory : "<<dir<<std::endl;
 
     //Capture
     cv::Mat src;
+    std::string path = "./workspace/procon2016-comp/CompImage/dpi300test.png";
 
     if(WebcameraEnable){
        src = capture();
     }else{
+       int state = system("sh ./workspace/procon2016-comp/scanimage.sh");
+
+       if(state ^= 0){
+           std::cout << "faild" << std::endl;
+       }
        //if checkbox(Use Webcamera) isn`t true
-
-
+       src = cv::imread(path);
     }
 
     //Display picture
