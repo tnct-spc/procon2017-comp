@@ -15,9 +15,9 @@ public:
     void run();
 
 private:
-    cv::Mat& Preprocessing(std::string path);
-    std::vector<cv::Vec4f>& LineDetection(cv::Mat image);
-    std::vector<PolygonExpansion>& Vectored(std::vector<cv::Vec4f> lines);
+    cv::Mat Preprocessing(std::string const& path);
+    std::vector<cv::Vec4f> LineDetection(cv::Mat const& image);
+    std::vector<PolygonExpansion> Vectored(std::vector<cv::Vec4f> const& lines);
 };
 
 #endif // IMAGERECOGNITION_H
