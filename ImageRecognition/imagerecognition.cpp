@@ -32,7 +32,7 @@ cv::Mat ImageRecognition::Preprocessing(std::string const& path)
     //閾値を設定して画像を二値化
     cv::threshold(image, image, 140, 255, cv::THRESH_BINARY);
 
-    return image;
+    return std::move(image);
 }
 
 std::vector<cv::Vec4f> ImageRecognition::LineDetection(cv::Mat const& image)
@@ -52,11 +52,11 @@ std::vector<cv::Vec4f> ImageRecognition::LineDetection(cv::Mat const& image)
     lsd->drawSegments(pic, lines);
     cv::imshow("pic with LSD line", pic);
 
-    return lines;
+    return std::move(lines);
 }
 
 std::vector<PolygonExpansion> ImageRecognition::Vectored(std::vector<cv::Vec4f> const& lines)
 {
     std::vector<PolygonExpansion> polygon;
-    return polygon;
+    return std::move(polygon);
 }

@@ -23,8 +23,13 @@
 #SECONDSは時間計測用．BashScriptが起動している間は毎秒1ずつ増える変数
 
 script_dir_path=$(dirname $(readlink -f $0))
-SECONDS=0
+
+scanimage --format=png --resolution 100 > $script_dir_path/CompImage/dpi100test.png
+scanimage --format=png --resolution 200 > $script_dir_path/CompImage/dpi200test.png
 scanimage --format=png --resolution 300 > $script_dir_path/CompImage/dpi300test.png
+scanimage --format=png --resolution 400 > $script_dir_path/CompImage/dpi400test.png
+SECONDS=0
+scanimage --format=png --resolution 500 > $script_dir_path/CompImage/dpi500test.png
 echo time=$SECONDS
 SECONDS=0
 scanimage --format=png --resolution 600 > $script_dir_path/CompImage/dpi600test.png
