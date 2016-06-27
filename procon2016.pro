@@ -1,10 +1,10 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    Hazama \
-    ImageRecognition \
-    Solver \
-    DisplayAnswer \
-    ProbMaker \
     Polygon \
+    ImageRecognition \
+    DisplayAnswer \
+    Solver \
+    ProbMaker \
+    Hazama \
     Test
