@@ -41,15 +41,14 @@ void Hazama::run()
 
     //Capture
     cv::Mat src;
-    std::string path = "./workspace/procon2016-comp/CompImage/dpi300test.png";
-
+    std::string path = "./../../procon2016-comp/CompImage/dpi300test.png";
     if(WebcameraEnable){
        src = capture();
     }else{
-       int state = system("sh ./workspace/procon2016-comp/scanimage.sh");
+       int state = system("sh ./../../procon2016-comp/scanimage.sh");
 
        if(state ^= 0){
-           std::cout << "faild" << std::endl;
+           std::cout << "failed" << std::endl;
        }
        //if checkbox(Use Webcamera) isn`t true
        src = cv::imread(path);
