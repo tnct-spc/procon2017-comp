@@ -1,9 +1,11 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
+#include "polygon_global.h"
 
-class Polygon
+class POLYGONSHARED_EXPORT Polygon
 {
+
 public:
     Polygon();
 };
