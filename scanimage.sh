@@ -21,6 +21,7 @@
 #このスクリプトが置かれている場所/CompImage下(./CompImage/)にファイルを保存する
 #$script_dir_pathが./に相当する
 #SECONDSは時間計測用．BashScriptが起動している間は毎秒1ずつ増える変数
+#test
 
 script_dir_path=$(dirname $(readlink -f $0))
 
