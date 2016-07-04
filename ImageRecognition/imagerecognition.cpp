@@ -26,17 +26,20 @@ void ImageRecognition::run()
 
 cv::Mat ImageRecognition::Preprocessing(std::string const& path)
 {
-    //画像をグレースケールとして読み込み(カラーで読み込みたい)
+    //画像をカラーで読み込み
     cv::Mat image = cv::imread(path, 1);
 
     //閾値を設定して画像を二値化
     //cv::threshold(image, image, 140, 255, cv::THRESH_BINARY);
 
-    //H:0-45/180, S:45-180/255, B:40-230/255
-    colorExtraction(&image, &image, CV_BGR2HSV, 0, 45, 50, 180, 40, 230);
+    //H:0-45/180, S:20-180/255, B:20-230/255
+    colorExtraction(&image, &image, CV_BGR2HSV, 0, 45, 20, 180, 20, 230);
 
     //グレースケールに変換
     cvtColor(image,image,CV_RGB2GRAY);
+
+    //しきい値を設定して二値化
+    cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV|cv::THRESH_OTSU);
 
     return std::move(image);
 }
