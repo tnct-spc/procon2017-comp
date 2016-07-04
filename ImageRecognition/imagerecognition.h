@@ -18,6 +18,12 @@ private:
     cv::Mat Preprocessing(std::string const& path);
     std::vector<cv::Vec4f> LineDetection(cv::Mat const& image);
     std::vector<PolygonExpansion> Vectored(std::vector<cv::Vec4f> const& lines);
+    void colorExtraction(cv::Mat* src, cv::Mat* dst,
+        int code,
+        int ch1Lower, int ch1Upper,
+        int ch2Lower, int ch2Upper,
+        int ch3Lower, int ch3Upper
+        );
 };
 
 #endif // IMAGERECOGNITION_H
