@@ -4,13 +4,15 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/photo/photo.hpp>
+#include <opencv2/photo.hpp>
 #include "polygon.h"
 #include "imagerecognition.h"
 //#include "ui_imagerecognition.h"
 
 void ImageRecognition::run()
 {
-    std::string path = "./../../procon2016-comp/picture/scan-sample.png";
+    std::string path = "./../../procon2016-comp/picture/camera-sample.JPEG";
 
     //前処理
     cv::Mat image = Preprocessing(path);
@@ -37,6 +39,9 @@ cv::Mat ImageRecognition::Preprocessing(std::string const& path)
 
     //グレースケールに変換
     cvtColor(image,image,CV_RGB2GRAY);
+
+    //画像のノイズ除去
+    cv::fastNlMeansDenoisingColored(image, image);
 
     //しきい値を設定して二値化
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV|cv::THRESH_OTSU);
