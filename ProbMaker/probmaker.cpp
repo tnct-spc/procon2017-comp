@@ -1,13 +1,13 @@
 #include "probmaker.h"
 #include "ui_probmaker.h"
 
-#include <QPainter>
+#include <math.h>
 #include <iostream>
 #include <random>
 #include <vector>
 #include <memory>
 #include <algorithm>
-#include <math.h>
+#include <QPainter>
 
 ProbMaker::ProbMaker(QWidget *parent) :
     QMainWindow(parent),
@@ -34,14 +34,6 @@ void ProbMaker::pushFlame()
     std::shared_ptr<Line> lineBC = std::make_shared<Line>(dotB, dotC);
     std::shared_ptr<Line> lineCD = std::make_shared<Line>(dotC, dotD);
     std::shared_ptr<Line> lineDA = std::make_shared<Line>(dotD, dotA);
-    dots.push_back(dotA);
-    dots.push_back(dotB);
-    dots.push_back(dotC);
-    dots.push_back(dotD);
-    lines.push_back(lineAB);
-    lines.push_back(lineBC);
-    lines.push_back(lineCD);
-    lines.push_back(lineDA);
     dotA->connectedLines.push_back(lineAB);
     dotA->connectedLines.push_back(lineDA);
     dotB->connectedLines.push_back(lineBC);
@@ -50,42 +42,62 @@ void ProbMaker::pushFlame()
     dotC->connectedLines.push_back(lineBC);
     dotD->connectedLines.push_back(lineDA);
     dotD->connectedLines.push_back(lineCD);
-
-    for(std::list<std::shared_ptr<Line>>::iterator it = lines.begin();it!=lines.end();it++){
-        can_connection_line_sum += (*it)->can_connection_line_length;
-    }
-    line_piece_start = 4;
+    dots.push_back(dotA);
+    dots.push_back(dotB);
+    dots.push_back(dotC);
+    dots.push_back(dotD);
+    lines.push_back(lineAB);
+    lines.push_back(lineBC);
+    lines.push_back(lineCD);
+    lines.push_back(lineDA);
 }
 
-std::shared_ptr<Dot> ProbMaker::pickRandomDot(std::list<std::shared_ptr<Line>>::iterator &line_pos)
+std::shared_ptr<Dot> ProbMaker::pickRandomDotAtAll(std::shared_ptr<Line> &line_pos)
 {
     std::random_device rd;
     std::uniform_real_distribution<double> rand(0.0,1.0);
 
-    //Select random point on lines
-    double seek = can_connection_line_sum * rand(rd);
+    //Select random point of dot on lines
+    double sum_can_connection_line_length = 0.0;
+    for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
+        sum_can_connection_line_length += (*line_itr)->can_connection_line_length;
+    }
+    double seek = sum_can_connection_line_length * rand(rd);
     auto lines_it = lines.begin();
     while(seek >= 0.0){
         seek -= (*lines_it)->can_connection_line_length;
         lines_it++;
     }
     lines_it--;
-    line_pos = lines_it;
+    line_pos = *lines_it;
     seek += (*lines_it)->can_connection_line_length + 15;
     double dotX = seek * cos((*lines_it)->angle) + (*lines_it)->dot1->x;
     double dotY = seek * sin((*lines_it)->angle) + (*lines_it)->dot1->y;
     return std::make_shared<Dot>(dotX, dotY);
 }
 
-void ProbMaker::Check()
+std::shared_ptr<Dot> ProbMaker::pickRandomDotOnRing(const std::vector<std::shared_ptr<Line>> lines, std::shared_ptr<Line> &line_pos)
 {
-    std::cout<<"Check"<<std::endl;
-    auto begin = lines.begin();
-    auto end = lines.end();
-    for(auto it = begin; it != end; it++){
-        std::cout<<"("<<(*it)->dot1->x<<","<<(*it)->dot1->y<<")"<<
-                   "("<<(*it)->dot2->x<<","<<(*it)->dot2->y<<")"<<std::endl;
+    std::random_device rd;
+    std::uniform_real_distribution<double> rand(0.0,1.0);
+
+    //Select random point of dot on lines
+    double sum_can_connection_line_length = 0.0;
+    for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
+        sum_can_connection_line_length += (*line_itr)->can_connection_line_length;
     }
+    double seek = sum_can_connection_line_length * rand(rd);
+    auto lines_it = lines.begin();
+    while(seek >= 0.0){
+        seek -= (*lines_it)->can_connection_line_length;
+        lines_it++;
+    }
+    lines_it--;
+    line_pos = *lines_it;
+    seek += (*lines_it)->can_connection_line_length + 15;
+    double dotX = seek * cos((*lines_it)->angle) + (*lines_it)->dot1->x;
+    double dotY = seek * sin((*lines_it)->angle) + (*lines_it)->dot1->y;
+    return std::make_shared<Dot>(dotX, dotY);
 }
 
 bool ProbMaker::isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2)
@@ -107,9 +119,7 @@ bool ProbMaker::isValid(const std::shared_ptr<Line> &newL, double startL_angle, 
     if((*newL).length < 15.0) return false;
 
     //Cross check
-    auto begin = lines.begin();
-    auto end = lines.end();
-    for(auto it = begin; it != end; it++){
+    for(auto it = lines.begin(), end = lines.end(); it != end; it++){
         if(isCross((*it), newL)) return false;
     }
 
@@ -131,8 +141,6 @@ bool ProbMaker::isValid(const std::shared_ptr<Line> &newL, double startL_angle, 
     double relative_endL_angle = normalized_endL_angle - normalized_newL_angle;
     if(relative_startL_angle < 0.0) relative_startL_angle += M_PI;
     if(relative_endL_angle < 0.0) relative_endL_angle += M_PI;
-
-    //std::cout << (M_PI - accept_angle) << " : " << accept_angle << " : " << relative_startL_angle << std::endl;
     if((M_PI - accept_angle) < relative_startL_angle || relative_startL_angle < accept_angle) return false;
     if((M_PI - accept_angle) < relative_endL_angle || relative_endL_angle < accept_angle) return false;
 
@@ -141,22 +149,11 @@ bool ProbMaker::isValid(const std::shared_ptr<Line> &newL, double startL_angle, 
 
 void ProbMaker::run()
 {
-/*
-    Dot* ue = new Dot(500,200);
-    Dot* sita = new Dot(300,600);
-    Dot* hidari = new Dot(200,300);
-    Dot* migi = new Dot(600,500);
-    lines.push_back(Line(ue,sita));
-    lines.push_back(Line(hidari,migi));
-    std::cout << isCross(lines[0],lines[1])<<std::endl;
-*/
     //Push flame
     pushFlame();
 
     /*
-    for(int i=0;i<40;i++){
-        addNewLine();
-    }
+    for(int i=0;i<40;i++) addNewLine();
     makePolygon();
     this->update();
     */
@@ -164,64 +161,124 @@ void ProbMaker::run()
 
 void ProbMaker::addNewLine()
 {
-    std::shared_ptr<Dot> dot1;
-    std::shared_ptr<Dot> dot2;
+    std::shared_ptr<Dot> start_dot;
+    std::shared_ptr<Dot> end_dot;
     std::shared_ptr<Line> new_line;
     std::shared_ptr<Line> start_line;
     std::shared_ptr<Line> end_line;
-    std::list<std::shared_ptr<Line>>::iterator start_line_it;
-    std::list<std::shared_ptr<Line>>::iterator end_line_it;
 
+    //始点と終点を決める
     while(true){
-        dot1 = pickRandomDot(start_line_it);
-        /*
-        static int count=0;
-        std::cout<<count << ", d1=("<<d1->x<<","<<d1->y<<")"<<std::endl;
-        count++;
-        */
+		//始点の決定
+        start_dot = pickRandomDotAtAll(start_line);
+
         //TODO: gutyoku
         for(int i=0;i<10000;i++){
-            dot2 = pickRandomDot(end_line_it);
-            bool hoge = isValid(std::make_shared<Line>(dot1,dot2), (*start_line_it)->angle, (*end_line_it)->angle);
-            if(hoge) goto finishSelectLine;
+            end_dot = pickRandomDotAtAll(end_line);
+            std::shared_ptr<Line> bl = std::make_shared<Line>(start_dot, end_dot);
+            double a1 = start_line->angle;
+            double a2 = end_line->angle;
+            if(isValid(bl , a1,a2)) goto finishSelectLine;
         }
+
+        /*
+		//終点の決定
+		//Reset Line Reference
+        for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
+			(*line_itr)->referenced_from_dot1 = false;
+			(*line_itr)->referenced_from_dot2 = false;
+		}
+        auto findNextLine = [&](std::vector<std::shared_ptr<Line>> &lines, std::shared_ptr<Line> &line){
+            int size = lines.size();
+            int i;
+            for(i=0;i<size;i++){
+                if(lines.at(i) == line) break;
+            }
+            i++;
+            if(i==size) i=0;
+            return lines.at(i);
+        };
+		//Search
+        auto Search = [&](std::shared_ptr<Dot> start_dot_){
+            start_dot = start_dot_;
+            for (auto line_itr = start_dot->connectedLines.begin(),end = start_dot->connectedLines.end(); line_itr != end; ++line_itr){
+                //Search Ring started by start_dot
+                if (((*line_itr)->dot1 == start_dot && ((*line_itr)->referenced_from_dot1)) ||
+                    ((*line_itr)->dot2 == start_dot && ((*line_itr)->referenced_from_dot2))) continue;
+                //mine
+                std::shared_ptr<Dot> mine_dot = start_dot;
+                std::shared_ptr<Line> mine_line = *line_itr;
+                std::vector<std::shared_ptr<Line>> mine_lines;
+                do{
+                    mine_lines.push_back(mine_line);
+                    if (mine_line->dot1 == mine_dot){
+                        mine_line->referenced_from_dot1 = true;
+                        mine_dot = mine_line->dot2;
+                    }
+                    else{
+                        mine_line->referenced_from_dot2 = true;
+                        mine_dot = mine_line->dot1;
+                    }
+                    mine_line = findNextLine(mine_dot->connectedLines, mine_line);
+                } while (mine_dot != start_dot);
+                //if can make line, make.
+                end_dot = pickRandomDotOnRing(mine_lines, end_line);
+                bool can_make_line = isValid(std::make_shared<Line>(start_dot,end_dot), start_line->angle, end_line->angle);
+                if(can_make_line) return 1;
+            }
+            return 0;
+        };
+        if(Search(start_line->dot1)) break;
+        if(Search(start_line->dot2)) break;
+        */
     }
     finishSelectLine:
-    new_line = std::make_shared<Line>(dot1,dot2);
-    newLine = new_line;
-    start_line = *start_line_it;
-    end_line = *end_line_it;
+    new_line = std::make_shared<Line>(start_dot,end_dot);
+    latest_line = new_line;
 
     //regist dot and line
-    dots.push_back(dot1);
-    dots.push_back(dot2);
-    std::shared_ptr<Line> divided_start_line_1 = std::make_shared<Line>((*start_line_it)->dot1, dot1);
-    std::shared_ptr<Line> divided_start_line_2 = std::make_shared<Line>(dot1, (*start_line_it)->dot2);
-    std::shared_ptr<Line> divided_end_line_1 = std::make_shared<Line>((*end_line_it)->dot1, dot2);
-    std::shared_ptr<Line> divided_end_line_2 = std::make_shared<Line>(dot2, (*end_line_it)->dot2);
+    dots.push_back(start_dot);
+    dots.push_back(end_dot);
     lines.push_back(new_line);
+    std::shared_ptr<Line> divided_start_line_1 = std::make_shared<Line>(start_line->dot1, start_dot);
+    std::shared_ptr<Line> divided_start_line_2 = std::make_shared<Line>(start_dot, start_line->dot2);
+    std::shared_ptr<Line> divided_end_line_1 = std::make_shared<Line>(end_line->dot1, end_dot);
+    std::shared_ptr<Line> divided_end_line_2 = std::make_shared<Line>(end_dot, end_line->dot2);
 
     //refresh dots
-
-    //newLineDot
-    dot1->connectedLines.push_back(new_line);
-    dot1->connectedLines.push_back(divided_start_line_1);
-    dot1->connectedLines.push_back(divided_start_line_2);
-    dot2->connectedLines.push_back(new_line);
-    dot2->connectedLines.push_back(divided_end_line_1);
-    dot2->connectedLines.push_back(divided_end_line_2);
+    //newlineDot
+    start_dot->connectedLines.push_back(new_line);
+    start_dot->connectedLines.push_back(divided_start_line_1);
+    start_dot->connectedLines.push_back(divided_start_line_2);
+    end_dot->connectedLines.push_back(new_line);
+    end_dot->connectedLines.push_back(divided_end_line_1);
+    end_dot->connectedLines.push_back(divided_end_line_2);
     //start line dots
-    (*start_line_it)->dot1->removeConnectedLine(start_line);
-    (*start_line_it)->dot1->connectedLines.push_back(divided_start_line_1);
-    (*start_line_it)->dot2->removeConnectedLine(start_line);
-    (*start_line_it)->dot2->connectedLines.push_back(divided_start_line_2);
+    start_line->dot1->removeConnectedLine(start_line);
+    start_line->dot1->connectedLines.push_back(divided_start_line_1);
+    start_line->dot2->removeConnectedLine(start_line);
+    start_line->dot2->connectedLines.push_back(divided_start_line_2);
     //end line dots
-    (*end_line_it)->dot1->removeConnectedLine(end_line);
-    (*end_line_it)->dot1->connectedLines.push_back(divided_end_line_1);
-    (*end_line_it)->dot2->removeConnectedLine(end_line);
-    (*end_line_it)->dot2->connectedLines.push_back(divided_end_line_2);
+    end_line->dot1->removeConnectedLine(end_line);
+    end_line->dot1->connectedLines.push_back(divided_end_line_1);
+    end_line->dot2->removeConnectedLine(end_line);
+    end_line->dot2->connectedLines.push_back(divided_end_line_2);
 
     //refresh lines
+    std::list<std::shared_ptr<Line>>::iterator start_line_it;
+    for(auto i=lines.begin(),end=lines.end();i!=end;++i){
+        if(*i == start_line){
+            start_line_it = i;
+            break;
+        }
+    }
+    std::list<std::shared_ptr<Line>>::iterator end_line_it;
+    for(auto i=lines.begin(),end=lines.end();i!=end;++i){
+        if(*i == end_line){
+            end_line_it = i;
+            break;
+        }
+    }
     lines.erase(start_line_it);
     lines.push_back(divided_start_line_1);
     lines.push_back(divided_start_line_2);
@@ -271,6 +328,12 @@ void ProbMaker::makePolygon()
             return  a1 > a2;
         });
     }
+
+	//Reset Line Reference
+    for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
+		(*line_itr)->referenced_from_dot1 = false;
+		(*line_itr)->referenced_from_dot2 = false;
+	}
 
     //Search
     for(int dots_cnt=0; dots_cnt < dots_size; dots_cnt++){
@@ -329,16 +392,14 @@ void ProbMaker::paintEvent(QPaintEvent *)
     };
 
     //Draw dot and line
-    auto begin = lines.begin();
-    auto end = lines.end();
-    for(auto it = begin; it != end; it++){
+    for(auto it = lines.begin(), end = lines.end(); it != end; it++){
         drawLine(*it);
     }
     if(lines.size()-1>=5){
         painter.setPen(QPen(Qt::red, 1));
-        drawLine(newLine);
+        drawLine(latest_line);
         painter.setPen(QPen(Qt::red, 5));
-        drawDot(newLine->dot1);
+        drawDot(latest_line->dot1);
     }
 
     //激やばテストコード

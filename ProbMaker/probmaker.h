@@ -1,11 +1,12 @@
 #ifndef PROBMAKER_H
 #define PROBMAKER_H
 
-#include <QMainWindow>
 #include <random>
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <QMainWindow>
+
 
 //prototype
 class Dot;
@@ -59,12 +60,11 @@ public:
         double lineX = dot2->x - dot1->x;
         double lineY = dot2->y - dot1->y;
         const_cast<double&>(length) = sqrt(lineX * lineX + lineY * lineY);
-        const_cast<double&>(can_connection_line_length) = length - 30;
-        if(can_connection_line_length < 0) const_cast<double&>(can_connection_line_length) = 0;
+        const_cast<double&>(can_connection_line_length) = length-30 < 0 ? 0 : length-30;//5mm * 3pixcel * left-right
         const_cast<double&>(angle) = atan2(lineY,lineX);
         const_cast<double&>(a) = lineY/lineX;
-        const std::shared_ptr<Dot> &dot = dot2->x - dot1->x > 0 ? dot1:dot2;
-        const_cast<double&>(b) = dot->y - a * dot->x;
+        const std::shared_ptr<Dot> &dot_buf = dot2->x - dot1->x > 0 ? dot1:dot2;
+        const_cast<double&>(b) = dot_buf->y - a * dot_buf->x;
     }
     //多角形生成時
     bool referenced_from_dot1 = false;
@@ -82,26 +82,31 @@ class ProbMaker : public QMainWindow
 private:
     Ui::ProbMaker *ui;
 
-public:
+    typedef std::vector<Point> polygon_t;
+
     std::vector<std::shared_ptr<Dot>> dots;
     std::list<std::shared_ptr<Line>> lines;
-    double can_connection_line_sum = 0.0;
-    int line_piece_start = 0;
-    int testCount = -1;
-    std::shared_ptr<Line> newLine;
-    typedef std::vector<Point> polygon_t;
     std::vector<polygon_t> Polygons;
+
+    std::shared_ptr<Line> latest_line;
+
+    void addNewLine();
+    void pushFlame();
+    std::shared_ptr<Dot> pickRandomDotAtAll(std::shared_ptr<Line> &line_pos);
+    std::shared_ptr<Dot> pickRandomDotOnRing(const std::vector<std::shared_ptr<Line>> lines,std::shared_ptr<Line> &line_pos);
+    bool isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2);
+    bool isValid(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle);
+    void makePolygon();
+public:
+
 
     explicit ProbMaker(QWidget *parent = 0);
     ~ProbMaker();
     void run();
-    void addNewLine();
-    void pushFlame();
-    std::shared_ptr<Dot> pickRandomDot(std::list<std::shared_ptr<Line>>::iterator &line_pos);
-    void Check();
-    bool isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2);
-    bool isValid(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle);
-    void makePolygon();
+
+
+    //test code
+    int testCount = -1;
 private slots:
     void clickStepButton();
     void clickTestButton();
