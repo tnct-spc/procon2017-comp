@@ -302,6 +302,7 @@ void ProbMaker::clickTestButton()
 
 void ProbMaker::makePolygon()
 {
+    Polygons.clear();
     int dots_size = dots.size();
     /*
     for(int dots_cnt=0; dots_cnt < dots_size; dots_cnt++){
@@ -357,17 +358,18 @@ void ProbMaker::makePolygon()
             if((line->dot1 == dot && (line->referenced_from_dot1)) ||
                (line->dot2 == dot && (line->referenced_from_dot2))) continue;
             //mine
-            polygon_t polygon;
+            std::vector<struct polygon> polygon;
             std::shared_ptr<Dot> start_dot = dot;
             std::shared_ptr<Dot> mine_dot = dot;
             std::shared_ptr<Line> mine_line = line;
             do{
-                polygon.push_back(Point(mine_dot->x,mine_dot->y));
                 if(mine_line->dot1 == mine_dot){
                     mine_line->referenced_from_dot1 = true;
+                    polygon.push_back({mine_line,mine_dot,mine_line->dot2});
                     mine_dot = mine_line->dot2;
                 }else{
                     mine_line->referenced_from_dot2 = true;
+                    polygon.push_back({mine_line,mine_dot,mine_line->dot1});
                     mine_dot = mine_line->dot1;
                 }
                 mine_line = findNextLine(mine_dot->connectedLines, mine_line);
@@ -403,12 +405,12 @@ void ProbMaker::paintEvent(QPaintEvent *)
     }
 
     //激やばテストコード
-    if(testCount != -1){
+    if(testCount > -1){
         painter.setPen(QPen(Qt::red, 15));
         int num = Polygons.at(testCount).size();
         for(int i=0;i<num;i++){
-            drawLine(std::make_shared<Line>(std::make_shared<Dot>(Polygons.at(testCount).at(i).x, Polygons.at(testCount).at(i).y),
-                                            std::make_shared<Dot>(Polygons.at(testCount).at(i-1<0?num-1:i-1).x, Polygons.at(testCount).at(i-1<0?num-1:i-1).y)));
+            drawLine(std::make_shared<Line>(std::make_shared<Dot>(Polygons.at(testCount).at(i).s_dot->x, Polygons.at(testCount).at(i).s_dot->y),
+                                            std::make_shared<Dot>(Polygons.at(testCount).at(i-1<0?num-1:i-1).s_dot->x, Polygons.at(testCount).at(i-1<0?num-1:i-1).s_dot->y)));
         }
     }
 }

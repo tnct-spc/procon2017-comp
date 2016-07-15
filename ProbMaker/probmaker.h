@@ -82,11 +82,16 @@ class ProbMaker : public QMainWindow
 private:
     Ui::ProbMaker *ui;
 
-    typedef std::vector<Point> polygon_t;
-
     std::vector<std::shared_ptr<Dot>> dots;
     std::list<std::shared_ptr<Line>> lines;
-    std::vector<polygon_t> Polygons;
+
+    struct polygon{
+        std::shared_ptr<Line> line;
+        std::shared_ptr<Dot> s_dot;
+        std::shared_ptr<Dot> e_dot;
+    };
+
+    std::vector<std::vector<struct polygon>> Polygons;
 
     std::shared_ptr<Line> latest_line;
 
