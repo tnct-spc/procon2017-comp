@@ -7,6 +7,8 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <functional>
+
 #include <QPainter>
 
 ProbMaker::ProbMaker(QWidget *parent) :
@@ -297,9 +299,142 @@ void ProbMaker::clickStepButton()
 
 void ProbMaker::clickTestButton()
 {
-    if(testCount==-1) makePolygon();
+    if(testCount==-2){
+        makePolygon();
+        eraseMinPolygon();
+    }
+    if(testCount==-1){
+        makePolygon();
+    }
     testCount++;
     this->update();
+}
+
+void ProbMaker::eraseMinPolygon()
+{
+    bool eraseFlag;
+    do{
+        eraseFlag = false;
+        for(auto polygons_it = Polygons.begin(),end = Polygons.end(); polygons_it < end; ++polygons_it){
+            std::vector<struct polygon>& Polygon = *polygons_it;
+
+            //[内包判定]
+            auto includeCheck = [&](std::shared_ptr<Dot> dot){
+                int cross_cnt = 0;
+                //点からrandomDotに線を生成(ランダムでないと角っこにぶつかってしまいご判定？)
+                std::random_device rd;
+                std::uniform_real_distribution<double> rand(0.0,1.0);
+                std::shared_ptr<Dot> zero_dot = std::make_shared<Dot>(-5+rand(rd),-5+rand(rd));
+                std::shared_ptr<Line> line = std::make_shared<Line>(zero_dot,dot);
+                //線と多角形との交差判定をカウント
+                for(int i=0;i<(int)Polygon.size();++i){
+                    if(isCross(line, Polygon.at(i).line)) cross_cnt++;
+                }
+                //奇数なら内包-true
+                return cross_cnt%2 == 1 ? true : false;
+            };
+
+            //座標の最大最小xyを取得
+            double minX=900,minY=900,maxX=0,maxY=0;
+            for(auto dot_it = Polygon.begin(), end = Polygon.end(); dot_it < end; ++dot_it){
+                if((*dot_it).s_dot->x < minX) minX = (*dot_it).s_dot->x;
+                if((*dot_it).s_dot->x > maxX) maxX = (*dot_it).s_dot->x;
+                if((*dot_it).s_dot->y < minY) minY = (*dot_it).s_dot->y;
+                if((*dot_it).s_dot->y > maxY) maxY = (*dot_it).s_dot->y;
+            }
+            //forで確認する正方形の始点を設定
+            for(double x = minX; (x+30) < maxX; x += 5){
+                for(double y = minY; (y+30) < maxY; y += 5){
+                    //正方形の点を生成
+                    std::array<std::shared_ptr<Dot>, 4> square_dot;
+                    square_dot[0] = std::make_shared<Dot>(x   ,y   );
+                    square_dot[1] = std::make_shared<Dot>(x   ,y+30);
+                    square_dot[2] = std::make_shared<Dot>(x+30,y+30);
+                    square_dot[3] = std::make_shared<Dot>(x+30,y   );
+                    //正方形の点と多角形の[内包判定]
+                    if(
+                    includeCheck(square_dot[0]) &&
+                    includeCheck(square_dot[1]) &&
+                    includeCheck(square_dot[2]) &&
+                    includeCheck(square_dot[3])
+                    ){
+                        //正方形の線を生成
+                        std::array<std::shared_ptr<Line>, 4> square_line;
+                        square_line[0] = std::make_shared<Line>(square_dot[0],square_dot[1]);
+                        square_line[1] = std::make_shared<Line>(square_dot[1],square_dot[2]);
+                        square_line[2] = std::make_shared<Line>(square_dot[2],square_dot[3]);
+                        square_line[3] = std::make_shared<Line>(square_dot[3],square_dot[0]);
+                        //正方形の線と多角形の[交差判定]
+                        for(int i=0;i<4;++i){
+                            for(int j=0;j<(int)Polygon.size();++j){
+                                if(isCross(square_line[i], Polygon[j].line)) goto FaildSquare;
+                            }
+                        }
+                        //true
+                        goto NextPolygon;
+                        //false
+                        FaildSquare:;
+                    }
+                }
+            }
+            //正方形を含むことができなかったので、線をひとつ消す
+            {
+                eraseFlag = true;
+
+                auto eraseLine = [&](std::shared_ptr<Line> line){
+                    for(auto i=lines.begin(),end=lines.end();i!=end;++i){
+                        if(*i == line){
+                            lines.erase(i);
+                            break;
+                        }
+                    }
+                };
+
+                auto eraseDot = [&](std::shared_ptr<Dot> dot){
+                    for(auto i=dots.begin(),end=dots.end();i!=end;++i){
+                        if(*i == dot){
+                            dots.erase(i);
+                            break;
+                        }
+                    }
+                };
+
+                //点に繋がってる線が一つだけなら再帰的に削除
+                std::function<void(std::shared_ptr<Dot> dot)> eraseStick = [&](std::shared_ptr<Dot> dot){
+                    if(dot->connectedLines.size() == 1){
+                        std::shared_ptr<Line> connectedLine = dot->connectedLines.at(0);
+                        std::shared_ptr<Dot> connectedDot = connectedLine->dot1 == dot ? connectedLine->dot2 : connectedLine->dot1;
+                        //Erase
+                        eraseDot(dot);
+                        connectedDot->removeConnectedLine(connectedLine);
+                        eraseLine(connectedLine);
+                        //Next
+                        eraseStick(connectedDot);
+                    }
+                };
+
+                int size = Polygon.size();
+                std::random_device rd;
+                std::uniform_real_distribution<double> rand(0.0,1.0);
+                int seek = size * rand(rd);
+                struct polygon& erasedLine = Polygon.at(seek);
+                erasedLine.s_dot->removeConnectedLine(erasedLine.line);
+                erasedLine.e_dot->removeConnectedLine(erasedLine.line);
+                eraseLine(erasedLine.line);
+                //棒になってしまったら削除
+                eraseStick(erasedLine.s_dot);
+                if(erasedLine.e_dot->connectedLines.size()==0){
+                    eraseDot(erasedLine.e_dot);
+                }else{
+                    eraseStick(erasedLine.e_dot);
+                }
+            }
+
+            NextPolygon:;
+        }
+        //作りなおす
+        makePolygon();
+    }while(eraseFlag==true);
 }
 
 void ProbMaker::makePolygon()

@@ -102,6 +102,7 @@ private:
     bool isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2);
     bool isValid(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle);
     void makePolygon();
+    void eraseMinPolygon();
 public:
 
 
@@ -111,7 +112,7 @@ public:
 
 
     //test code
-    int testCount = -1;
+    int testCount = -2;
 private slots:
     void clickStepButton();
     void clickTestButton();
