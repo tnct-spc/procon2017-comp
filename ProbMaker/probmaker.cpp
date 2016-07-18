@@ -25,11 +25,14 @@ ProbMaker::~ProbMaker()
 
 void ProbMaker::pushFlame()
 {
+    std::random_device rd;
+    std::uniform_real_distribution<double> rand(0.0,1.0);
+
     //This is normal square flame
-    std::shared_ptr<Dot> dotA = std::make_shared<Dot>(0,0);
-    std::shared_ptr<Dot> dotB = std::make_shared<Dot>(0,900);
-    std::shared_ptr<Dot> dotC = std::make_shared<Dot>(900,900);
-    std::shared_ptr<Dot> dotD = std::make_shared<Dot>(900,0);
+    std::shared_ptr<Dot> dotA = std::make_shared<Dot>(rand(rd),rand(rd));
+    std::shared_ptr<Dot> dotB = std::make_shared<Dot>(rand(rd),900+rand(rd));
+    std::shared_ptr<Dot> dotC = std::make_shared<Dot>(900+rand(rd),900+rand(rd));
+    std::shared_ptr<Dot> dotD = std::make_shared<Dot>(900+rand(rd),rand(rd));
     std::shared_ptr<Line> lineAB = std::make_shared<Line>(dotA, dotB);
     std::shared_ptr<Line> lineBC = std::make_shared<Line>(dotB, dotC);
     std::shared_ptr<Line> lineCD = std::make_shared<Line>(dotC, dotD);
@@ -103,13 +106,13 @@ std::shared_ptr<Dot> ProbMaker::pickRandomDotOnRing(const std::vector<std::share
 bool ProbMaker::isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2)
 {
     //Get cross point x
-    double cross_pointX = std::abs(((*line2).b - (*line1).b)/((*line2).a - (*line1).a));
+    double cross_pointX = ((*line2).b - (*line1).b)/((*line1).a - (*line2).a);
 
     //Include check
-    bool is_cross = ((*line1).dot1->x < cross_pointX ? (*line1).dot1->x : (*line1).dot2->x) <= cross_pointX &&
-            cross_pointX <= ((*line1).dot1->x < cross_pointX ? (*line1).dot2->x : (*line1).dot1->x) &&
-            ((*line2).dot1->x < cross_pointX ? (*line2).dot1->x : (*line2).dot2->x) <= cross_pointX &&
-            cross_pointX <= ((*line2).dot1->x < cross_pointX ? (*line2).dot2->x : (*line2).dot1->x);
+    bool is_cross = ((*line1).dot1->x < cross_pointX ? (*line1).dot1->x : (*line1).dot2->x) < cross_pointX &&
+            cross_pointX < ((*line1).dot1->x < cross_pointX ? (*line1).dot2->x : (*line1).dot1->x) &&
+            ((*line2).dot1->x < cross_pointX ? (*line2).dot1->x : (*line2).dot2->x) < cross_pointX &&
+            cross_pointX < ((*line2).dot1->x < cross_pointX ? (*line2).dot2->x : (*line2).dot1->x);
     return is_cross;
 }
 
@@ -124,10 +127,9 @@ bool ProbMaker::isValid(const std::shared_ptr<Line> &newL, double startL_angle, 
     }
 
     auto NormAngle = [&](double angle){
-        double result = angle;
-        if(angle < 0.0) result += 2 * M_PI;
-        if(angle > M_PI) result -= M_PI;
-        return result;
+        while(angle < 0.0) angle += M_PI;
+        while(angle > M_PI) angle -= M_PI;
+        return angle;
     };
 
     double normalized_newL_angle = NormAngle((*newL).angle);
