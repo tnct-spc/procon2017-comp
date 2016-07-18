@@ -10,7 +10,7 @@ class DISPLAYANSWERSHARED_EXPORT DisplayAnswer
 
 public:
     DisplayAnswer();
-    AnswerBoard board;
+    std::shared_ptr<AnswerBoard> board;
     void setField(Field& field);
 private:
     Field field;

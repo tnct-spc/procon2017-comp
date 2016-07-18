@@ -39,20 +39,20 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     };
 
     //drawField
-    polygon_t flame = field.getFlame();
-    std::vector<polygon_t> pieces;
-    pieces.push_back(field.getPiece(0));
+    polygon_t raw_flame = field.getFlame().getPolygon();
+    std::vector<polygon_t> raw_pieces;
+    raw_pieces.push_back(field.getPiece(0).getPolygon());
     //flame
-    int flame_size = flame.outer().size();
+    int flame_size = raw_flame.outer().size();
     for(int i=0;i<flame_size;i++){
-        drawLine(flame.outer()[i].x(), flame.outer()[i].y(), flame.outer()[(i+1)%flame_size].x(), flame.outer()[(i+1)%flame_size].y());
+        drawLine(raw_flame.outer()[i].x(), raw_flame.outer()[i].y(), raw_flame.outer()[(i+1)%flame_size].x(), raw_flame.outer()[(i+1)%flame_size].y());
     }
     //piece
     int pieces_size = 1;
     for(int i=0;i<pieces_size;i++){
-        int piece_size = pieces[i].outer().size();
+        int piece_size = raw_pieces[i].outer().size();
         for(int j=0;j<piece_size;j++){
-            drawLine(pieces[i].outer()[j].x(), pieces[i].outer()[j].y(), pieces[i].outer()[(j+1)%flame_size].x(), pieces[i].outer()[(j+1)%flame_size].y());
+            drawLine(raw_pieces[i].outer()[j].x(), raw_pieces[i].outer()[j].y(), raw_pieces[i].outer()[(j+1)%flame_size].x(), raw_pieces[i].outer()[(j+1)%flame_size].y());
         }
     }
 
