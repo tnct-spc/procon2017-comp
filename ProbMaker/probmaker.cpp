@@ -31,10 +31,10 @@ void ProbMaker::pushFlame()
     std::uniform_real_distribution<double> rand(0.0,1.0);
 
     //This is normal square flame
-    std::shared_ptr<Dot> dotA = std::make_shared<Dot>(rand(rd),rand(rd));
-    std::shared_ptr<Dot> dotB = std::make_shared<Dot>(rand(rd),900+rand(rd));
-    std::shared_ptr<Dot> dotC = std::make_shared<Dot>(900+rand(rd),900+rand(rd));
-    std::shared_ptr<Dot> dotD = std::make_shared<Dot>(900+rand(rd),rand(rd));
+    std::shared_ptr<Dot> dotA = std::make_shared<Dot>(60+30*rand(rd),60+30*rand(rd));
+    std::shared_ptr<Dot> dotB = std::make_shared<Dot>(60+30*rand(rd),900-(60+30*rand(rd)));
+    std::shared_ptr<Dot> dotC = std::make_shared<Dot>(900-(60+30*rand(rd)),900-(60+30*rand(rd)));
+    std::shared_ptr<Dot> dotD = std::make_shared<Dot>(900-(60+30*rand(rd)),(60+30*rand(rd)));
     std::shared_ptr<Line> lineAB = std::make_shared<Line>(dotA, dotB);
     std::shared_ptr<Line> lineBC = std::make_shared<Line>(dotB, dotC);
     std::shared_ptr<Line> lineCD = std::make_shared<Line>(dotC, dotD);
