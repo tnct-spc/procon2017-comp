@@ -19,8 +19,6 @@ ProbMaker::ProbMaker(QWidget *parent) :
     ui(new Ui::ProbMaker)
 {
     ui->setupUi(this);
-    connect(ui->stepButton, &QPushButton::clicked, this, &ProbMaker::clickStepButton);
-    connect(ui->polygonButton, &QPushButton::clicked, this, &ProbMaker::clickTestButton);
     display = new DisplayAnswer();
 }
 
@@ -29,16 +27,44 @@ ProbMaker::~ProbMaker()
     delete ui;
 }
 
+void ProbMaker::run()
+{
+    //枠を作る
+    pushFlame();
+
+    //300回線を引く
+    for(int i=0;i<300;i++) addNewLine();
+
+    //ポリゴンを認識する
+    makePolygon();
+
+    //小さいポリゴンを削除する
+    eraseMinPolygon();
+
+    //ポリゴンの数が50個以下になるように減らす
+    erasePolygonUnderFifty();
+
+    //TestDisplayの再描画
+    this->update();
+
+    //認識したポリゴンを拡張ポリゴンに変換
+    Field field = PolygonToExPolygon();
+
+    //拡張ポリゴンの表示
+    display->setField(field);
+}
+
 void ProbMaker::pushFlame()
 {
     std::random_device rd;
     std::uniform_real_distribution<double> rand(0.0,1.0);
 
-    //This is normal square flame
-    std::shared_ptr<Dot> dotA = std::make_shared<Dot>(60+30*rand(rd),60+30*rand(rd));
-    std::shared_ptr<Dot> dotB = std::make_shared<Dot>(60+30*rand(rd),900-(60+30*rand(rd)));
-    std::shared_ptr<Dot> dotC = std::make_shared<Dot>(900-(60+30*rand(rd)),900-(60+30*rand(rd)));
-    std::shared_ptr<Dot> dotD = std::make_shared<Dot>(900-(60+30*rand(rd)),(60+30*rand(rd)));
+    //2cm以上空けて枠を作成
+    double margin = 30 * 2;
+    std::shared_ptr<Dot> dotA = std::make_shared<Dot>(margin+30*rand(rd),margin+30*rand(rd));
+    std::shared_ptr<Dot> dotB = std::make_shared<Dot>(margin+30*rand(rd),900-(margin+30*rand(rd)));
+    std::shared_ptr<Dot> dotC = std::make_shared<Dot>(900-(margin+30*rand(rd)),900-(margin+30*rand(rd)));
+    std::shared_ptr<Dot> dotD = std::make_shared<Dot>(900-(60+margin*rand(rd)),(60+margin*rand(rd)));
     std::shared_ptr<Line> lineAB = std::make_shared<Line>(dotA, dotB);
     std::shared_ptr<Line> lineBC = std::make_shared<Line>(dotB, dotC);
     std::shared_ptr<Line> lineCD = std::make_shared<Line>(dotC, dotD);
@@ -66,7 +92,6 @@ std::shared_ptr<Dot> ProbMaker::pickRandomDotAtAll(std::shared_ptr<Line> &line_p
     std::random_device rd;
     std::uniform_real_distribution<double> rand(0.0,1.0);
 
-    //Select random point of dot on lines
     double sum_can_connection_line_length = 0.0;
     for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
         sum_can_connection_line_length += (*line_itr)->can_connection_line_length;
@@ -111,26 +136,28 @@ std::shared_ptr<Dot> ProbMaker::pickRandomDotOnRing(const std::vector<std::share
 
 bool ProbMaker::isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2)
 {
-    //Get cross point x
+    //2本の線を直線としたときの交点のX座標
     double cross_pointX = ((*line2).b - (*line1).b)/((*line1).a - (*line2).a);
 
-    //Include check
+    //X座標でくらべて、線どうしが交差しているかを判定
     bool is_cross = ((*line1).dot1->x < cross_pointX ? (*line1).dot1->x : (*line1).dot2->x) < cross_pointX &&
-            cross_pointX < ((*line1).dot1->x < cross_pointX ? (*line1).dot2->x : (*line1).dot1->x) &&
-            ((*line2).dot1->x < cross_pointX ? (*line2).dot1->x : (*line2).dot2->x) < cross_pointX &&
-            cross_pointX < ((*line2).dot1->x < cross_pointX ? (*line2).dot2->x : (*line2).dot1->x);
+                    ((*line1).dot1->x < cross_pointX ? (*line1).dot2->x : (*line1).dot1->x) > cross_pointX &&
+                    ((*line2).dot1->x < cross_pointX ? (*line2).dot1->x : (*line2).dot2->x) < cross_pointX &&
+                    ((*line2).dot1->x < cross_pointX ? (*line2).dot2->x : (*line2).dot1->x) > cross_pointX;
     return is_cross;
 }
 
-bool ProbMaker::isValid(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle)
+bool ProbMaker::isValidLine(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle)
 {
-    //Length check
+    //5mm以上の長さか
     if((*newL).length < 15.0) return false;
 
-    //Cross check
+    //他の線と交差していないか
     for(auto it = lines.begin(), end = lines.end(); it != end; it++){
         if(isCross((*it), newL)) return false;
     }
+
+    //25度より鋭い角度になっていないか
 
     auto NormAngle = [&](double angle){
         while(angle < 0.0) angle += M_PI;
@@ -142,7 +169,6 @@ bool ProbMaker::isValid(const std::shared_ptr<Line> &newL, double startL_angle, 
     double normalized_startL_angle = NormAngle(startL_angle);
     double normalized_endL_angle = NormAngle(endL_angle);
 
-    //Angle check
     double accept_angle = 2 * M_PI * (25.0/360.0);
 
     double relative_startL_angle = normalized_startL_angle - normalized_newL_angle;
@@ -155,19 +181,8 @@ bool ProbMaker::isValid(const std::shared_ptr<Line> &newL, double startL_angle, 
     return true;
 }
 
-void ProbMaker::run()
+Field ProbMaker::PolygonToExPolygon()
 {
-    //Push flame
-    pushFlame();
-
-    //Make Polygon
-    for(int i=0;i<300;i++) addNewLine();
-    makePolygon();
-    eraseMinPolygon();
-    erasePolygonUnderFifty();
-    this->update();
-
-    //To TruePolygon
     polygon_t flame;
     polygon_t buff;
     std::vector<polygon_t> pieces;
@@ -196,117 +211,62 @@ void ProbMaker::run()
         field.pushPiece(exPieces.at(i-1));
     }
 
-    field.printFlame();
-    field.printPiece();
-    display->setField(field);
+    return field;
 }
 
 void ProbMaker::addNewLine()
 {
     std::shared_ptr<Dot> start_dot;
     std::shared_ptr<Dot> end_dot;
-    std::shared_ptr<Line> new_line;
     std::shared_ptr<Line> start_line;
     std::shared_ptr<Line> end_line;
+    std::shared_ptr<Line> new_line;
 
-    //始点と終点を決める
+    //生成するLineの始点と終点が決まるまで繰り返す
     while(true){
-		//始点の決定
+        //始点の決定
         start_dot = pickRandomDotAtAll(start_line);
 
-        //TODO: gutyoku
+        //終点の決定
         for(int i=0;i<10000;i++){
             end_dot = pickRandomDotAtAll(end_line);
-            std::shared_ptr<Line> bl = std::make_shared<Line>(start_dot, end_dot);
+            //有効な線になるか検査
+            std::shared_ptr<Line> buff_line = std::make_shared<Line>(start_dot, end_dot);
             double a1 = start_line->angle;
             double a2 = end_line->angle;
-            if(isValid(bl , a1,a2)) goto finishSelectLine;
+            if(isValidLine(buff_line , a1,a2)) goto finishSelectLine;
         }
-
-        /*
-		//終点の決定
-		//Reset Line Reference
-        for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
-			(*line_itr)->referenced_from_dot1 = false;
-			(*line_itr)->referenced_from_dot2 = false;
-		}
-        auto findNextLine = [&](std::vector<std::shared_ptr<Line>> &lines, std::shared_ptr<Line> &line){
-            int size = lines.size();
-            int i;
-            for(i=0;i<size;i++){
-                if(lines.at(i) == line) break;
-            }
-            i++;
-            if(i==size) i=0;
-            return lines.at(i);
-        };
-		//Search
-        auto Search = [&](std::shared_ptr<Dot> start_dot_){
-            start_dot = start_dot_;
-            for (auto line_itr = start_dot->connectedLines.begin(),end = start_dot->connectedLines.end(); line_itr != end; ++line_itr){
-                //Search Ring started by start_dot
-                if (((*line_itr)->dot1 == start_dot && ((*line_itr)->referenced_from_dot1)) ||
-                    ((*line_itr)->dot2 == start_dot && ((*line_itr)->referenced_from_dot2))) continue;
-                //mine
-                std::shared_ptr<Dot> mine_dot = start_dot;
-                std::shared_ptr<Line> mine_line = *line_itr;
-                std::vector<std::shared_ptr<Line>> mine_lines;
-                do{
-                    mine_lines.push_back(mine_line);
-                    if (mine_line->dot1 == mine_dot){
-                        mine_line->referenced_from_dot1 = true;
-                        mine_dot = mine_line->dot2;
-                    }
-                    else{
-                        mine_line->referenced_from_dot2 = true;
-                        mine_dot = mine_line->dot1;
-                    }
-                    mine_line = findNextLine(mine_dot->connectedLines, mine_line);
-                } while (mine_dot != start_dot);
-                //if can make line, make.
-                end_dot = pickRandomDotOnRing(mine_lines, end_line);
-                bool can_make_line = isValid(std::make_shared<Line>(start_dot,end_dot), start_line->angle, end_line->angle);
-                if(can_make_line) return 1;
-            }
-            return 0;
-        };
-        if(Search(start_line->dot1)) break;
-        if(Search(start_line->dot2)) break;
-        */
     }
     finishSelectLine:
-    new_line = std::make_shared<Line>(start_dot,end_dot);
-    latest_line = new_line;
 
-    //regist dot and line
-    dots.push_back(start_dot);
-    dots.push_back(end_dot);
-    lines.push_back(new_line);
+    //新しいLineを生成（もともとあったLineを分裂させてくっつける）
+
+    new_line = std::make_shared<Line>(start_dot,end_dot);
     std::shared_ptr<Line> divided_start_line_1 = std::make_shared<Line>(start_line->dot1, start_dot);
     std::shared_ptr<Line> divided_start_line_2 = std::make_shared<Line>(start_dot, start_line->dot2);
     std::shared_ptr<Line> divided_end_line_1 = std::make_shared<Line>(end_line->dot1, end_dot);
     std::shared_ptr<Line> divided_end_line_2 = std::make_shared<Line>(end_dot, end_line->dot2);
-
-    //refresh dots
-    //newlineDot
+    //dotsとlinesに新しいdotと新しいlineを登録
+    dots.push_back(start_dot);
+    dots.push_back(end_dot);
+    lines.push_back(new_line);
+    //新しいdotに新しいlineを登録
     start_dot->connectedLines.push_back(new_line);
     start_dot->connectedLines.push_back(divided_start_line_1);
     start_dot->connectedLines.push_back(divided_start_line_2);
     end_dot->connectedLines.push_back(new_line);
     end_dot->connectedLines.push_back(divided_end_line_1);
     end_dot->connectedLines.push_back(divided_end_line_2);
-    //start line dots
+    //すでにあったdotに新しいlineを登録
     start_line->dot1->removeConnectedLine(start_line);
     start_line->dot1->connectedLines.push_back(divided_start_line_1);
     start_line->dot2->removeConnectedLine(start_line);
     start_line->dot2->connectedLines.push_back(divided_start_line_2);
-    //end line dots
     end_line->dot1->removeConnectedLine(end_line);
     end_line->dot1->connectedLines.push_back(divided_end_line_1);
     end_line->dot2->removeConnectedLine(end_line);
     end_line->dot2->connectedLines.push_back(divided_end_line_2);
-
-    //refresh lines
+    //分裂前のLineを削除して、分裂後のLineを登録
     std::list<std::shared_ptr<Line>>::iterator start_line_it;
     for(auto i=lines.begin(),end=lines.end();i!=end;++i){
         if(*i == start_line){
@@ -327,25 +287,6 @@ void ProbMaker::addNewLine()
     lines.erase(end_line_it);
     lines.push_back(divided_end_line_1);
     lines.push_back(divided_end_line_2);
-}
-
-void ProbMaker::clickStepButton()
-{
-    addNewLine();
-    this->update();
-}
-
-void ProbMaker::clickTestButton()
-{
-    if(testCount==-2){
-        makePolygon();
-        eraseMinPolygon();
-    }
-    if(testCount==-1){
-        makePolygon();
-    }
-    testCount++;
-    this->update();
 }
 
 void ProbMaker::eraseMinPolygon()
@@ -380,7 +321,8 @@ void ProbMaker::eraseMinPolygon()
                 if((*dot_it).s_dot->y < minY) minY = (*dot_it).s_dot->y;
                 if((*dot_it).s_dot->y > maxY) maxY = (*dot_it).s_dot->y;
             }
-            //forで確認する正方形の始点を設定
+
+            //正方形の始点を1/6cmずつずらす
             for(double x = minX; (x+30) < maxX; x += 5){
                 for(double y = minY; (y+30) < maxY; y += 5){
                     //正方形の点を生成
@@ -405,68 +347,20 @@ void ProbMaker::eraseMinPolygon()
                         //正方形の線と多角形の[交差判定]
                         for(int i=0;i<4;++i){
                             for(int j=0;j<(int)Polygon.size();++j){
-                                if(isCross(square_line[i], Polygon[j].line)) goto FaildSquare;
+                                if(isCross(square_line[i], Polygon[j].line)) goto NextSquare;
                             }
                         }
                         //true
                         goto NextPolygon;
                         //false
-                        FaildSquare:;
+                        NextSquare:;
                     }
                 }
             }
+
             //正方形を含むことができなかったので、線をひとつ消す
-            {
-                eraseFlag = true;
-
-                auto eraseLine = [&](std::shared_ptr<Line> line){
-                    for(auto i=lines.begin(),end=lines.end();i!=end;++i){
-                        if(*i == line){
-                            lines.erase(i);
-                            break;
-                        }
-                    }
-                };
-
-                auto eraseDot = [&](std::shared_ptr<Dot> dot){
-                    for(auto i=dots.begin(),end=dots.end();i!=end;++i){
-                        if(*i == dot){
-                            dots.erase(i);
-                            break;
-                        }
-                    }
-                };
-
-                //点に繋がってる線が一つだけなら再帰的に削除
-                std::function<void(std::shared_ptr<Dot> dot)> eraseStick = [&](std::shared_ptr<Dot> dot){
-                    if(dot->connectedLines.size() == 1){
-                        std::shared_ptr<Line> connectedLine = dot->connectedLines.at(0);
-                        std::shared_ptr<Dot> connectedDot = connectedLine->dot1 == dot ? connectedLine->dot2 : connectedLine->dot1;
-                        //Erase
-                        eraseDot(dot);
-                        connectedDot->removeConnectedLine(connectedLine);
-                        eraseLine(connectedLine);
-                        //Next
-                        eraseStick(connectedDot);
-                    }
-                };
-
-                int size = Polygon.size();
-                std::random_device rd;
-                std::uniform_real_distribution<double> rand(0.0,1.0);
-                int seek = size * rand(rd);
-                struct polygon& erasedLine = Polygon.at(seek);
-                erasedLine.s_dot->removeConnectedLine(erasedLine.line);
-                erasedLine.e_dot->removeConnectedLine(erasedLine.line);
-                eraseLine(erasedLine.line);
-                //棒になってしまったら削除
-                eraseStick(erasedLine.s_dot);
-                if(erasedLine.e_dot->connectedLines.size()==0){
-                    eraseDot(erasedLine.e_dot);
-                }else{
-                    eraseStick(erasedLine.e_dot);
-                }
-            }
+            eraseFlag = true;
+            eraseRandomLineOnPolygon(Polygon);
 
             NextPolygon:;
         }
@@ -477,82 +371,80 @@ void ProbMaker::eraseMinPolygon()
 
 void ProbMaker::erasePolygonUnderFifty()
 {
+    //50個以下になるまで、線の削除→ポリゴンの作り直し、を繰り返す
     while(Polygons.size() >= 50){
-        //線をひとつ消す
 
+        //ランダムなポリゴンを指定
         std::random_device rd;
         std::uniform_real_distribution<double> rand(0.0,1.0);
         std::vector<struct polygon>& Polygon = Polygons.at(Polygons.size()*rand(rd));
 
-        auto eraseLine = [&](std::shared_ptr<Line> line){
-            for(auto i=lines.begin(),end=lines.end();i!=end;++i){
-                if(*i == line){
-                    lines.erase(i);
-                    break;
-                }
-            }
-        };
+        //線を一つ削除する
+        eraseRandomLineOnPolygon(Polygon);
 
-        auto eraseDot = [&](std::shared_ptr<Dot> dot){
-            for(auto i=dots.begin(),end=dots.end();i!=end;++i){
-                if(*i == dot){
-                    dots.erase(i);
-                    break;
-                }
-            }
-        };
-
-        //点に繋がってる線が一つだけなら再帰的に削除
-        std::function<void(std::shared_ptr<Dot> dot)> eraseStick = [&](std::shared_ptr<Dot> dot){
-            if(dot->connectedLines.size() == 1){
-                std::shared_ptr<Line> connectedLine = dot->connectedLines.at(0);
-                std::shared_ptr<Dot> connectedDot = connectedLine->dot1 == dot ? connectedLine->dot2 : connectedLine->dot1;
-                //Erase
-                eraseDot(dot);
-                connectedDot->removeConnectedLine(connectedLine);
-                eraseLine(connectedLine);
-                //Next
-                eraseStick(connectedDot);
-            }
-        };
-
-        int size = Polygon.size();
-        int seek = size * rand(rd);
-        struct polygon& erasedLine = Polygon.at(seek);
-        erasedLine.s_dot->removeConnectedLine(erasedLine.line);
-        erasedLine.e_dot->removeConnectedLine(erasedLine.line);
-        eraseLine(erasedLine.line);
-        //棒になってしまったら削除
-        eraseStick(erasedLine.s_dot);
-        if(erasedLine.e_dot->connectedLines.size()==0){
-            eraseDot(erasedLine.e_dot);
-        }else{
-            eraseStick(erasedLine.e_dot);
-        }
-
-        //remake
+        //ポリゴンの再生成
         makePolygon();
+    }
+}
+
+void ProbMaker::eraseRandomLineOnPolygon(std::vector<struct polygon>& Polygon)
+{
+    auto eraseLine = [&](std::shared_ptr<Line> line){
+        for(auto i=lines.begin(),end=lines.end();i!=end;++i){
+            if(*i == line){
+                lines.erase(i);
+                break;
+            }
+        }
+    };
+
+    auto eraseDot = [&](std::shared_ptr<Dot> dot){
+        for(auto i=dots.begin(),end=dots.end();i!=end;++i){
+            if(*i == dot){
+                dots.erase(i);
+                break;
+            }
+        }
+    };
+
+    std::function<void(std::shared_ptr<Dot> dot)> eraseStick = [&](std::shared_ptr<Dot> dot){
+        if(dot->connectedLines.size() == 1){
+            std::shared_ptr<Line> connectedLine = dot->connectedLines.at(0);
+            std::shared_ptr<Dot> connectedDot = connectedLine->dot1 == dot ? connectedLine->dot2 : connectedLine->dot1;
+            //Erase
+            eraseDot(dot);
+            connectedDot->removeConnectedLine(connectedLine);
+            eraseLine(connectedLine);
+            //Next
+            eraseStick(connectedDot);
+        }
+    };
+
+    //ランダムでポリゴンの一箇所の線を削除
+    int size = Polygon.size();
+    std::random_device rd;
+    std::uniform_real_distribution<double> rand(0.0,1.0);
+    int seek = size * rand(rd);
+    struct polygon& erasedLine = Polygon.at(seek);
+    erasedLine.s_dot->removeConnectedLine(erasedLine.line);
+    erasedLine.e_dot->removeConnectedLine(erasedLine.line);
+    eraseLine(erasedLine.line);
+
+    //点に繋がってる線が一つだけなら再帰的に削除
+    eraseStick(erasedLine.s_dot);
+    if(erasedLine.e_dot->connectedLines.size()==0){
+        eraseDot(erasedLine.e_dot);
+    }else{
+        eraseStick(erasedLine.e_dot);
     }
 }
 
 void ProbMaker::makePolygon()
 {
     Polygons.clear();
-    int dots_size = dots.size();
-    /*
-    for(int dots_cnt=0; dots_cnt < dots_size; dots_cnt++){
-        std::shared_ptr<Dot> &dot = dots.at(dots_cnt);
-        std::cout<<"dots "<<dots_cnt<<std::endl;
-        int size = dot->connectedLines.size();
-        for(int i=0;i<size;i++){
-            std::cout<<"("<<dot->connectedLines.at(i)->dot1->x<<","<<dot->connectedLines.at(i)->dot1->y<<")";
-            std::cout<<"("<<dot->connectedLines.at(i)->dot2->x<<","<<dot->connectedLines.at(i)->dot2->y<<")";
-            std::cout<<dot->connectedLines.at(i)->angle<<std::endl;
-        }
-    }
-    */
 
-    //All connectedLines sort
+    //すべてのdotに対して、繋がっているLineを角度順にソートする
+    int dots_size = dots.size();
     for(int dots_cnt=0; dots_cnt < dots_size; dots_cnt++){
         std::shared_ptr<Dot> &dot = dots.at(dots_cnt);
         std::sort(dot->connectedLines.begin(), dot->connectedLines.end(),
@@ -565,11 +457,11 @@ void ProbMaker::makePolygon()
         });
     }
 
-	//Reset Line Reference
+    //Reset Line Reference
     for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
-		(*line_itr)->referenced_from_dot1 = false;
-		(*line_itr)->referenced_from_dot2 = false;
-	}
+        (*line_itr)->referenced_from_dot1 = false;
+        (*line_itr)->referenced_from_dot2 = false;
+    }
 
     //Search
     for(int dots_cnt=0; dots_cnt < dots_size; dots_cnt++){
@@ -628,24 +520,8 @@ void ProbMaker::paintEvent(QPaintEvent *)
         painter.drawPoint(dot->x+marginX,dot->y+marginY);
     };
 
-    //Draw dot and line
+    //すべてのlineを描画
     for(auto it = lines.begin(), end = lines.end(); it != end; it++){
         drawLine(*it);
-    }
-    if(lines.size()-1>=5){
-        painter.setPen(QPen(Qt::red, 1));
-        drawLine(latest_line);
-        painter.setPen(QPen(Qt::red, 5));
-        drawDot(latest_line->dot1);
-    }
-
-    //激やばテストコード
-    if(testCount > -1){
-        painter.setPen(QPen(Qt::red, 15));
-        int num = Polygons.at(testCount).size();
-        for(int i=0;i<num;i++){
-            drawLine(std::make_shared<Line>(std::make_shared<Dot>(Polygons.at(testCount).at(i).s_dot->x, Polygons.at(testCount).at(i).s_dot->y),
-                                            std::make_shared<Dot>(Polygons.at(testCount).at(i-1<0?num-1:i-1).s_dot->x, Polygons.at(testCount).at(i-1<0?num-1:i-1).s_dot->y)));
-        }
     }
 }

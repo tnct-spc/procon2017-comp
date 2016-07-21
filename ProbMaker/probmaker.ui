@@ -14,30 +14,22 @@
    <string>ProbMaker</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="stepButton">
+   <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>0</y>
-      <width>85</width>
-      <height>27</height>
+      <y>10</y>
+      <width>201</width>
+      <height>31</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Step</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="polygonButton">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>0</y>
-      <width>85</width>
-      <height>27</height>
-     </rect>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
-     <string>Polygon</string>
+     <string>Test Display</string>
     </property>
    </widget>
   </widget>

@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+
 #include <QMainWindow>
 
 #include "displayanswer.h"
@@ -30,10 +31,6 @@ public:
     std::vector<std::shared_ptr<Line>> connectedLines;
 
     Dot(double x_,double y_):x(x_),y(y_){}
-    bool operator==(const Dot &dot) const
-    {
-        return this->x == dot.x && this->y == dot.y;
-    }
     bool removeConnectedLine(std::shared_ptr<Line> line)
     {
         auto begin = connectedLines.begin();
@@ -68,10 +65,12 @@ public:
         const std::shared_ptr<Dot> &dot_buf = dot2->x - dot1->x > 0 ? dot1:dot2;
         const_cast<double&>(b) = dot_buf->y - a * dot_buf->x;
     }
-    //多角形生成時
+    //多角形生成時に使用する
     bool referenced_from_dot1 = false;
     bool referenced_from_dot2 = false;
 };
+
+
 
 namespace Ui {
 class ProbMaker;
@@ -84,43 +83,36 @@ class ProbMaker : public QMainWindow
 private:
     Ui::ProbMaker *ui;
 
-    std::vector<std::shared_ptr<Dot>> dots;
-    std::list<std::shared_ptr<Line>> lines;
-
     struct polygon{
         std::shared_ptr<Line> line;
         std::shared_ptr<Dot> s_dot;
         std::shared_ptr<Dot> e_dot;
     };
 
-    std::vector<std::vector<struct polygon>> Polygons;
 
-    std::shared_ptr<Line> latest_line;
+    std::vector<std::shared_ptr<Dot>> dots;
+    std::list<std::shared_ptr<Line>> lines;
+    std::vector<std::vector<struct polygon>> Polygons;
 
     void addNewLine();
     void pushFlame();
     std::shared_ptr<Dot> pickRandomDotAtAll(std::shared_ptr<Line> &line_pos);
     std::shared_ptr<Dot> pickRandomDotOnRing(const std::vector<std::shared_ptr<Line>> lines,std::shared_ptr<Line> &line_pos);
     bool isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2);
-    bool isValid(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle);
+    bool isValidLine(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle);
     void makePolygon();
     void eraseMinPolygon();
     void erasePolygonUnderFifty();
+    Field PolygonToExPolygon();
+    void eraseRandomLineOnPolygon(std::vector<struct polygon>& Polygon);
 
     DisplayAnswer* display;
+
 public:
-
-
     explicit ProbMaker(QWidget *parent = 0);
     ~ProbMaker();
     void run();
 
-
-    //test code
-    int testCount = -2;
-private slots:
-    void clickStepButton();
-    void clickTestButton();
 protected:
     void paintEvent(QPaintEvent *);
 };
