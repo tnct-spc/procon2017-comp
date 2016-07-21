@@ -89,22 +89,33 @@ private:
         std::shared_ptr<Dot> e_dot;
     };
 
-
     std::vector<std::shared_ptr<Dot>> dots;
     std::list<std::shared_ptr<Line>> lines;
     std::vector<std::vector<struct polygon>> Polygons;
 
+    //新しいLineを引く
     void addNewLine();
+    //枠線を引く
     void pushFlame();
+    //すべての線からランダムでdotを作る
     std::shared_ptr<Dot> pickRandomDotAtAll(std::shared_ptr<Line> &line_pos);
+    //ポリゴンの中からランダムでdotを作る
     std::shared_ptr<Dot> pickRandomDotOnRing(const std::vector<std::shared_ptr<Line>> lines,std::shared_ptr<Line> &line_pos);
+    //線同士が重なっているか
     bool isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2);
+    //角度や長さ、重なりなどを見て、引いても良い線なのか判別する
     bool isValidLine(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle);
+
+    //ポリゴンを認識する
     void makePolygon();
-    void eraseMinPolygon();
-    void erasePolygonUnderFifty();
-    Field PolygonToExPolygon();
+    //ポリゴンからランダムな線を削除
     void eraseRandomLineOnPolygon(std::vector<struct polygon>& Polygon);
+    //小さいポリゴンを削除
+    void eraseMinPolygon();
+    //ポリゴンの数が50になるまでポリゴンを削除
+    void erasePolygonUnderFifty();
+    //ポリゴンを拡張ポリゴンに変更
+    Field PolygonToExPolygon();
 
     DisplayAnswer* display;
 
