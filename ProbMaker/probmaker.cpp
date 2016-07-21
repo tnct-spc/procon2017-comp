@@ -11,6 +11,9 @@
 
 #include <QPainter>
 
+#include "polygon.h"
+#include "displayanswer.h"
+
 ProbMaker::ProbMaker(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ProbMaker)
@@ -18,6 +21,7 @@ ProbMaker::ProbMaker(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->stepButton, &QPushButton::clicked, this, &ProbMaker::clickStepButton);
     connect(ui->polygonButton, &QPushButton::clicked, this, &ProbMaker::clickTestButton);
+    display = new DisplayAnswer();
 }
 
 ProbMaker::~ProbMaker()
@@ -156,11 +160,44 @@ void ProbMaker::run()
     //Push flame
     pushFlame();
 
-    /*
-    for(int i=0;i<40;i++) addNewLine();
+    //Make Polygon
+    for(int i=0;i<300;i++) addNewLine();
     makePolygon();
+    eraseMinPolygon();
     this->update();
-    */
+
+    //To TruePolygon
+    polygon_t flame;
+    polygon_t buff;
+    std::vector<polygon_t> pieces;
+    PolygonExpansion exFlame;
+    PolygonExpansion buff2;
+    std::vector<PolygonExpansion> exPieces;
+    Field field;
+
+    //flame
+    for(int j=0;j<Polygons.at(0).size();++j){
+        flame.outer().push_back(point_t(Polygons.at(0).at(j).s_dot->x/30,Polygons.at(0).at(j).s_dot->y/30));
+    }
+    flame.outer().push_back(point_t(Polygons.at(0).at(0).s_dot->x/30,Polygons.at(0).at(0).s_dot->y/30));
+    exFlame.setPolygon(flame);
+    field.setFlame(exFlame);
+
+    //polygons
+    for(int i=1;i<Polygons.size();++i){
+        pieces.push_back(buff);
+        for(int j=0;j<Polygons.at(i).size();++j){
+            pieces.at(i-1).outer().push_back(point_t(Polygons.at(i).at(j).s_dot->x/30,Polygons.at(i).at(j).s_dot->y/30));
+        }
+        pieces.at(i-1).outer().push_back(point_t(Polygons.at(i).at(0).s_dot->x/30,Polygons.at(i).at(0).s_dot->y/30));
+        exPieces.push_back(buff2);
+        exPieces.at(i-1).setPolygon(pieces.at(i-1));
+        field.pushPiece(exPieces.at(i-1));
+    }
+
+    field.printFlame();
+    field.printPiece();
+    display->setField(field);
 }
 
 void ProbMaker::addNewLine()
