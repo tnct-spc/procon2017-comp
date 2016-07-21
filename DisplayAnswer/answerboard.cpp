@@ -28,7 +28,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 3));
 
-    auto drawLine = [&](int x1, int y1, int x2, int y2){
+    auto drawLine = [&](double x1, double y1, double x2, double y2){
         static const int max = 30;
         static const int margin = 20;
         int y = height - margin;
@@ -40,17 +40,17 @@ void AnswerBoard::paintEvent(QPaintEvent *)
 
     //drawField
     polygon_t raw_flame = field.getFlame().getPolygon();
-    std::vector<polygon_t> raw_pieces;
-    raw_pieces.push_back(field.getPiece(0).getPolygon());
     //flame
     int flame_size = raw_flame.outer().size();
     for(int i=0;i<flame_size;i++){
         drawLine(raw_flame.outer()[i].x(), raw_flame.outer()[i].y(), raw_flame.outer()[(i+1)%flame_size].x(), raw_flame.outer()[(i+1)%flame_size].y());
     }
     //piece
-    int pieces_size = 1;
+    std::vector<polygon_t> raw_pieces;
+    int pieces_size = field.pieceSize();
     for(int i=0;i<pieces_size;i++){
-        int piece_size = raw_pieces[i].outer().size();
+        raw_pieces.push_back(field.getPiece(i).getPolygon());
+        int piece_size = raw_pieces[i].outer().size()-1;
         for(int j=0;j<piece_size;j++){
             drawLine(raw_pieces[i].outer()[j].x(), raw_pieces[i].outer()[j].y(), raw_pieces[i].outer()[(j+1)%flame_size].x(), raw_pieces[i].outer()[(j+1)%flame_size].y());
         }
