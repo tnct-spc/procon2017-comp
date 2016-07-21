@@ -143,7 +143,7 @@ bool ProbMaker::isValid(const std::shared_ptr<Line> &newL, double startL_angle, 
     double normalized_endL_angle = NormAngle(endL_angle);
 
     //Angle check
-    double accept_angle = 2 * M_PI * (10.0/360.0);
+    double accept_angle = 2 * M_PI * (25.0/360.0);
 
     double relative_startL_angle = normalized_startL_angle - normalized_newL_angle;
     double relative_endL_angle = normalized_endL_angle - normalized_newL_angle;
