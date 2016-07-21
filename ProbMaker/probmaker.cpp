@@ -164,6 +164,7 @@ void ProbMaker::run()
     for(int i=0;i<300;i++) addNewLine();
     makePolygon();
     eraseMinPolygon();
+    erasePolygonUnderFifty();
     this->update();
 
     //To TruePolygon
@@ -472,6 +473,66 @@ void ProbMaker::eraseMinPolygon()
         //作りなおす
         makePolygon();
     }while(eraseFlag==true);
+}
+
+void ProbMaker::erasePolygonUnderFifty()
+{
+    while(Polygons.size() >= 50){
+        //線をひとつ消す
+
+        std::random_device rd;
+        std::uniform_real_distribution<double> rand(0.0,1.0);
+        std::vector<struct polygon>& Polygon = Polygons.at(Polygons.size()*rand(rd));
+
+        auto eraseLine = [&](std::shared_ptr<Line> line){
+            for(auto i=lines.begin(),end=lines.end();i!=end;++i){
+                if(*i == line){
+                    lines.erase(i);
+                    break;
+                }
+            }
+        };
+
+        auto eraseDot = [&](std::shared_ptr<Dot> dot){
+            for(auto i=dots.begin(),end=dots.end();i!=end;++i){
+                if(*i == dot){
+                    dots.erase(i);
+                    break;
+                }
+            }
+        };
+
+        //点に繋がってる線が一つだけなら再帰的に削除
+        std::function<void(std::shared_ptr<Dot> dot)> eraseStick = [&](std::shared_ptr<Dot> dot){
+            if(dot->connectedLines.size() == 1){
+                std::shared_ptr<Line> connectedLine = dot->connectedLines.at(0);
+                std::shared_ptr<Dot> connectedDot = connectedLine->dot1 == dot ? connectedLine->dot2 : connectedLine->dot1;
+                //Erase
+                eraseDot(dot);
+                connectedDot->removeConnectedLine(connectedLine);
+                eraseLine(connectedLine);
+                //Next
+                eraseStick(connectedDot);
+            }
+        };
+
+        int size = Polygon.size();
+        int seek = size * rand(rd);
+        struct polygon& erasedLine = Polygon.at(seek);
+        erasedLine.s_dot->removeConnectedLine(erasedLine.line);
+        erasedLine.e_dot->removeConnectedLine(erasedLine.line);
+        eraseLine(erasedLine.line);
+        //棒になってしまったら削除
+        eraseStick(erasedLine.s_dot);
+        if(erasedLine.e_dot->connectedLines.size()==0){
+            eraseDot(erasedLine.e_dot);
+        }else{
+            eraseStick(erasedLine.e_dot);
+        }
+
+        //remake
+        makePolygon();
+    }
 }
 
 void ProbMaker::makePolygon()

@@ -105,6 +105,7 @@ private:
     bool isValid(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle);
     void makePolygon();
     void eraseMinPolygon();
+    void erasePolygonUnderFifty();
 
     DisplayAnswer* display;
 public:
