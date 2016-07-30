@@ -15,12 +15,14 @@ DEFINES += SOLVER_LIBRARY
 
 SOURCES += solver.cpp \
     Algorithm/algorithmwrapper.cpp \
-    Algorithm/simplealgorithm.cpp
+    Algorithm/simplealgorithm.cpp \
+    Algorithm/pooralgorithm.cpp
 
 HEADERS += solver.h\
         solver_global.h \
     Algorithm/algorithmwrapper.h \
-    Algorithm/simplealgorithm.h
+    Algorithm/simplealgorithm.h \
+    Algorithm/pooralgorithm.h
 
 unix {
     target.path = /usr/lib
