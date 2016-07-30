@@ -14,15 +14,12 @@ void Field::setPiece(const PolygonExpansion &piece,const int &n, double x, doubl
 }
 
 void Field::pushPiece(const PolygonExpansion &piece, double x, double y){
-    PolygonExpansion old_piece = piece;
-    PolygonExpansion new_piece;
-    polygon_t polygon;
-    int size = piece.size();
-    for(int i=0;i<size;i++){
-        polygon.outer().push_back(point_t(old_piece.getPolygon().outer()[i].x()+x,old_piece.getPolygon().outer()[i].y()+y));
-    }
-    new_piece.setPolygon(polygon);
-    fieldPiece.push_back(new_piece);
+    polygon_t translated_polygon;
+    PolygonExpansion piece_buff = piece;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
+    boost::geometry::transform(piece_buff.getPolygon(),translated_polygon,translate);
+    piece_buff.setPolygon(translated_polygon);
+    fieldPiece.push_back(piece_buff);
 }
 
 PolygonExpansion Field::popPiece(){

@@ -4,6 +4,7 @@
 #include <boost/geometry.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/algorithms/disjoint.hpp>
 #include <vector>
 #include "polygonexpansion.h"
 namespace bg = boost::geometry;
