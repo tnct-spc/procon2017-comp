@@ -372,7 +372,7 @@ void ProbMaker::eraseMinPolygon()
 void ProbMaker::erasePolygonUnderFifty()
 {
     //50個以下になるまで、線の削除→ポリゴンの作り直し、を繰り返す
-    while(Polygons.size() >= 50){
+    while(Polygons.size() > 50){
 
         //ランダムなポリゴンを指定
         std::random_device rd;
