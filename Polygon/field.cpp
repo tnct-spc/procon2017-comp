@@ -36,6 +36,16 @@ PolygonExpansion Field::getFlame(){
     return fieldFlame;
 }
 
+bool Field::isPuttable(PolygonExpansion polygon)
+{
+    if(!boost::geometry::within(polygon.getPolygon(), fieldFlame.getPolygon())) return false;
+    int size=fieldPiece.size();
+    for(int i=0;i<size;i++){
+        if(!boost::geometry::disjoint(polygon.getPolygon(), fieldPiece.at(i).getPolygon())) return false;
+    }
+    return true;
+}
+
 
 /*後方互換*/
 /*

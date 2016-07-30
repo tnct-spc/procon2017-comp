@@ -25,6 +25,7 @@ public:
     PolygonExpansion popPiece();
     PolygonExpansion getPiece(const int &n) ;
     PolygonExpansion getFlame() ;
+    bool isPuttable(PolygonExpansion polygon);
     //以下はsetterとgetterの後方互換用 *↑とオーバーロードできない(getterの引数が同じ)なので気をつけて*
     /*
     void setFlame(const polygon_t &flame);
