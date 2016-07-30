@@ -9,6 +9,7 @@
 #include <QMainWindow>
 
 #include "displayanswer.h"
+#include "polygonset.h"
 
 
 //prototype
@@ -115,7 +116,7 @@ private:
     //ポリゴンの数が50になるまでポリゴンを削除
     void erasePolygonUnderFifty();
     //ポリゴンを拡張ポリゴンに変更
-    Field PolygonToExPolygon();
+    PolygonSet PolygonToExPolygon();
 
     DisplayAnswer* display;
 

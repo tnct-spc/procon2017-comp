@@ -13,6 +13,8 @@
 
 #include "polygon.h"
 #include "displayanswer.h"
+#include "polygonset.h"
+#include "polygonio.h"
 
 ProbMaker::ProbMaker(QWidget *parent) :
     QMainWindow(parent),
@@ -48,10 +50,11 @@ void ProbMaker::run()
     this->update();
 
     //認識したポリゴンを拡張ポリゴンに変換
-    Field field = PolygonToExPolygon();
+    PolygonSet set = PolygonToExPolygon();
 
-    //拡張ポリゴンの表示
-    display->setField(field);
+    //ポリゴンをファイルに出力
+    PolygonIO::exportPolygon(set,"./../output.csv");
+
 }
 
 void ProbMaker::pushFlame()
@@ -181,7 +184,7 @@ bool ProbMaker::isValidLine(const std::shared_ptr<Line> &newL, double startL_ang
     return true;
 }
 
-Field ProbMaker::PolygonToExPolygon()
+PolygonSet ProbMaker::PolygonToExPolygon()
 {
     polygon_t flame;
     polygon_t buff;
@@ -189,7 +192,7 @@ Field ProbMaker::PolygonToExPolygon()
     PolygonExpansion exFlame;
     PolygonExpansion buff2;
     std::vector<PolygonExpansion> exPieces;
-    Field field;
+    PolygonSet set;
 
     //flame
     for(int j=0;j<Polygons.at(0).size();++j){
@@ -197,7 +200,7 @@ Field ProbMaker::PolygonToExPolygon()
     }
     flame.outer().push_back(point_t(Polygons.at(0).at(0).s_dot->x/30,Polygons.at(0).at(0).s_dot->y/30));
     exFlame.setPolygon(flame);
-    field.setFlame(exFlame);
+    set.fieldFlame = exFlame;
 
     //polygons
     for(int i=1;i<Polygons.size();++i){
@@ -208,10 +211,10 @@ Field ProbMaker::PolygonToExPolygon()
         pieces.at(i-1).outer().push_back(point_t(Polygons.at(i).at(0).s_dot->x/30,Polygons.at(i).at(0).s_dot->y/30));
         exPieces.push_back(buff2);
         exPieces.at(i-1).setPolygon(pieces.at(i-1));
-        field.pushPiece(exPieces.at(i-1));
+        set.fieldPiece.push_back(exPieces.at(i-1));
     }
 
-    return field;
+    return set;
 }
 
 void ProbMaker::addNewLine()
