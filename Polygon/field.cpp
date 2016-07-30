@@ -8,13 +8,21 @@ void Field::setFlame(const PolygonExpansion &flame){
     fieldFlame = flame;
 }
 
-void Field::setPiece(const PolygonExpansion &piece,const int &n){
+void Field::setPiece(const PolygonExpansion &piece,const int &n, double x, double y){
     if (n < pieceSize()) fieldPiece[n] = piece;
-    else pushPiece(piece);
+    else pushPiece(piece, x, y);
 }
 
-void Field::pushPiece(const PolygonExpansion &piece){
-    fieldPiece.push_back(piece);
+void Field::pushPiece(const PolygonExpansion &piece, double x, double y){
+    PolygonExpansion old_piece = piece;
+    PolygonExpansion new_piece;
+    polygon_t polygon;
+    int size = piece.size();
+    for(int i=0;i<size;i++){
+        polygon.outer().push_back(point_t(old_piece.getPolygon().outer()[i].x()+x,old_piece.getPolygon().outer()[i].y()+y));
+    }
+    new_piece.setPolygon(polygon);
+    fieldPiece.push_back(new_piece);
 }
 
 PolygonExpansion Field::popPiece(){

@@ -19,8 +19,8 @@ public:
     Field();
     //setterとgetter
     void setFlame(const PolygonExpansion &flame); 
-    void setPiece(const PolygonExpansion &piece,const int &n);
-    void pushPiece(const PolygonExpansion &piece);
+    void setPiece(const PolygonExpansion &piece,const int &n, double x=0, double y=0);
+    void pushPiece(const PolygonExpansion &piece, double x=0, double y=0);
     PolygonExpansion popPiece();
     PolygonExpansion getPiece(const int &n) ;
     PolygonExpansion getFlame() ;
