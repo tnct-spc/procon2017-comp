@@ -6,8 +6,12 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <QFileDialog>
 
+#include "polygonexpansion.h"
+#include "polygonset.h"
 #include "field.h"
+#include "polygonio.h"
 
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),
@@ -15,7 +19,6 @@ Hazama::Hazama(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->RunButton, &QPushButton::clicked, this, &Hazama::clickedRunButton);
-    connect(ui->UseWebCamera, &QCheckBox::stateChanged, this, &Hazama::checkedWebCameraEnable);
 }
 
 Hazama::~Hazama()
@@ -34,37 +37,35 @@ void Hazama::run()
 
     Field field;
 
-    /*Take a picture*/
-    char dir[255];
-    getcwd(dir,255);
-    std::cout<<"Current Directory : "<<dir<<std::endl;
+    /*Get puzzle data*/
+    PolygonSet PDATA;
 
-    //Capture
     cv::Mat src;
-    std::string path = "./../../procon2016-comp/CompImage/dpi300test.png";
-    if(WebcameraEnable){
-       src = capture();
+    if(ui->useWebCamera->isChecked() || ui->useScaner->isChecked()){
+        //get Image
+        if(ui->useWebCamera->isChecked()){
+           src = capture();
+        }else{
+            int state = system("sh ./../../procon2016-comp/scanimage.sh");
+            if(state ^= 0){
+                std::cout << "failed. scanimage.sh error." << std::endl;
+                return;
+            }
+            std::string path = "./../../procon2016-comp/CompImage/dpi300test.png";
+            src = cv::imread(path);
+        }
+        //display picture
+        cv::namedWindow("picture",CV_WINDOW_AUTOSIZE);
+        cv::imshow("picture",src);
+
+        /*Image Recognition*/
+        //PDATA = ...
+    }else if(ui->useFileData->isChecked()){
+        std::string path = QFileDialog::getOpenFileName(this).toStdString();
+        PDATA = PolygonIO::importPolygon(path);
     }else{
-       int state = system("sh ./../../procon2016-comp/scanimage.sh");
-
-       if(state ^= 0){
-           std::cout << "failed" << std::endl;
-       }
-       //if checkbox(Use Webcamera) isn`t true
-       src = cv::imread(path);
+        return;
     }
-
-    //Display picture
-    cv::namedWindow("picture",CV_WINDOW_AUTOSIZE);
-    cv::imshow("picture",src);
-
-    /*
-    if ( src.empty() ) {
-        std::cerr << "Image can't be loaded!" << std::endl;
-    }
-
-    */
-    /*Image Recognition*/
 
     /*Solve puzzle*/
 
@@ -100,11 +101,4 @@ cv::Mat Hazama::capture()
 void Hazama::clickedRunButton()
 {
     run();
-}
-
-void Hazama::checkedWebCameraEnable()
-{
-    std::cout << "checked!" << std::endl;
-
-    WebcameraEnable =  !WebcameraEnable;
 }
