@@ -205,10 +205,12 @@ PolygonSet ProbMaker::PolygonToExPolygon()
     //polygons
     for(int i=1;i<Polygons.size();++i){
         pieces.push_back(buff);
+        double reference_point_x = Polygons.at(i).at(0).s_dot->x/30;
+        double reference_point_y = Polygons.at(i).at(0).s_dot->y/30;
         for(int j=0;j<Polygons.at(i).size();++j){
-            pieces.at(i-1).outer().push_back(point_t(Polygons.at(i).at(j).s_dot->x/30,Polygons.at(i).at(j).s_dot->y/30));
+            pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(j).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(j).s_dot->y/30)-reference_point_y));
         }
-        pieces.at(i-1).outer().push_back(point_t(Polygons.at(i).at(0).s_dot->x/30,Polygons.at(i).at(0).s_dot->y/30));
+        pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(0).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(0).s_dot->y/30)-reference_point_y));
         exPieces.push_back(buff2);
         exPieces.at(i-1).setPolygon(pieces.at(i-1));
         set.fieldPiece.push_back(exPieces.at(i-1));
