@@ -8,8 +8,8 @@ class PolygonIO
 {
 public:
     PolygonIO();
-    PolygonSet importPolygon(std::string file_path);
-    void exportPolygon(PolygonSet set, std::string file_path);
+    static PolygonSet importPolygon(std::string file_path);
+    static void exportPolygon(PolygonSet set, std::string file_path);
 };
 
 #endif // POLYGONIO_H
