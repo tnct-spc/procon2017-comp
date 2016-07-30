@@ -12,6 +12,8 @@
 #include "polygonset.h"
 #include "field.h"
 #include "polygonio.h"
+#include "displayanswer.h"
+#include "solver.h"
 
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),
@@ -35,11 +37,8 @@ void Hazama::run()
 {
     std::cout << "Run" << std::endl;
 
-    Field field;
-
     /*Get puzzle data*/
     PolygonSet PDATA;
-
     cv::Mat src;
     if(ui->useWebCamera->isChecked() || ui->useScaner->isChecked()){
         //get Image
@@ -68,9 +67,13 @@ void Hazama::run()
     }
 
     /*Solve puzzle*/
+    Solver solver;
+    Field field = solver.run(PDATA);
 
     /*Display answer*/
+    Display.setField(field);
 
+    std::cout<<"finish"<<std::endl;
 }
 
 cv::Mat Hazama::capture()

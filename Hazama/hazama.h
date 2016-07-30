@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <opencv2/core/core.hpp>
+#include "displayanswer.h"
 
 namespace Ui {
 class Hazama;
@@ -15,12 +16,13 @@ class Hazama : public QMainWindow
 public:
     explicit Hazama(QWidget *parent = 0);
     ~Hazama();
+    void init();
+    void run();
 
 private:
     Ui::Hazama *ui;
-    void init();
-    void run();
     cv::Mat capture();
+    DisplayAnswer Display;
 private slots:
     void clickedRunButton();
 };
