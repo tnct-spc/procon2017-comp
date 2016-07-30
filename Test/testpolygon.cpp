@@ -10,6 +10,8 @@
 #include "field.h"
 #include "testpolygon.h"
 #include "polygonexpansion.h"
+#include "polygonset.h"
+#include "polygonio.h"
 
 TestPolygon::TestPolygon()
 {
@@ -31,5 +33,21 @@ bool TestPolygon::run(){
     f.setPiece(huga,1919);
     f.printFlame();
     f.printPiece();
+
+    PolygonSet s;
+    s.fieldFlame = hoge;
+    s.fieldPiece.push_back(huga);
+    s.fieldPiece.push_back(huga);
+    PolygonIO io;
+    io.exportPolygon(s,"./../output.csv");
+
+    PolygonSet newS;
+    newS = io.importPolygon("./../output.csv");
+    Field newF;
+    newF.setFlame(newS.fieldFlame);
+    newF.pushPiece(newS.fieldPiece.at(0));
+    newF.pushPiece(newS.fieldPiece.at(1));
+    newF.printFlame();
+    newF.printPiece();
     return 1;
 }

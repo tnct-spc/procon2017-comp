@@ -34,6 +34,7 @@ public:
     const std::vector<double> getSideLength();
     const std::vector<double> getSideAngle();
     void setPolygon(const polygon_t &pol);
+    int size() const;
 };
 
 #endif // POLYGONEXPANSION_H
