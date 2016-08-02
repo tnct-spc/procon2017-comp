@@ -10,6 +10,7 @@
 
 #include "displayanswer.h"
 #include "polygonset.h"
+#include "expandedpolygon.h"
 
 
 //prototype
