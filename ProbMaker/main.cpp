@@ -5,6 +5,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     /*test code*/
+    /*
     procon::polygon::ExpandedPolygon p;
     p.outer().push_back(point_t(0,0));
     p.outer().push_back(point_t(0,1));
@@ -21,12 +22,9 @@ int main(int argc, char *argv[])
     std::cout << bg::area(p) << std::endl;
     std::cout << bg::dsv(p) << std::endl;
     std::cout << p.outer().at(2).x() << std::endl;
-
-    /*
+    */
     ProbMaker w;
     w.show();
     w.run();
-    */
-
     return a.exec();
 }

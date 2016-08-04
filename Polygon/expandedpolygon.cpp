@@ -1,7 +1,7 @@
 #include "expandedpolygon.h"
 
 //-------------------constructor--------------------
-procon::polygon::ExpandedPolygon::ExpandedPolygon()
+procon::ExpandedPolygon::ExpandedPolygon()
     : size(0)
 {
     //this->inners().push_back(polygon::ring_type());
@@ -10,8 +10,7 @@ procon::polygon::ExpandedPolygon::ExpandedPolygon()
 }
 
 //copy
-procon::polygon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
-    : polygon_t(p)
+procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
 {
     this->size = p.size;
     this->side_length = p.side_length;
@@ -22,31 +21,31 @@ procon::polygon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
 }
 
 //--------------------private-----------------------
-void procon::polygon::ExpandedPolygon::calcSize()
+void procon::ExpandedPolygon::calcSize()
 {
-    size = static_cast<int>(this->outer().size() - 1);
+    size = static_cast<int>(polygon.outer().size() - 1);
 }
 
-void procon::polygon::ExpandedPolygon::calcSideLength()
+void procon::ExpandedPolygon::calcSideLength()
 {
     for(int i=0;i<size;i++){
-       const double length = bg::distance(this->outer().at(i),this->outer().at(i+1));
+       const double length = bg::distance(polygon.outer().at(i),polygon.outer().at(i+1));
        side_length.push_back(length);
     }
 }
 
-void procon::polygon::ExpandedPolygon::calcSideAngle()
+void procon::ExpandedPolygon::calcSideAngle()
 {
     try {
         for (int i = -1;i < size - 1;i++){
             double x1,y1;
             if (i == -1){
-                x1 = this->outer().at(size - 1).x(), y1 = this->outer().at(size - 1).y();
+                x1 = polygon.outer().at(size - 1).x(), y1 = polygon.outer().at(size - 1).y();
             } else {
-                x1 = this->outer().at(i).x(), y1 = this->outer().at(i).y();
+                x1 = polygon.outer().at(i).x(), y1 = polygon.outer().at(i).y();
             }
-            const double x2 = this->outer().at(i+1).x(), y2 = this->outer().at(i+1).y();
-            const double x3 = this->outer().at(i+2).x(), y3 = this->outer().at(i+2).y();
+            const double x2 = polygon.outer().at(i+1).x(), y2 = polygon.outer().at(i+1).y();
+            const double x3 = polygon.outer().at(i+2).x(), y3 = polygon.outer().at(i+2).y();
             const double numer = (x2 - x1) * (x2 - x3) + (y2 - y1) * (y2 - y3);
             const double denom1 = std::sqrt(std::pow(x2 - x3,2) + std::pow(y2 - y3,2));
             const double denom2 = std::sqrt(std::pow(x2 - x1,2) + std::pow(y2 - y1,2));
@@ -63,24 +62,35 @@ void procon::polygon::ExpandedPolygon::calcSideAngle()
 
 //---------------------public------------------------
 // getter
-int procon::polygon::ExpandedPolygon::getSize()
+int procon::ExpandedPolygon::getSize()
 {
     return size;
 }
 
-std::vector<double> procon::polygon::ExpandedPolygon::getSideLength()
+std::vector<double> const& procon::ExpandedPolygon::getSideLength()
 {
     return side_length;
 }
 
-std::vector<double> procon::polygon::ExpandedPolygon::getSideAngle()
+std::vector<double> const& procon::ExpandedPolygon::getSideAngle()
 {
     return side_angle;
 }
 
+polygon_t const& procon::ExpandedPolygon::getPolygon()
+{
+    return polygon;
+}
+
+//setter
+void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
+{
+    polygon = p;
+}
+
 // operator
-procon::polygon::ExpandedPolygon procon::polygon::ExpandedPolygon::operator =
-(procon::polygon::ExpandedPolygon const& p)
+procon::ExpandedPolygon procon::ExpandedPolygon::operator =
+(procon::ExpandedPolygon const& p)
 {
     this->side_length = p.side_length;
     this->side_angle = p.side_angle;
@@ -93,7 +103,7 @@ procon::polygon::ExpandedPolygon procon::polygon::ExpandedPolygon::operator =
 
 // 計算をまとめて行う
 // ここ以外からcalc関数を呼ぶのは禁止
-void procon::polygon::ExpandedPolygon::updatePolygon()
+void procon::ExpandedPolygon::updatePolygon()
 {
     calcSize();
     calcSideLength();

@@ -7,7 +7,7 @@ class PoorAlgorithm : public AlgorithmWrapper
 {
 public:
     PoorAlgorithm();
-    Field run(PolygonSet set);
+    procon::Field run(PolygonSet set);
 };
 
 #endif // POORALGORITHM_H

@@ -8,7 +8,7 @@ class AlgorithmWrapper
 {
 public:
     AlgorithmWrapper();
-    virtual Field run(PolygonSet set);
+    virtual procon::Field run(PolygonSet set);
 };
 
 #endif // ALGORITHMWRAPPER_H

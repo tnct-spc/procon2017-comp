@@ -5,8 +5,8 @@ AlgorithmWrapper::AlgorithmWrapper()
 
 }
 
-Field AlgorithmWrapper::run(PolygonSet set)
+procon::Field AlgorithmWrapper::run(PolygonSet set)
 {
-    Field field;
+    procon::Field field;
     return field;
 }

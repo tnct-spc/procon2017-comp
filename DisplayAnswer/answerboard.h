@@ -15,11 +15,11 @@ class AnswerBoard : public QWidget
 public:
     explicit AnswerBoard(QWidget *parent = 0);
     ~AnswerBoard();
-    void setField(Field& field);
+    void setField(procon::Field& field);
 
 private:
     Ui::AnswerBoard *ui;
-    Field field;
+    procon::Field field;
 
 protected:
     void paintEvent(QPaintEvent *);

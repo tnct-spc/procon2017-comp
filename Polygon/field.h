@@ -1,46 +1,38 @@
 #ifndef FIELD_H
 #define FIELD_H
+
+#include "expandedpolygon.h"
 #include <iostream>
+#include <vector>
 #include <boost/geometry.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
-#include <vector>
-#include "polygonexpansion.h"
-namespace bg = boost::geometry;
-typedef bg::model::d2::point_xy<double> point_t;
-typedef bg::model::polygon<point_t> polygon_t;
 
-
+namespace procon {
 class Field
 {
-    PolygonExpansion fieldFlame;
-    std::vector<PolygonExpansion> fieldPiece;
+private:
+    procon::ExpandedPolygon field_flame;
+    std::vector<procon::ExpandedPolygon> field_pieces;
 public:
     Field();
-    //setterとgetter
-    void setFlame(const PolygonExpansion &flame); 
-    void setPiece(const PolygonExpansion &piece,const int &n, double x=0, double y=0);
-    void pushPiece(const PolygonExpansion &piece, double x=0, double y=0);
-    PolygonExpansion popPiece();
-    PolygonExpansion getPiece(const int &n) ;
-    PolygonExpansion getFlame() ;
-    bool isPuttable(PolygonExpansion polygon);
-    //以下はsetterとgetterの後方互換用 *↑とオーバーロードできない(getterの引数が同じ)なので気をつけて*
-    /*
-    void setFlame(const polygon_t &flame);
-    void setPiece(const polygon_t &piece,const int &n);
-    void pushPiece(const polygon_t &piece);
-    polygon_t popPiece();
-    polygon_t getPiece(const int &n) ;
-    polygon_t getFlame();
-    */
-    //*ここまで*
-    //fieldPieceにセットされているピースの数
-    int pieceSize();
+    //setter
+    void setFlame(const procon::ExpandedPolygon &flame);
+    void setPiece(procon::ExpandedPolygon piece,double x=0, double y=0);
+    void setPiece(procon::ExpandedPolygon piece,int n,double x=0,double y=0);
+    //getter
+    std::vector<procon::ExpandedPolygon> getPieces();
+    procon::ExpandedPolygon getPiece(const int &n);
+    procon::ExpandedPolygon getFlame();
+    int getPiecesSize();
+    //任意の位置のピースを消去
+    void removePiece(int n);
+    //置けるかチェック
+    bool isPuttable(procon::ExpandedPolygon polygon);
     //コンソール出力
     void printFlame();
     void printPiece();
 };
-
+}
 #endif // FIELD_H

@@ -5,10 +5,10 @@ SimpleAlgorithm::SimpleAlgorithm()
 
 }
 
-Field SimpleAlgorithm::run(PolygonSet set)
+procon::Field SimpleAlgorithm::run(PolygonSet set)
 {
-    Field field;
-    PolygonExpansion ExP_buff;
+    procon::Field field;
+    procon::ExpandedPolygon ExP_buff;
     polygon_t P_buff;
 
     field.setFlame(set.fieldFlame);

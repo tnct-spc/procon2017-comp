@@ -10,7 +10,7 @@ class SOLVERSHARED_EXPORT Solver
 
 public:
     Solver();
-    Field run(PolygonSet set);
+    procon::Field run(PolygonSet set);
 };
 
 #endif // SOLVER_H

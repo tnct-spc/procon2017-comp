@@ -11,9 +11,9 @@ class DISPLAYANSWERSHARED_EXPORT DisplayAnswer
 public:
     DisplayAnswer();
     std::shared_ptr<AnswerBoard> board;
-    void setField(Field& field);
+    void setField(procon::Field& field);
 private:
-    Field field;
+    procon::Field field;
 };
 
 #endif // DISPLAYANSWER_H
