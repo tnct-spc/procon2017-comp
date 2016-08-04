@@ -7,7 +7,7 @@ procon::Field::Field()
 
 /*---------------------public--------------------------*/
 //setter
-void procon::Field::setFlame(const ExpandedPolygon &flame)
+void procon::Field::setFlame(ExpandedPolygon const& flame)
 {
     field_flame = flame;
 }
@@ -32,27 +32,48 @@ void procon::Field::setPiece(procon::ExpandedPolygon piece, int n, double x, dou
     field_pieces.at(n) = p;
 }
 
+void procon::Field::setElementaryFlame(procon::ExpandedPolygon const& flame)
+{
+    elementary_flame = flame;
+}
+
+
+void procon::Field::setElementaryPieces(std::vector<procon::ExpandedPolygon> const& pieces)
+{
+    elementary_pieces = pieces;
+}
+
 //getter
-std::vector<procon::ExpandedPolygon> procon::Field::getPieces()
+std::vector<procon::ExpandedPolygon> const& procon::Field::getPieces() const
 {
     return field_pieces;
 }
 
-procon::ExpandedPolygon procon::Field::getPiece(const int &n)
+procon::ExpandedPolygon const& procon::Field::getPiece(const int &n) const
 {
     return field_pieces.at(n);
 }
 
-procon::ExpandedPolygon procon::Field::getFlame()
+procon::ExpandedPolygon const& procon::Field::getFlame() const
 {
     return field_flame;
+}
+
+
+procon::ExpandedPolygon const& procon::Field::getElementaryFlame() const
+{
+    return elementary_flame;
+}
+
+std::vector<procon::ExpandedPolygon> const& procon::Field::getElementaryPieces() const
+{
+    return elementary_pieces;
 }
 
 int procon::Field::getPiecesSize()
 {
     return static_cast<int>(field_pieces.size());
 }
-
 //remove
 void procon::Field::removePiece(int n)
 {

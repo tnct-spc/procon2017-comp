@@ -67,17 +67,17 @@ int procon::ExpandedPolygon::getSize()
     return size;
 }
 
-std::vector<double> const& procon::ExpandedPolygon::getSideLength()
+std::vector<double> const& procon::ExpandedPolygon::getSideLength() const
 {
     return side_length;
 }
 
-std::vector<double> const& procon::ExpandedPolygon::getSideAngle()
+std::vector<double> const& procon::ExpandedPolygon::getSideAngle() const
 {
     return side_angle;
 }
 
-polygon_t const& procon::ExpandedPolygon::getPolygon()
+polygon_t const& procon::ExpandedPolygon::getPolygon() const
 {
     return polygon;
 }

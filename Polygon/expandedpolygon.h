@@ -37,9 +37,9 @@ public:
 
     //getter
     int getSize();
-    std::vector<double> const& getSideLength();
-    std::vector<double> const& getSideAngle();
-    polygon_t const& getPolygon();
+    std::vector<double> const& getSideLength() const;
+    std::vector<double> const& getSideAngle() const;
+    polygon_t const& getPolygon() const;
 
     //setter
     void setPolygon(polygon_t const & p);
