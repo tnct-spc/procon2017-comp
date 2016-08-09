@@ -108,13 +108,10 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
     int count = 0;
     for(auto &image : images){
-        //エッジ検出（使用すべきか検討必要）
-        //cv::Canny(image, image, 50, 200, 3); // Apply canny edge
-
-        //LSD直線検出(モードは要検証)
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD);
-        //cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_NONE);
         pieces_lines.push_back(std::vector<cv::Vec4f>());
+
+        //LSD直線検出 引数の"scale"が重要！！！
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.35,0.6,2.0,22.5,0,0.7,1024);
         lsd->detect(image, pieces_lines[count]);
 
         //描画
