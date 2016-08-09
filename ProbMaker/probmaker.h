@@ -11,7 +11,6 @@
 #include "displayanswer.h"
 #include "polygonset.h"
 #include "expandedpolygon.h"
-using namespace procon;
 
 //prototype
 class Dot;

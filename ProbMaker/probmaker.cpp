@@ -53,7 +53,7 @@ void ProbMaker::run()
     procon::Field field = PolygonToExPolygon();
 
     //ポリゴンをファイルに出力
-    PolygonIO::exportPolygon(field,"./../output.csv");
+    procon::PolygonIO::exportPolygon(field,"./../output.csv");
 
 }
 
@@ -189,9 +189,9 @@ procon::Field ProbMaker::PolygonToExPolygon()
     polygon_t flame;
     polygon_t buff;
     std::vector<polygon_t> pieces;
-    ExpandedPolygon ex_flame;
-    ExpandedPolygon buff2;
-    std::vector<ExpandedPolygon> ex_pieces;
+    procon::ExpandedPolygon ex_flame;
+    procon::ExpandedPolygon buff2;
+    std::vector<procon::ExpandedPolygon> ex_pieces;
     procon::Field field;
 
     //flame
