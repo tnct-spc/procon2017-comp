@@ -16,6 +16,7 @@ private:
     //フィールド上のピース&フレーム
     procon::ExpandedPolygon field_flame;
     std::vector<procon::ExpandedPolygon> field_pieces;
+
     //素のピース&フレーム
     procon::ExpandedPolygon elementary_flame;
     std::vector<procon::ExpandedPolygon> elementary_pieces;

@@ -36,7 +36,7 @@ public:
     ExpandedPolygon(ExpandedPolygon const& p);
 
     //getter
-    int getSize();
+    int getSize() const;
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
     polygon_t const& getPolygon() const;

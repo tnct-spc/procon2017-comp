@@ -38,7 +38,7 @@ void Hazama::run()
     std::cout << "Run" << std::endl;
 
     /*Get puzzle data*/
-    PolygonSet PDATA;
+    procon::Field PDATA;
     cv::Mat src;
     if(ui->useWebCamera->isChecked() || ui->useScaner->isChecked()){
         //get Image
@@ -61,14 +61,13 @@ void Hazama::run()
         //PDATA = ...
     }else if(ui->useFileData->isChecked()){
         std::string path = QFileDialog::getOpenFileName(this).toStdString();
-        PDATA = PolygonIO::importPolygon(path);
+        PDATA = procon::PolygonIO::importPolygon(path);
     }else{
         return;
     }
-
     /*Solve puzzle*/
     Solver solver;
-    Field field = solver.run(PDATA);
+    procon::Field field = solver.run(PDATA);
 
     /*Display answer*/
     Display.setField(field);

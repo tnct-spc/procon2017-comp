@@ -50,10 +50,10 @@ void ProbMaker::run()
     this->update();
 
     //認識したポリゴンを拡張ポリゴンに変換
-    PolygonSet set = PolygonToExPolygon();
+    procon::Field field = PolygonToExPolygon();
 
     //ポリゴンをファイルに出力
-    PolygonIO::exportPolygon(set,"./../output.csv");
+    PolygonIO::exportPolygon(field,"./../output.csv");
 
 }
 
@@ -184,39 +184,39 @@ bool ProbMaker::isValidLine(const std::shared_ptr<Line> &newL, double startL_ang
     return true;
 }
 
-PolygonSet ProbMaker::PolygonToExPolygon()
+procon::Field ProbMaker::PolygonToExPolygon()
 {
     polygon_t flame;
     polygon_t buff;
     std::vector<polygon_t> pieces;
-    PolygonExpansion exFlame;
-    PolygonExpansion buff2;
-    std::vector<PolygonExpansion> exPieces;
-    PolygonSet set;
+    ExpandedPolygon ex_flame;
+    ExpandedPolygon buff2;
+    std::vector<ExpandedPolygon> ex_pieces;
+    procon::Field field;
 
     //flame
-    for(int j=0;j<Polygons.at(0).size();++j){
+    for(int j = 0;j < (static_cast<int>(Polygons.at(0).size()));++j){
         flame.outer().push_back(point_t(Polygons.at(0).at(j).s_dot->x/30,Polygons.at(0).at(j).s_dot->y/30));
     }
     flame.outer().push_back(point_t(Polygons.at(0).at(0).s_dot->x/30,Polygons.at(0).at(0).s_dot->y/30));
-    exFlame.setPolygon(flame);
-    set.fieldFlame = exFlame;
+    ex_flame.setPolygon(flame);
+    field.setElementaryFlame(ex_flame);
 
-    //polygons
-    for(int i=1;i<Polygons.size();++i){
+    //polygon
+    for(int i = 1;i < (static_cast<int>(Polygons.size()));++i){
         pieces.push_back(buff);
         double reference_point_x = Polygons.at(i).at(0).s_dot->x/30;
         double reference_point_y = Polygons.at(i).at(0).s_dot->y/30;
-        for(int j=0;j<Polygons.at(i).size();++j){
+        for(int j = 0;j < (static_cast<int>(Polygons.at(i).size()));++j){
             pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(j).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(j).s_dot->y/30)-reference_point_y));
         }
         pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(0).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(0).s_dot->y/30)-reference_point_y));
-        exPieces.push_back(buff2);
-        exPieces.at(i-1).setPolygon(pieces.at(i-1));
-        set.fieldPiece.push_back(exPieces.at(i-1));
+        ex_pieces.push_back(buff2);
+        ex_pieces.at(i-1).setPolygon(pieces.at(i-1));
     }
+    field.setElementaryPieces(ex_pieces);
 
-    return set;
+    return field;
 }
 
 void ProbMaker::addNewLine()

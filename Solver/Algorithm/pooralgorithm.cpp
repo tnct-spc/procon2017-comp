@@ -5,12 +5,11 @@ PoorAlgorithm::PoorAlgorithm()
 
 }
 
-Field PoorAlgorithm::run(PolygonSet set)
+procon::Field PoorAlgorithm::run(procon::Field field)
 {
-    Field field;
 
-    field.setFlame(set.fieldFlame);
-    field.pushPiece(set.fieldPiece.at(0),15,15);
+    field.setFlame(field.getElementaryFlame());
+    field.setPiece(field.getElementaryPieces().at(0),15.0,15.0);
 
     return field;
 }

@@ -7,12 +7,13 @@ Solver::Solver()
 {
 }
 
-procon::Field Solver::run(PolygonSet set)
+procon::Field Solver::run(procon::Field field)
 {
-    PoorAlgorithm algo1;
-    SimpleAlgorithm algo2;
+    PoorAlgorithm poor_algo;
+    SimpleAlgorithm simple_algo;
 
-    procon::Field field = algo1.run(set);
+    procon::Field poor_field = poor_algo.run(field);
+    procon::Field simple_field = simple_algo.run(field);
 
-    return field;
+    return simple_field;
 }

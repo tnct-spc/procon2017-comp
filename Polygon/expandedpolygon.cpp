@@ -7,16 +7,19 @@ procon::ExpandedPolygon::ExpandedPolygon()
     //this->inners().push_back(polygon::ring_type());
     side_length.reserve(32);
     side_angle.reserve(32);
+    polygon.outer().reserve(32);
 }
 
-//copy
+//copy_constructor
 procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
 {
+    this->polygon = p.polygon;
     this->size = p.size;
     this->side_length = p.side_length;
     this->side_angle = p.side_angle;
-    side_length.reserve(32);
-    side_angle.reserve(32);
+    this->side_length.reserve(32);
+    this->side_angle.reserve(32);
+    this->polygon.outer().reserve(32);
 
 }
 
@@ -62,7 +65,7 @@ void procon::ExpandedPolygon::calcSideAngle()
 
 //---------------------public------------------------
 // getter
-int procon::ExpandedPolygon::getSize()
+int procon::ExpandedPolygon::getSize() const
 {
     return size;
 }
@@ -92,10 +95,12 @@ void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 procon::ExpandedPolygon procon::ExpandedPolygon::operator =
 (procon::ExpandedPolygon const& p)
 {
+    this->polygon = p.polygon;
     this->side_length = p.side_length;
     this->side_angle = p.side_angle;
     this->side_length.reserve(32);
     this->side_angle.reserve(32);
+    this->polygon.outer().reserve(32);
     return (*this);
 }
 

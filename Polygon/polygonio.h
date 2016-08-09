@@ -2,14 +2,19 @@
 #define POLYGONIO_H
 
 #include "polygonexpansion.h"
-#include "polygonset.h"
+#include "field.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
+namespace procon {
 class PolygonIO
 {
 public:
     PolygonIO();
-    static PolygonSet importPolygon(std::string file_path);
-    static void exportPolygon(PolygonSet set, std::string file_path);
+    static procon::Field importPolygon(std::string file_path);
+    static void exportPolygon(procon::Field field, std::string file_path);
 };
 
+}
 #endif // POLYGONIO_H

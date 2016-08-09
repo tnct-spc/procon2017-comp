@@ -91,7 +91,7 @@ bool procon::Field::isPuttable(procon::ExpandedPolygon polygon)
 
 void procon::Field::printFlame()
 {
-    std::cout << bg::dsv(field_flame.getPolygon()) << std::endl;
+    std::cout << bg::dsv(elementary_flame.getPolygon()) << std::endl;
 }
 
 void procon::Field::printPiece()
