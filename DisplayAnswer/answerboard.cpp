@@ -16,7 +16,7 @@ AnswerBoard::~AnswerBoard()
     delete ui;
 }
 
-void AnswerBoard::setField(Field &field)
+void AnswerBoard::setField(procon::Field &field)
 {
     this->field = field;
 }
@@ -47,7 +47,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     }
     //piece
     std::vector<polygon_t> raw_pieces;
-    int pieces_size = field.pieceSize();
+    int pieces_size = field.getPiecesSize();
     for(int i=0;i<pieces_size;i++){
         raw_pieces.push_back(field.getPiece(i).getPolygon());
         int piece_size = raw_pieces[i].outer().size()-1;

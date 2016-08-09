@@ -10,7 +10,7 @@
 
 #include "displayanswer.h"
 #include "polygonset.h"
-
+#include "expandedpolygon.h"
 
 //prototype
 class Dot;
@@ -116,7 +116,8 @@ private:
     //ポリゴンの数が50になるまでポリゴンを削除
     void erasePolygonUnderFifty();
     //ポリゴンを拡張ポリゴンに変更
-    PolygonSet PolygonToExPolygon();
+    //NOTE:PolygonSet->fieldに修正
+    procon::Field PolygonToExPolygon();
 
     DisplayAnswer* display;
 

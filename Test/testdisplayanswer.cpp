@@ -8,6 +8,7 @@ TestDisplayAnswer::TestDisplayAnswer()
 
 bool TestDisplayAnswer::run()
 {
+    /*
     std::cout << "Hello,display!" << std::endl;
     polygon_t b,c,d;
     bg::exterior_ring(b) = boost::assign::list_of<point_t>(0, 0)(30, 0)(30,30)(0, 30)(0, 2)(2, 2)(2,28)(28, 28)(28, 2)(0, 2)(0,0);
@@ -22,5 +23,6 @@ bool TestDisplayAnswer::run()
     f.printFlame();
     f.printPiece();
     disp->setField(f);
+    */
     return true;
 }

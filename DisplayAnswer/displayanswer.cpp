@@ -5,7 +5,7 @@ DisplayAnswer::DisplayAnswer()
 {
 }
 
-void DisplayAnswer::setField(Field &field)
+void DisplayAnswer::setField(procon::Field &field)
 {
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();

@@ -1,16 +1,13 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include "polygonio.h"
 
-PolygonIO::PolygonIO()
+procon::PolygonIO::PolygonIO()
 {
 
 }
 
-PolygonSet PolygonIO::importPolygon(std::string file_path)
+procon::Field procon::PolygonIO::importPolygon(std::string file_path)
 {
-    PolygonSet Set;
+    procon::Field field;
     std::ifstream inputfile(file_path);
 
     std::string str;
@@ -23,9 +20,13 @@ PolygonSet PolygonIO::importPolygon(std::string file_path)
         std::getline(stream,tmpY,',');
         flame.outer().push_back(point_t(std::stof(tmpX),std::stof(tmpY)));
     }
-    Set.fieldFlame.setPolygon(flame);
+    ExpandedPolygon ex_flame;
+    ex_flame.setPolygon(flame);
+    field.setElementaryFlame(ex_flame);
+
     //pieces
     int pieces_cnt = 0;
+    std::vector<procon::ExpandedPolygon> ex_pieces;
     while(std::getline(inputfile, str)){
         polygon_t piece;
         std::string tmpX,tmpY;
@@ -34,21 +35,21 @@ PolygonSet PolygonIO::importPolygon(std::string file_path)
             std::getline(stream,tmpY,',');
             piece.outer().push_back(point_t(std::stof(tmpX),std::stof(tmpY)));
         }
-        PolygonExpansion tmpP;
-        tmpP.setPolygon(piece);
-        Set.fieldPiece.push_back(tmpP);
+        procon::ExpandedPolygon ex_piece;
+        ex_piece.setPolygon(piece);
+        ex_pieces.push_back(ex_piece);
         pieces_cnt++;
     }
-
-    return Set;
+    field.setElementaryPieces(ex_pieces);
+    return field;
 }
 
-void PolygonIO::exportPolygon(PolygonSet set, std::string file_path)
+void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path)
 {
     std::ofstream outputfile(file_path);
     //flame
-    polygon_t raw_flame = set.fieldFlame.getPolygon();
-    int flame_size = set.fieldFlame.size();
+    polygon_t raw_flame = field.getElementaryFlame().getPolygon();
+    int flame_size = field.getElementaryFlame().getSize();
     for(int i=0;i<flame_size;i++){
         if(i!=0) outputfile << ",";
         outputfile << raw_flame.outer()[i].x() << "," << raw_flame.outer()[i].y();
@@ -56,12 +57,12 @@ void PolygonIO::exportPolygon(PolygonSet set, std::string file_path)
     outputfile << "\n";
     //piece
     std::vector<polygon_t> raw_pieces;
-    int pieces_size = set.fieldPiece.size();
+    int pieces_size = field.getElementaryPieces().size();
     for(int i=0;i<pieces_size;i++){
-        raw_pieces.push_back(set.fieldPiece.at(i).getPolygon());
+        raw_pieces.push_back(field.getElementaryPieces().at(i).getPolygon());
     }
     for(int i=0;i<pieces_size;i++){
-        int piece_size = set.fieldPiece.at(i).size();
+        int piece_size = field.getElementaryPieces().at(i).getSize();
         for(int j=0;j<piece_size;j++){
             if(j!=0) outputfile << ",";
             outputfile << raw_pieces.at(i).outer()[j].x() << "," << raw_pieces.at(i).outer()[j].y();

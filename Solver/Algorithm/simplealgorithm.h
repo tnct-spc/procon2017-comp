@@ -7,7 +7,7 @@ class SimpleAlgorithm : public AlgorithmWrapper
 {
 public:
     SimpleAlgorithm();
-    Field run(PolygonSet set);
+    procon::Field run(procon::Field field);
 };
 
 #endif // SIMPLEALGORITHM_H
