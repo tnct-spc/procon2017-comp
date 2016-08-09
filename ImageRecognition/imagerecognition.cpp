@@ -12,26 +12,28 @@
 
 void ImageRecognition::run()
 {
-    std::string path = "./../../procon2016-comp/picture/camera-sample.JPEG";
+    std::string path = "./../../procon2016-comp/picture/scan.png";
 
     //前処理
-    cv::Mat image = Preprocessing(path);
+    std::vector<cv::Mat> images = Preprocessing(path);
 
     //線分検出
-    std::vector<cv::Vec4f> lines = LineDetection(image);
+    std::vector<std::vector<cv::Vec4f>> pieces_lines = LineDetection(images);
 
     //ベクター化
-    std::vector<PolygonExpansion> polygons = Vectored(lines);
+    std::vector<PolygonExpansion> polygons = Vectored(pieces_lines);
 
     cv::waitKey();
 }
 
-cv::Mat ImageRecognition::Preprocessing(std::string const& path)
+std::vector<cv::Mat> ImageRecognition::Preprocessing(std::string const& path)
 {
-    //画像をカラーで読み込み
+    //画像読み込み
     cv::Mat image = cv::imread(path, 1);
+    int rows = image.rows;
+    int cols = image.cols;
 
-    //H:0-255/180, S:51-255/255, B:133-230/255
+    //色抽出 H:0-255/180, S:51-255/255, B:133-230/255
     colorExtraction(&image, &image, CV_BGR2HSV, 0, 180, 51, 255, 133, 191);
 
     //グレースケールに変換
@@ -40,31 +42,94 @@ cv::Mat ImageRecognition::Preprocessing(std::string const& path)
     //二値化
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
 
-    return std::move(image);
+    //ピース内に混じっている白い穴を削除
+    cv::Mat *hole_label = new cv::Mat();
+    cv::connectedComponents(image, *hole_label,4);
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++) image.at<unsigned char>(y,x) = hole_label->at<int>(y,x) == 1  ? 255 : 0;
+    delete hole_label;
+
+    //二値化
+    cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
+
+    //ピースを一つ一つに分ける
+    struct minmax2D{
+        int minX = 10000;
+        int maxX = 0;
+        int minY = 10000;
+        int maxY = 0;
+    };
+    std::vector<cv::Mat> images;
+    cv::Mat *piece_label = new cv::Mat();
+    int label_num = cv::connectedComponents(image, *piece_label);
+    std::vector<struct minmax2D> minmaxs(label_num-1);
+    for(int i=0;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
+    int n;
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
+    {
+        n = piece_label->at<int>(y,x);
+        if(n!=0){
+            images[n-1].at<unsigned char>(y,x) = 255;
+            if(minmaxs[n-1].minX > x) minmaxs[n-1].minX = x;
+            if(minmaxs[n-1].maxX < x) minmaxs[n-1].maxX = x;
+            if(minmaxs[n-1].minY > y) minmaxs[n-1].minY = y;
+            if(minmaxs[n-1].maxY < y) minmaxs[n-1].maxY = y;
+        }
+    }
+    delete piece_label;
+
+    //triming and delete small noise
+    const int NOIZE_SIZE = 10;
+    std::vector<cv::Mat> result_images;
+    int count=0;
+    for(auto &im: images){
+        if(minmaxs[count].maxX-minmaxs[count].minX < NOIZE_SIZE && minmaxs[count].maxY-minmaxs[count].minY < NOIZE_SIZE){
+            count++;
+            continue;
+        }
+        result_images.push_back(cv::Mat(im,cv::Rect(minmaxs[count].minX - 5 < 0 ? 0 : minmaxs[count].minX - 5,
+                                                    minmaxs[count].minY - 5 < 0 ? 0 : minmaxs[count].minY - 5,
+                                                    minmaxs[count].maxX + 5 > cols ? cols-minmaxs[count].minX : minmaxs[count].maxX-minmaxs[count].minX + 10,
+                                                    minmaxs[count].maxY + 5 > rows ? rows-minmaxs[count].minY : minmaxs[count].maxY-minmaxs[count].minY + 10
+                                                    )));
+        count++;
+    }
+
+    //二値化
+    for(auto &im : images){
+        cv::threshold(im, im, 0, 255, cv::THRESH_BINARY_INV);
+    }
+
+    return std::move(result_images);
 }
 
-std::vector<cv::Vec4f> ImageRecognition::LineDetection(cv::Mat const& image)
+std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<cv::Mat> const& images)
 {
-    std::vector<cv::Vec4f> lines;
+    std::vector<std::vector<cv::Vec4f>> pieces_lines;
 
-    //エッジ検出（使用すべきか検討必要）
-    //cv::Canny(image, image, 50, 200, 3); // Apply canny edge
+    int count = 0;
+    for(auto &image : images){
+        //エッジ検出（使用すべきか検討必要）
+        //cv::Canny(image, image, 50, 200, 3); // Apply canny edge
 
-    //LSD直線検出(モードは要検証)
-    cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD);
-    //cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_NONE);
-    lsd->detect(image, lines);
+        //LSD直線検出(モードは要検証)
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD);
+        //cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_NONE);
+        pieces_lines.push_back(std::vector<cv::Vec4f>());
+        lsd->detect(image, pieces_lines[count]);
 
-    //描画
-    cv::Mat pic(image);
-    lsd->drawSegments(pic, lines);
-    cv::namedWindow("pic with LSD line",CV_WINDOW_NORMAL);
-    cv::imshow("pic with LSD line", pic);
+        //描画
+        cv::Mat pic(image);
+        lsd->drawSegments(pic, pieces_lines[count]);
+        cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
+        cv::imshow(std::to_string(count+1), pic);
 
-    return std::move(lines);
+        count++;
+    }
+
+    return std::move(pieces_lines);
 }
 
-std::vector<PolygonExpansion> ImageRecognition::Vectored(std::vector<cv::Vec4f> const& lines)
+std::vector<PolygonExpansion> ImageRecognition::Vectored(std::vector<std::vector<cv::Vec4f>> const& pieces_lines)
 {
     std::vector<PolygonExpansion> polygon;
     return std::move(polygon);
