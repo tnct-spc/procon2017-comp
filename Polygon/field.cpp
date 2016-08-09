@@ -12,6 +12,18 @@ void procon::Field::setFlame(ExpandedPolygon const& flame)
     field_flame = flame;
 }
 
+void procon::Field::setPiece(polygon_t piece)
+{
+    procon::ExpandedPolygon ex_piece;
+    ex_piece.setPolygon(piece);
+    field_pieces.push_back(ex_piece);
+}
+
+void procon::Field::setPiece(procon::ExpandedPolygon piece)
+{
+    field_pieces.push_back(piece);
+}
+
 void procon::Field::setPiece(ExpandedPolygon piece, double x, double y)
 {
     polygon_t translated_polygon;
@@ -80,6 +92,7 @@ void procon::Field::removePiece(int n)
     field_pieces.erase(field_pieces.begin() + n);
 }
 
+//is_
 bool procon::Field::isPuttable(procon::ExpandedPolygon polygon)
 {
     if(!boost::geometry::within(polygon.getPolygon(), field_flame.getPolygon())) return false;

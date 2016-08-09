@@ -26,8 +26,11 @@ public:
 
     //setter
     void setFlame(procon::ExpandedPolygon const& flame);
-    void setPiece(procon::ExpandedPolygon piece,double x=0, double y=0);
-    void setPiece(procon::ExpandedPolygon piece,int n,double x=0,double y=0);
+
+    void setPiece(polygon_t piece);
+    void setPiece(procon::ExpandedPolygon piece);
+    void setPiece(procon::ExpandedPolygon piece,double x, double y);
+    void setPiece(procon::ExpandedPolygon piece,int n,double x = 0,double y = 0);
     void setElementaryFlame(procon::ExpandedPolygon const& flame);
     void setElementaryPieces(std::vector<procon::ExpandedPolygon> const& pieces);
 
