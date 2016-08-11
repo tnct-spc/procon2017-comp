@@ -154,7 +154,7 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
     };
     std::vector<cv::Mat> images;
     cv::Mat piece_label;
-    int label_num = cv::connectedComponents(image, piece_label);
+    int label_num = cv::connectedComponents(image, piece_label, 4);
     std::vector<struct minmax2D> minmaxs(label_num);
     for(int i=0;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
