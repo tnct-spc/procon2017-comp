@@ -61,7 +61,7 @@ std::vector<cv::Mat> ImageRecognition::Preprocessing(std::string const& path)
     std::vector<cv::Mat> images;
     cv::Mat *piece_label = new cv::Mat();
     int label_num = cv::connectedComponents(image, *piece_label);
-    std::vector<struct minmax2D> minmaxs(label_num-1);
+    std::vector<struct minmax2D> minmaxs(label_num);
     for(int i=0;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
     int n;
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
@@ -77,7 +77,7 @@ std::vector<cv::Mat> ImageRecognition::Preprocessing(std::string const& path)
     }
     delete piece_label;
 
-    //triming and delete small noise
+    //triming, and delete small noise
     const int NOIZE_SIZE = 10;
     std::vector<cv::Mat> result_images;
     int count=0;
