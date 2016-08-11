@@ -47,11 +47,11 @@ cv::Mat ImageRecognition::preprocessingFlame(std::string const& path)
 {
     //画像読み込み
     cv::Mat image = cv::imread(path, 1);
+
+    threshold(image);
     int rows = image.rows;
     int cols = image.cols;
 
-    threshold(image);
-/*
     //ピース内に混じっている白い穴を削除
     cv::Mat *hole_label = new cv::Mat();
     cv::connectedComponents(image, *hole_label,4);
@@ -73,12 +73,17 @@ cv::Mat ImageRecognition::preprocessingFlame(std::string const& path)
     int label_num = cv::connectedComponents(image, *piece_label);
     std::vector<struct minmax2D> minmaxs(label_num);
     for(int i=0;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
+        for(int i=0;i<label_num;++i){
+            images[i].at<unsigned char>(y,x) = 255;
+        }
+    }
     int n;
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
     {
         n = piece_label->at<int>(y,x);
         if(n!=0){
-            images[n-1].at<unsigned char>(y,x) = 255;
+            images[n-1].at<unsigned char>(y,x) = 0;
             if(minmaxs[n-1].minX > x) minmaxs[n-1].minX = x;
             if(minmaxs[n-1].maxX < x) minmaxs[n-1].maxX = x;
             if(minmaxs[n-1].minY > y) minmaxs[n-1].minY = y;
@@ -116,10 +121,10 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
 {
     //画像読み込み
     cv::Mat image = cv::imread(path, 1);
-    int rows = image.rows;
-    int cols = image.cols;
 
     threshold(image);
+    int rows = image.rows;
+    int cols = image.cols;
 
     //ピース内に混じっている白い穴を削除
     cv::Mat *hole_label = new cv::Mat();
@@ -142,12 +147,17 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
     int label_num = cv::connectedComponents(image, *piece_label);
     std::vector<struct minmax2D> minmaxs(label_num);
     for(int i=0;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
+        for(int i=0;i<label_num;++i){
+            images[i].at<unsigned char>(y,x) = 255;
+        }
+    }
     int n;
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
     {
         n = piece_label->at<int>(y,x);
         if(n!=0){
-            images[n-1].at<unsigned char>(y,x) = 255;
+            images[n-1].at<unsigned char>(y,x) = 0;
             if(minmaxs[n-1].minX > x) minmaxs[n-1].minX = x;
             if(minmaxs[n-1].maxX < x) minmaxs[n-1].maxX = x;
             if(minmaxs[n-1].minY > y) minmaxs[n-1].minY = y;
