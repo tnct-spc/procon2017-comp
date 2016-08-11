@@ -38,3 +38,10 @@ else:unix: LIBS += -L$$OUT_PWD/../Solver/ -lSolver
 
 INCLUDEPATH += $$PWD/../Solver
 DEPENDPATH += $$PWD/../Solver
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ImageRecognition/release/ -lImageRecognition
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ImageRecognition/debug/ -lImageRecognition
+else:unix: LIBS += -L$$OUT_PWD/../ImageRecognition/ -lImageRecognition
+
+INCLUDEPATH += $$PWD/../ImageRecognition
+DEPENDPATH += $$PWD/../ImageRecognition

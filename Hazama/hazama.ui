@@ -34,7 +34,7 @@
    </widget>
    <widget class="QRadioButton" name="useWebCamera">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -71,9 +71,9 @@
      <string>UseFileData</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="useScaner">
+   <widget class="QRadioButton" name="useImageData">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -89,7 +89,7 @@
      </font>
     </property>
     <property name="text">
-     <string>UseScaner</string>
+     <string>UseImageData</string>
     </property>
    </widget>
   </widget>

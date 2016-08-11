@@ -8,12 +8,15 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <QFileDialog>
 
+#define noVectored
+
 #include "polygonexpansion.h"
 #include "polygonset.h"
 #include "field.h"
 #include "polygonio.h"
 #include "displayanswer.h"
 #include "solver.h"
+#include "imagerecognition.h"
 
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),
@@ -33,31 +36,49 @@ void Hazama::init()
 
 }
 
+cv::Mat drawRawPicWithId(cv::Mat raw_pieces_pic, std::vector<cv::Point> raw_pieces_pos)
+{
+    for(int i=0;i<raw_pieces_pos.size();++i){
+        cv::putText(raw_pieces_pic, std::to_string(i), cv::Point(raw_pieces_pos[i].x-60,raw_pieces_pos[i].y+60), cv::FONT_HERSHEY_SIMPLEX, 5, cv::Scalar(255,0,0));
+    }
+    return raw_pieces_pic;
+}
+
 void Hazama::run()
 {
     std::cout << "Run" << std::endl;
 
-    /*Get puzzle data*/
     procon::Field PDATA;
-    cv::Mat src;
-    if(ui->useWebCamera->isChecked() || ui->useScaner->isChecked()){
+
+    /*Get puzzle data*/
+    cv::Mat flame;
+    cv::Mat pieces;
+    if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
         //get Image
         if(ui->useWebCamera->isChecked()){
-           src = capture();
+            flame = capture();
+            pieces = capture();
         }else{
-            int state = system("sh ./../../procon2016-comp/scanimage.sh");
-            if(state ^= 0){
-                std::cout << "failed. scanimage.sh error." << std::endl;
-                return;
-            }
-            std::string path = "./../../procon2016-comp/CompImage/dpi300test.png";
-            src = cv::imread(path);
+            std::string flame_path = "./../../procon2016-comp/picture/flame.jpg";
+            std::string pieces_path = "./../../procon2016-comp/picture/pieces.jpg";
+            flame = cv::imread(flame_path, 1);
+            pieces = cv::imread(pieces_path, 1);
         }
-        //display picture
-        cv::namedWindow("picture",CV_WINDOW_AUTOSIZE);
-        cv::imshow("picture",src);
 
         /*Image Recognition*/
+        ImageRecognition imrec;
+#ifdef noVectored
+        imrec.run(flame, pieces);
+#else
+        PDATA = imrec.run(flame, pieces);
+#endif
+        //display recognized image
+        cv::Mat raw_pieces_pic = imrec.getRawPiecesPic();
+        std::vector<cv::Point> raw_pieces_pos = imrec.getRawPiecesPos();
+        cv::Mat disp_pic = drawRawPicWithId(raw_pieces_pic,raw_pieces_pos);
+        cv::namedWindow("an",CV_WINDOW_NORMAL);
+        cv::imshow("an", raw_pieces_pic);
+
         //PDATA = ...
     }else if(ui->useFileData->isChecked()){
         std::string path = QFileDialog::getOpenFileName(this).toStdString();
@@ -65,19 +86,26 @@ void Hazama::run()
     }else{
         return;
     }
+
+#ifdef noVectored
+    if(!(ui->useWebCamera->isChecked() || ui->useImageData->isChecked())){
+#endif
     /*Solve puzzle*/
     Solver solver;
     procon::Field field = solver.run(PDATA);
 
     /*Display answer*/
     Display.setField(field);
+#ifdef noVectored
+    }
+#endif
 
     std::cout<<"finish"<<std::endl;
 }
 
 cv::Mat Hazama::capture()
 {
-    cv::VideoCapture cap(0);//デバイスのオープン
+    cv::VideoCapture cap(1);//デバイスのオープン
     //cap.open(0);//こっちでも良い．
 
     if(!cap.isOpened()){
