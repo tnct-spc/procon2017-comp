@@ -153,8 +153,8 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
         int maxY = 0;
     };
     std::vector<cv::Mat> images;
-    cv::Mat *piece_label = new cv::Mat();
-    int label_num = cv::connectedComponents(image, *piece_label);
+    cv::Mat piece_label;
+    int label_num = cv::connectedComponents(image, piece_label);
     std::vector<struct minmax2D> minmaxs(label_num);
     for(int i=0;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
@@ -165,7 +165,7 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
     int n;
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
     {
-        n = piece_label->at<int>(y,x);
+        n = piece_label.at<int>(y,x);
         if(n!=0){
             images[n-1].at<unsigned char>(y,x) = 0;
             if(minmaxs[n-1].minX > x) minmaxs[n-1].minX = x;
@@ -174,7 +174,6 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
             if(minmaxs[n-1].maxY < y) minmaxs[n-1].maxY = y;
         }
     }
-    delete piece_label;
 
     //triming, and delete small noise
     const int NOIZE_SIZE = 10;
