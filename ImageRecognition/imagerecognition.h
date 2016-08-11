@@ -15,9 +15,11 @@ public:
     void run();
 
 private:
-    std::vector<cv::Mat> Preprocessing(std::string const& path);
+    cv::Mat preprocessingFlame(std::string const& path);
+    std::vector<cv::Mat> preprocessingPieces(std::string const& path);
     std::vector<std::vector<cv::Vec4f>> LineDetection(std::vector<cv::Mat> const& images);
     std::vector<PolygonExpansion> Vectored(std::vector<std::vector<cv::Vec4f>> const& lines);
+    void threshold(cv::Mat& image);
     void colorExtraction(cv::Mat* src, cv::Mat* dst,
         int code,
         int ch1Lower, int ch1Upper,
