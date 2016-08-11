@@ -12,12 +12,13 @@
 
 void ImageRecognition::run()
 {
-    std::string flame_path = "./../../procon2016-comp/picture/flame.png";
-    std::string pieces_path = "./../../procon2016-comp/picture/pieces.png";
+    std::string flame_path = "./../../procon2016-comp/picture/flame.jpg";
+    std::string pieces_path = "./../../procon2016-comp/picture/pieces.jpg";
 
     //前処理
     cv::Mat flame_image = preprocessingFlame(flame_path);
     std::vector<cv::Mat> pieces_images = preprocessingPieces(pieces_path);
+
     std::vector<cv::Mat> images;
     images.push_back(flame_image);
     for(cv::Mat& piece : pieces_images) images.push_back(piece);
@@ -33,8 +34,11 @@ void ImageRecognition::run()
 
 void ImageRecognition::threshold(cv::Mat& image)
 {
-    //色抽出 H:0-255/180, S:51-255/255, B:133-230/255
-    colorExtraction(&image, &image, CV_BGR2HSV, 0, 180, 51, 255, 133, 191);
+    //resize
+    image = cv::Mat(image,cv::Rect(250,0,1450,1080));
+
+    //色抽出 H:0-180/180, S:76-255/255, B:76-153/255
+    colorExtraction(&image, &image, CV_BGR2HSV, 0, 180, 76, 255, 76, 153);
 
     //グレースケールに変換
     cvtColor(image,image,CV_RGB2GRAY);
@@ -53,10 +57,23 @@ cv::Mat ImageRecognition::preprocessingFlame(std::string const& path)
     int cols = image.cols;
 
     //ピース内に混じっている白い穴を削除
-    cv::Mat *hole_label = new cv::Mat();
-    cv::connectedComponents(image, *hole_label,4);
-    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++) image.at<unsigned char>(y,x) = hole_label->at<int>(y,x) == 1  ? 255 : 0;
-    delete hole_label;
+    cv::Mat hole_label;
+    cv::Mat hole_label_stats;
+    cv::Mat buf;
+    int hole_num = cv::connectedComponentsWithStats(image, hole_label, hole_label_stats, buf, 4, 4);
+    std::vector<int> labels_area;
+    for(int i=2;i<hole_num;++i){
+        labels_area.push_back(hole_label_stats.ptr<int>(i)[cv::ConnectedComponentsTypes::CC_STAT_AREA]);
+    }
+    int max_val=0;
+    int max_num=0;
+    for(int i=0;i<labels_area.size();++i){
+        if(labels_area[i] > max_val){
+            max_val = labels_area[i];
+            max_num = i + 2;
+        }
+    }
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++) image.at<unsigned char>(y,x) = (hole_label.at<int>(y,x) == 1 || hole_label.at<int>(y,x) == max_num) ? 255 : 0;
 
     //二値化
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
@@ -108,13 +125,7 @@ cv::Mat ImageRecognition::preprocessingFlame(std::string const& path)
                                                     )));
         count++;
     }
-
-    //二値化
-    for(auto &im : images){
-        cv::threshold(im, im, 0, 255, cv::THRESH_BINARY_INV);
-    }
-*/
-    return std::move(image);
+    return std::move(result_images[0]);
 }
 
 std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& path)
@@ -127,10 +138,9 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
     int cols = image.cols;
 
     //ピース内に混じっている白い穴を削除
-    cv::Mat *hole_label = new cv::Mat();
-    cv::connectedComponents(image, *hole_label,4);
-    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++) image.at<unsigned char>(y,x) = hole_label->at<int>(y,x) == 1  ? 255 : 0;
-    delete hole_label;
+    cv::Mat hole_label;
+    cv::connectedComponents(image, hole_label,4);
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++) image.at<unsigned char>(y,x) = hole_label.at<int>(y,x) == 1  ? 255 : 0;
 
     //二値化
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
@@ -181,11 +191,6 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
                                                     minmaxs[count].maxY + 5 > rows ? rows-minmaxs[count].minY : minmaxs[count].maxY-minmaxs[count].minY + 10
                                                     )));
         count++;
-    }
-
-    //二値化
-    for(auto &im : images){
-        cv::threshold(im, im, 0, 255, cv::THRESH_BINARY_INV);
     }
 
     return std::move(result_images);
