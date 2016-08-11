@@ -59,8 +59,8 @@ void Hazama::run()
             flame = capture();
             pieces = capture();
         }else{
-            std::string flame_path = "./../../procon2016-comp/picture/flame.jpg";
-            std::string pieces_path = "./../../procon2016-comp/picture/pieces.jpg";
+            std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
+            std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
             flame = cv::imread(flame_path, 1);
             pieces = cv::imread(pieces_path, 1);
         }
