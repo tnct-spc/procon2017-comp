@@ -15,9 +15,14 @@ void ImageRecognition::run()
     std::string flame_path = "./../../procon2016-comp/picture/flame.jpg";
     std::string pieces_path = "./../../procon2016-comp/picture/pieces.jpg";
 
+    //画像読み込み
+    cv::Mat raw_flame_image = cv::imread(flame_path, 1);
+    cv::Mat raw_pieces_image = cv::imread(pieces_path, 1);
+    raw_pieces_pic = cv::Mat(raw_pieces_image,cv::Rect(250,0,1450,1080));
+
     //前処理
-    cv::Mat flame_image = preprocessingFlame(flame_path);
-    std::vector<cv::Mat> pieces_images = preprocessingPieces(pieces_path);
+    cv::Mat flame_image = preprocessingFlame(raw_flame_image);
+    std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
 
     std::vector<cv::Mat> images;
     images.push_back(flame_image);
@@ -28,8 +33,6 @@ void ImageRecognition::run()
 
     //ベクター化
     std::vector<PolygonExpansion> polygons = Vectored(pieces_lines);
-
-    cv::waitKey();
 }
 
 void ImageRecognition::threshold(cv::Mat& image)
@@ -47,11 +50,8 @@ void ImageRecognition::threshold(cv::Mat& image)
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
 }
 
-cv::Mat ImageRecognition::preprocessingFlame(std::string const& path)
+cv::Mat ImageRecognition::preprocessingFlame(cv::Mat image)
 {
-    //画像読み込み
-    cv::Mat image = cv::imread(path, 1);
-
     threshold(image);
     int rows = image.rows;
     int cols = image.cols;
@@ -60,7 +60,7 @@ cv::Mat ImageRecognition::preprocessingFlame(std::string const& path)
     cv::Mat hole_label;
     cv::Mat hole_label_stats;
     cv::Mat buf;
-    int hole_num = cv::connectedComponentsWithStats(image, hole_label, hole_label_stats, buf, 4, 4);
+    int hole_num = cv::connectedComponentsWithStats(image, hole_label, hole_label_stats, buf, 4);
     std::vector<int> labels_area;
     for(int i=2;i<hole_num;++i){
         labels_area.push_back(hole_label_stats.ptr<int>(i)[cv::ConnectedComponentsTypes::CC_STAT_AREA]);
@@ -128,11 +128,8 @@ cv::Mat ImageRecognition::preprocessingFlame(std::string const& path)
     return std::move(result_images[0]);
 }
 
-std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& path)
+std::vector<cv::Mat> ImageRecognition::preprocessingPieces(cv::Mat image)
 {
-    //画像読み込み
-    cv::Mat image = cv::imread(path, 1);
-
     threshold(image);
     int rows = image.rows;
     int cols = image.cols;
@@ -153,19 +150,19 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
         int maxY = 0;
     };
     std::vector<cv::Mat> images;
-    cv::Mat piece_label;
-    int label_num = cv::connectedComponents(image, piece_label, 4);
-    std::vector<struct minmax2D> minmaxs(label_num);
-    for(int i=0;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
+    cv::Mat pieces_label;
+    int piece_num = cv::connectedComponents(image, pieces_label, 4);
+    std::vector<struct minmax2D> minmaxs(piece_num);
+    for(int i=0;i<piece_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
-        for(int i=0;i<label_num;++i){
+        for(int i=0;i<piece_num;++i){
             images[i].at<unsigned char>(y,x) = 255;
         }
     }
     int n;
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
     {
-        n = piece_label.at<int>(y,x);
+        n = pieces_label.at<int>(y,x);
         if(n!=0){
             images[n-1].at<unsigned char>(y,x) = 0;
             if(minmaxs[n-1].minX > x) minmaxs[n-1].minX = x;
@@ -175,7 +172,7 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
         }
     }
 
-    //triming, and delete small noise
+    //delete small noise, and triming, get piece raw pos
     const int NOIZE_SIZE = 10;
     std::vector<cv::Mat> result_images;
     int count=0;
@@ -189,9 +186,10 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(std::string const& pa
                                                     minmaxs[count].maxX + 5 > cols ? cols-minmaxs[count].minX : minmaxs[count].maxX-minmaxs[count].minX + 10,
                                                     minmaxs[count].maxY + 5 > rows ? rows-minmaxs[count].minY : minmaxs[count].maxY-minmaxs[count].minY + 10
                                                     )));
+        raw_pieces_pos.push_back({minmaxs[count].minX+((minmaxs[count].maxX-minmaxs[count].minX)/2),
+                                  minmaxs[count].minY+((minmaxs[count].maxY-minmaxs[count].minY)/2)});
         count++;
     }
-
     return std::move(result_images);
 }
 

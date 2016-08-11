@@ -14,9 +14,17 @@ class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 public:
     void run();
 
+    inline cv::Mat getRawPiecesPic(){
+        return std::move(raw_pieces_pic);
+    }
+
+    inline std::vector<cv::Point> getRawPiecesPos(){
+        return std::move(raw_pieces_pos);
+    }
+
 private:
-    cv::Mat preprocessingFlame(std::string const& path);
-    std::vector<cv::Mat> preprocessingPieces(std::string const& path);
+    cv::Mat preprocessingFlame(cv::Mat image);
+    std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
     std::vector<std::vector<cv::Vec4f>> LineDetection(std::vector<cv::Mat> const& images);
     std::vector<PolygonExpansion> Vectored(std::vector<std::vector<cv::Vec4f>> const& lines);
     void threshold(cv::Mat& image);
@@ -26,6 +34,9 @@ private:
         int ch2Lower, int ch2Upper,
         int ch3Lower, int ch3Upper
         );
+
+    cv::Mat raw_pieces_pic;
+    std::vector<cv::Point> raw_pieces_pos;
 };
 
 #endif // IMAGERECOGNITION_H
