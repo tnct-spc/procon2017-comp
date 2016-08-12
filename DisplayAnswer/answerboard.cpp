@@ -23,63 +23,77 @@ void AnswerBoard::setField(procon::Field &field)
 
 void AnswerBoard::paintEvent(QPaintEvent *)
 {
-    int height = this->height();
-    int width = this->width();
     QPainter painter(this);
-    painter.setPen(QPen(Qt::black, 3));
 
-    auto drawLine = [&](double x1, double y1, double x2, double y2){
-        static const int max = 30;
-        static const int margin = 20;
-        int y = height - margin;
-        int x = height - margin;
-        int y_margin = margin/2;
-        int x_margin = (width-height)/2 + margin/2;
-        painter.drawLine((x1*x/max)+x_margin, (y1*y/max)+y_margin, (x2*x/max)+x_margin, (y2*y/max)+y_margin);
+    enum Space
+    {
+        LEFT    = 0,
+        RIGHT   = 1,
+        OVERALL = 2
     };
 
-    auto drawPolygon = [&](std::vector<QPointF> points){
-        int size = points.size();
-        QPointF* draw_point = new QPointF[points.size()];
+    int height = this->height();
+    int width  = this->width();
+    int size   = height < width ? height : width;
+    int cutted_size = height < (width/2) ? height : (width/2);
+
+    auto getPosition = [&](QPointF point, Space space) -> QPointF{
         static const int max = 30;
-        static const int margin = 20;
-        int y = height - margin;
-        int x = height - margin;
-        int y_margin = margin/2;
-        int x_margin = (width-height)/2 + margin/2;
-        for(int i=0;i<size;i++){
-            draw_point[i].setX(((points.at(i).x())*x/max)+x_margin);
-            draw_point[i].setY(((points.at(i).y())*y/max)+y_margin);
+        static const int top_margin    = 10;
+        static const int bottom_margin = 10;
+        static const int left_margin   = 10;
+        static const int right_margin  = 10;
+        int height_size = height - (top_margin + bottom_margin);
+        int width_size  = ( width - (left_margin + right_margin) )/2;
+        int image_size = height_size < width_size ? height_size : width_size;
+        int y_padding  = height_size < width_size ? 0 : (height_size-image_size)/2;
+        int x_padding  = height_size < width_size ? (width_size-image_size)/2 : 0;
+        return QPointF(((point.x()/max)*image_size) + x_padding + left_margin + (space == LEFT || space == OVERALL ? 0 : width_size),
+                       ((point.y()/max)*image_size) + y_padding +  top_margin);
+    };
+
+    auto drawPolygon = [&](polygon_t polygon, Space isLeftOrRight){
+        int dot_num = polygon.outer().size();
+        QPointF* draw_point = new QPointF[dot_num];
+        for(int i=0;i<dot_num;i++){
+            draw_point[i] = getPosition(QPointF(polygon.outer()[i].x(),polygon.outer()[i].y()), isLeftOrRight);
         }
-        painter.drawPolygon(draw_point,size);
+        painter.drawPolygon(draw_point,dot_num);
         delete[] draw_point;
     };
 
-    //Field
+    //draw background
     painter.setBrush(QBrush(QColor("#d4c91f")));
     painter.drawRect(0,0,width,height);
 
-    //flame
-    polygon_t raw_flame = field.getFlame().getPolygon();
-    int flame_size = raw_flame.outer().size();
-    std::vector<QPointF> points;
-    for(int i=0;i<flame_size;i++){
-        points.push_back(QPointF(raw_flame.outer()[i].x(),raw_flame.outer()[i].y()));
-    }
+    //draw flame
+    painter.setPen(QPen(Qt::black, 3));
     painter.setBrush(QBrush(QColor("#d0b98d")));
-    drawPolygon(points);
+    drawPolygon(field.getFlame().getPolygon(),Space::LEFT);
 
-    //piece
-    std::vector<polygon_t> raw_pieces;
+    //draw pieces
     int pieces_size = field.getPiecesSize();
     for(int i=0;i<pieces_size;i++){
+        //get polygon center pos
         int piece_size = field.getPiece(i).getPolygon().outer().size()-1;
-        std::vector<QPointF> points;
+        double center_x = 0.0;
+        double center_y = 0.0;
         for(int j=0;j<piece_size;j++){
-            points.push_back(QPointF(field.getPiece(i).getPolygon().outer()[j].x(),field.getPiece(i).getPolygon().outer()[j].y()));
+            center_x += field.getPiece(i).getPolygon().outer()[j].x();
+            center_y += field.getPiece(i).getPolygon().outer()[j].y();
         }
+        center_x /= piece_size;
+        center_y /= piece_size;
+        //draw piece
+        painter.setPen(QPen(Qt::black, 3));
         painter.setBrush(QBrush(QColor("#0f5ca0")));
-        drawPolygon(points);
+        drawPolygon(field.getPiece(i).getPolygon(),Space::LEFT);
+        //draw number
+        painter.setPen(QPen(QColor("#ff33cc")));
+        QFont font = painter.font();
+        font.setPointSize(std::abs(cutted_size/15));
+        painter.setFont(font);
+        painter.drawText(getPosition(QPointF(center_x, center_y), Space::LEFT), QString::number(i));
     }
 
 }
