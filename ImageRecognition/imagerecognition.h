@@ -2,22 +2,30 @@
 #define IMAGERECOGNITION_H
 
 #include "imagerecognition_global.h"
-#include "polygonexpansion.h"
+#include "expandedpolygon.h"
+#include "field.h"
+#include <iostream>
+#include <string>
+#include <exception>
+#include <stdexcept>
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/photo/photo.hpp>
+#include <opencv2/photo.hpp>
 
 class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
 
 public:
-    void run();
+    procon::Field run(std::string const& path);
 
 private:
     std::vector<cv::Mat> Preprocessing(std::string const& path);
     std::vector<std::vector<cv::Vec4f>> LineDetection(std::vector<cv::Mat> const& images);
-    std::vector<PolygonExpansion> Vectored(std::vector<std::vector<cv::Vec4f>> const& lines);
+    std::vector<polygon_t> Vectored(std::vector<std::vector<cv::Vec4f>> const& lines);
+    procon::Field makeField(std::vector<polygon_t> pieces);
     void colorExtraction(cv::Mat* src, cv::Mat* dst,
         int code,
         int ch1Lower, int ch1Upper,

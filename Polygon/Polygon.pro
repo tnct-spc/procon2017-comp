@@ -14,11 +14,17 @@ TEMPLATE = lib
 DEFINES += POLYGON_LIBRARY
 
 SOURCES += polygonexpansion.cpp \
-    field.cpp
+    field.cpp \
+    polygonio.cpp \
+    polygonset.cpp \
+    expandedpolygon.cpp
 
 HEADERS += polygonexpansion.h \
         polygon_global.h \
-    field.h
+    field.h \
+    polygonio.h \
+    polygonset.h \
+    expandedpolygon.h
 
 LIBS += -lboost_system -lboost_thread
 

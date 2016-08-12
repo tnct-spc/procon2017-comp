@@ -1,13 +1,20 @@
 #include "hazama.h"
 #include "ui_hazama.h"
-
+#include <unistd.h>
 #include <iostream>
+#include <string>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <QFileDialog>
 
+#include "polygonexpansion.h"
+#include "polygonset.h"
 #include "field.h"
 #include "imagerecognition.h"
+#include "polygonio.h"
+#include "displayanswer.h"
+#include "solver.h"
 
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),
@@ -31,28 +38,49 @@ void Hazama::run()
 {
     std::cout << "Run" << std::endl;
 
-    Field field;
+    /*Get puzzle data*/
+    procon::Field PDATA;
     ImageRecognition imrec;
-
-    /*Take a picture*/
-
-    //Capture
-    cv::Mat src = capture();
-
-    //Display picture
-    cv::namedWindow("picture",CV_WINDOW_AUTOSIZE);
-    cv::imshow("picture",src);
-    if ( src.empty() ) {
-        std::cerr << "Image can't be loaded!" << std::endl;
+    std::string path;
+    cv::Mat src;
+    if(ui->useWebCamera->isChecked() || ui->useScaner->isChecked() || ui->UseFileImage->isChecked()){
+        //get Image
+        if(ui->useWebCamera->isChecked()){
+           src = capture();
+        } else if (ui->useScaner->isChecked()){
+            int state = system("sh ./../../procon2016-comp/scanimage.sh");
+            if(state ^= 0){
+                std::cout << "failed. scanimage.sh error." << std::endl;
+                return;
+            path = "./../../procon2016-comp/CompImage/dpi300test.png";
+            }
+            src = cv::imread(path);
+        } else {
+            path = QFileDialog::getOpenFileName(this).toStdString();
+        }
+        //display picture
+        /*
+        cv::namedWindow("picture",CV_WINDOW_AUTOSIZE);
+        cv::imshow("picture",src);
+        */
+        /*Image Recognition*/
+        PDATA = imrec.run(path);
+        //PDATA = ...
+    }else if(ui->useFileData->isChecked()){
+        std::string path = QFileDialog::getOpenFileName(this).toStdString();
+        PDATA = procon::PolygonIO::importPolygon(path);
+    }else{
+        return;
     }
 
-    /*Image Recognition*/
-    imrec.run();
-
     /*Solve puzzle*/
+    Solver solver;
+    procon::Field field = solver.run(PDATA);
 
     /*Display answer*/
+    Display.setField(field);
 
+    std::cout<<"finish"<<std::endl;
 }
 
 cv::Mat Hazama::capture()

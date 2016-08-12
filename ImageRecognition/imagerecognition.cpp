@@ -1,18 +1,8 @@
-#include <iostream>
-#include <string>
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/photo/photo.hpp>
-#include <opencv2/photo.hpp>
-#include "polygon.h"
 #include "imagerecognition.h"
-//#include "ui_imagerecognition.h"
 
-void ImageRecognition::run()
+procon::Field ImageRecognition::run(std::string const& path)
 {
-    std::string path = "./../../procon2016-comp/picture/scan.png";
+    //std::string path = "./../../procon2016-comp/picture/scan.png";
 
     //前処理
     std::vector<cv::Mat> images = Preprocessing(path);
@@ -21,9 +11,12 @@ void ImageRecognition::run()
     std::vector<std::vector<cv::Vec4f>> pieces_lines = LineDetection(images);
 
     //ベクター化
-    std::vector<PolygonExpansion> polygons = Vectored(pieces_lines);
+    std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
     cv::waitKey();
+    //return makeField(polygons);
+    procon::Field hoge;
+    return hoge;
 }
 
 std::vector<cv::Mat> ImageRecognition::Preprocessing(std::string const& path)
@@ -62,7 +55,7 @@ std::vector<cv::Mat> ImageRecognition::Preprocessing(std::string const& path)
     cv::Mat *piece_label = new cv::Mat();
     int label_num = cv::connectedComponents(image, *piece_label);
     std::vector<struct minmax2D> minmaxs(label_num-1);
-    for(int i=0;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
+    for(int i=1;i<label_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
     int n;
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
     {
@@ -115,6 +108,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         lsd->detect(image, pieces_lines[count]);
 
         //描画
+
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
         cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
@@ -126,10 +120,66 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
     return std::move(pieces_lines);
 }
 
-std::vector<PolygonExpansion> ImageRecognition::Vectored(std::vector<std::vector<cv::Vec4f>> const& pieces_lines)
+std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Vec4f>> const& pieces_lines)
 {
-    std::vector<PolygonExpansion> polygon;
-    return std::move(polygon);
+    std::vector<polygon_t> polygons;
+    for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
+        polygon_t polygon,translated_polygon;
+        for (int i = -1;i < static_cast<int>(piece_lines.size() - 1);i++){
+            cv::Vec4f v1,v2;
+            if (i == -1){
+                v1 = piece_lines.at(static_cast<int>(piece_lines.size() - 1)),v2 = piece_lines.at(0);
+            } else {
+                v1 = piece_lines.at(i),v2 = piece_lines.at(i+1);
+            }
+
+            const double x1 = v1[0] , y1 = v1[1];
+            const double x2 = v1[2] , y2 = v1[3];
+            const double x3 = v2[0] , y3 = v2[1];
+            const double x4 = v2[2] , y4 = v2[3];
+            const std::vector<double> vec_x{0,x1,x2,x3,x4};
+            const std::vector<double> vec_y{0,y1,y2,y3,y4};
+            for (auto v : vec_y){
+                std::cout << v << std::endl;
+            }
+            //2線分の交点をだす
+            auto calcIntersection = [](std::vector<double> a,std::vector<double> b)->double {
+                const double numer1 = (a.at(2) - a.at(1)) * (a.at(4) - a.at(3)) * (b.at(3) - b.at(1));
+                const double numer2 = (a.at(1)) * (b.at(2) - b.at(1)) * (a.at(4) - a.at(3));
+                const double numer3 = (a.at(3)) * (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
+                const double denom1 = (b.at(2) - b.at(1)) * (a.at(4) - a.at(3));
+                const double denom2 = (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
+                try {
+                    if (std::abs((b.at(2) - b.at(1) / a.at(2) - a.at(1)) - (b.at(4) - b.at(3) / a.at(4) - a.at(3))) < 1) {
+                        throw std::runtime_error("two lines are parallel.");
+                    }
+                } catch (std::exception &e) {
+                   std::cerr << e.what() << std::endl;
+                }
+                return ((numer1 + numer2 - numer3) / (denom1 - denom2));
+            };
+            const double x = calcIntersection(vec_x,vec_y);
+            const double y = calcIntersection(vec_y,vec_x);
+            polygon.outer().push_back(point_t(x,y));
+        }
+        polygon.outer().push_back(polygon.outer().at(0));
+        polygons.push_back(polygon);
+    }
+    for (auto p : polygons){
+        std::cout << bg::dsv(p) << std::endl;
+    }
+    return std::move(polygons);
+}
+
+procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
+    /*
+    polygons.
+        bg::strategy::transform::translate_transformer<double,2,2> translate(-polygon.outer().at(0).x(),-polygon.outer().at(0).y());
+        bg::transform(polygon,translated_polygon,translate);
+        procon::ExpandedPolygon ex_polygon;
+        ex_polygon.setPolygon(translated_polygon);
+        pieces.push_back(ex_polygon);
+    */
 }
 
 void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst,

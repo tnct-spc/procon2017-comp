@@ -1,78 +1,115 @@
 #include "field.h"
-
-Field::Field()
+/*--------------------constructor---------------------*/
+procon::Field::Field()
 {
-    fieldPiece.reserve(50);
-}
-void Field::setFlame(const PolygonExpansion &flame){
-    fieldFlame = flame;
+    field_pieces.reserve(50);
 }
 
-void Field::setPiece(const PolygonExpansion &piece,const int &n){
-    if (n < pieceSize()) fieldPiece[n] = piece;
-    else pushPiece(piece);
+/*---------------------public--------------------------*/
+//setter
+void procon::Field::setFlame(ExpandedPolygon const& flame)
+{
+    field_flame = flame;
 }
 
-void Field::pushPiece(const PolygonExpansion &piece){
-    fieldPiece.push_back(piece);
+void procon::Field::setPiece(polygon_t piece)
+{
+    procon::ExpandedPolygon ex_piece;
+    ex_piece.setPolygon(piece);
+    field_pieces.push_back(ex_piece);
 }
 
-PolygonExpansion Field::popPiece(){
-    PolygonExpansion tmp = fieldPiece.back();
-    fieldPiece.pop_back();
-    return tmp;
+void procon::Field::setPiece(procon::ExpandedPolygon piece)
+{
+    field_pieces.push_back(piece);
 }
 
-PolygonExpansion Field::getPiece(const int &n){
-    return fieldPiece[n];
+void procon::Field::setPiece(ExpandedPolygon piece, double x, double y)
+{
+    polygon_t translated_polygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
+    boost::geometry::transform(piece.getPolygon(),translated_polygon,translate);
+    ExpandedPolygon p;
+    p.setPolygon(translated_polygon);
+    field_pieces.push_back(p);
 }
 
-PolygonExpansion Field::getFlame(){
-    return fieldFlame;
+void procon::Field::setPiece(procon::ExpandedPolygon piece, int n, double x, double y)
+{
+    polygon_t translated_polygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
+    boost::geometry::transform(piece.getPolygon(),translated_polygon,translate);
+    ExpandedPolygon p;
+    p.setPolygon(translated_polygon);
+    field_pieces.at(n) = p;
+}
+
+void procon::Field::setElementaryFlame(procon::ExpandedPolygon const& flame)
+{
+    elementary_flame = flame;
 }
 
 
-/*後方互換*/
-/*
-void Field::setFlame(const polygon_t &flame){
-    fieldFlame.setPolygon(flame);
+void procon::Field::setElementaryPieces(std::vector<procon::ExpandedPolygon> const& pieces)
+{
+    elementary_pieces = pieces;
 }
 
-void Field::setPiece(const polygon_t &piece,const int &n){
-    if (n < pieceSize()) fieldPiece[n].setPolygon(piece);
-    else pushPiece(piece);
+//getter
+std::vector<procon::ExpandedPolygon> const& procon::Field::getPieces() const
+{
+    return field_pieces;
 }
 
-void Field::pushPiece(const polygon_t &piece){
-    PolygonExpansion tmp;
-    tmp.setPolygon(piece);
-    fieldPiece.push_back(tmp);
+procon::ExpandedPolygon const& procon::Field::getPiece(const int &n) const
+{
+    return field_pieces.at(n);
 }
 
-polygon_t Field::popPiece(){
-    PolygonExpansion tmp = fieldPiece.back();
-    fieldPiece.pop_back();
-    return tmp.getPolygon();
+procon::ExpandedPolygon const& procon::Field::getFlame() const
+{
+    return field_flame;
 }
 
-polygon_t Field::getFlame() {
-    return fieldFlame.getPolygon();
+
+procon::ExpandedPolygon const& procon::Field::getElementaryFlame() const
+{
+    return elementary_flame;
 }
 
-polygon_t Field::getPiece(const int &n) {
-    return fieldPiece[n].getPolygon();
-}
-*/
-/*ここまで*/
-
-int Field::pieceSize(){
-    return (int)(fieldPiece.end() - fieldPiece.begin());
+std::vector<procon::ExpandedPolygon> const& procon::Field::getElementaryPieces() const
+{
+    return elementary_pieces;
 }
 
-void Field::printFlame(){
-    std::cout << bg::dsv(fieldFlame.getPolygon()) << std::endl;
+int procon::Field::getPiecesSize()
+{
+    return static_cast<int>(field_pieces.size());
+}
+//remove
+void procon::Field::removePiece(int n)
+{
+    field_pieces.erase(field_pieces.begin() + n);
 }
 
-void Field::printPiece(){
-    std::for_each(fieldPiece.begin(),fieldPiece.end(),[](PolygonExpansion &a){std::cout << bg::dsv(a.getPolygon()) << std::endl;});
+//is_
+bool procon::Field::isPuttable(procon::ExpandedPolygon polygon)
+{
+    if(!boost::geometry::within(polygon.getPolygon(), field_flame.getPolygon())) return false;
+    for(auto p : field_pieces){
+        if(!boost::geometry::disjoint(polygon.getPolygon(), p.getPolygon())) return false;
+    }
+    return true;
+}
+
+void procon::Field::printFlame()
+{
+    std::cout << bg::dsv(elementary_flame.getPolygon()) << std::endl;
+}
+
+void procon::Field::printPiece()
+{
+    for (auto p : field_pieces){
+        std::cout << bg::dsv(p.getPolygon()) << std::endl;
+    }
 }

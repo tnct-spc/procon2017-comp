@@ -45,3 +45,7 @@ void PolygonExpansion::calcSideAngle(){
         else sideAngle.push_back(std::atan(std::sqrt(std::pow(-x3 * y2 + x3 * y1 - x2 * y1 + x2 * y3 - x1 * y3 + x1 * y2,2))) / std::sqrt(std::pow(y2 * y3 - y2 * y2 - y1 * y3 + y1 * y2 + x2 * x3 - x2 * x2 - x1 * x3 + x1 * x2,2)));
     }
 }
+
+int PolygonExpansion::size() const{
+    return n+1;
+}

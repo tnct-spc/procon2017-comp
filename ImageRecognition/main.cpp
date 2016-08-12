@@ -1,12 +1,7 @@
-#include "imagerecognition.h"
-#include <QApplication>
+#include <QCoreApplication>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    ImageRecognition w;
-    w.show();
-    w.run();
-
+    QCoreApplication a(argc, argv);
     return a.exec();
 }

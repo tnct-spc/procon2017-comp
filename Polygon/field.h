@@ -1,44 +1,55 @@
 #ifndef FIELD_H
 #define FIELD_H
+
+#include "expandedpolygon.h"
 #include <iostream>
+#include <vector>
 #include <boost/geometry.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <vector>
-#include "polygonexpansion.h"
-namespace bg = boost::geometry;
-typedef bg::model::d2::point_xy<double> point_t;
-typedef bg::model::polygon<point_t> polygon_t;
+#include <boost/geometry/algorithms/disjoint.hpp>
 
-
+namespace procon {
 class Field
 {
-    PolygonExpansion fieldFlame;
-    std::vector<PolygonExpansion> fieldPiece;
+private:
+    //フィールド上のピース&フレーム
+    procon::ExpandedPolygon field_flame;
+    std::vector<procon::ExpandedPolygon> field_pieces;
+
+    //素のピース&フレーム
+    procon::ExpandedPolygon elementary_flame;
+    std::vector<procon::ExpandedPolygon> elementary_pieces;
 public:
+    //constructor
     Field();
-    //setterとgetter
-    void setFlame(const PolygonExpansion &flame); 
-    void setPiece(const PolygonExpansion &piece,const int &n);
-    void pushPiece(const PolygonExpansion &piece);
-    PolygonExpansion popPiece();
-    PolygonExpansion getPiece(const int &n) ;
-    PolygonExpansion getFlame() ;
-    //以下はsetterとgetterの後方互換用 *↑とオーバーロードできない(getterの引数が同じ)なので気をつけて*
-    /*
-    void setFlame(const polygon_t &flame);
-    void setPiece(const polygon_t &piece,const int &n);
-    void pushPiece(const polygon_t &piece);
-    polygon_t popPiece();
-    polygon_t getPiece(const int &n) ;
-    polygon_t getFlame();
-    */
-    //*ここまで*
-    //fieldPieceにセットされているピースの数
-    int pieceSize();
+
+    //setter
+    void setFlame(procon::ExpandedPolygon const& flame);
+
+    void setPiece(polygon_t piece);
+    void setPiece(procon::ExpandedPolygon piece);
+    void setPiece(procon::ExpandedPolygon piece,double x, double y);
+    void setPiece(procon::ExpandedPolygon piece,int n,double x = 0,double y = 0);
+    void setElementaryFlame(procon::ExpandedPolygon const& flame);
+    void setElementaryPieces(std::vector<procon::ExpandedPolygon> const& pieces);
+
+    //getter
+    std::vector<procon::ExpandedPolygon> const& getPieces() const;
+    procon::ExpandedPolygon const& getPiece(int const& n) const;
+    procon::ExpandedPolygon const& getFlame() const;
+    procon::ExpandedPolygon const& getElementaryFlame() const;
+    std::vector<procon::ExpandedPolygon> const& getElementaryPieces() const;
+    int getPiecesSize();
+
+    //任意の位置のピースを消去
+    void removePiece(int n);
+    //置けるかチェック
+    bool isPuttable(procon::ExpandedPolygon polygon);
+
     //コンソール出力
     void printFlame();
     void printPiece();
 };
-
+}
 #endif // FIELD_H
