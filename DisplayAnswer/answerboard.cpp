@@ -110,7 +110,19 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         }
     }
     if(is_set_rawpic){
+        //draw pic
         double rawpic_height_margin = max * ((1-((double)pieces_pic.height()/(double)pieces_pic.width()))/2);
         painter.drawImage(QRectF(getPosition(QPointF(0,rawpic_height_margin),RIGHT),getPosition(QPointF(max,max-rawpic_height_margin),RIGHT)), pieces_pic);
+        //draw number
+        int count = 0;
+        for(cv::Point pos : pieces_pos){
+            painter.setPen(QPen(QColor("#ff33cc")));
+            QFont font = painter.font();
+            font.setPointSize(std::abs(half_size/15));
+            painter.setFont(font);
+            std::cout<<pos.x<<","<<pos.y<<","<<(double)pos.y/(double)pieces_pic.height()<<std::endl;
+            painter.drawText(getPosition(QPointF(max * ((double)pos.x/(double)pieces_pic.width()),rawpic_height_margin + max * ((double)pieces_pic.height()/(double)pieces_pic.width()) * ((double)pos.y/(double)pieces_pic.height())), Space::RIGHT), QString::number(count));
+            count++;
+        }
     }
 }
