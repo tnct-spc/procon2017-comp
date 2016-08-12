@@ -1,8 +1,8 @@
 #ifndef IMAGERECOGNITION_H
 #define IMAGERECOGNITION_H
 
+#include "expandedpolygon.h"
 #include "imagerecognition_global.h"
-#include "polygonexpansion.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -26,7 +26,7 @@ private:
     cv::Mat preprocessingFlame(cv::Mat image);
     std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
     std::vector<std::vector<cv::Vec4f>> LineDetection(std::vector<cv::Mat> const& images);
-    std::vector<PolygonExpansion> Vectored(std::vector<std::vector<cv::Vec4f>> const& lines);
+    std::vector<procon::ExpandedPolygon> Vectored(std::vector<std::vector<cv::Vec4f>> const& lines);
     void threshold(cv::Mat& image);
     void colorExtraction(cv::Mat* src, cv::Mat* dst,
         int code,

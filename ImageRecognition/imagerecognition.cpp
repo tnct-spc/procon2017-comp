@@ -7,6 +7,7 @@
 #include <opencv2/photo/photo.hpp>
 #include <opencv2/photo.hpp>
 #include "polygon.h"
+#include "expandedpolygon.h"
 #include "imagerecognition.h"
 //#include "ui_imagerecognition.h"
 
@@ -26,7 +27,7 @@ void ImageRecognition::run(cv::Mat raw_flame_image, cv::Mat raw_pieces_image)
     std::vector<std::vector<cv::Vec4f>> pieces_lines = LineDetection(images);
 
     //ベクター化
-    std::vector<PolygonExpansion> polygons = Vectored(pieces_lines);
+    std::vector<procon::ExpandedPolygon> polygons = Vectored(pieces_lines);
 }
 
 void ImageRecognition::threshold(cv::Mat& image)
@@ -211,9 +212,9 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
     return std::move(pieces_lines);
 }
 
-std::vector<PolygonExpansion> ImageRecognition::Vectored(std::vector<std::vector<cv::Vec4f>> const& pieces_lines)
+std::vector<procon::ExpandedPolygon> ImageRecognition::Vectored(std::vector<std::vector<cv::Vec4f>> const& pieces_lines)
 {
-    std::vector<PolygonExpansion> polygon;
+    std::vector<procon::ExpandedPolygon> polygon;
     return std::move(polygon);
 }
 

@@ -9,7 +9,6 @@
 #include <QMainWindow>
 
 #include "field.h"
-#include "polygonset.h"
 #include "expandedpolygon.h"
 
 //prototype

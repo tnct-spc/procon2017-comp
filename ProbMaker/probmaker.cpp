@@ -12,7 +12,6 @@
 #include <QPainter>
 
 #include "polygon.h"
-#include "polygonset.h"
 #include "polygonio.h"
 
 ProbMaker::ProbMaker(QWidget *parent) :

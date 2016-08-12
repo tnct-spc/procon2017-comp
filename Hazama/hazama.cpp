@@ -10,8 +10,6 @@
 
 #define noVectored
 
-#include "polygonexpansion.h"
-#include "polygonset.h"
 #include "field.h"
 #include "polygonio.h"
 #include "solver.h"
