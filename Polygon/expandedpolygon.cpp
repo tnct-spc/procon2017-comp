@@ -116,3 +116,34 @@ void procon::ExpandedPolygon::updatePolygon()
     calcSideLength();
     calcSideAngle();
 }
+
+polygon_t procon::ExpandedPolygon::inversePolygon(polygon_t polygon){
+
+    const int polygon_size = polygon.outer().size();
+
+    double totalx;
+    for(int i = 0; i < polygon_size; i++){
+        totalx = totalx + polygon.outer().at(i).x();
+    }
+    double xgenten = totalx/polygon_size;
+
+    polygon_t translate_polygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-xgenten,0);
+    boost::geometry::transform(polygon,translate_polygon,transformgo);
+
+    polygon_t inversePolygon;
+
+    for(int i=0; i < polygon_size; i++){
+        const double x = translate_polygon.outer().at(i).x();
+        const double y = translate_polygon.outer().at(i).y();
+        inversePolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-x,y));
+    }
+
+    polygon_t returnPolygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(xgenten,0);
+    boost::geometry::transform(inversePolygon,returnPolygon,transformback);
+
+    return returnPolygon;
+}

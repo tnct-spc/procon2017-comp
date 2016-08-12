@@ -9,6 +9,7 @@
 #include <boost/geometry/geometries/ring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
+#include <boost/geometry/algorithms/transform.hpp>
 #include <boost/assign/list_of.hpp>
 namespace bg = boost::geometry;
 using point_t = bg::model::d2::point_xy<double>;
@@ -50,6 +51,9 @@ public:
     //calcAll
     //***ポリゴン変更後必ず実行のこと***
     void updatePolygon();
+
+
+    static polygon_t inversePolygon(polygon_t polygon);
 
 };
 
