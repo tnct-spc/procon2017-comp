@@ -122,52 +122,96 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
 std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Vec4f>> const& pieces_lines)
 {
+    auto sortLines = [](std::vector<cv::Vec4f> lines)->std::vector<cv::Vec4f> {
+        auto calcDistance = [](double x1,double y1,double x2,double y2)->double{
+            return std::sqrt(std::pow(x1 - x2,2) + std::pow(y1 - y2,2));
+        };
+        for (int i = 0;i < static_cast<int>(lines.size() - 1); i++){
+            //ある線分の終点に対して他の線分の始点を調べ近い順に入れ替える
+            const double end_x = lines.at(i)[2];
+            const double end_y = lines.at(i)[3];
+            double min = 4000; //dekai
+            double min_subscript = 0;
+            for (int j = i + 1; j < static_cast<int>(lines.size()); j++){
+                const double begin_x = lines.at(j)[2];
+                const double begin_y = lines.at(j)[3];
+                const double distance = calcDistance(begin_x,begin_y,end_x,end_y);
+                if (min > distance){
+                    min = distance;
+                    min_subscript = j;
+                }
+            }
+            std::swap(lines.at(i + 1),lines.at(min_subscript));
+        }
+        return std::move(lines);
+    };
+
     std::vector<polygon_t> polygons;
     for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
         polygon_t polygon,translated_polygon;
-        for (int i = -1;i < static_cast<int>(piece_lines.size() - 1);i++){
+        piece_lines = sortLines(piece_lines);
+        for (int i = -1 , connection_failure_count = 0;i < static_cast<int>(piece_lines.size() - 1);i++){
             cv::Vec4f v1,v2;
             if (i == -1){
-                v1 = piece_lines.at(static_cast<int>(piece_lines.size() - 1)),v2 = piece_lines.at(0);
+                v1 = piece_lines.at(static_cast<int>(piece_lines.size() - 1));
+                v2 = piece_lines.at(i + connection_failure_count + 1);
             } else {
-                v1 = piece_lines.at(i),v2 = piece_lines.at(i+1);
+                v1 = piece_lines.at(i);
+                v2 = piece_lines.at(i + connection_failure_count + 1);
             }
 
+            //1本目
             const double x1 = v1[0] , y1 = v1[1];
             const double x2 = v1[2] , y2 = v1[3];
+            //2本目
             const double x3 = v2[0] , y3 = v2[1];
             const double x4 = v2[2] , y4 = v2[3];
+            //xとyにまとめる
             const std::vector<double> vec_x{0,x1,x2,x3,x4};
             const std::vector<double> vec_y{0,y1,y2,y3,y4};
-            for (auto v : vec_y){
-                std::cout << v << std::endl;
-            }
-            //2線分の交点をだす
+            //表示
+
+            //2線分の交点をだす関数
             auto calcIntersection = [](std::vector<double> a,std::vector<double> b)->double {
+                //分子項
                 const double numer1 = (a.at(2) - a.at(1)) * (a.at(4) - a.at(3)) * (b.at(3) - b.at(1));
                 const double numer2 = (a.at(1)) * (b.at(2) - b.at(1)) * (a.at(4) - a.at(3));
                 const double numer3 = (a.at(3)) * (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
+                //分母項
                 const double denom1 = (b.at(2) - b.at(1)) * (a.at(4) - a.at(3));
                 const double denom2 = (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
-                try {
-                    if (std::abs((b.at(2) - b.at(1) / a.at(2) - a.at(1)) - (b.at(4) - b.at(3) / a.at(4) - a.at(3))) < 1) {
-                        throw std::runtime_error("two lines are parallel.");
-                    }
-                } catch (std::exception &e) {
-                   std::cerr << e.what() << std::endl;
-                }
                 return ((numer1 + numer2 - numer3) / (denom1 - denom2));
             };
+            //ここまで
+
+            //二直線のx軸との角度
+            const double angle1 = std::atan2(std::abs(y2 - y1),std::abs(x2 - x1));
+            const double angle2 = std::atan2(std::abs(y4 - y3),std::abs(x4 - x3));
+            //許容角度
+            constexpr double allowable_angle = 5 * (3.14 / 180); //deg->rad
+            std::cout << "angle1:" << angle1 << "angle2:" << angle2 << std::endl;
+            //二つの直線の許容角度が一定以下であれば切れてる直線であると考える
+            if (std::abs(angle1 - angle2) < allowable_angle) {
+                connection_failure_count++;
+                i--;
+                continue;
+            } else {
+                connection_failure_count = 0;
+            }
             const double x = calcIntersection(vec_x,vec_y);
             const double y = calcIntersection(vec_y,vec_x);
             polygon.outer().push_back(point_t(x,y));
         }
         polygon.outer().push_back(polygon.outer().at(0));
+        std::cout << bg::dsv(polygon) << std::endl;
         polygons.push_back(polygon);
     }
+    int count = 0;
     for (auto p : polygons){
+        count++;
         std::cout << bg::dsv(p) << std::endl;
     }
+    std::cout << count << std::endl;
     return std::move(polygons);
 }
 
