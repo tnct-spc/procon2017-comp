@@ -1,9 +1,7 @@
 #include "testdisplayanswer.h"
-#include "displayanswer.h"
 
 TestDisplayAnswer::TestDisplayAnswer()
 {
-    disp = new DisplayAnswer();
 }
 
 bool TestDisplayAnswer::run()

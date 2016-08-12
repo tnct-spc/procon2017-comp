@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <opencv2/core/core.hpp>
-#include "displayanswer.h"
+#include "answerboard.h"
 
 namespace Ui {
 class Hazama;
@@ -22,7 +22,7 @@ public:
 private:
     Ui::Hazama *ui;
     cv::Mat capture();
-    DisplayAnswer Display;
+    std::shared_ptr<AnswerBoard> board;
 private slots:
     void clickedRunButton();
 };

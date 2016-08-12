@@ -61,7 +61,7 @@ cv::Mat ImageRecognition::preprocessingFlame(cv::Mat image)
     }
     int max_val=0;
     int max_num=0;
-    for(int i=0;i<labels_area.size();++i){
+    for(int i=0;i<(int)labels_area.size();++i){
         if(labels_area[i] > max_val){
             max_val = labels_area[i];
             max_num = i + 2;

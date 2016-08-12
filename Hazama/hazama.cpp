@@ -14,7 +14,6 @@
 #include "polygonset.h"
 #include "field.h"
 #include "polygonio.h"
-#include "displayanswer.h"
 #include "solver.h"
 #include "imagerecognition.h"
 
@@ -24,6 +23,7 @@ Hazama::Hazama(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->RunButton, &QPushButton::clicked, this, &Hazama::clickedRunButton);
+    init();
 }
 
 Hazama::~Hazama()
@@ -33,7 +33,8 @@ Hazama::~Hazama()
 
 void Hazama::init()
 {
-
+    board = std::make_shared<AnswerBoard>();
+    board->showMaximized();
 }
 
 void Hazama::run()
@@ -65,7 +66,7 @@ void Hazama::run()
         PDATA = imrec.run(flame, pieces);
 #endif
         //display recognized image
-        Display.setRawPicture(imrec.getRawPiecesPic(),imrec.getRawPiecesPos());
+        board->setRawPicture(imrec.getRawPiecesPic(),imrec.getRawPiecesPos());
 
         //PDATA = ...
     }else if(ui->useFileData->isChecked()){
@@ -83,7 +84,7 @@ void Hazama::run()
     procon::Field field = solver.run(PDATA);
 
     /*Display answer*/
-    Display.setField(field);
+    board->setField(field);
 #ifdef noVectored
     }
 #endif

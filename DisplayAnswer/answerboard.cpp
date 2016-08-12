@@ -48,8 +48,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     static const int max = 30;
     int height = this->height();
     int width  = this->width();
-    int size   = height < width ? height : width;
-    int cutted_size = height < (width/2) ? height : (width/2);
+    int half_size = height < (width/2) ? height : (width/2);
 
     auto getPosition = [&](QPointF point, Space space) -> QPointF{
         static const int top_margin    = 10;
@@ -105,7 +104,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             //draw number
             painter.setPen(QPen(QColor("#ff33cc")));
             QFont font = painter.font();
-            font.setPointSize(std::abs(cutted_size/15));
+            font.setPointSize(std::abs(half_size/15));
             painter.setFont(font);
             painter.drawText(getPosition(QPointF(center_x, center_y), Space::LEFT), QString::number(i));
         }

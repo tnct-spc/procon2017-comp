@@ -13,10 +13,10 @@ TEMPLATE = lib
 
 DEFINES += DISPLAYANSWER_LIBRARY
 
-SOURCES += displayanswer.cpp \
+SOURCES += \
     answerboard.cpp
 
-HEADERS += displayanswer.h\
+HEADERS +=\
         displayanswer_global.h \
     answerboard.h
 
