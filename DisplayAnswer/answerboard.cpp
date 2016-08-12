@@ -18,8 +18,21 @@ AnswerBoard::~AnswerBoard()
 
 void AnswerBoard::setField(procon::Field &field)
 {
+    is_set_field = true;
     this->field = field;
+    this->update();
 }
+
+void AnswerBoard::setRawPicture(cv::Mat raw_pieces_pic, std::vector<cv::Point> pieces_pos)
+{
+    is_set_rawpic = true;
+    cv::cvtColor(raw_pieces_pic, raw_pieces_pic, CV_RGB2BGR);
+    QImage buffer(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
+    this->pieces_pic = buffer.copy();
+    this->pieces_pos = pieces_pos;
+    this->update();
+}
+
 
 void AnswerBoard::paintEvent(QPaintEvent *)
 {
@@ -32,13 +45,13 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         OVERALL = 2
     };
 
+    static const int max = 30;
     int height = this->height();
     int width  = this->width();
     int size   = height < width ? height : width;
     int cutted_size = height < (width/2) ? height : (width/2);
 
     auto getPosition = [&](QPointF point, Space space) -> QPointF{
-        static const int max = 30;
         static const int top_margin    = 10;
         static const int bottom_margin = 10;
         static const int left_margin   = 10;
@@ -66,34 +79,39 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor("#d4c91f")));
     painter.drawRect(0,0,width,height);
 
-    //draw flame
-    painter.setPen(QPen(Qt::black, 3));
-    painter.setBrush(QBrush(QColor("#d0b98d")));
-    drawPolygon(field.getFlame().getPolygon(),Space::LEFT);
-
-    //draw pieces
-    int pieces_size = field.getPiecesSize();
-    for(int i=0;i<pieces_size;i++){
-        //get polygon center pos
-        int piece_size = field.getPiece(i).getPolygon().outer().size()-1;
-        double center_x = 0.0;
-        double center_y = 0.0;
-        for(int j=0;j<piece_size;j++){
-            center_x += field.getPiece(i).getPolygon().outer()[j].x();
-            center_y += field.getPiece(i).getPolygon().outer()[j].y();
-        }
-        center_x /= piece_size;
-        center_y /= piece_size;
-        //draw piece
+    if(is_set_field){
+        //draw flame
         painter.setPen(QPen(Qt::black, 3));
-        painter.setBrush(QBrush(QColor("#0f5ca0")));
-        drawPolygon(field.getPiece(i).getPolygon(),Space::LEFT);
-        //draw number
-        painter.setPen(QPen(QColor("#ff33cc")));
-        QFont font = painter.font();
-        font.setPointSize(std::abs(cutted_size/15));
-        painter.setFont(font);
-        painter.drawText(getPosition(QPointF(center_x, center_y), Space::LEFT), QString::number(i));
-    }
+        painter.setBrush(QBrush(QColor("#d0b98d")));
+        drawPolygon(field.getFlame().getPolygon(),Space::LEFT);
 
+        //draw pieces
+        int pieces_size = field.getPiecesSize();
+        for(int i=0;i<pieces_size;i++){
+            //get polygon center pos
+            int piece_size = field.getPiece(i).getPolygon().outer().size()-1;
+            double center_x = 0.0;
+            double center_y = 0.0;
+            for(int j=0;j<piece_size;j++){
+                center_x += field.getPiece(i).getPolygon().outer()[j].x();
+                center_y += field.getPiece(i).getPolygon().outer()[j].y();
+            }
+            center_x /= piece_size;
+            center_y /= piece_size;
+            //draw piece
+            painter.setPen(QPen(Qt::black, 3));
+            painter.setBrush(QBrush(QColor("#0f5ca0")));
+            drawPolygon(field.getPiece(i).getPolygon(),Space::LEFT);
+            //draw number
+            painter.setPen(QPen(QColor("#ff33cc")));
+            QFont font = painter.font();
+            font.setPointSize(std::abs(cutted_size/15));
+            painter.setFont(font);
+            painter.drawText(getPosition(QPointF(center_x, center_y), Space::LEFT), QString::number(i));
+        }
+    }
+    if(is_set_rawpic){
+        double rawpic_height_margin = max * ((1-((double)pieces_pic.height()/(double)pieces_pic.width()))/2);
+        painter.drawImage(QRectF(getPosition(QPointF(0,rawpic_height_margin),RIGHT),getPosition(QPointF(max,max-rawpic_height_margin),RIGHT)), pieces_pic);
+    }
 }

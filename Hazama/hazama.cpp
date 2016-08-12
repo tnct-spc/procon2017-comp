@@ -36,14 +36,6 @@ void Hazama::init()
 
 }
 
-cv::Mat drawRawPicWithId(cv::Mat raw_pieces_pic, std::vector<cv::Point> raw_pieces_pos)
-{
-    for(int i=0;i<raw_pieces_pos.size();++i){
-        cv::putText(raw_pieces_pic, std::to_string(i), cv::Point(raw_pieces_pos[i].x-60,raw_pieces_pos[i].y+60), cv::FONT_HERSHEY_SIMPLEX, 5, cv::Scalar(255,0,0));
-    }
-    return raw_pieces_pic;
-}
-
 void Hazama::run()
 {
     std::cout << "Run" << std::endl;
@@ -73,11 +65,7 @@ void Hazama::run()
         PDATA = imrec.run(flame, pieces);
 #endif
         //display recognized image
-        cv::Mat raw_pieces_pic = imrec.getRawPiecesPic();
-        std::vector<cv::Point> raw_pieces_pos = imrec.getRawPiecesPos();
-        cv::Mat disp_pic = drawRawPicWithId(raw_pieces_pic,raw_pieces_pos);
-        cv::namedWindow("an",CV_WINDOW_NORMAL);
-        cv::imshow("an", raw_pieces_pic);
+        Display.setRawPicture(imrec.getRawPiecesPic(),imrec.getRawPiecesPos());
 
         //PDATA = ...
     }else if(ui->useFileData->isChecked()){
