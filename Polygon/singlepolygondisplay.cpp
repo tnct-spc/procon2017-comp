@@ -16,10 +16,12 @@ SinglePolygonDisplay::~SinglePolygonDisplay()
     delete ui;
 }
 
-void SinglePolygonDisplay::setPolygon(procon::ExpandedPolygon &polygon, int scale)
+void SinglePolygonDisplay::setPolygon(procon::ExpandedPolygon &polygon, int scale, std::string wname_)
 {
     this->polygon = polygon;
     this->scale = scale;
+    QString wname = QString::fromStdString(wname_);
+    this->setWindowTitle(wname);
 }
 
 void SinglePolygonDisplay::paintEvent(QPaintEvent *)

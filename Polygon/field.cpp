@@ -1,4 +1,5 @@
 #include "field.h"
+
 /*--------------------constructor---------------------*/
 procon::Field::Field()
 {

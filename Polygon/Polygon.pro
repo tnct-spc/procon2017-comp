@@ -18,7 +18,8 @@ SOURCES += polygonexpansion.cpp \
     polygonio.cpp \
     polygonset.cpp \
     expandedpolygon.cpp \
-    singlepolygondisplay.cpp
+    singlepolygondisplay.cpp \
+    form.cpp
 
 HEADERS += polygonexpansion.h \
         polygon_global.h \
@@ -26,7 +27,8 @@ HEADERS += polygonexpansion.h \
     polygonio.h \
     polygonset.h \
     expandedpolygon.h \
-    singlepolygondisplay.h
+    singlepolygondisplay.h \
+    form.h
 
 LIBS += -lboost_system -lboost_thread
 
@@ -38,4 +40,5 @@ unix {
 }
 
 FORMS += \
-    singlepolygondisplay.ui
+    singlepolygondisplay.ui \
+    form.ui

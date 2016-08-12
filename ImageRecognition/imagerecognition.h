@@ -3,6 +3,7 @@
 
 #include "imagerecognition_global.h"
 #include "expandedpolygon.h"
+#include "singlepolygondisplay.h"
 #include "field.h"
 #include <iostream>
 #include <string>
@@ -32,6 +33,7 @@ private:
         int ch2Lower, int ch2Upper,
         int ch3Lower, int ch3Upper
         );
+    std::vector<SinglePolygonDisplay*> disp;
 };
 
 #endif // IMAGERECOGNITION_H

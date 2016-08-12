@@ -13,10 +13,8 @@ procon::Field ImageRecognition::run(std::string const& path)
     //ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
-    cv::waitKey();
-    //return makeField(polygons);
-    procon::Field hoge;
-    return hoge;
+    //cv::waitKey();
+    return makeField(polygons);
 }
 
 std::vector<cv::Mat> ImageRecognition::Preprocessing(std::string const& path)
@@ -145,7 +143,6 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         }
         return std::move(lines);
     };
-
     std::vector<polygon_t> polygons;
     for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
         polygon_t polygon,translated_polygon;
@@ -207,23 +204,31 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         polygons.push_back(polygon);
     }
     int count = 0;
-    for (auto p : polygons){
+    for (auto po:polygons){
+        procon::ExpandedPolygon ishowta;
+        ishowta.setPolygon(po);
+        disp.push_back(new SinglePolygonDisplay());
+        disp.at(count)->setPolygon(ishowta,4000,std::to_string(count + 1));
+        disp.at(count)->show();
         count++;
-        std::cout << bg::dsv(p) << std::endl;
     }
-    std::cout << count << std::endl;
     return std::move(polygons);
 }
 
 procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
-    /*
-    polygons.
+    std::vector<procon::ExpandedPolygon> ex_pieces;
+    procon::ExpandedPolygon ex_flame;
+    procon::Field field;
+    for (auto polygon : polygons){
+        polygon_t translated_polygon;
         bg::strategy::transform::translate_transformer<double,2,2> translate(-polygon.outer().at(0).x(),-polygon.outer().at(0).y());
         bg::transform(polygon,translated_polygon,translate);
         procon::ExpandedPolygon ex_polygon;
         ex_polygon.setPolygon(translated_polygon);
-        pieces.push_back(ex_polygon);
-    */
+        ex_pieces.push_back(ex_polygon);
+    }
+    field.setElementaryPieces(ex_pieces);
+    return field;
 }
 
 void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst,

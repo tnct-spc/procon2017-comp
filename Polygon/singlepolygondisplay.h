@@ -1,8 +1,11 @@
 #ifndef SINGLEPOLYGONDISPLAY_H
 #define SINGLEPOLYGONDISPLAY_H
 
-#include <QWidget>
 #include "expandedpolygon.h"
+/*#include <QWidget>*/
+
+
+#include <QWidget>
 
 namespace Ui {
 class SinglePolygonDisplay;
@@ -15,7 +18,7 @@ class SinglePolygonDisplay : public QWidget
 public:
     explicit SinglePolygonDisplay(QWidget *parent = 0);
     ~SinglePolygonDisplay();
-    void setPolygon(procon::ExpandedPolygon& polygon, int scale = 30);
+    void setPolygon(procon::ExpandedPolygon& polygon, int scale = 30,std::string wname_ = "kinironote");
 
 private:
     Ui::SinglePolygonDisplay *ui;
