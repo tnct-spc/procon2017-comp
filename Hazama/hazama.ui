@@ -34,7 +34,7 @@
    </widget>
    <widget class="QRadioButton" name="useWebCamera">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -99,7 +99,7 @@
      <x>0</x>
      <y>0</y>
      <width>589</width>
-     <height>27</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>
