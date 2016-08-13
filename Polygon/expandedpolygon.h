@@ -33,7 +33,7 @@ class ExpandedPolygon
 
 public:
     //constructor
-    ExpandedPolygon();
+    ExpandedPolygon(int id_ = -1);
     ExpandedPolygon(ExpandedPolygon const& p);
 
     //getter
@@ -41,9 +41,10 @@ public:
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
     polygon_t const& getPolygon() const;
+    int getId() const;
 
     //setter
-    void setPolygon(polygon_t const & p, int id_ = -1);
+    void setPolygon(polygon_t const & p);
 
     //operator
     ExpandedPolygon operator =  (ExpandedPolygon const& p);

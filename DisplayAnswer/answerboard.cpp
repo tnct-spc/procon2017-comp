@@ -103,7 +103,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             QFont font = painter.font();
             font.setPointSize(std::abs(getScale()/15));
             painter.setFont(font);
-            painter.drawText(getPosition(QPointF(center.x()/flame_size, center.y()/flame_size), Space::LEFT), QString::number(i));
+            painter.drawText(getPosition(QPointF(center.x()/flame_size, center.y()/flame_size), Space::LEFT), QString::number(field->getPiece(i).getId()));
         }
     }
     if(is_set_rawpic){

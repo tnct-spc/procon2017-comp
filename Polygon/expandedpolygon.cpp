@@ -1,8 +1,8 @@
 #include "expandedpolygon.h"
 
 //-------------------constructor--------------------
-procon::ExpandedPolygon::ExpandedPolygon()
-    : size(0)
+procon::ExpandedPolygon::ExpandedPolygon(int id_)
+    : size(0),id(id_)
 {
     //this->inners().push_back(polygon::ring_type());
     side_length.reserve(32);
@@ -13,6 +13,7 @@ procon::ExpandedPolygon::ExpandedPolygon()
 //copy_constructor
 procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
 {
+    this->id = p.id;
     this->polygon = p.polygon;
     this->size = p.size;
     this->side_length = p.side_length;
@@ -85,11 +86,15 @@ polygon_t const& procon::ExpandedPolygon::getPolygon() const
     return polygon;
 }
 
+int procon::ExpandedPolygon::getId() const
+{
+    return id;
+}
+
 //setter
-void procon::ExpandedPolygon::setPolygon(polygon_t const& p, int id_)
+void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 {
     polygon = p;
-    id = id_;
     calcSize();
 }
 
@@ -97,6 +102,7 @@ void procon::ExpandedPolygon::setPolygon(polygon_t const& p, int id_)
 procon::ExpandedPolygon procon::ExpandedPolygon::operator =
 (procon::ExpandedPolygon const& p)
 {
+    this->id = p.id;
     this->polygon = p.polygon;
     this->side_length = p.side_length;
     this->side_angle = p.side_angle;
