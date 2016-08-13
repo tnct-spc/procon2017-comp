@@ -129,16 +129,23 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         };
         /****ここまで****/
 
+        //ある線分の終点に対して他の線分の始点を調べ近い順に入れ替える
+        //距離を評価値とした選択ソート
         for (int i = 0;i < static_cast<int>(lines.size() - 1); i++){
-            //ある線分の終点に対して他の線分の始点を調べ近い順に入れ替える
+
             const double end_x = lines.at(i)[2];
             const double end_y = lines.at(i)[3];
+
             double min = 4000;
             double min_subscript = i + 1;
+
             for (int j = i + 1; j < static_cast<int>(lines.size()); j++){
+
                 const double begin_x = lines.at(j)[0];
                 const double begin_y = lines.at(j)[1];
+
                 const double distance = calcDistance(begin_x,begin_y,end_x,end_y);
+
                 if (min > distance){
                     min = distance;
                     min_subscript = j;
