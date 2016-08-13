@@ -9,8 +9,6 @@
 #include <iostream>
 #include "field.h"
 #include "testpolygon.h"
-#include "polygonexpansion.h"
-#include "polygonset.h"
 #include "polygonio.h"
 
 TestPolygon::TestPolygon()

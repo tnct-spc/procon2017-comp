@@ -8,12 +8,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <QFileDialog>
 
-#include "polygonexpansion.h"
-#include "polygonset.h"
 #include "field.h"
 #include "imagerecognition.h"
 #include "polygonio.h"
-#include "displayanswer.h"
 #include "solver.h"
 
 Hazama::Hazama(QWidget *parent) :
@@ -22,6 +19,7 @@ Hazama::Hazama(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->RunButton, &QPushButton::clicked, this, &Hazama::clickedRunButton);
+    init();
 }
 
 Hazama::~Hazama()
@@ -31,7 +29,8 @@ Hazama::~Hazama()
 
 void Hazama::init()
 {
-
+    board = std::make_shared<AnswerBoard>();
+    board->showMaximized();
 }
 
 void Hazama::run()
@@ -40,32 +39,26 @@ void Hazama::run()
 
     /*Get puzzle data*/
     procon::Field PDATA;
-    ImageRecognition imrec;
-    std::string path;
-    cv::Mat src;
-    if(ui->useWebCamera->isChecked() || ui->useScaner->isChecked() || ui->UseFileImage->isChecked()){
+    cv::Mat flame;
+    cv::Mat pieces;
+    if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
         //get Image
         if(ui->useWebCamera->isChecked()){
-           src = capture();
-        } else if (ui->useScaner->isChecked()){
-            int state = system("sh ./../../procon2016-comp/scanimage.sh");
-            if(state ^= 0){
-                std::cout << "failed. scanimage.sh error." << std::endl;
-                return;
-            path = "./../../procon2016-comp/CompImage/dpi300test.png";
-            }
-            src = cv::imread(path);
-        } else {
-            path = QFileDialog::getOpenFileName(this).toStdString();
+            flame = capture();
+            pieces = capture();
+        }else{
+            std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
+            std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
+            flame = cv::imread(flame_path, 1);
+            pieces = cv::imread(pieces_path, 1);
         }
-        //display picture
-        /*
-        cv::namedWindow("picture",CV_WINDOW_AUTOSIZE);
-        cv::imshow("picture",src);
-        */
+
         /*Image Recognition*/
-        PDATA = imrec.run(path);
-        //PDATA = ...
+        ImageRecognition imrec;
+        PDATA = imrec.run(flame, pieces);
+        //display recognized image
+        board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
+        board->setRandomColors(imrec.getRawRandomColors());
     }else if(ui->useFileData->isChecked()){
         std::string path = QFileDialog::getOpenFileName(this).toStdString();
         PDATA = procon::PolygonIO::importPolygon(path);
@@ -73,19 +66,22 @@ void Hazama::run()
         return;
     }
 
-    /*Solve puzzle*/
-    Solver solver;
-    procon::Field field = solver.run(PDATA);
+    if(!(ui->useWebCamera->isChecked() || ui->useImageData->isChecked())){
 
-    /*Display answer*/
-    Display.setField(field);
+        /*Solve puzzle*/
+        Solver solver;
+        procon::Field field = solver.run(PDATA);
+
+        /*Display answer*/
+        board->setField(field);
+    }
 
     std::cout<<"finish"<<std::endl;
 }
 
 cv::Mat Hazama::capture()
 {
-    cv::VideoCapture cap(0);//デバイスのオープン
+    cv::VideoCapture cap(1);//デバイスのオープン
     //cap.open(0);//こっちでも良い．
 
     if(!cap.isOpened()){

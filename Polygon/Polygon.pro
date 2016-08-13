@@ -13,22 +13,18 @@ TEMPLATE = lib
 
 DEFINES += POLYGON_LIBRARY
 
-SOURCES += polygonexpansion.cpp \
+SOURCES += \
     field.cpp \
     polygonio.cpp \
-    polygonset.cpp \
     expandedpolygon.cpp \
-    singlepolygondisplay.cpp \
-    form.cpp
+    singlepolygondisplay.cpp
 
-HEADERS += polygonexpansion.h \
+HEADERS += \
         polygon_global.h \
     field.h \
     polygonio.h \
-    polygonset.h \
     expandedpolygon.h \
-    singlepolygondisplay.h \
-    form.h
+    singlepolygondisplay.h
 
 LIBS += -lboost_system -lboost_thread
 

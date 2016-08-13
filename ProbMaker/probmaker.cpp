@@ -12,8 +12,6 @@
 #include <QPainter>
 
 #include "polygon.h"
-#include "displayanswer.h"
-#include "polygonset.h"
 #include "polygonio.h"
 
 ProbMaker::ProbMaker(QWidget *parent) :
@@ -21,7 +19,6 @@ ProbMaker::ProbMaker(QWidget *parent) :
     ui(new Ui::ProbMaker)
 {
     ui->setupUi(this);
-    display = new DisplayAnswer();
 }
 
 ProbMaker::~ProbMaker()
@@ -520,9 +517,6 @@ void ProbMaker::paintEvent(QPaintEvent *)
 
     auto drawLine = [&](std::shared_ptr<Line> line){
         painter.drawLine(QPointF(line->dot1->x+marginX, line->dot1->y+marginY), QPointF(line->dot2->x+marginX, line->dot2->y+marginY));
-    };
-    auto drawDot = [&](std::shared_ptr<Dot> dot){
-        painter.drawPoint(dot->x+marginX,dot->y+marginY);
     };
 
     //すべてのlineを描画
