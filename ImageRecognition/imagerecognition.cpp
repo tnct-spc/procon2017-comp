@@ -106,12 +106,12 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         lsd->detect(image, pieces_lines[count]);
 
         //描画
-
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
-        cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
-        cv::imshow(std::to_string(count+1), pic);
-
+        //if (count + 1 == 14) {
+            cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
+            cv::imshow(std::to_string(count+1), pic);
+        //}
         count++;
     }
 
@@ -120,19 +120,24 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
 std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Vec4f>> const& pieces_lines)
 {
+    /***線分の順番を適切に並び替える関数***/
     auto sortLines = [](std::vector<cv::Vec4f> lines)->std::vector<cv::Vec4f> {
+
+        /****二点の距離を返す関数****/
         auto calcDistance = [](double x1,double y1,double x2,double y2)->double{
             return std::sqrt(std::pow(x1 - x2,2) + std::pow(y1 - y2,2));
         };
+        /****ここまで****/
+
         for (int i = 0;i < static_cast<int>(lines.size() - 1); i++){
             //ある線分の終点に対して他の線分の始点を調べ近い順に入れ替える
             const double end_x = lines.at(i)[2];
             const double end_y = lines.at(i)[3];
             double min = 4000; //dekai
-            double min_subscript = 0;
+            double min_subscript = i + 1;
             for (int j = i + 1; j < static_cast<int>(lines.size()); j++){
-                const double begin_x = lines.at(j)[2];
-                const double begin_y = lines.at(j)[3];
+                const double begin_x = lines.at(j)[0];
+                const double begin_y = lines.at(j)[1];
                 const double distance = calcDistance(begin_x,begin_y,end_x,end_y);
                 if (min > distance){
                     min = distance;
@@ -143,18 +148,78 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         }
         return std::move(lines);
     };
+    /***ここまで***/
+
+    /***線分を修復する関数***/
+    auto repairLines = [](std::vector<cv::Vec4f> lines)->std::vector<cv::Vec4f> {
+        /****x軸に対する角度を計算(ただし第一象限のみ有効)****/
+        auto calcAngle = [](double x1,double y1,double x2,double y2)->double{
+            const double angle = std::atan2(std::abs(y2 - y1),std::abs(x2 - x1));
+            const double slope = (y2 - y1) / (x2 - x1);
+            return slope >= 0 ? angle : -angle;
+        };
+        /****ここまで****/
+        std::vector<cv::Vec4f> ret_lines;
+        double connection_failure_count = 0;
+        for (int i = -1;i < static_cast<int>(lines.size() - 1);i++) {
+            double x1,x2,y1,y2;
+            if (i == -1) {
+                x1 = lines.at(static_cast<int>(lines.size() - 1))[0];
+                y1 = lines.at(static_cast<int>(lines.size() - 1))[1];
+                x2 = lines.at(static_cast<int>(lines.size() - 1))[2];
+                y2 = lines.at(static_cast<int>(lines.size() - 1))[3];
+            } else {
+                x1 = lines.at(i)[0];
+                y1 = lines.at(i)[1];
+                x2 = lines.at(i)[2];
+                y2 = lines.at(i)[3];
+            }
+            int next_i = i + 1 + connection_failure_count;
+            if (next_i >= static_cast<int>(lines.size())) {
+                next_i -= static_cast<int>(lines.size());
+            }
+            const double x3 = lines.at(next_i)[0];
+            const double y3 = lines.at(next_i)[1];
+            const double x4 = lines.at(next_i)[2];
+            const double y4 = lines.at(next_i)[3];
+
+            const double angle1 = calcAngle(x1,y1,x2,y2);
+            const double angle2 = calcAngle(x3,y3,x4,y4);
+            constexpr double allowable_angle = 5 * (3.14 / 180); //deg->rad
+            if (std::abs(angle1-angle2) < allowable_angle) {
+                connection_failure_count++;
+                i--; //終了条件やつ
+            } else {
+                double last_x,last_y;
+                if (next_i == 0) {
+                    last_x = lines.at(static_cast<int>(lines.size() - 1))[2];
+                    last_y = lines.at(static_cast<int>(lines.size() - 1))[3];
+                } else {
+                    last_x = lines.at(next_i - 1)[2];
+                    last_y = lines.at(next_i - 1)[3];
+                }
+                cv::Vec4f tmp(x1,y1,last_x,last_y);
+                ret_lines.push_back(tmp);
+                connection_failure_count = 0;
+            }
+        }
+        return ret_lines;
+    };
+    /***ここまで***/
+
     std::vector<polygon_t> polygons;
     for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
         polygon_t polygon,translated_polygon;
         piece_lines = sortLines(piece_lines);
-        for (int i = -1 , connection_failure_count = 0;i < static_cast<int>(piece_lines.size() - 1);i++){
+        piece_lines = repairLines(piece_lines);
+        for (int i = -1 ;i < static_cast<int>(piece_lines.size() - 1);i++){
             cv::Vec4f v1,v2;
-            if (i == -1){
+            if (i == -1){ //初回時のみの処理
                 v1 = piece_lines.at(static_cast<int>(piece_lines.size() - 1));
-                v2 = piece_lines.at(i + connection_failure_count + 1);
+                v2 = piece_lines.at(i + 1);
             } else {
                 v1 = piece_lines.at(i);
-                v2 = piece_lines.at(i + connection_failure_count + 1);
+                v2 = piece_lines.at(i + 1);
             }
 
             //1本目
@@ -168,7 +233,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             const std::vector<double> vec_y{0,y1,y2,y3,y4};
             //表示
 
-            //2線分の交点をだす関数
+            /***2線分の交点をだす関数***/
             auto calcIntersection = [](std::vector<double> a,std::vector<double> b)->double {
                 //分子項
                 const double numer1 = (a.at(2) - a.at(1)) * (a.at(4) - a.at(3)) * (b.at(3) - b.at(1));
@@ -179,22 +244,8 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
                 const double denom2 = (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
                 return ((numer1 + numer2 - numer3) / (denom1 - denom2));
             };
-            //ここまで
+            /***ここまで***/
 
-            //二直線のx軸との角度
-            const double angle1 = std::atan2(std::abs(y2 - y1),std::abs(x2 - x1));
-            const double angle2 = std::atan2(std::abs(y4 - y3),std::abs(x4 - x3));
-            //許容角度
-            constexpr double allowable_angle = 5 * (3.14 / 180); //deg->rad
-            std::cout << "angle1:" << angle1 << "angle2:" << angle2 << std::endl;
-            //二つの直線の許容角度が一定以下であれば切れてる直線であると考える
-            if (std::abs(angle1 - angle2) < allowable_angle) {
-                connection_failure_count++;
-                i--;
-                continue;
-            } else {
-                connection_failure_count = 0;
-            }
             const double x = calcIntersection(vec_x,vec_y);
             const double y = calcIntersection(vec_y,vec_x);
             polygon.outer().push_back(point_t(x,y));
@@ -204,6 +255,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         polygons.push_back(polygon);
     }
     int count = 0;
+
     for (auto po:polygons){
         procon::ExpandedPolygon ishowta;
         ishowta.setPolygon(po);
@@ -212,6 +264,15 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         disp.at(count)->show();
         count++;
     }
+
+    /*
+    polygon_t po = polygons.at((5));
+    procon::ExpandedPolygon ishowta;
+    ishowta.setPolygon(po);
+    disp.push_back((new SinglePolygonDisplay()));
+    disp.at(0)->setPolygon(ishowta,4000,"iitenki");
+    disp.at(0)->show();
+    */
     return std::move(polygons);
 }
 
