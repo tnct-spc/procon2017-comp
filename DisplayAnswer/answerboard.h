@@ -1,11 +1,16 @@
 #ifndef ANSWERBOARD_H
 #define ANSWERBOARD_H
 
+#include <memory>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <QPainter>
+#include <QPen>
 #include <QWidget>
+
 #include "field.h"
 
 namespace Ui {
@@ -19,16 +24,33 @@ class AnswerBoard : public QWidget
 public:
     explicit AnswerBoard(QWidget *parent = 0);
     ~AnswerBoard();
-    void setField(procon::Field& field);
-    void setRawPicture(cv::Mat raw_pieces_pic, std::vector<cv::Point> pieces_pos);
+    void setField(const procon::Field& field);
+    void setRawPicture(const cv::Mat& raw_pieces_pic,const std::vector<cv::Point>& pieces_pos);
 
 private:
     Ui::AnswerBoard *ui;
-    procon::Field field;
-    QImage pieces_pic;
-    std::vector<cv::Point> pieces_pos;
+    std::unique_ptr<procon::Field> field;
+    std::unique_ptr<QImage> pieces_pic;
+    std::unique_ptr<std::vector<cv::Point>> pieces_pos;
     bool is_set_field = false;
     bool is_set_rawpic = false;
+
+    const int top_margin    = 10;
+    const int bottom_margin = 10;
+    const int left_margin   = 10;
+    const int right_margin  = 10;
+    const double flame_size = 30;
+
+    enum Space
+    {
+        LEFT    = 0,
+        RIGHT   = 1,
+        OVERALL = 2
+    };
+
+    QPointF getPosition(QPointF point_percent, Space space);
+
+    double getScale();
 
 protected:
     void paintEvent(QPaintEvent *);
