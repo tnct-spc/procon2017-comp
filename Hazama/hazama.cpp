@@ -64,7 +64,8 @@ void Hazama::run()
         PDATA = imrec.run(flame, pieces);
 #endif
         //display recognized image
-        board->setRawPicture(imrec.getRawPiecesPic(),imrec.getRawPiecesPos());
+        board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
+        board->setRandomColors(imrec.getRawRandomColors());
 
         //PDATA = ...
     }else if(ui->useFileData->isChecked()){

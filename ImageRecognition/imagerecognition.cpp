@@ -7,6 +7,7 @@
 #include <opencv2/photo/photo.hpp>
 #include <opencv2/photo.hpp>
 #include "polygon.h"
+
 #include "expandedpolygon.h"
 #include "imagerecognition.h"
 //#include "ui_imagerecognition.h"
@@ -138,44 +139,84 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(cv::Mat image)
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
 
     //ピースを一つ一つに分ける
+
+    //get blackzone label
+    cv::Mat blackzone_label;
+    cv::Mat blackzone_stats;
+    cv::Mat blackzone_centroids;
+    int blackzone_num = cv::connectedComponentsWithStats(image, blackzone_label, blackzone_stats, blackzone_centroids, 4);
+
+    //delete small noise from image
+    const int NOIZE_SIZE = 100;
+    std::vector<bool> isErase;
+    for(int i=0;i<blackzone_num;++i){
+        if(i==0){
+            //first label is white zone.
+            isErase.push_back(false);
+        }else{
+            isErase.push_back(blackzone_stats.ptr<int>(i)[cv::ConnectedComponentsTypes::CC_STAT_AREA] < NOIZE_SIZE ? true : false);
+        }
+    }
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
+    {
+        if(isErase.at(blackzone_label.at<int>(y,x))){
+            image.at<unsigned char>(y,x) = 0;
+        }
+    }
+
+    //get pieces label
+    cv::Mat pieces_label;
+    cv::Mat pieces_stats;
+    cv::Mat pieces_centroids;
+    int piece_num = cv::connectedComponentsWithStats(image, pieces_label, pieces_stats, pieces_centroids, 4);
+    piece_num--; //white zone
+
+    //make random color
+    std::random_device rd;
+    std::uniform_real_distribution<double> rand(0,255);
+    for(int i=0;i<piece_num;++i){
+        raw_random_colors.push_back(cv::Vec3b(rand(rd),rand(rd),rand(rd)));
+    }
+
+    //reset images
+    std::vector<cv::Mat> images;
+    for(int i=0;i<piece_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
+    for(int i=0;i<piece_num;++i){
+        for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
+            images.at(i).at<unsigned char>(y,x) = 255;
+        }
+    }
+
+    //sepalate image, and calc minmax, and make color image
     struct minmax2D{
         int minX = 10000;
         int maxX = 0;
         int minY = 10000;
         int maxY = 0;
     };
-    std::vector<cv::Mat> images;
-    cv::Mat pieces_label;
-    int piece_num = cv::connectedComponents(image, pieces_label, 4);
     std::vector<struct minmax2D> minmaxs(piece_num);
-    for(int i=0;i<piece_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
-    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
-        for(int i=0;i<piece_num;++i){
-            images[i].at<unsigned char>(y,x) = 255;
-        }
-    }
-    int n;
+    cv::Mat color_image(rows,cols,CV_8UC3);
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
     {
-        n = pieces_label.at<int>(y,x);
+        int n = pieces_label.at<int>(y,x);
         if(n!=0){
+            //separate image
             images[n-1].at<unsigned char>(y,x) = 0;
+            //calc minmax
             if(minmaxs[n-1].minX > x) minmaxs[n-1].minX = x;
             if(minmaxs[n-1].maxX < x) minmaxs[n-1].maxX = x;
             if(minmaxs[n-1].minY > y) minmaxs[n-1].minY = y;
             if(minmaxs[n-1].maxY < y) minmaxs[n-1].maxY = y;
         }
+        //make color image
+        color_image.at<cv::Vec3b>(y,x) = (n==0) ? cv::Vec3b(255,255,255) : raw_random_colors[n-1];
     }
+    raw_colored_pic = color_image;
 
-    //delete small noise, and triming, get piece raw pos
-    const int NOIZE_SIZE = 10;
+    //triming, and get piece raw pos
     std::vector<cv::Mat> result_images;
     int count=0;
     for(auto &im: images){
-        if(minmaxs[count].maxX-minmaxs[count].minX < NOIZE_SIZE && minmaxs[count].maxY-minmaxs[count].minY < NOIZE_SIZE){
-            count++;
-            continue;
-        }
         result_images.push_back(cv::Mat(im,cv::Rect(minmaxs[count].minX - 5 < 0 ? 0 : minmaxs[count].minX - 5,
                                                     minmaxs[count].minY - 5 < 0 ? 0 : minmaxs[count].minY - 5,
                                                     minmaxs[count].maxX + 5 > cols ? cols-minmaxs[count].minX : minmaxs[count].maxX-minmaxs[count].minX + 10,

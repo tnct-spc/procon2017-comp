@@ -38,6 +38,11 @@ void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector
     this->update();
 }
 
+void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors)
+{
+    this->random_colors = std::make_unique<std::vector<cv::Vec3b>>(random_colors);
+}
+
 QPointF AnswerBoard::getPosition(QPointF point_percent, Space space){
     int height = this->height();
     int width  = this->width();

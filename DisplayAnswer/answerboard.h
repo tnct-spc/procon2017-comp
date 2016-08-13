@@ -26,12 +26,14 @@ public:
     ~AnswerBoard();
     void setField(const procon::Field& field);
     void setRawPicture(const cv::Mat& raw_pieces_pic,const std::vector<cv::Point>& pieces_pos);
+    void setRandomColors(const std::vector<cv::Vec3b>& random_colors);
 
 private:
     Ui::AnswerBoard *ui;
     std::unique_ptr<procon::Field> field;
     std::unique_ptr<QImage> pieces_pic;
     std::unique_ptr<std::vector<cv::Point>> pieces_pos;
+    std::unique_ptr<std::vector<cv::Vec3b>> random_colors;
     bool is_set_field = false;
     bool is_set_rawpic = false;
 
