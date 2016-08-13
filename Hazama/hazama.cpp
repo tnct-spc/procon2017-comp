@@ -66,7 +66,7 @@ void Hazama::run()
         return;
     }
 
-    if(!(ui->useWebCamera->isChecked() || ui->useImageData->isChecked())){
+    if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
 
         /*Solve puzzle*/
         Solver solver;

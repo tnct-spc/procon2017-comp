@@ -110,7 +110,7 @@ void procon::Field::printFlame()
 
 void procon::Field::printPiece()
 {
-    for (auto p : field_pieces){
+    for (auto p : elementary_pieces){
         std::cout << bg::dsv(p.getPolygon()) << std::endl;
     }
 }

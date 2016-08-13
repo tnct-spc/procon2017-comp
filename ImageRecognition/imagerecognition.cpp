@@ -286,7 +286,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     /***線分を修復する関数***/
     auto repairLines = [](std::vector<cv::Vec4f> lines)->std::vector<cv::Vec4f> {
 
-        /****x軸に対する角度を計算(ただし第一象限のみ有効)****/
+        /****x軸に対する角度を計算****/
         auto calcAngle = [](double x1,double y1,double x2,double y2)->double{
             const double angle = std::atan2(std::abs(y2 - y1),std::abs(x2 - x1));
             const double slope = (y2 - y1) / (x2 - x1);
@@ -359,55 +359,35 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     };
     /***ここまで***/
 
-    /***2線分の交点をだす関数***/
-    auto calcIntersection = [](std::vector<double> a,std::vector<double> b)->double {
+    auto convertLineToPolygon = [](std::vector<cv::Vec4f> const& lines)->polygon_t {
 
-        //分子項
-        const double numer1 = (a.at(2) - a.at(1)) * (a.at(4) - a.at(3)) * (b.at(3) - b.at(1));
-        const double numer2 = (a.at(1)) * (b.at(2) - b.at(1)) * (a.at(4) - a.at(3));
-        const double numer3 = (a.at(3)) * (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
+        /****2線分の交点をだす関数****/
+        auto calcIntersection = [](std::vector<double> a,std::vector<double> b)->double {
 
-        //分母項
-        const double denom1 = (b.at(2) - b.at(1)) * (a.at(4) - a.at(3));
-        const double denom2 = (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
+            //分子項
+            const double numer1 = (a.at(2) - a.at(1)) * (a.at(4) - a.at(3)) * (b.at(3) - b.at(1));
+            const double numer2 = (a.at(1)) * (b.at(2) - b.at(1)) * (a.at(4) - a.at(3));
+            const double numer3 = (a.at(3)) * (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
 
-        return ((numer1 + numer2 - numer3) / (denom1 - denom2));
-    };
-    /***ここまで***/
+            //分母項
+            const double denom1 = (b.at(2) - b.at(1)) * (a.at(4) - a.at(3));
+            const double denom2 = (b.at(4) - b.at(3)) * (a.at(2) - a.at(1));
 
-    std::vector<polygon_t> polygons;
-    bool flame_flag = true;
-    int flame_line_count = 0;
-    for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
-        polygon_t polygon,translated_polygon,flame;
+            return ((numer1 + numer2 - numer3) / (denom1 - denom2));
+        };
+        /****ここまで****/
 
-        if (flame_flag == true){
-            double min = piece_lines.at(0)[0];
-            double min_subscript = 0;
-            for (int i = 0;i < static_cast<int>(piece_lines.size());i++){
-                const double tmp = piece_lines.at(i)[0];
-                if (tmp < min){
-                    min = tmp;
-                    min_subscript = i;
-                }
-            }
-            std::swap(piece_lines.at(0),piece_lines.at(min_subscript));
-            polygon.inners().push_back(polygon_t::ring_type());
-        }
-
-        piece_lines = sortLines(piece_lines);
-        piece_lines = repairLines(piece_lines);
-
-        for (int i = -1 ;i < static_cast<int>(piece_lines.size() - 1);i++){
+        polygon_t polygon;
+        for (int i = -1 ;i < static_cast<int>(lines.size() - 1);i++){
 
             //それぞれ一本目と二本目のベクトル
             cv::Vec4f v1,v2;
             if (i == -1){
-                v1 = piece_lines.at(static_cast<int>(piece_lines.size() - 1));
-                v2 = piece_lines.at(i + 1);
+                v1 = lines.at(static_cast<int>(lines.size() - 1));
+                v2 = lines.at(i + 1);
             } else {
-                v1 = piece_lines.at(i);
-                v2 = piece_lines.at(i + 1);
+                v1 = lines.at(i);
+                v2 = lines.at(i + 1);
             }
 
             //1本目の始点(x1,y1),終点(x2,y2)
@@ -426,24 +406,62 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             const double x = calcIntersection(vec_x,vec_y);
             const double y = calcIntersection(vec_y,vec_x);
 
-            if (flame_flag == true) {
-                if (flame_line_count < 4){
-                    polygon.inners().back().push_back(point_t(x,y));
-                } else {
-                    polygon.outer().push_back(point_t(x,y));
-                }
-                flame_line_count++;
-            } else {
-                polygon.outer().push_back(point_t(x,y));
-            }
+            polygon.outer().push_back(point_t(x,y));
         }
-        flame_flag = false;
         polygon.outer().push_back(polygon.outer().at(0));
-        polygons.push_back(polygon);
+        return polygon;
+    };
+    /***ここまで***/
+
+    std::vector<polygon_t> polygons;
+    bool flame_flag = true;
+    for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
+        polygon_t polygon,translated_polygon;
+
+        if (flame_flag == true){
+            double min = piece_lines.at(0)[0];
+            double min_subscript = 0;
+            for (int i = 0;i < static_cast<int>(piece_lines.size());i++){
+                const double tmp = piece_lines.at(i)[0];
+                if (tmp < min){
+                    min = tmp;
+                    min_subscript = i;
+                }
+            }
+            std::swap(piece_lines.at(0),piece_lines.at(min_subscript));
+
+        }
+
+        piece_lines = sortLines(piece_lines);
+
+        if (flame_flag == true){
+            std::vector<cv::Vec4f> outer,inner;
+            polygon_t outer_polygon,inner_polygon;
+            for (int i = 0;i < static_cast<int>(piece_lines.size());i++){
+                if (i < 4) {
+                    outer.push_back(piece_lines.at(i));
+                } else {
+                    inner.push_back(piece_lines.at(i));
+                }
+            }
+            outer = repairLines(outer);
+            outer_polygon = convertLineToPolygon(outer);
+            inner = repairLines(inner);
+            inner_polygon = convertLineToPolygon(inner);
+            outer_polygon.inners().push_back(polygon_t::ring_type());
+            for (auto point : inner_polygon.outer()) {
+                outer_polygon.inners().back().push_back(point);
+            }
+            polygons.push_back(outer_polygon);
+            flame_flag = false;
+
+        } else {
+            piece_lines = repairLines(piece_lines);
+            polygons.push_back(convertLineToPolygon(piece_lines));
+        }
     }
 
     //表示
-    /*
     int count = 0;
     for (auto po:polygons){
         procon::ExpandedPolygon ishowta;
@@ -453,8 +471,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         disp.at(count)->show();
         count++;
     }
-    */
-
+    std::cout << bg::dsv(polygons.at(0)) << std::endl;
     return std::move(polygons);
 }
 
@@ -463,21 +480,40 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
     std::vector<procon::ExpandedPolygon> ex_pieces;
     procon::ExpandedPolygon ex_flame;
     procon::Field field;
+    bool flame_flag = true;
+
+    //Flame幅から全体のスケールを計算
+    const double flame_length = bg::distance(polygons.at(0).outer().at(0),polygons.at(0).outer().at(1));
+    const double default_flame_length = 30;
+    const double scale = default_flame_length / flame_length;
 
     for (auto polygon : polygons){
 
         //始点が(0,0)になるように移動
         polygon_t translated_polygon;
-        bg::strategy::transform::translate_transformer<double,2,2> translate(-polygon.outer().at(0).x(),-polygon.outer().at(0).y());
+        bg::strategy::transform::translate_transformer<double,2,2> translate(-polygon.outer().at(2).x(),-polygon.outer().at(2).y());
         bg::transform(polygon,translated_polygon,translate);
 
-        //Flame幅から全体のスケールを計算
-        procon::ExpandedPolygon ex_polygon;
-        ex_polygon.setPolygon(translated_polygon);
-        ex_pieces.push_back(ex_polygon);
+        //縮小
+        bg::strategy::transform::scale_transformer<double, 2, 2> reduction(scale);
+        bg::transform(translated_polygon,polygon,reduction);
+        bg::reverse(polygon);
+        std::cout << bg::area(polygon) << std::endl;
+        if (flame_flag){
+            flame_flag = false;
+            ex_flame.setPolygon(polygon);
+        } else {
+            procon::ExpandedPolygon ex_polygon;
+            ex_polygon.setPolygon(polygon);
+            ex_pieces.push_back(ex_polygon);
+        }
     }
 
     field.setElementaryPieces(ex_pieces);
+    field.setElementaryFlame(ex_flame);
+    field.printFlame();
+    field.printPiece();
+
     return field;
 }
 
