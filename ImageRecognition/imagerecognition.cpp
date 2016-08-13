@@ -250,8 +250,24 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     /***ここまで***/
 
     std::vector<polygon_t> polygons;
+    bool flame_flag = true;
+    int flame_line_count = 0;
     for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
-        polygon_t polygon,translated_polygon;
+        polygon_t polygon,translated_polygon,flame;
+
+        if (flame_flag == true){
+            double min = piece_lines.at(0)[0];
+            double min_subscript = 0;
+            for (int i = 0;i < static_cast<int>(piece_lines.size());i++){
+                const double tmp = piece_lines.at(i)[0];
+                if (tmp < min){
+                    min = tmp;
+                    min_subscript = i;
+                }
+            }
+            std::swap(piece_lines.at(0),piece_lines.at(min_subscript));
+            polygon.inners().push_back(polygon_t::ring_type());
+        }
 
         piece_lines = sortLines(piece_lines);
         piece_lines = repairLines(piece_lines);
@@ -284,13 +300,24 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             const double x = calcIntersection(vec_x,vec_y);
             const double y = calcIntersection(vec_y,vec_x);
 
-            polygon.outer().push_back(point_t(x,y));
+            if (flame_flag == true) {
+                if (flame_line_count < 4){
+                    polygon.inners().back().push_back(point_t(x,y));
+                } else {
+                    polygon.outer().push_back(point_t(x,y));
+                }
+                flame_line_count++;
+            } else {
+                polygon.outer().push_back(point_t(x,y));
+            }
         }
+        flame_flag = false;
         polygon.outer().push_back(polygon.outer().at(0));
         polygons.push_back(polygon);
     }
 
     //表示
+    /*
     int count = 0;
     for (auto po:polygons){
         procon::ExpandedPolygon ishowta;
@@ -300,22 +327,30 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         disp.at(count)->show();
         count++;
     }
+    */
 
     return std::move(polygons);
 }
 
 procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
+
     std::vector<procon::ExpandedPolygon> ex_pieces;
     procon::ExpandedPolygon ex_flame;
     procon::Field field;
+
     for (auto polygon : polygons){
+
+        //始点が(0,0)になるように移動
         polygon_t translated_polygon;
         bg::strategy::transform::translate_transformer<double,2,2> translate(-polygon.outer().at(0).x(),-polygon.outer().at(0).y());
         bg::transform(polygon,translated_polygon,translate);
+
+        //Flame幅から全体のスケールを計算
         procon::ExpandedPolygon ex_polygon;
         ex_polygon.setPolygon(translated_polygon);
         ex_pieces.push_back(ex_polygon);
     }
+
     field.setElementaryPieces(ex_pieces);
     return field;
 }
