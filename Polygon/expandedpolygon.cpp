@@ -86,9 +86,10 @@ polygon_t const& procon::ExpandedPolygon::getPolygon() const
 }
 
 //setter
-void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
+void procon::ExpandedPolygon::setPolygon(polygon_t const& p, int id_)
 {
     polygon = p;
+    id = id_;
     calcSize();
 }
 
