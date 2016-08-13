@@ -89,7 +89,7 @@ polygon_t const& procon::ExpandedPolygon::getPolygon() const
 void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 {
     polygon = p;
-    size = p.outer().size();
+    calcSize();
 }
 
 // operator
