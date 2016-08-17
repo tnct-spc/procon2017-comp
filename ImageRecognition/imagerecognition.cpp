@@ -483,6 +483,7 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
     procon::Field field;
     bool flame_flag = true;
 
+    int piece_count = 0;
     for (auto polygon : polygons){
 
         //始点が(0,0)になるように移動
@@ -504,9 +505,10 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
             flame_flag = false;
             ex_flame.setPolygon(polygon);
         } else {
-            procon::ExpandedPolygon ex_polygon;
+            procon::ExpandedPolygon ex_polygon(piece_count);
             ex_polygon.setPolygon(polygon);
             ex_pieces.push_back(ex_polygon);
+            piece_count++;
         }
     }
 
