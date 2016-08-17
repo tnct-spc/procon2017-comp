@@ -1,9 +1,6 @@
 #include "answerboard.h"
 #include "ui_answerboard.h"
 
-#include <QPainter>
-#include <QPen>
-
 AnswerBoard::AnswerBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AnswerBoard)
@@ -16,70 +13,110 @@ AnswerBoard::~AnswerBoard()
     delete ui;
 }
 
-void AnswerBoard::setField(procon::Field &field)
+void AnswerBoard::setField(const procon::Field &field)
 {
-    this->field = field;
+    is_set_field = true;
+    this->field = std::make_unique<procon::Field>(field);
+    this->update();
+}
+
+void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos)
+{
+    is_set_rawpic = true;
+    cv::cvtColor(raw_pieces_pic, raw_pieces_pic, CV_RGB2BGR);
+    this->pieces_pic = std::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
+    *(this->pieces_pic) = QImage(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888).copy();
+    this->pieces_pos = std::make_unique<std::vector<cv::Point>>(pieces_pos);
+    this->update();
+}
+
+void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors)
+{
+    this->random_colors = std::make_unique<std::vector<cv::Vec3b>>(random_colors);
+}
+
+QPointF AnswerBoard::getPosition(QPointF point_percent, Space space){
+    int height = this->height();
+    int width  = this->width();
+    int height_size = height - (top_margin + bottom_margin);
+    int width_size  = ( width - (left_margin + right_margin) )/2;
+    int image_size = height_size < width_size ? height_size : width_size;
+    int y_padding  = height_size < width_size ? 0 : (height_size-image_size)/2;
+    int x_padding  = height_size < width_size ? (width_size-image_size)/2 : 0;
+    return QPointF((point_percent.x()*image_size) + x_padding + left_margin + (space == LEFT || space == OVERALL ? 0 : width_size),
+                   (point_percent.y()*image_size) + y_padding +  top_margin);
+}
+
+double AnswerBoard::getScale(){
+    int height = this->height();
+    int width  = this->width();
+    int height_size = height - (top_margin + bottom_margin);
+    int width_size  = ( width - (left_margin + right_margin) )/2;
+    int image_size = height_size < width_size ? height_size : width_size;
+    return image_size;
 }
 
 void AnswerBoard::paintEvent(QPaintEvent *)
 {
-    int height = this->height();
-    int width = this->width();
     QPainter painter(this);
-    painter.setPen(QPen(Qt::black, 3));
 
-    auto drawLine = [&](double x1, double y1, double x2, double y2){
-        static const int max = 30;
-        static const int margin = 20;
-        int y = height - margin;
-        int x = height - margin;
-        int y_margin = margin/2;
-        int x_margin = (width-height)/2 + margin/2;
-        painter.drawLine((x1*x/max)+x_margin, (y1*y/max)+y_margin, (x2*x/max)+x_margin, (y2*y/max)+y_margin);
-    };
-
-    auto drawPolygon = [&](std::vector<QPointF> points){
-        int size = points.size();
-        QPointF* draw_point = new QPointF[points.size()];
-        static const int max = 30;
-        static const int margin = 20;
-        int y = height - margin;
-        int x = height - margin;
-        int y_margin = margin/2;
-        int x_margin = (width-height)/2 + margin/2;
-        for(int i=0;i<size;i++){
-            draw_point[i].setX(((points.at(i).x())*x/max)+x_margin);
-            draw_point[i].setY(((points.at(i).y())*y/max)+y_margin);
+    auto drawPolygon = [&](polygon_t polygon, Space isLeftOrRight){
+        int dot_num = polygon.outer().size();
+        QPointF* draw_point = new QPointF[dot_num];
+        for(int i=0;i<dot_num;i++){
+            draw_point[i] = getPosition(QPointF(polygon.outer()[i].x()/flame_size,polygon.outer()[i].y()/flame_size), isLeftOrRight);
         }
-        painter.drawPolygon(draw_point,size);
+        painter.drawPolygon(draw_point,dot_num);
         delete[] draw_point;
     };
 
-    //Field
-    painter.setBrush(QBrush(QColor("#d4c91f")));
-    painter.drawRect(0,0,width,height);
+    static const QString color_background = "#d4c91f";
+    static const QString color_piece      = "#0f5ca0";
+    static const QString color_flame      = "#d0b98d";
+    static const QString color_id         = "#ff33cc";
 
-    //flame
-    polygon_t raw_flame = field.getFlame().getPolygon();
-    int flame_size = raw_flame.outer().size();
-    std::vector<QPointF> points;
-    for(int i=0;i<flame_size;i++){
-        points.push_back(QPointF(raw_flame.outer()[i].x(),raw_flame.outer()[i].y()));
-    }
-    painter.setBrush(QBrush(QColor("#d0b98d")));
-    drawPolygon(points);
+    //draw background
+    painter.setBrush(QBrush(QColor(color_background)));
+    painter.drawRect(0,0,this->width(),this->height());
 
-    //piece
-    std::vector<polygon_t> raw_pieces;
-    int pieces_size = field.getPiecesSize();
-    for(int i=0;i<pieces_size;i++){
-        int piece_size = field.getPiece(i).getPolygon().outer().size()-1;
-        std::vector<QPointF> points;
-        for(int j=0;j<piece_size;j++){
-            points.push_back(QPointF(field.getPiece(i).getPolygon().outer()[j].x(),field.getPiece(i).getPolygon().outer()[j].y()));
+    if(is_set_field){
+        //draw flame
+        painter.setPen(QPen(Qt::black, 3));
+        painter.setBrush(QBrush(QColor(color_flame)));
+        drawPolygon(field->getFlame().getPolygon(),Space::LEFT);
+
+        //draw pieces
+        int pieces_size = field->getPiecesSize();
+        for(int i=0;i<pieces_size;i++){
+            int piece_id = field->getPiece(i).getId();
+            //get polygon center pos
+            point_t center = {0,0};
+            boost::geometry::centroid(field->getPiece(i).getPolygon(), center);
+            //draw piece
+            painter.setPen(QPen(Qt::black, 3));
+            painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
+            drawPolygon(field->getPiece(i).getPolygon(),Space::LEFT);
+            //draw number
+            painter.setPen(QPen(QColor(color_id)));
+            QFont font = painter.font();
+            font.setPointSize(std::abs(getScale()/15));
+            painter.setFont(font);
+            painter.drawText(getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT), QString::number(field->getPiece(i).getId()));
         }
-        painter.setBrush(QBrush(QColor("#0f5ca0")));
-        drawPolygon(points);
     }
-
+    if(is_set_rawpic){
+        //draw pic
+        double rawpic_height_margin = (1-((double)pieces_pic->height()/(double)pieces_pic->width()))/2;
+        painter.drawImage(QRectF(getPosition(QPointF(0,rawpic_height_margin),RIGHT),getPosition(QPointF(1,1-rawpic_height_margin),RIGHT)), *pieces_pic);
+        //draw number
+        int count = 0;
+        for(cv::Point& pos : *pieces_pos){
+            painter.setPen(QPen(QColor(color_id)));
+            QFont font = painter.font();
+            font.setPointSize(std::abs(getScale()/15));
+            painter.setFont(font);
+            painter.drawText(getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.025), Space::RIGHT), QString::number(count));
+            count++;
+        }
+    }
 }

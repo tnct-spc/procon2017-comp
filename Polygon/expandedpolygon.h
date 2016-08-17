@@ -20,6 +20,7 @@ namespace procon {
 class ExpandedPolygon
 {
     //メンバ
+    int id;
     int size;
     std::vector<double> side_length;
     std::vector<double> side_angle;
@@ -32,7 +33,7 @@ class ExpandedPolygon
 
 public:
     //constructor
-    ExpandedPolygon();
+    ExpandedPolygon(int id_ = -1);
     ExpandedPolygon(ExpandedPolygon const& p);
 
     //getter
@@ -40,6 +41,7 @@ public:
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
     polygon_t const& getPolygon() const;
+    int getId() const;
 
     //setter
     void setPolygon(polygon_t const & p);

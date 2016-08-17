@@ -8,11 +8,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <QFileDialog>
 
-#include "polygonexpansion.h"
-#include "polygonset.h"
 #include "field.h"
+#include "imagerecognition.h"
 #include "polygonio.h"
-#include "displayanswer.h"
 #include "solver.h"
 
 Hazama::Hazama(QWidget *parent) :
@@ -21,6 +19,7 @@ Hazama::Hazama(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->RunButton, &QPushButton::clicked, this, &Hazama::clickedRunButton);
+    init();
 }
 
 Hazama::~Hazama()
@@ -30,47 +29,50 @@ Hazama::~Hazama()
 
 void Hazama::init()
 {
-
+    board = std::make_shared<AnswerBoard>();
+    board->showMaximized();
 }
 
 void Hazama::run()
 {
     std::cout << "Run" << std::endl;
 
-    /*Get puzzle data*/
     procon::Field PDATA;
-    cv::Mat src;
-    if(ui->useWebCamera->isChecked() || ui->useScaner->isChecked()){
+
+    /*Get puzzle data*/
+    if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
+        cv::Mat flame;
+        cv::Mat pieces;
         //get Image
         if(ui->useWebCamera->isChecked()){
-           src = capture();
+            flame = capture();
+            pieces = capture();
         }else{
-            int state = system("sh ./../../procon2016-comp/scanimage.sh");
-            if(state ^= 0){
-                std::cout << "failed. scanimage.sh error." << std::endl;
-                return;
-            }
-            std::string path = "./../../procon2016-comp/CompImage/dpi300test.png";
-            src = cv::imread(path);
+            std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
+            std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
+            flame = cv::imread(flame_path, 1);
+            pieces = cv::imread(pieces_path, 1);
         }
-        //display picture
-        cv::namedWindow("picture",CV_WINDOW_AUTOSIZE);
-        cv::imshow("picture",src);
 
         /*Image Recognition*/
-        //PDATA = ...
+        ImageRecognition imrec;
+        PDATA = imrec.run(flame, pieces);
+        //display recognized image
+        board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
+        board->setRandomColors(imrec.getRawRandomColors());
     }else if(ui->useFileData->isChecked()){
         std::string path = QFileDialog::getOpenFileName(this).toStdString();
         PDATA = procon::PolygonIO::importPolygon(path);
     }else{
         return;
     }
+
     /*Solve puzzle*/
     Solver solver;
     procon::Field field = solver.run(PDATA);
 
     /*Display answer*/
-    Display.setField(field);
+    board->setField(field);
 
     std::cout<<"finish"<<std::endl;
 }

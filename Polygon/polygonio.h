@@ -1,7 +1,6 @@
 #ifndef POLYGONIO_H
 #define POLYGONIO_H
 
-#include "polygonexpansion.h"
 #include "field.h"
 #include <iostream>
 #include <fstream>

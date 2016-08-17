@@ -3,7 +3,6 @@
 
 #include "solver_global.h"
 #include "field.h"
-#include "polygonset.h"
 
 class SOLVERSHARED_EXPORT Solver
 {

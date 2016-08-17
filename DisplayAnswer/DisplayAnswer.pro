@@ -13,12 +13,14 @@ TEMPLATE = lib
 
 DEFINES += DISPLAYANSWER_LIBRARY
 
-SOURCES += displayanswer.cpp \
+SOURCES += \
     answerboard.cpp
 
-HEADERS += displayanswer.h\
+HEADERS +=\
         displayanswer_global.h \
     answerboard.h
+
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
 unix {
     target.path = /usr/lib

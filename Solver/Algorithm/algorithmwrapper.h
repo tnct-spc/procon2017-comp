@@ -2,7 +2,6 @@
 #define ALGORITHMWRAPPER_H
 
 #include "field.h"
-#include "polygonset.h"
 
 class AlgorithmWrapper
 {

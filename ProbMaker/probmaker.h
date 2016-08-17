@@ -8,8 +8,7 @@
 
 #include <QMainWindow>
 
-#include "displayanswer.h"
-#include "polygonset.h"
+#include "field.h"
 #include "expandedpolygon.h"
 
 //prototype
@@ -118,8 +117,6 @@ private:
     //ポリゴンを拡張ポリゴンに変更
     //NOTE:PolygonSet->fieldに修正
     procon::Field PolygonToExPolygon();
-
-    DisplayAnswer* display;
 
 public:
     explicit ProbMaker(QWidget *parent = 0);
