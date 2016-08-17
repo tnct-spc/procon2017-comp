@@ -88,12 +88,13 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         //draw pieces
         int pieces_size = field->getPiecesSize();
         for(int i=0;i<pieces_size;i++){
+            int piece_id = field->getPiece(i).getId();
             //get polygon center pos
             point_t center = {0,0};
             boost::geometry::centroid(field->getPiece(i).getPolygon(), center);
             //draw piece
             painter.setPen(QPen(Qt::black, 3));
-            painter.setBrush(QBrush(QColor(color_piece)));
+            painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
             drawPolygon(field->getPiece(i).getPolygon(),Space::LEFT);
             //draw number
             painter.setPen(QPen(QColor(color_id)));
