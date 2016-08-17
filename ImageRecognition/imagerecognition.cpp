@@ -448,12 +448,13 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             outer_polygon = convertLineToPolygon(outer);
             inner = repairLines(inner);
             inner_polygon = convertLineToPolygon(inner);
-            outer_polygon.inners().push_back(polygon_t::ring_type());
-            for (auto point : inner_polygon.outer()) {
-                outer_polygon.inners().back().push_back(point);
-            }
-            polygons.push_back(outer_polygon);
+
+            polygons.push_back(inner_polygon);
             flame_flag = false;
+            //Flame幅から全体のスケールを計算
+            const double flame_length = bg::distance(outer_polygon.outer()[0],outer_polygon.outer()[1]);
+            const double default_flame_length = 30;
+            scale = default_flame_length / flame_length;
 
         } else {
             piece_lines = repairLines(piece_lines);
@@ -482,16 +483,16 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
     procon::Field field;
     bool flame_flag = true;
 
-    //Flame幅から全体のスケールを計算
-    const double flame_length = bg::distance(polygons.at(0).outer().at(0),polygons.at(0).outer().at(1));
-    const double default_flame_length = 30;
-    const double scale = default_flame_length / flame_length;
-
     for (auto polygon : polygons){
 
         //始点が(0,0)になるように移動
+        double minX=30.0,minY=30.0;
+        for(auto point : polygon.outer()){
+            if(point.x() < minX) minX = point.x();
+            if(point.y() < minY) minY = point.y();
+        }
         polygon_t translated_polygon;
-        bg::strategy::transform::translate_transformer<double,2,2> translate(-polygon.outer().at(2).x(),-polygon.outer().at(2).y());
+        bg::strategy::transform::translate_transformer<double,2,2> translate(-minX,-minY);
         bg::transform(polygon,translated_polygon,translate);
 
         //縮小

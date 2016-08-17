@@ -55,6 +55,7 @@ private:
     cv::Mat raw_colored_pic;
     std::vector<cv::Point> raw_pieces_pos;
     std::vector<cv::Vec3b> raw_random_colors;
+    double scale;
 };
 
 #endif // IMAGERECOGNITION_H
