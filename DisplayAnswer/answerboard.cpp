@@ -89,7 +89,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         int pieces_size = field->getPiecesSize();
         for(int i=0;i<pieces_size;i++){
             //get polygon center pos
-            point_t center;
+            point_t center = {0,0};
             boost::geometry::centroid(field->getPiece(i).getPolygon(), center);
             //draw piece
             painter.setPen(QPen(Qt::black, 3));
@@ -100,7 +100,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             QFont font = painter.font();
             font.setPointSize(std::abs(getScale()/15));
             painter.setFont(font);
-            painter.drawText(getPosition(QPointF(center.x()/flame_size, center.y()/flame_size), Space::LEFT), QString::number(field->getPiece(i).getId()));
+            painter.drawText(getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT), QString::number(field->getPiece(i).getId()));
         }
     }
     if(is_set_rawpic){
@@ -114,7 +114,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             QFont font = painter.font();
             font.setPointSize(std::abs(getScale()/15));
             painter.setFont(font);
-            painter.drawText(getPosition(QPointF((double)pos.x/(double)pieces_pic->width(),rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height())), Space::RIGHT), QString::number(count));
+            painter.drawText(getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.025), Space::RIGHT), QString::number(count));
             count++;
         }
     }
