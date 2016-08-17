@@ -37,11 +37,12 @@ void Hazama::run()
 {
     std::cout << "Run" << std::endl;
 
-    /*Get puzzle data*/
     procon::Field PDATA;
-    cv::Mat flame;
-    cv::Mat pieces;
+
+    /*Get puzzle data*/
     if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
+        cv::Mat flame;
+        cv::Mat pieces;
         //get Image
         if(ui->useWebCamera->isChecked()){
             flame = capture();
@@ -66,15 +67,12 @@ void Hazama::run()
         return;
     }
 
-    if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
+    /*Solve puzzle*/
+    Solver solver;
+    procon::Field field = solver.run(PDATA);
 
-        /*Solve puzzle*/
-        Solver solver;
-        procon::Field field = solver.run(PDATA);
-
-        /*Display answer*/
-        board->setField(field);
-    }
+    /*Display answer*/
+    board->setField(field);
 
     std::cout<<"finish"<<std::endl;
 }
