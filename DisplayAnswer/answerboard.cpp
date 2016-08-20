@@ -94,14 +94,17 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             boost::geometry::centroid(field->getPiece(i).getPolygon(), center);
             //draw piece
             painter.setPen(QPen(Qt::black, 3));
-            painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
+            if(is_set_rawpic) painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
+            else painter.setBrush(QBrush(QColor(color_piece)));
             drawPolygon(field->getPiece(i).getPolygon(),Space::LEFT);
             //draw number
-            painter.setPen(QPen(QColor(color_id)));
-            QFont font = painter.font();
-            font.setPointSize(std::abs(getScale()/15));
-            painter.setFont(font);
-            painter.drawText(getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT), QString::number(field->getPiece(i).getId()));
+            if(is_set_rawpic){
+                painter.setPen(QPen(QColor(color_id)));
+                QFont font = painter.font();
+                font.setPointSize(std::abs(getScale()/15));
+                painter.setFont(font);
+                painter.drawText(getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT), QString::number(field->getPiece(i).getId()));
+            }
         }
     }
     if(is_set_rawpic){
