@@ -26,10 +26,12 @@ class ExpandedPolygon
     std::vector<double> side_angle;
     polygon_t polygon;
     //calc
-    //calcSideSize -> calcSideLength -> calcSideAngle
     void calcSize();
     void calcSideLength();
     void calcSideAngle();
+    bool calcSize_flag = false;
+    bool calcSideLength_flag = false;
+    bool calcSideAngle_flag = false;
 
 public:
     //constructor
@@ -37,9 +39,9 @@ public:
     ExpandedPolygon(ExpandedPolygon const& p);
 
     //getter
-    int getSize() const;
-    std::vector<double> const& getSideLength() const;
-    std::vector<double> const& getSideAngle() const;
+    int getSize();
+    std::vector<double> const& getSideLength();
+    std::vector<double> const& getSideAngle();
     polygon_t const& getPolygon() const;
     int getId() const;
 

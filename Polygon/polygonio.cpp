@@ -48,8 +48,9 @@ void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path
 {
     std::ofstream outputfile(file_path);
     //flame
-    polygon_t raw_flame = field.getElementaryFlame().getPolygon();
-    int flame_size = field.getElementaryFlame().getSize();
+    procon::ExpandedPolygon raw_ex_flame = field.getElementaryFlame();
+    polygon_t raw_flame = raw_ex_flame.getPolygon();
+    int flame_size = raw_ex_flame.getSize();
     for(int i=0;i<flame_size;i++){
         if(i!=0) outputfile << ",";
         outputfile << raw_flame.outer()[i].x() << "," << raw_flame.outer()[i].y();
@@ -62,7 +63,8 @@ void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path
         raw_pieces.push_back(field.getElementaryPieces().at(i).getPolygon());
     }
     for(int i=0;i<pieces_size;i++){
-        int piece_size = field.getElementaryPieces().at(i).getSize();
+        procon::ExpandedPolygon raw_ex_piece = field.getElementaryPieces().at(i);
+        int piece_size = raw_ex_piece.getSize();
         for(int j=0;j<piece_size;j++){
             if(j!=0) outputfile << ",";
             outputfile << raw_pieces.at(i).outer()[j].x() << "," << raw_pieces.at(i).outer()[j].y();
