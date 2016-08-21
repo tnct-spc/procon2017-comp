@@ -28,18 +28,22 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
 void procon::ExpandedPolygon::calcSize()
 {
     size = static_cast<int>(polygon.outer().size() - 1);
+    calcSize_flag = true;
 }
 
 void procon::ExpandedPolygon::calcSideLength()
 {
+    if(!calcSize_flag) calcSize();
     for(int i=0;i<size;i++){
        const double length = bg::distance(polygon.outer().at(i),polygon.outer().at(i+1));
        side_length.push_back(length);
     }
+    calcSideLength_flag = true;
 }
 
 void procon::ExpandedPolygon::calcSideAngle()
 {
+    if(!calcSize_flag) calcSize();
     try {
         for (int i = -1;i < size - 1;i++){
             double x1,y1;
@@ -62,22 +66,26 @@ void procon::ExpandedPolygon::calcSideAngle()
     } catch (std::exception &e) {
            std::cerr << e.what() << std::endl;
     }
+    calcSideAngle_flag = true;
 }
 
 //---------------------public------------------------
 // getter
-int procon::ExpandedPolygon::getSize() const
+int procon::ExpandedPolygon::getSize()
 {
+    if(!calcSize_flag) calcSize();
     return size;
 }
 
-std::vector<double> const& procon::ExpandedPolygon::getSideLength() const
+std::vector<double> const& procon::ExpandedPolygon::getSideLength()
 {
+    if(!calcSideLength_flag) calcSideLength();
     return side_length;
 }
 
-std::vector<double> const& procon::ExpandedPolygon::getSideAngle() const
+std::vector<double> const& procon::ExpandedPolygon::getSideAngle()
 {
+    if(!calcSideAngle_flag) calcSideAngle();
     return side_angle;
 }
 
@@ -95,7 +103,6 @@ int procon::ExpandedPolygon::getId() const
 void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 {
     polygon = p;
-    calcSize();
 }
 
 // operator
@@ -116,7 +123,6 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
 // member
 
 // 計算をまとめて行う
-// ここ以外からcalc関数を呼ぶのは禁止
 void procon::ExpandedPolygon::updatePolygon()
 {
     calcSize();
