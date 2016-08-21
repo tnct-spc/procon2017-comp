@@ -10,6 +10,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QWidget>
+#include <QKeyEvent>
 
 #include "field.h"
 
@@ -36,6 +37,9 @@ private:
     std::unique_ptr<std::vector<cv::Vec3b>> random_colors;
     bool is_set_field = false;
     bool is_set_rawpic = false;
+    std::vector<int> putid_list;
+    int putid_left = -1;
+    int putid_right = -1;
 
     const int top_margin    = 10;
     const int bottom_margin = 10;
@@ -56,6 +60,7 @@ private:
 
 protected:
     void paintEvent(QPaintEvent *);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // ANSWERBOARD_H

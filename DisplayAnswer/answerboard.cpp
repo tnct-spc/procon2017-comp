@@ -18,6 +18,13 @@ void AnswerBoard::setField(const procon::Field &field)
     is_set_field = true;
     this->field = std::make_unique<procon::Field>(field);
     this->update();
+
+    //add putid_list
+    for(auto piece : this->field->getPieces()){
+        if(piece.getId() != 0 && piece.getId() != 1) putid_list.push_back(piece.getId());
+    }
+    if(this->field->getPiecesSize() >= 1) putid_left = this->field->getPiece(0).getId();
+    if(this->field->getPiecesSize() >= 2) putid_right = this->field->getPiece(1).getId();
 }
 
 void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos)
@@ -74,11 +81,17 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     static const QString color_piece      = "#0f5ca0";
     static const QString color_flame      = "#d0b98d";
     static const QString color_id         = "#ff33cc";
+    static const QString color_arrow_left = "#ff0000";
+    static const QString color_arrow_right= "#00ff00";
+
+    std::array<QPointF,50> field_pieces_pos;
+    std::array<QPointF,50> rawpic_pieces_pos;
 
     //draw background
     painter.setBrush(QBrush(QColor(color_background)));
     painter.drawRect(0,0,this->width(),this->height());
 
+    //draw field
     if(is_set_field){
         //draw flame
         painter.setPen(QPen(Qt::black, 3));
@@ -92,6 +105,9 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             //get polygon center pos
             point_t center = {0,0};
             boost::geometry::centroid(field->getPiece(i).getPolygon(), center);
+            QPointF display_pos = getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT);
+            field_pieces_pos.at(piece_id) = display_pos;
+
             //draw piece
             painter.setPen(QPen(Qt::black, 3));
             if(is_set_rawpic) painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
@@ -103,10 +119,12 @@ void AnswerBoard::paintEvent(QPaintEvent *)
                 QFont font = painter.font();
                 font.setPointSize(std::abs(getScale()/15));
                 painter.setFont(font);
-                painter.drawText(getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT), QString::number(field->getPiece(i).getId()));
+                painter.drawText(display_pos, QString::number(piece_id));
             }
         }
     }
+
+    //draw rawpic
     if(is_set_rawpic){
         //draw pic
         double rawpic_height_margin = (1-((double)pieces_pic->height()/(double)pieces_pic->width()))/2;
@@ -114,12 +132,54 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         //draw number
         int count = 0;
         for(cv::Point& pos : *pieces_pos){
+            QPointF display_pos = getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.025), Space::RIGHT);
+            rawpic_pieces_pos.at(count) = display_pos;
+
             painter.setPen(QPen(QColor(color_id)));
             QFont font = painter.font();
             font.setPointSize(std::abs(getScale()/15));
             painter.setFont(font);
-            painter.drawText(getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.025), Space::RIGHT), QString::number(count));
+            painter.drawText(display_pos, QString::number(count));
             count++;
         }
+    }
+
+    //draw arrow
+    if(is_set_field && is_set_rawpic){
+        if(putid_left != -1){
+            painter.setPen(QPen(QColor(color_arrow_left), 5));
+            painter.drawLine(field_pieces_pos.at(putid_left),rawpic_pieces_pos.at(putid_left));
+        }
+        if(putid_right != -1){
+            painter.setPen(QPen(QColor(color_arrow_right), 5));
+            painter.drawLine(field_pieces_pos.at(putid_right),rawpic_pieces_pos.at(putid_right));
+        }
+    }
+}
+
+void AnswerBoard::keyPressEvent(QKeyEvent *event)
+{
+    switch(event->key()){
+        case 16781616:
+            if(putid_list.size() == 0){
+                putid_left = -1;
+            }else{
+                putid_left = putid_list.back();
+                putid_list.pop_back();
+            }
+            this->update();
+            break;
+        case 16777220:
+            if(putid_list.size() == 0){
+                putid_right = -1;
+            }else{
+                putid_right = putid_list.back();
+                putid_list.pop_back();
+            }
+            this->update();
+            break;
+        default:
+            std::cout<<"Press Key : "<<event->key()<<std::endl;
+            break;
     }
 }
