@@ -117,7 +117,8 @@ void procon::ExpandedPolygon::updatePolygon()
     calcSideAngle();
 }
 
-polygon_t procon::ExpandedPolygon::inversePolygon(polygon_t polygon){
+polygon_t procon::ExpandedPolygon::inversePolygon(polygon_t polygon)
+{
 
     const int polygon_size = polygon.outer().size();
 
@@ -146,4 +147,12 @@ polygon_t procon::ExpandedPolygon::inversePolygon(polygon_t polygon){
     boost::geometry::transform(inversePolygon,returnPolygon,transformback);
 
     return returnPolygon;
+}
+
+polygon_t procon::ExpandedPolygon::rotatePolygon(polygon_t polygon, double degree)
+{
+    polygon_t rotatePolygon;
+    boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree,double,2,2> rotate(degree);
+    boost::geometry::transform(polygon,rotatePolygon,rotate);
+    return rotatePolygon;
 }

@@ -55,6 +55,8 @@ public:
 
     static polygon_t inversePolygon(polygon_t polygon);
 
+
+    static polygon_t rotatePolygon(polygon_t polygon,double degree);
 };
 
 }
