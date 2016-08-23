@@ -45,8 +45,16 @@ void Hazama::run()
         cv::Mat pieces;
         //get Image
         if(ui->useWebCamera->isChecked()){
+            cv::namedWindow("capture",cv::WINDOW_AUTOSIZE);
+            cv::Mat pressentertextwindow = cv::Mat::zeros(100,700,CV_8UC3);
+            cv::putText(pressentertextwindow, "Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(255,255,255),2,CV_AA);
+            cv::imshow("capture",pressentertextwindow);
+            while(cv::waitKey(0)==13);
             flame = capture();
+            while(cv::waitKey(0)==13);
             pieces = capture();
+            cv::destroyWindow("capture");
+
         }else{
             std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
             std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
