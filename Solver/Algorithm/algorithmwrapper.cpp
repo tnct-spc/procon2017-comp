@@ -89,7 +89,7 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
             }
    }
 
-   reexit:
+   reexit: //この先を正順循環ではなく起点から逆方向に探索するよう変更するべきである
    for (int k=0; k<maxloop; ++k)
    {
         comped=polygon1.getSideLength()[i];
