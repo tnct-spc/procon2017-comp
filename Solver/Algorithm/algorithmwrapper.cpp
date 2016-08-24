@@ -10,49 +10,131 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
     return field;
 }
 
-int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, int& ans1, int& ans2, int& ans3, int& ans4, double& length1, double& length2, double& angleb1, double& angleb2, double& anglea1, double& anglea2)
+int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, Fit fit1, Fit fit2)
 {
-    ans1 = -1;
-    ans2 = -1;
-    ans3 = -1;
-    ans4 = -1;
-    length1 = -1;
-    length2 = -1;
-    angleb1 = -1;
-    angleb2 = -1;
-    anglea1 = -1;
-    anglea2 = -1;
+    /*許容誤差指定*/
     const double length_error = 0.05; // 単位CM
     const double angle_error = 0.017; //単位rad
-    int loopNumber1 = polygon1.getSize();
-    int loopNumber2 = polygon2.getSize();
-    for(int i=0; i < loopNumber1; ++i)
+    double comped;
+    double comping;
+    int result;
+    int maxloop;
+    int repeat;
+    int Eva;
+    int i=0;
+    int j=0;
+
+    maxloop = polygon1.getSize();
+    for (i=0; i<maxloop; ++i)
     {
-        double Comped = polygon1.getSideLength()[i];
-        for(int j=0; j < loopNumber2; ++j)
+        comped=polygon1.getSideAngle()[i];
+        repeat=polygon2.getSize();
+        for (j=0; j<repeat; ++j)
         {
-            double Comping = polygon2.getSideLength()[j];
-            if (Comped - (length_error*2) < Comping && Comping < Comped + (length_error*2))
+            comping=polygon2.getSideAngle()[j];
+            if ((M_PI * 2)-(angle_error * 2) < (comped + comping) && (comped + comping) < (M_PI * 2)+(angle_error * 2))
             {
-                angleb1=polygon1.getSideAngle()[i];
-                angleb2=polygon2.getSideAngle()[j];
-                if ((M_PI * 2)-(angle_error * 2) < (angleb1 + angleb2) && (angleb1 + angleb2) < (M_PI * 2)+(angle_error * 2))
-                {
-                    anglea1=polygon1.getSideAngle()[i+1];
-                    anglea2=polygon2.getSideAngle()[j+1];
-                    if ((M_PI * 2)-(angle_error * 2) < (anglea1 + anglea2) && (anglea1 + anglea2) < (M_PI * 2)+(angle_error * 2))
-                    {
-                        ans1 = i;
-                        ans2 = i+1;
-                        ans3 = j;
-                        ans4 = j+1;
-                        length1 = Comped;
-                        length2 = Comping;
-                        return 1;
-                    }
-                }
+                goto exit;
             }
         }
     }
     return 0;
+
+    exit:
+    for (int k=0; k<maxloop; ++k)
+    {
+            comped=polygon1.getSideLength()[i];
+            comping=polygon2.getSideLength()[j];
+            if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+            {
+                Eva++;
+                result=1;
+            } else {
+                result=0;
+            }
+            if (result = 0)
+            {
+                fit1.start_dot_or_line=false;
+                fit1.start_id=i-1;
+                fit2.start_dot_or_line=false;
+                fit2.start_id=j+1;
+                goto reexit;
+            }
+            comped=polygon1.getSideAngle()[i];
+            comping=polygon2.getSideAngle()[j];
+            if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+            {
+                Eva++;
+                result=1;
+            } else {
+                result=0;
+            }
+            if (result = 0)
+            {
+                fit1.start_dot_or_line=true;
+                fit1.start_id=i-1;
+                fit2.start_dot_or_line=true;
+                fit2.start_id=j+1;
+                goto reexit;
+            }
+            i++;
+            j--;
+            if (i > polygon1.getSize())
+            {
+                i=0;
+            }
+            if (j < 0)
+            {
+                j=polygon2.getSize();
+            }
+   }
+
+   reexit:
+   for (int k=0; k<maxloop; ++k)
+   {
+        comped=polygon1.getSideLength()[i];
+        comping=polygon2.getSideLength()[j];
+        if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+        {
+            Eva++;
+            result=1;
+        } else {
+            result=0;
+        }
+            if (result = 1)
+        {
+            fit1.end_dot_or_line=false;
+            fit1.end_id=i;
+            fit2.end_dot_or_line=false;
+            fit2.end_id=j;
+            return 1;
+        }
+            comped=polygon1.getSideAngle()[i];
+            comping=polygon2.getSideAngle()[j];
+            if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+        {
+            Eva++;
+            result=1;
+        } else {
+            result=0;
+        }
+        if (result = 1)
+        {
+            fit1.start_dot_or_line=true;
+            fit1.start_id=i;
+            fit2.start_dot_or_line=true;
+            fit2.start_id=j;
+            return 1;
+         }
+         i++;
+         j--;
+         if (i > polygon1.getSize())
+         {
+             i=0;
+         }
+         if (j < 0)
+         {
+             j=polygon2.getSize();
+         }
+    }
 }

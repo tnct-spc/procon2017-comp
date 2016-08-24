@@ -6,9 +6,17 @@
 class AlgorithmWrapper
 {
 public:
+    typedef struct FIT{
+        bool start_dot_or_line;
+        int start_id;
+        bool end_dot_or_line;
+        int end_id;
+    } Fit;
+
     AlgorithmWrapper();
     virtual procon::Field run(procon::Field field);
-    int searchSameLength(procon::ExpandedPolygon polygon1 ,procon::ExpandedPolygon polygon2, int& ans1, int& ans2, int& ans3, int& ans4, double& lengrh1, double& length2, double& angleb1, double& angleb2, double& anglea1, double& anglea2);
+    Fit fit1,fit2;
+    int searchSameLength(procon::ExpandedPolygon polygon1 ,procon::ExpandedPolygon polygon2, Fit fit1, Fit fit2);
 };
 
 #endif // ALGORITHMWRAPPER_H
