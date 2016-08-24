@@ -51,13 +51,15 @@ void Hazama::run()
             cv::imshow("capture",pressentertextwindow);
             while(cv::waitKey(0)==13);
             flame = capture();
+            cv::namedWindow("flame",CV_WINDOW_AUTOSIZE);
+            cv::imshow("flame",flame);
             while(cv::waitKey(0)==13);
             pieces = capture();
             cv::destroyWindow("capture");
 
         }else{
-            std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
-            std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
+            std::string flame_path = "./../../procon2016-comp/sample/flame.jpg";
+            std::string pieces_path = "./../../procon2016-comp/sample/pieces.jpg";
             flame = cv::imread(flame_path, 1);
             pieces = cv::imread(pieces_path, 1);
         }
@@ -69,7 +71,7 @@ void Hazama::run()
         board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
         board->setRandomColors(imrec.getRawRandomColors());
     }else if(ui->useFileData->isChecked()){
-        std::string path = QFileDialog::getOpenFileName(this).toStdString();
+        std::string path = "./../../procon2016-comp/sample/sample.csv";
         PDATA = procon::PolygonIO::importPolygon(path);
     }else{
         return;
@@ -93,6 +95,7 @@ cv::Mat Hazama::capture()
     //撮影サイズの指定
     cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
+    cap.set(cv::CAP_PROP_BRIGHTNESS,0.9);
 
     if(!cap.isOpened()){
         std::cerr << "Can't open camera!" << std::endl;
