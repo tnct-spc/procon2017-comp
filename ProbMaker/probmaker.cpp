@@ -516,7 +516,7 @@ void ProbMaker::paintEvent(QPaintEvent *)
     painter.setPen(QPen(Qt::black, 1));
 
     auto drawLine = [&](std::shared_ptr<Line> line){
-        painter.drawLine(QPointF(line->dot1->x+marginX, line->dot1->y+marginY), QPointF(line->dot2->x+marginX, line->dot2->y+marginY));
+        painter.drawLine(QPointF(line->dot1->x/1.3+marginX, line->dot1->y/1.3+marginY), QPointF(line->dot2->x/1.3+marginX, line->dot2->y/1.3+marginY));
     };
 
     //すべてのlineを描画
