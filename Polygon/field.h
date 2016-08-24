@@ -50,6 +50,9 @@ public:
     //コンソール出力
     void printFlame();
     void printPiece();
+
+    //translate polygon
+    static polygon_t translatePolygon(polygon_t polygon, double x, double y);
 };
 }
 #endif // FIELD_H

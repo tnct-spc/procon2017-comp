@@ -113,3 +113,11 @@ void procon::Field::printPiece()
         std::cout << bg::dsv(p.getPolygon()) << std::endl;
     }
 }
+
+polygon_t procon::Field::translatePolygon(polygon_t polygon, double x, double y)
+{
+    polygon_t translatedPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
+    boost::geometry::transform(polygon,translatedPolygon,translate);
+    return translatedPolygon;
+}
