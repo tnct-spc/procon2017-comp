@@ -16,10 +16,8 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->id = p.id;
     this->polygon = p.polygon;
     this->size = p.size;
-    this->side_length = p.side_length;
-    this->side_angle = p.side_angle;
-    this->side_length.reserve(32);
-    this->side_angle.reserve(32);
+    std::copy(p.side_length.begin(),p_side_length.end(), std::back_inserter(this->side_length));
+    std::copy(p.side_angle.begin(),p_side_angle.end(), std::back_inserter(this->side_angle));
     this->polygon.outer().reserve(32);
 
 }
@@ -111,10 +109,8 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
 {
     this->id = p.id;
     this->polygon = p.polygon;
-    this->side_length = p.side_length;
-    this->side_angle = p.side_angle;
-    this->side_length.reserve(32);
-    this->side_angle.reserve(32);
+    std::copy(p.side_length.begin(),p_side_length.end(), std::back_inserter(this->side_length));
+    std::copy(p.side_angle.begin(),p_side_angle.end(), std::back_inserter(this->side_angle));
     this->polygon.outer().reserve(32);
     this->size = p.size;
     return (*this);
