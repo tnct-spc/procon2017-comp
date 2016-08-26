@@ -485,15 +485,30 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
 
     int piece_count = 0;
     for (auto polygon : polygons){
-
-        //始点が(0,0)になるように移動
-        double minX=30.0,minY=30.0;
-        for(auto point : polygon.outer()){
-            if(point.x() < minX) minX = point.x();
-            if(point.y() < minY) minY = point.y();
+        //座標移動
+        double translateX = 0;
+        double translateY = 0;
+        if (flame_flag){
+            //左上が(0,0)になるように移動
+            double minX=30.0,minY=30.0;
+            for(auto point : polygon.outer()){
+                if(point.x() < minX) minX = point.x();
+                if(point.y() < minY) minY = point.y();
+            }
+            translateX = minX;
+            translateY = minY;
+        }else{
+            //中心が(0,0)になるように移動
+            double sumX=0.0,sumY=0.0;
+            for(auto point : polygon.outer()){
+                sumX += point.x();
+                sumY += point.y();
+            }
+            translateX = sumX / polygon.outer().size();
+            translateY = sumY / polygon.outer().size();
         }
         polygon_t translated_polygon;
-        bg::strategy::transform::translate_transformer<double,2,2> translate(-minX,-minY);
+        bg::strategy::transform::translate_transformer<double,2,2> translate(-translateX,-translateY);
         bg::transform(polygon,translated_polygon,translate);
 
         //縮小
@@ -502,7 +517,6 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
         bg::reverse(polygon);
         std::cout << bg::area(polygon) << std::endl;
         if (flame_flag){
-            flame_flag = false;
             ex_flame.setPolygon(polygon);
         } else {
             procon::ExpandedPolygon ex_polygon(piece_count);
@@ -510,6 +524,7 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
             ex_pieces.push_back(ex_polygon);
             piece_count++;
         }
+        if (flame_flag) flame_flag = false;
     }
 
     field.setElementaryPieces(ex_pieces);
