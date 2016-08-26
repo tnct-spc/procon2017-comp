@@ -202,8 +202,16 @@ procon::Field ProbMaker::PolygonToExPolygon()
     //polygon
     for(int i = 1;i < (static_cast<int>(Polygons.size()));++i){
         pieces.push_back(buff);
-        double reference_point_x = Polygons.at(i).at(0).s_dot->x/30;
-        double reference_point_y = Polygons.at(i).at(0).s_dot->y/30;
+        //cal center
+        double sumX=0.0,sumY=0.0;
+        int polygon_size = Polygons.at(i).size();
+        for(int j = 0;j < polygon_size;++j){
+            sumX += Polygons.at(i).at(j).s_dot->x/30;
+            sumY += Polygons.at(i).at(j).s_dot->y/30;
+        }
+        double reference_point_x = sumX / polygon_size;
+        double reference_point_y = sumY / polygon_size;
+        //put polygon
         for(int j = 0;j < (static_cast<int>(Polygons.at(i).size()));++j){
             pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(j).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(j).s_dot->y/30)-reference_point_y));
         }
