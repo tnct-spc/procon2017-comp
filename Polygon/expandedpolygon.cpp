@@ -20,6 +20,9 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->side_length.reserve(32);
     this->side_angle.reserve(32);
     this->polygon.outer().reserve(32);
+    this->centerx = p.centerx;
+    this->centery = p.centery;
+    this->difference_of_default_degree = p.difference_of_default_degree;
 
 }
 
@@ -103,6 +106,10 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->side_angle.reserve(32);
     this->polygon.outer().reserve(32);
     this->size = p.size;
+    this->centerx = p.centerx;
+    this->centery = p.centery;
+    this->difference_of_default_degree = p.difference_of_default_degree;
+
     return (*this);
 }
 
@@ -155,6 +162,8 @@ void procon::ExpandedPolygon::rotatePolygon(double degree)
     boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(centerx,centery);
     boost::geometry::transform(rotated_Polygon,backPolygon,backTranslate);
 
+    difference_of_default_degree = difference_of_default_degree + degree;
+
     polygon = backPolygon;
 }
 
@@ -172,9 +181,14 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
 
 void procon::ExpandedPolygon::setPolygonAngle(double degree)
 {
-    //double  = polygon.outer().at(0).y() / polygon.outer().at(0).x();
-    //double std::asin(Nowdegree);
-    
+    //回転量
+    const double ddegree = degree - difference_of_default_degree;
+
+    polygon_t rotatedPolygon;
+    boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree,double,2,2> rotate(ddegree);
+    boost::geometry::transform(polygon,rotatedPolygon,rotate);
+
+    polygon = rotatedPolygon;
 }
 
 void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
