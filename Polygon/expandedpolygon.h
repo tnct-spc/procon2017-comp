@@ -28,8 +28,8 @@ class ExpandedPolygon
 
     double difference_of_default_degree = 0;
 
-    double centerx = 1;
-    double centery = 1;
+    double centerx = 0;
+    double centery = 0;
 
 
     //calc

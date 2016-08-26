@@ -181,14 +181,28 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
 
 void procon::ExpandedPolygon::setPolygonAngle(double degree)
 {
+    polygon_t goPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
+    boost::geometry::transform(polygon,goPolygon,goTranslate);
+
     //回転量
-    const double ddegree = degree - difference_of_default_degree;
+    double ddegree = degree - difference_of_default_degree;
+
+    while(ddegree < 0){
+        ddegree = ddegree + 360;
+    }
 
     polygon_t rotatedPolygon;
     boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree,double,2,2> rotate(ddegree);
-    boost::geometry::transform(polygon,rotatedPolygon,rotate);
+    boost::geometry::transform(goPolygon,rotatedPolygon,rotate);
 
-    polygon = rotatedPolygon;
+    polygon_t backPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(centerx,centery);
+    boost::geometry::transform(rotatedPolygon,backPolygon,backTranslate);
+
+    difference_of_default_degree = degree;
+
+    polygon = backPolygon;
 }
 
 void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
