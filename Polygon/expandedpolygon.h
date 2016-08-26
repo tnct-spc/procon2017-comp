@@ -25,6 +25,12 @@ class ExpandedPolygon
     std::vector<double> side_length;
     std::vector<double> side_angle;
     polygon_t polygon;
+
+    double first_degree = 0;
+
+    double centerx = 1;
+    double centery = 1;
+
     //calc
     //calcSideSize -> calcSideLength -> calcSideAngle
     void calcSize();
@@ -52,11 +58,14 @@ public:
     //***ポリゴン変更後必ず実行のこと***
     void updatePolygon();
 
+    void inversePolygon();
+    void rotatePolygon(double degree);
+    void translatePolygon(double x,double y);
+    
+    void setPolygonAngle(double degree);
+    void setPolygonPosition(double x,double y);
 
-    static polygon_t inversePolygon(polygon_t polygon);
 
-
-    static polygon_t rotatePolygon(polygon_t polygon,double degree);
 };
 
 }

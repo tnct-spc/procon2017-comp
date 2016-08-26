@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
+QT       += widgets
 
 CONFIG += c++14
 
@@ -13,18 +13,18 @@ TEMPLATE = lib
 
 DEFINES += POLYGON_LIBRARY
 
-SOURCES += polygonexpansion.cpp \
+SOURCES += \
     field.cpp \
     polygonio.cpp \
-    polygonset.cpp \
-    expandedpolygon.cpp
+    expandedpolygon.cpp \
+    singlepolygondisplay.cpp
 
-HEADERS += polygonexpansion.h \
+HEADERS += \
         polygon_global.h \
     field.h \
     polygonio.h \
-    polygonset.h \
-    expandedpolygon.h
+    expandedpolygon.h \
+    singlepolygondisplay.h
 
 LIBS += -lboost_system -lboost_thread
 
@@ -34,3 +34,7 @@ unix {
     target.path = /usr/lib
     target.extra = ldconfig
 }
+
+FORMS += \
+    singlepolygondisplay.ui \
+form.ui
