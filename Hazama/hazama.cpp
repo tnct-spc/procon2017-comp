@@ -90,17 +90,20 @@ cv::Mat Hazama::capture()
     cv::VideoCapture cap(1);//デバイスのオープン
     //cap.open(0);//こっちでも良い．
 
-    //撮影サイズの指定
-    cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
-
     if(!cap.isOpened()){
         std::cerr << "Can't open camera!" << std::endl;
     }
 
+    //setting
+    cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
+    cap.set(cv::CAP_PROP_BRIGHTNESS,0.0);
+
     cv::Mat src;
 
-    cap >> src;
+    for(int i=0;i<30;i++){
+        cap >> src;
+    }
 
     return src;
 

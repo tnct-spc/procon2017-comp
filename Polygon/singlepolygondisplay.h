@@ -2,10 +2,8 @@
 #define SINGLEPOLYGONDISPLAY_H
 
 #include "expandedpolygon.h"
-/*#include <QWidget>*/
-
-
 #include <QWidget>
+
 
 namespace Ui {
 class SinglePolygonDisplay;

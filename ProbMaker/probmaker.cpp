@@ -202,8 +202,16 @@ procon::Field ProbMaker::PolygonToExPolygon()
     //polygon
     for(int i = 1;i < (static_cast<int>(Polygons.size()));++i){
         pieces.push_back(buff);
-        double reference_point_x = Polygons.at(i).at(0).s_dot->x/30;
-        double reference_point_y = Polygons.at(i).at(0).s_dot->y/30;
+        //cal center
+        double sumX=0.0,sumY=0.0;
+        int polygon_size = Polygons.at(i).size();
+        for(int j = 0;j < polygon_size;++j){
+            sumX += Polygons.at(i).at(j).s_dot->x/30;
+            sumY += Polygons.at(i).at(j).s_dot->y/30;
+        }
+        double reference_point_x = sumX / polygon_size;
+        double reference_point_y = sumY / polygon_size;
+        //put polygon
         for(int j = 0;j < (static_cast<int>(Polygons.at(i).size()));++j){
             pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(j).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(j).s_dot->y/30)-reference_point_y));
         }
@@ -374,7 +382,7 @@ void ProbMaker::eraseMinPolygon()
 void ProbMaker::erasePolygonUnderFifty()
 {
     //50個以下になるまで、線の削除→ポリゴンの作り直し、を繰り返す
-    while(Polygons.size() > 50){
+    while(Polygons.size() >= 50){
 
         //ランダムなポリゴンを指定
         std::random_device rd;
@@ -516,7 +524,7 @@ void ProbMaker::paintEvent(QPaintEvent *)
     painter.setPen(QPen(Qt::black, 1));
 
     auto drawLine = [&](std::shared_ptr<Line> line){
-        painter.drawLine(QPointF(line->dot1->x+marginX, line->dot1->y+marginY), QPointF(line->dot2->x+marginX, line->dot2->y+marginY));
+        painter.drawLine(QPointF(line->dot1->x/1.3+marginX, line->dot1->y/1.3+marginY), QPointF(line->dot2->x/1.3+marginX, line->dot2->y/1.3+marginY));
     };
 
     //すべてのlineを描画

@@ -13,6 +13,7 @@
 #include <QKeyEvent>
 
 #include "field.h"
+#include "singlepolygondisplay.h"
 
 namespace Ui {
 class AnswerBoard;
@@ -57,6 +58,7 @@ private:
     QPointF getPosition(QPointF point_percent, Space space);
 
     double getScale();
+    std::vector<SinglePolygonDisplay*> displays;
 
 protected:
     void paintEvent(QPaintEvent *);

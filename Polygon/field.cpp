@@ -13,13 +13,6 @@ void procon::Field::setFlame(ExpandedPolygon const& flame)
     field_flame = flame;
 }
 
-void procon::Field::setPiece(polygon_t piece)
-{
-    procon::ExpandedPolygon ex_piece;
-    ex_piece.setPolygon(piece);
-    field_pieces.push_back(ex_piece);
-}
-
 void procon::Field::setPiece(procon::ExpandedPolygon piece)
 {
     field_pieces.push_back(piece);
@@ -30,9 +23,8 @@ void procon::Field::setPiece(ExpandedPolygon piece, double x, double y)
     polygon_t translated_polygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
     boost::geometry::transform(piece.getPolygon(),translated_polygon,translate);
-    ExpandedPolygon p;
-    p.setPolygon(translated_polygon);
-    field_pieces.push_back(p);
+    piece.setPolygon(translated_polygon);
+    field_pieces.push_back(piece);
 }
 
 void procon::Field::setPiece(procon::ExpandedPolygon piece, int n, double x, double y)
@@ -40,9 +32,8 @@ void procon::Field::setPiece(procon::ExpandedPolygon piece, int n, double x, dou
     polygon_t translated_polygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
     boost::geometry::transform(piece.getPolygon(),translated_polygon,translate);
-    ExpandedPolygon p;
-    p.setPolygon(translated_polygon);
-    field_pieces.at(n) = p;
+    piece.setPolygon(translated_polygon);
+    field_pieces.at(n) = piece;
 }
 
 void procon::Field::setElementaryFlame(procon::ExpandedPolygon const& flame)
@@ -113,4 +104,12 @@ void procon::Field::printPiece()
     for (auto p : elementary_pieces){
         std::cout << bg::dsv(p.getPolygon()) << std::endl;
     }
+}
+
+polygon_t procon::Field::translatePolygon(polygon_t polygon, double x, double y)
+{
+    polygon_t translatedPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
+    boost::geometry::transform(polygon,translatedPolygon,translate);
+    return translatedPolygon;
 }

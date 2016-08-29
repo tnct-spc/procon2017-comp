@@ -16,11 +16,12 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->id = p.id;
     this->polygon = p.polygon;
     this->size = p.size;
-    this->side_length = p.side_length;
-    this->side_angle = p.side_angle;
-    this->side_length.reserve(32);
-    this->side_angle.reserve(32);
+    std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
+    std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
     this->polygon.outer().reserve(32);
+    this->centerx = p.centerx;
+    this->centery = p.centery;
+    this->difference_of_default_degree = p.difference_of_default_degree;
 
 }
 
@@ -111,12 +112,14 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
 {
     this->id = p.id;
     this->polygon = p.polygon;
-    this->side_length = p.side_length;
-    this->side_angle = p.side_angle;
-    this->side_length.reserve(32);
-    this->side_angle.reserve(32);
+    std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
+    std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
     this->polygon.outer().reserve(32);
     this->size = p.size;
+    this->centerx = p.centerx;
+    this->centery = p.centery;
+    this->difference_of_default_degree = p.difference_of_default_degree;
+
     return (*this);
 }
 
@@ -128,4 +131,101 @@ void procon::ExpandedPolygon::updatePolygon()
     calcSize();
     calcSideLength();
     calcSideAngle();
+}
+
+void procon::ExpandedPolygon::inversePolygon()
+{
+    polygon_t translate_polygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-centerx,0);
+    boost::geometry::transform(polygon,translate_polygon,transformgo);
+
+    //
+    polygon_t inversedPolygon;
+    const int polygon_size = polygon.outer().size();
+    for(int i=0; i < polygon_size; i++){
+        const double x = translate_polygon.outer().at(i).x();
+        const double y = translate_polygon.outer().at(i).y();
+        inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-x,y));
+    }
+
+    polygon_t returnPolygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(centerx,0);
+    boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
+
+    polygon = returnPolygon;
+}
+
+void procon::ExpandedPolygon::rotatePolygon(double degree)
+{
+    polygon_t goPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
+    boost::geometry::transform(polygon,goPolygon,goTranslate);
+
+    polygon_t rotated_Polygon;
+    boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree,double,2,2> rotate(degree);
+    boost::geometry::transform(goPolygon,rotated_Polygon,rotate);
+
+    polygon_t backPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(centerx,centery);
+    boost::geometry::transform(rotated_Polygon,backPolygon,backTranslate);
+
+    difference_of_default_degree = difference_of_default_degree + degree;
+
+    polygon = backPolygon;
+}
+
+void procon::ExpandedPolygon::translatePolygon(double x, double y)
+{
+    polygon_t translatedPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(x,y);
+    boost::geometry::transform(polygon,translatedPolygon,backTranslate);
+    
+    centerx = centerx + x;
+    centery = centery + y;
+
+    polygon = translatedPolygon;
+}
+
+void procon::ExpandedPolygon::setPolygonAngle(double degree)
+{
+    polygon_t goPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
+    boost::geometry::transform(polygon,goPolygon,goTranslate);
+
+    //回転量
+    double ddegree = degree - difference_of_default_degree;
+
+    while(ddegree < 0){
+        ddegree = ddegree + 360;
+    }
+
+    polygon_t rotatedPolygon;
+    boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree,double,2,2> rotate(ddegree);
+    boost::geometry::transform(goPolygon,rotatedPolygon,rotate);
+
+    polygon_t backPolygon;
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(centerx,centery);
+    boost::geometry::transform(rotatedPolygon,backPolygon,backTranslate);
+
+    difference_of_default_degree = degree;
+
+    polygon = backPolygon;
+}
+
+void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
+{
+    double dx = x - centerx;
+    double dy = y - centery;
+    
+    polygon_t translatedPolygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(dx,dy);
+    boost::geometry::transform(polygon,translatedPolygon,translate);
+    
+    centerx = x;
+    centery = y;
+    
+    polygon = translatedPolygon;
 }
