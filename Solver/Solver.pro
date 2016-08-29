@@ -16,13 +16,15 @@ DEFINES += SOLVER_LIBRARY
 SOURCES += solver.cpp \
     Algorithm/algorithmwrapper.cpp \
     Algorithm/simplealgorithm.cpp \
-    Algorithm/pooralgorithm.cpp
+    Algorithm/pooralgorithm.cpp \
+    Algorithm/hillclibming.cpp
 
 HEADERS += solver.h\
         solver_global.h \
     Algorithm/algorithmwrapper.h \
     Algorithm/simplealgorithm.h \
-    Algorithm/pooralgorithm.h
+    Algorithm/pooralgorithm.h \
+    Algorithm/hillclibming.h
 
 unix {
     target.path = /usr/lib
