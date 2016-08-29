@@ -17,7 +17,7 @@ public:
     AlgorithmWrapper();
     virtual procon::Field run(procon::Field field);
     Fit fit1,fit2;
-    int searchSameLength(procon::ExpandedPolygon polygon1 ,procon::ExpandedPolygon polygon2, Fit &fit1, Fit &fit2);
+    int searchSameLength(procon::ExpandedPolygon polygon1 ,procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result);
 };
 
 #endif // ALGORITHMWRAPPER_H
