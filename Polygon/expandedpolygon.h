@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <cmath>
+#include <numeric>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/ring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
@@ -37,6 +38,7 @@ class ExpandedPolygon
     void calcSize();
     void calcSideLength();
     void calcSideAngle();
+    void fixOutsideAngle();
     bool calcSize_flag = false;
     bool calcSideLength_flag = false;
     bool calcSideAngle_flag = false;
