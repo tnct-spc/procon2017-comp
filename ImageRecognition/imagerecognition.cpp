@@ -24,10 +24,10 @@ procon::Field ImageRecognition::run(cv::Mat raw_flame_image, cv::Mat raw_pieces_
 void ImageRecognition::threshold(cv::Mat& image)
 {
     //resize
-    image = cv::Mat(image,cv::Rect(250,0,1450,1080));
+    image = cv::Mat(image,cv::Rect(75,0,1455,1080));
 
     //色抽出 H:0-180/180, S:76-255/255, B:76-153/255
-    colorExtraction(&image, &image, CV_BGR2HSV, 0, 180, 76, 255, 76, 153);
+    colorExtraction(&image, &image, CV_BGR2HSV, 0, 180, 37, 255, 120, 217);
 
     //グレースケールに変換
     cvtColor(image,image,CV_RGB2GRAY);
@@ -96,7 +96,7 @@ cv::Mat ImageRecognition::preprocessingFlame(cv::Mat image)
     delete piece_label;
 
     //triming, and delete small noise
-    const int NOIZE_SIZE = 10;
+    const int NOIZE_SIZE = 100;
     std::vector<cv::Mat> result_images;
     int count=0;
     for(auto &im: images){
@@ -228,7 +228,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         pieces_lines.push_back(std::vector<cv::Vec4f>());
 
         //LSD直線検出 引数の"scale"が重要！！！
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.35);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.50);
         lsd->detect(image, pieces_lines[count]);
 
         //描画
