@@ -18,5 +18,5 @@ procon::Field Solver::run(procon::Field field)
     procon::Field simple_field = simple_algo.run(field);
     procon::Field hillclimb_field = hillclimb_algo.run(field);
 
-    return simple_field;
+    return hillclimb_field;
 }
