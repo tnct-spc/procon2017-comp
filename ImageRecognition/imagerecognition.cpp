@@ -24,10 +24,10 @@ procon::Field ImageRecognition::run(cv::Mat raw_flame_image, cv::Mat raw_pieces_
 void ImageRecognition::threshold(cv::Mat& image)
 {
     //resize
-    image = cv::Mat(image,cv::Rect(250,0,1450,1080));
+    image = cv::Mat(image,cv::Rect(75,0,1455,1080));
 
     //色抽出 H:0-180/180, S:76-255/255, B:76-153/255
-    colorExtraction(&image, &image, CV_BGR2HSV, 0, 180, 76, 255, 76, 153);
+    colorExtraction(&image, &image, CV_BGR2HSV, 0, 180, 37, 255, 120, 217);
 
     //グレースケールに変換
     cvtColor(image,image,CV_RGB2GRAY);
@@ -96,7 +96,7 @@ cv::Mat ImageRecognition::preprocessingFlame(cv::Mat image)
     delete piece_label;
 
     //triming, and delete small noise
-    const int NOIZE_SIZE = 10;
+    const int NOIZE_SIZE = 100;
     std::vector<cv::Mat> result_images;
     int count=0;
     for(auto &im: images){
@@ -228,15 +228,15 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         pieces_lines.push_back(std::vector<cv::Vec4f>());
 
         //LSD直線検出 引数の"scale"が重要！！！
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.35);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.50);
         lsd->detect(image, pieces_lines[count]);
 
         //描画
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
         //if (count + 1 == 14) {
-            cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
-            cv::imshow(std::to_string(count+1), pic);
+        //    cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
+        //    cv::imshow(std::to_string(count+1), pic);
         //}
         count++;
     }
@@ -463,16 +463,16 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     }
 
     //表示
-    int count = 0;
-    for (auto po:polygons){
-        procon::ExpandedPolygon ishowta;
-        ishowta.setPolygon(po);
-        disp.push_back(new SinglePolygonDisplay());
-        disp.at(count)->setPolygon(ishowta,4000,std::to_string(count + 1));
-        disp.at(count)->show();
-        count++;
-    }
-    std::cout << bg::dsv(polygons.at(0)) << std::endl;
+    //int count = 0;
+    //for (auto po:polygons){
+    //    procon::ExpandedPolygon ishowta;
+    //    ishowta.setPolygon(po);
+    //    disp.push_back(new SinglePolygonDisplay());
+    //    disp.at(count)->setPolygon(ishowta,4000,std::to_string(count + 1));
+    //    disp.at(count)->show();
+    //    count++;
+    //}
+    //std::cout << bg::dsv(polygons.at(0)) << std::endl;
     return std::move(polygons);
 }
 
@@ -485,15 +485,30 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
 
     int piece_count = 0;
     for (auto polygon : polygons){
-
-        //始点が(0,0)になるように移動
-        double minX=30.0,minY=30.0;
-        for(auto point : polygon.outer()){
-            if(point.x() < minX) minX = point.x();
-            if(point.y() < minY) minY = point.y();
+        //座標移動
+        double translateX = 0;
+        double translateY = 0;
+        if (flame_flag){
+            //左上が(0,0)になるように移動
+            double minX=30.0,minY=30.0;
+            for(auto point : polygon.outer()){
+                if(point.x() < minX) minX = point.x();
+                if(point.y() < minY) minY = point.y();
+            }
+            translateX = minX;
+            translateY = minY;
+        }else{
+            //中心が(0,0)になるように移動
+            double sumX=0.0,sumY=0.0;
+            for(auto point : polygon.outer()){
+                sumX += point.x();
+                sumY += point.y();
+            }
+            translateX = sumX / polygon.outer().size();
+            translateY = sumY / polygon.outer().size();
         }
         polygon_t translated_polygon;
-        bg::strategy::transform::translate_transformer<double,2,2> translate(-minX,-minY);
+        bg::strategy::transform::translate_transformer<double,2,2> translate(-translateX,-translateY);
         bg::transform(polygon,translated_polygon,translate);
 
         //縮小
@@ -502,7 +517,6 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
         bg::reverse(polygon);
         std::cout << bg::area(polygon) << std::endl;
         if (flame_flag){
-            flame_flag = false;
             ex_flame.setPolygon(polygon);
         } else {
             procon::ExpandedPolygon ex_polygon(piece_count);
@@ -510,6 +524,7 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
             ex_pieces.push_back(ex_polygon);
             piece_count++;
         }
+        if (flame_flag) flame_flag = false;
     }
 
     field.setElementaryPieces(ex_pieces);

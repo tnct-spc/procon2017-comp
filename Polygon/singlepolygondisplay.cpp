@@ -41,8 +41,8 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
         int y_margin = margin/2;
         int x_margin = (width-height)/2 + margin/2;
         for(int i=0;i<size;i++){
-            draw_point[i].setX(((points.at(i).x())*x/max)+x_margin);
-            draw_point[i].setY(((points.at(i).y())*y/max)+y_margin);
+            draw_point[i].setX(((points.at(i).x())*x/max)+(x/2)+x_margin);
+            draw_point[i].setY(((points.at(i).y())*y/max)+(y/2)+y_margin);
         }
         painter.drawPolygon(draw_point,size);
         delete[] draw_point;

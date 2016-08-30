@@ -48,18 +48,22 @@ void Hazama::run()
             cv::namedWindow("capture",cv::WINDOW_AUTOSIZE);
             cv::Mat pressentertextwindow = cv::Mat::zeros(100,700,CV_8UC3);
             cv::putText(pressentertextwindow, "Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(255,255,255),2,CV_AA);
+            cv::Mat pressentertextsecondwindow = cv::Mat::zeros(100,700,CV_8UC3);
+            cv::putText(pressentertextsecondwindow,"Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(0,255,255),2,CV_AA);
             cv::imshow("capture",pressentertextwindow);
             while(cv::waitKey(0)==13);
             flame = capture();
-            cv::namedWindow("flame",CV_WINDOW_AUTOSIZE);
-            cv::imshow("flame",flame);
+            cv::imshow("capture",pressentertextsecondwindow);
             while(cv::waitKey(0)==13);
             pieces = capture();
             cv::destroyWindow("capture");
 
         }else{
-            std::string flame_path = "./../../procon2016-comp/sample/flame.jpg";
-            std::string pieces_path = "./../../procon2016-comp/sample/pieces.jpg";
+            std::string flame_path = "./../../procon2016-comp/sample/flame.png";
+            std::string pieces_path = "./../../procon2016-comp/sample/pieces.png";
+            //std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
+            //std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
+
             flame = cv::imread(flame_path, 1);
             pieces = cv::imread(pieces_path, 1);
         }
@@ -92,18 +96,21 @@ cv::Mat Hazama::capture()
     cv::VideoCapture cap(1);//デバイスのオープン
     //cap.open(0);//こっちでも良い．
 
-    //撮影サイズの指定
-    cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
-    cap.set(cv::CAP_PROP_BRIGHTNESS,0.9);
-
     if(!cap.isOpened()){
         std::cerr << "Can't open camera!" << std::endl;
     }
 
+    //setting
+    cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
+    cap.set(cv::CAP_PROP_BRIGHTNESS,0.3);
+    cap.set(cv::CAP_PROP_FOCUS,0.3);
+
     cv::Mat src;
 
-    cap >> src;
+    for(int i=0;i<30;i++){
+        cap >> src;
+    }
 
     return src;
 

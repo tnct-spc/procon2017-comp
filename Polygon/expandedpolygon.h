@@ -5,10 +5,12 @@
 #include <stdexcept>
 #include <vector>
 #include <cmath>
+#include <numeric>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/ring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
+#include <boost/geometry/algorithms/transform.hpp>
 #include <boost/assign/list_of.hpp>
 namespace bg = boost::geometry;
 using point_t = bg::model::d2::point_xy<double>;
@@ -25,10 +27,18 @@ class ExpandedPolygon
     std::vector<double> side_length;
     std::vector<double> side_angle;
     polygon_t polygon;
+
+    double difference_of_default_degree = 0;
+
+    double centerx = 0;
+    double centery = 0;
+
+
     //calc
     void calcSize();
     void calcSideLength();
     void calcSideAngle();
+    void fixOutsideAngle();
     bool calcSize_flag = false;
     bool calcSideLength_flag = false;
     bool calcSideAngle_flag = false;
@@ -54,6 +64,14 @@ public:
     //calcAll
     //***ポリゴン変更後必ず実行のこと***
     void updatePolygon();
+
+    void inversePolygon();
+    void rotatePolygon(double degree);
+    void translatePolygon(double x,double y);
+    
+    void setPolygonAngle(double degree);
+    void setPolygonPosition(double x,double y);
+
 
 };
 

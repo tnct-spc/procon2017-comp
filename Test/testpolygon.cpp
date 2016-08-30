@@ -18,36 +18,19 @@ TestPolygon::TestPolygon()
 
 bool TestPolygon::run(){
     /*polygon*/
-    /*
     std::cout << "Hello,polygon!" << std::endl;
     polygon_t b,c,d;
-    bg::exterior_ring(b) = boost::assign::list_of<point_t>(0, 0)(30, 0)(30,30)(0, 30)(0, 2)(2, 2)(2,28)(28, 28)(28, 2)(0, 2)(0,0);
+    bg::exterior_ring(b) = boost::assign::list_of<point_t>(0, 0)(0, 30.12)(30.14,30.17)(15.92,15.42)(30.11, 0)(0, 0);
     bg::exterior_ring(c) = boost::assign::list_of<point_t>(0, 0)(0,1)(1,0)(0,0);
-    procon::Field f;
-    PolygonExpansion hoge,huga;
+    bg::model::linestring<point_t> seg1 = boost::assign::list_of<point_t>(0,0)(1,1);
+    bg::model::linestring<point_t> seg2 = boost::assign::list_of<point_t>(0,0)(0,1);
+    std::cout << bg::intersects(seg1,seg2) << std::endl;
+    procon::ExpandedPolygon hoge;
     hoge.setPolygon(b);
-    huga.setPolygon(c);
-    f.setFlame(hoge);
-    f.setPiece(huga);
-    f.setPiece(huga,1919);
-    f.printFlame();
-    f.printPiece();
-
-    PolygonSet s;
-    s.fieldFlame = hoge;
-    s.fieldPiece.push_back(huga);
-    s.fieldPiece.push_back(huga);
-    PolygonIO io;
-    io.exportPolygon(s,"./../output.csv");
-
-    PolygonSet newS;
-    newS = io.importPolygon("./../output.csv");
-    Field newF;
-    newF.setFlame(newS.fieldFlame);
-    newF.pushPiece(newS.fieldPiece.at(0));
-    newF.pushPiece(newS.fieldPiece.at(1));
-    newF.printFlame();
-    newF.printPiece();
-    */
-    return 1;
+    std::cout << bg::area(b) << std::endl;
+    auto angle= hoge.getSideAngle();
+    for(auto a : angle){
+        std::cout << a << std::endl;
+    }
+    return true;
 }
