@@ -48,9 +48,12 @@ void Hazama::run()
             cv::namedWindow("capture",cv::WINDOW_AUTOSIZE);
             cv::Mat pressentertextwindow = cv::Mat::zeros(100,700,CV_8UC3);
             cv::putText(pressentertextwindow, "Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(255,255,255),2,CV_AA);
+            cv::Mat pressentertextsecondwindow = cv::Mat::zeros(100,700,CV_8UC3);
+            cv::putText(pressentertextsecondwindow,"Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(0,255,255),2,CV_AA);
             cv::imshow("capture",pressentertextwindow);
             while(cv::waitKey(0)==13);
             flame = capture();
+            cv::imshow("capture",pressentertextsecondwindow);
             while(cv::waitKey(0)==13);
             pieces = capture();
             cv::destroyWindow("capture");
