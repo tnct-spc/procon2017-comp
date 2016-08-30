@@ -96,7 +96,7 @@ cv::Mat ImageRecognition::preprocessingFlame(cv::Mat image)
     delete piece_label;
 
     //triming, and delete small noise
-    const int NOIZE_SIZE = 10;
+    const int NOIZE_SIZE = 100;
     std::vector<cv::Mat> result_images;
     int count=0;
     for(auto &im: images){
