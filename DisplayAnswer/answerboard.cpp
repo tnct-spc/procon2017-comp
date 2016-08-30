@@ -1,6 +1,14 @@
 #include "answerboard.h"
 #include "ui_answerboard.h"
 
+namespace procon{
+ template<typename T, typename ...Args>
+ std::unique_ptr<T> make_unique( Args&& ...args )
+ {
+     return std::unique_ptr<T>( new T( std::forward<Args>(args)... ) );
+ }
+}
+
 namespace std{
 template<typename T, typename ...Args>
 std::unique_ptr<T> make_unique( Args&& ...args )
@@ -24,7 +32,7 @@ AnswerBoard::~AnswerBoard()
 void AnswerBoard::setField(const procon::Field &field)
 {
     is_set_field = true;
-    this->field = std::make_unique<procon::Field>(field);
+    this->field = procon::make_unique<procon::Field>(field);
     this->update();
 
     //add putid_list
@@ -39,15 +47,15 @@ void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector
 {
     is_set_rawpic = true;
     cv::cvtColor(raw_pieces_pic, raw_pieces_pic, CV_RGB2BGR);
-    this->pieces_pic = std::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
+    this->pieces_pic = procon::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
     *(this->pieces_pic) = QImage(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888).copy();
-    this->pieces_pos = std::make_unique<std::vector<cv::Point>>(pieces_pos);
+    this->pieces_pos = procon::make_unique<std::vector<cv::Point>>(pieces_pos);
     this->update();
 }
 
 void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors)
 {
-    this->random_colors = std::make_unique<std::vector<cv::Vec3b>>(random_colors);
+    this->random_colors = procon::make_unique<std::vector<cv::Vec3b>>(random_colors);
 }
 
 QPointF AnswerBoard::getPosition(QPointF point_percent, Space space){

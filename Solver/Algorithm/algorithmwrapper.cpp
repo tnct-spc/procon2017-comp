@@ -10,11 +10,11 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
     return field;
 }
 
-int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result)
+int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result, int &line1, int &line2)
 {
     /*許容誤差指定*/
-    const double length_error = 0.05; // 単位CM
-    const double angle_error = 0.017; //単位rad
+    const double length_error = 0.5; // 単位CM
+    const double angle_error = 0.034; //単位rad 0.017rad=1°
     double comped;
     double comping;
     double comped_first;
@@ -34,6 +34,8 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
     fit1.end_id=-1;
     fit2.end_dot_or_line=Dot;
     fit2.end_id=-1;
+    line1=polygon1.getSize();
+    line2=polygon2.getSize();
 
     maxloop = polygon1.getSize();
     repeat=polygon2.getSize();
