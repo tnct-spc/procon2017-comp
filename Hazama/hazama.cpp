@@ -97,7 +97,8 @@ cv::Mat Hazama::capture()
     //setting
     cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
-    cap.set(cv::CAP_PROP_BRIGHTNESS,0.0);
+    cap.set(cv::CAP_PROP_BRIGHTNESS,0.3);
+    cap.set(cv::CAP_PROP_FOCUS,0.3);
 
     cv::Mat src;
 
