@@ -1,4 +1,4 @@
-#include "expandedpolygon.h"
+ #include "expandedpolygon.h"
 
 //-------------------constructor--------------------
 procon::ExpandedPolygon::ExpandedPolygon(int id_)
