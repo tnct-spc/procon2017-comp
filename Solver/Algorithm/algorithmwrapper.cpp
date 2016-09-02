@@ -10,6 +10,7 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
 
 procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon1_start_pos,int Polygon1_end_pos, procon::ExpandedPolygon Polygon2,int Polygon2_start_pos,int Polygon2_end_pos)
 {
+    // 各ポリゴンのstartからend方面の次の角までのベクトルから、ポリゴンの傾きを調べる。
     int size1 = Polygon1.getSize() + 1;
     int size2 = Polygon2.getSize() + 1;
     double x1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].x() - Polygon1.getPolygon().outer()[Polygon1_start_pos].x();
@@ -20,6 +21,7 @@ procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon
     double degree1 = atan2(y1, x1);
     double degree = (degree1 - degree2) * 180 / PI;
 
+    // Polygon2を回転させる。このとき誤差が生じる。
     double rad = degree * PI / 180;
     polygon_t turn_polygon;
     for (int i=0; i<size2; i++)
@@ -34,6 +36,7 @@ procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon
     }
     Polygon2.setPolygon(turn_polygon);
 
+    // 結合後完全に一致する点からポリゴンのx,y移動を調べ、Polygon2を平行移動
     int Join_point1 = (Polygon1_start_pos + 1) % size1;
     int Join_point2 = (Polygon2_start_pos + size2 - 1) % size2;
     double move_x = Polygon1.getPolygon().outer()[Join_point1].x() - Polygon2.getPolygon().outer()[Join_point2].x();
@@ -45,6 +48,7 @@ procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon
     int count = Polygon1_end_pos + 1;
     int Type = 1;
 
+    // ポリゴンの結合端の辺の長さ
     double x1_st = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].x() - Polygon1.getPolygon().outer()[Polygon1_start_pos].x();
     double y1_st = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].y() - Polygon1.getPolygon().outer()[Polygon1_start_pos].y();
     double x2_st = Polygon2.getPolygon().outer()[(Polygon2_start_pos + size2 - 1) % size1].x() - Polygon2.getPolygon().outer()[Polygon2_start_pos].x();
@@ -54,6 +58,9 @@ procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon
     double x2_end = Polygon2.getPolygon().outer()[(Polygon2_end_pos + 1) % size1].x() - Polygon2.getPolygon().outer()[Polygon2_end_pos].x();
     double y2_end = Polygon2.getPolygon().outer()[(Polygon2_end_pos + 1) % size1].y() - Polygon2.getPolygon().outer()[Polygon2_end_pos].y();
 
+    // 新しいポリゴンに結合後の外周の角を入れる。
+    // もし、結合端の辺の長さが等しくならない時はPolygon1,Polygon2ともに端の角を入力。
+    // ここで回転の誤差により角が一致しない場合がある。
     do
     {
         double x,y;
@@ -102,6 +109,7 @@ procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon
 
 AlgorithmWrapper::AlgorithmWrapper()
 {
+    // サンプル
     polygon_t sample11;
     sample11.outer().push_back(point_t(0,0));
     sample11.outer().push_back(point_t(0,2));
