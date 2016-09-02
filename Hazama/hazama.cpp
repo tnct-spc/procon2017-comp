@@ -39,6 +39,10 @@ void Hazama::run()
 
     procon::Field PDATA;
 
+    std::string flame_path = "./../../procon2016-comp/sample/1_flame.png";
+    std::string pieces_path = "./../../procon2016-comp/sample/1_pieces.png";
+    std::string path = "./../../procon2016-comp/sample/data.csv";
+
     /*Get puzzle data*/
     if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
         cv::Mat flame;
@@ -63,9 +67,12 @@ void Hazama::run()
             cv::imwrite("pieces.png",pieces,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
             cv::destroyWindow("capture");
 
-        }else{
-            std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
-            std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
+        } else {
+
+            //環境によっては動かない
+            //std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
+            //std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
+
             flame = cv::imread(flame_path, 1);
             pieces = cv::imread(pieces_path, 1);
         }
@@ -73,13 +80,16 @@ void Hazama::run()
         /*Image Recognition*/
         ImageRecognition imrec;
         PDATA = imrec.run(flame, pieces);
+
         //display recognized image
         board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
         board->setRandomColors(imrec.getRawRandomColors());
-    }else if(ui->useFileData->isChecked()){
-        std::string path = QFileDialog::getOpenFileName(this).toStdString();
+
+    } else if(ui->useFileData->isChecked()) {
+        //環境によっては動かない
+        //std::string path = QFileDialog::getOpenFileName(this).toStdString();
         PDATA = procon::PolygonIO::importPolygon(path);
-    }else{
+    } else {
         return;
     }
 
