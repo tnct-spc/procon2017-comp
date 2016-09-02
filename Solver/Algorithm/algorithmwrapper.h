@@ -1,4 +1,4 @@
-#ifndef ALGORITHMWRAPPER_H
+ #ifndef ALGORITHMWRAPPER_H
 #define ALGORITHMWRAPPER_H
 
 #include "field.h"

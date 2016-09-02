@@ -17,3 +17,4 @@ procon::Field Solver::run(procon::Field field)
 
     return simple_field;
 }
+
