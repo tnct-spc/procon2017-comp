@@ -99,7 +99,10 @@ void procon::Field::removePiece(int n)
 //is_
 bool procon::Field::isPuttable(procon::ExpandedPolygon polygon)
 {
-    if(!boost::geometry::within(polygon.getPolygon(), field_flame.getPolygon())) return false;
+    for (auto inner_ring : field_flame.getPolygon().inners()){
+        if(!boost::geometry::within(polygon.getPolygon(),inner_ring)) return false;
+    }
+    //if(!boost::geometry::within(polygon.getPolygon(), field_flame.getPolygon())) return false;
     for(auto p : field_pieces){
         if(!boost::geometry::disjoint(polygon.getPolygon(), p.getPolygon())) return false;
     }
