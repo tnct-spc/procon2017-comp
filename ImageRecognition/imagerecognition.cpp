@@ -246,14 +246,14 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
 std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Vec4f>> const& pieces_lines)
 {
-    /***線分の順番を適切に並び替える関数***/
-    auto sortLines = [](std::vector<cv::Vec4f> lines)->std::vector<cv::Vec4f> {
+    /****二点の距離を返す関数****/
+    auto calcDistance = [](double x1,double y1,double x2,double y2)->double{
+        return std::sqrt(std::pow(x1 - x2,2) + std::pow(y1 - y2,2));
+    };
+    /****ここまで****/
 
-        /****二点の距離を返す関数****/
-        auto calcDistance = [](double x1,double y1,double x2,double y2)->double{
-            return std::sqrt(std::pow(x1 - x2,2) + std::pow(y1 - y2,2));
-        };
-        /****ここまで****/
+    /***線分の順番を適切に並び替える関数***/
+    auto sortLines = [&](std::vector<cv::Vec4f> lines)->std::vector<cv::Vec4f> {
 
         //ある線分の終点に対して他の線分の始点を調べ近い順に入れ替える
         //距離を評価値とした選択ソート
@@ -281,9 +281,8 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         }
         return std::move(lines);
     };
-    /***ここまで***/
 
-    /***線分を修復する関数***/
+    /***切れてる線分を修復する関数***/
     auto repairLines = [](std::vector<cv::Vec4f> lines)->std::vector<cv::Vec4f> {
 
         /****x軸に対する角度を計算****/
@@ -435,26 +434,61 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         piece_lines = sortLines(piece_lines);
 
         if (flame_flag == true){
-            std::vector<cv::Vec4f> outer,inner;
-            polygon_t outer_polygon,inner_polygon;
+
+            std::vector<std::vector<cv::Vec4f>> rings;
+            std::vector<cv::Vec4f> ring;
+
+            //謎の長さtoセンチメートル
+            //scaleを頑張って測る
+            //コードが最高にキモい
+            const cv::Vec4f start_line = piece_lines.at(0);
+            auto func = [&](cv::Vec4f line1,cv::Vec4f line2)->double {
+                const double line1_distance = calcDistance(start_line[0],start_line[1],line1[2],line1[3]);
+                const double line2_distance = calcDistance(start_line[0],start_line[1],line2[2],line2[3]);
+                return line1_distance < line2_distance;
+            };
+            auto end_line = *(std::min_element(piece_lines.begin(),piece_lines.end(),func));
+            double sum = 0;
+            for (auto line : piece_lines) {
+                sum += calcDistance(line[0],line[1],line[2],line[3]);
+                if (line == end_line) break;    //キモい
+            }
+            scale =  30 * 4 / sum;
+
+            polygon_t outer_polygon,inner_polygon,flame_polygon;
+
             for (int i = 0;i < static_cast<int>(piece_lines.size());i++){
-                if (i < 4) {
-                    outer.push_back(piece_lines.at(i));
-                } else {
-                    inner.push_back(piece_lines.at(i));
+                double distance = 0;
+                if (i != 0){
+                    const cv::Vec4f line1 = piece_lines.at(i - 1);
+                    const cv::Vec4f line2 = piece_lines.at(i);
+                    distance = calcDistance(line1[2],line1[3],line2[0],line2[1]) * scale;
+                }
+
+                //許容幅20mm(要検証)
+                constexpr double weight_threshold = 2;
+
+                if (distance > weight_threshold) {
+                    rings.push_back(ring);
+                    ring.clear();
+                }
+                ring.push_back(piece_lines.at(i));
+            }
+            rings.push_back(ring);
+            rings.at(0) = repairLines(rings.at(0));
+            flame_polygon = convertLineToPolygon(rings.at(0));
+
+            for (int i = 1;i < static_cast<int>(rings.size());i++){
+                rings.at(i) = repairLines(rings.at(i));
+                inner_polygon = convertLineToPolygon(rings.at(i));
+                flame_polygon.inners().push_back(polygon_t::ring_type());
+                for (auto point : inner_polygon.outer()) {
+                    flame_polygon.inners().back().push_back(point);
                 }
             }
-            outer = repairLines(outer);
-            outer_polygon = convertLineToPolygon(outer);
-            inner = repairLines(inner);
-            inner_polygon = convertLineToPolygon(inner);
 
-            polygons.push_back(inner_polygon);
+            polygons.push_back(flame_polygon);
             flame_flag = false;
-            //Flame幅から全体のスケールを計算
-            const double flame_length = bg::distance(outer_polygon.outer()[0],outer_polygon.outer()[1]);
-            const double default_flame_length = 30;
-            scale = default_flame_length / flame_length;
 
         } else {
             piece_lines = repairLines(piece_lines);
@@ -463,6 +497,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     }
 
     //表示
+    /*
     int count = 0;
     for (auto po:polygons){
         procon::ExpandedPolygon ishowta;
@@ -471,8 +506,10 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         disp.at(count)->setPolygon(ishowta,4000,std::to_string(count + 1));
         disp.at(count)->show();
         count++;
-    }
-    std::cout << bg::dsv(polygons.at(0)) << std::endl;
+        std::cout << "piece" << bg::dsv(po) << std::endl;
+    }*/
+    std::cout << "flame" << bg::dsv(polygons.at(0)) << std::endl;
+
     return std::move(polygons);
 }
 
@@ -515,7 +552,6 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
         bg::strategy::transform::scale_transformer<double, 2, 2> reduction(scale);
         bg::transform(translated_polygon,polygon,reduction);
         bg::reverse(polygon);
-        std::cout << bg::area(polygon) << std::endl;
         if (flame_flag){
             ex_flame.setPolygon(polygon);
         } else {
