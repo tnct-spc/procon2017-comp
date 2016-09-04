@@ -4,6 +4,7 @@
 procon::Field::Field()
 {
     field_pieces.reserve(50);
+    isPlaced.fill(false);
 }
 
 /*---------------------public--------------------------*/
@@ -47,6 +48,11 @@ void procon::Field::setElementaryPieces(std::vector<procon::ExpandedPolygon> con
     elementary_pieces = pieces;
 }
 
+void procon::Field::setIsPlaced(const std::array<bool,50> &IsPlaced)
+{
+    isPlaced = IsPlaced;
+}
+
 //getter
 std::vector<procon::ExpandedPolygon> const& procon::Field::getPieces() const
 {
@@ -78,6 +84,12 @@ int procon::Field::getPiecesSize()
 {
     return static_cast<int>(field_pieces.size());
 }
+
+std::array<bool,50> const& procon::Field::getIsPlaced() const
+{
+    return isPlaced;
+}
+
 //remove
 void procon::Field::removePiece(int n)
 {

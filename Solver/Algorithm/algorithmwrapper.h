@@ -18,6 +18,18 @@ public:
     virtual procon::Field run(procon::Field field);
     Fit fit1,fit2;
     int searchSameLength(procon::ExpandedPolygon polygon1 ,procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result);
+    typedef struct PieceAssesment{
+        //評価値
+        int EvaluationValue;
+        //評価したpolygon
+        procon::ExpandedPolygon Polygon;
+
+        bool operator<(const PieceAssesment& Pieceassesment) const {
+            return EvaluationValue < Pieceassesment.EvaluationValue;
+        }
+
+    } PieceAssesment;
+
 };
 
 #endif // ALGORITHMWRAPPER_H

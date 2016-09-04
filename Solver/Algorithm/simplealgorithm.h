@@ -9,8 +9,6 @@ class SimpleAlgorithm : public AlgorithmWrapper
 public:
     SimpleAlgorithm();
     procon::Field run(procon::Field field);
-
-    SinglePolygonDisplay Display;
 };
 
 #endif // SIMPLEALGORITHM_H
