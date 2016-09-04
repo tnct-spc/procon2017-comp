@@ -100,21 +100,18 @@ void procon::ExpandedPolygon::calcSideAngle()
 
 //---------------------public------------------------
 // getter
-int procon::ExpandedPolygon::getSize()
+int procon::ExpandedPolygon::getSize() const
 {
-    if(!calcSize_flag) calcSize();
     return size;
 }
 
-std::vector<double> const& procon::ExpandedPolygon::getSideLength()
+std::vector<double> const& procon::ExpandedPolygon::getSideLength() const
 {
-    if(!calcSideLength_flag) calcSideLength();
     return side_length;
 }
 
-std::vector<double> const& procon::ExpandedPolygon::getSideAngle()
+std::vector<double> const& procon::ExpandedPolygon::getSideAngle() const
 {
-    if(!calcSideAngle_flag) calcSideAngle();
     return side_angle;
 }
 

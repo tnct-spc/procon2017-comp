@@ -48,10 +48,10 @@ public:
     ExpandedPolygon(int id_ = -1);
     ExpandedPolygon(ExpandedPolygon const& p);
 
+    int getSize() const;
     //getter
-    int getSize();
-    std::vector<double> const& getSideLength();
-    std::vector<double> const& getSideAngle();
+    std::vector<double> const& getSideLength() const;
+    std::vector<double> const& getSideAngle() const;
     polygon_t const& getPolygon() const;
     int getId() const;
 

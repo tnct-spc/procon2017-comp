@@ -22,12 +22,13 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
     int Eva = 0;
     int maxEva = 0;
     std::array<Fit,2> fits;
+    polygon1.updatePolygon();
+    polygon2.updatePolygon();
     for (int i = 0; i < polygon1.getSize(); ++i) { //角度のみ探索
         comped_first = polygon1.getSideAngle()[i];
         for (int j = 0; j < polygon2.getSize(); ++j) {
             comping_first = polygon2.getSideAngle()[j];
             if ((M_PI * 2)-(angle_error * 2) < (comped_first + comping_first) && (comped_first + comping_first) < (M_PI * 2)+(angle_error * 2)) {
-                std::cout << i << ',' << j << "::" << comped_first + comping_first << std::endl;
                 Eva++;
                 int start_polygon1 = i;
                 int start_polygon2 = j;
