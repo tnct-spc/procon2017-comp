@@ -10,7 +10,7 @@ procon::Field PoorAlgorithm::run(procon::Field field)
     field.setFlame(field.getElementaryFlame());
     field.setPiece(field.getElementaryPieces().at(0),15.0,15.0);
     const int maxpiece = static_cast<int>(field.getElementaryPieces().size());
-    for (int i=0 ; i < maxpiece ; i++) {
+    for (int i = 0 ; i < maxpiece ; i++) {
         for (int j = i + 1 ; j<maxpiece ; j++) {
             std::vector<std::array<Fit,2>> result;
             auto piece1 = field.getElementaryPieces().at(i);

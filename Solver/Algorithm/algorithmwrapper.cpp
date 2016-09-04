@@ -27,6 +27,7 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
         for (int j = 0; j < polygon2.getSize(); ++j) {
             comping_first = polygon2.getSideAngle()[j];
             if ((M_PI * 2)-(angle_error * 2) < (comped_first + comping_first) && (comped_first + comping_first) < (M_PI * 2)+(angle_error * 2)) {
+                std::cout << i << ',' << j << "::" << comped_first + comping_first << std::endl;
                 Eva++;
                 int start_polygon1 = i;
                 int start_polygon2 = j;

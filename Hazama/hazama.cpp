@@ -1,3 +1,4 @@
+
 #include "hazama.h"
 #include "ui_hazama.h"
 #include <unistd.h>
