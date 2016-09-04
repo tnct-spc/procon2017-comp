@@ -1,4 +1,5 @@
 #include "algorithmwrapper.h"
+
 #include <math.h>
 
 #define PI 3.141592
@@ -8,10 +9,26 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
     return field;
 }
 
-procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon1_start_pos,int Polygon1_end_pos, procon::ExpandedPolygon Polygon2,int Polygon2_start_pos,int Polygon2_end_pos)
+procon::ExpandedPolygon AlgorithmWrapper::newPolygonDate(procon::ExpandedPolygon polygon)
 {
-    int size1 = Polygon1.getSize() + 1;
-    int size2 = Polygon2.getSize() + 1;
+    int size = polygon.getSize();
+    polygon_t newPolygon;
+    for (int i=0; i<size; i++) {
+        double x = polygon.getPolygon().outer()[i].x();
+        double y = polygon.getPolygon().outer()[i].y();
+        newPolygon.outer().push_back(point_t(x,y));
+    }
+    procon::ExpandedPolygon change_Polygon;
+    change_Polygon.setPolygon(newPolygon);
+    return change_Polygon;
+}
+
+procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon1_start_pos,int Polygon1_end_pos, procon::ExpandedPolygon Polygon2,int Polygon2_start_pos,int Polygon2_end_pos)
+{
+    int size1 = Polygon1.getSize();
+    int size2 = Polygon2.getSize();
+    Polygon1 = newPolygonDate(Polygon1);
+    Polygon2 = newPolygonDate(Polygon2);
     double x1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].x() - Polygon1.getPolygon().outer()[Polygon1_start_pos].x();
     double y1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].y() - Polygon1.getPolygon().outer()[Polygon1_start_pos].y();
     double x2 = Polygon2.getPolygon().outer()[(Polygon2_start_pos + size2 - 1) % size2].x() - Polygon2.getPolygon().outer()[Polygon2_start_pos].x();
@@ -54,39 +71,27 @@ procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon
     double x2_end = Polygon2.getPolygon().outer()[(Polygon2_end_pos + 1) % size1].x() - Polygon2.getPolygon().outer()[Polygon2_end_pos].x();
     double y2_end = Polygon2.getPolygon().outer()[(Polygon2_end_pos + 1) % size1].y() - Polygon2.getPolygon().outer()[Polygon2_end_pos].y();
 
-    do
-    {
-        double x,y;
-        if (Type == 1)
-        {
+    double x,y;
+    do{
+        if (Type == 1){
             x = Polygon1.getPolygon().outer()[count%size1].x();
             y = Polygon1.getPolygon().outer()[count%size1].y();
-            if (count % size1 == Polygon1_start_pos)
-            {
+            if (count % size1 == Polygon1_start_pos){
                 Type = 2;
-                if ((x1_st == x2_st) && (y1_st == y2_st))
-                {
+                if ((x1_st == x2_st) && (y1_st == y2_st)){
                     count = Polygon2_start_pos;
-                }
-                else
-                {
+                } else {
                     count = Polygon2_start_pos - 1;
                 }
             }
-        }
-        else if (Type == 2)
-        {
+        } else if (Type == 2) {
             x = Polygon2.getPolygon().outer()[count%size2].x();
             y = Polygon2.getPolygon().outer()[count%size2].y();
-            if (count % size2 == Polygon2_end_pos)
-            {
+            if (count % size2 == Polygon2_end_pos) {
                 Type = 1;
-                if ((x1_end == x2_end) && (y1_end == y2_end))
-                {
+                if ((x1_end == x2_end) && (y1_end == y2_end)){
                     count = Polygon1_end_pos;
-                }
-                else
-                {
+                } else {
                     count = Polygon1_end_pos - 1;
                 }
             }
@@ -94,6 +99,10 @@ procon::ExpandedPolygon joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon
         new_pieces.outer().push_back(point_t(x,y));
         count++;
     } while ((Type != 1) || (count != (Polygon1_end_pos + 1)));
+
+    x = Polygon1.getPolygon().outer()[count].x();
+    y = Polygon1.getPolygon().outer()[count].y();
+    new_pieces.outer().push_back(point_t(x,y));
 
     procon::ExpandedPolygon new_polygon;
     new_polygon.setPolygon(new_pieces);
@@ -109,12 +118,14 @@ AlgorithmWrapper::AlgorithmWrapper()
     sample11.outer().push_back(point_t(1,1));
     sample11.outer().push_back(point_t(2,1));
     sample11.outer().push_back(point_t(2,0));
+    sample11.outer().push_back(point_t(0,0));
 
     polygon_t sample12;
     sample12.outer().push_back(point_t(0,0));
     sample12.outer().push_back(point_t(0,1));
     sample12.outer().push_back(point_t(2,2));
     sample12.outer().push_back(point_t(2,0));
+    sample12.outer().push_back(point_t(0,0));
 
     procon::ExpandedPolygon polygon1(0);
     procon::ExpandedPolygon polygon2(1);

@@ -70,7 +70,6 @@ public:
     void setPolygonAngle(double degree);
     void setPolygonPosition(double x,double y);
 
-
 };
 
 }

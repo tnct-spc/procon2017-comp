@@ -6,6 +6,8 @@
 
 #include "testdisplayanswer.h"
 
+#define PI 3.141592
+
 bool Test()
 {
     TestDisplayAnswer test_displayanswer;
