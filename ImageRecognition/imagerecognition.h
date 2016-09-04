@@ -1,7 +1,6 @@
 #ifndef IMAGERECOGNITION_H
 #define IMAGERECOGNITION_H
 
-#include <random>
 
 #include "expandedpolygon.h"
 #include "imagerecognition_global.h"
@@ -9,6 +8,8 @@
 #include "singlepolygondisplay.h"
 #include "field.h"
 #include <iostream>
+#include <random>
+#include <algorithm>
 #include <string>
 #include <exception>
 #include <stdexcept>
