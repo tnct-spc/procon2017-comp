@@ -126,9 +126,10 @@ int procon::ExpandedPolygon::getId() const
 }
 
 //setter
-void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
+void procon::ExpandedPolygon::setPolygon(polygon_t const& p,bool calc)
 {
     polygon = p;
+    if (calc) this->updatePolygon();
 }
 
 // operator
@@ -158,7 +159,7 @@ void procon::ExpandedPolygon::updatePolygon()
     calcSideAngle();
 }
 
-void procon::ExpandedPolygon::inversePolygon()
+void procon::ExpandedPolygon::inversePolygon(bool calc)
 {
     polygon_t translate_polygon;
 
@@ -180,9 +181,10 @@ void procon::ExpandedPolygon::inversePolygon()
     boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
 
     polygon = returnPolygon;
+    if (calc) this->updatePolygon();
 }
 
-void procon::ExpandedPolygon::rotatePolygon(double degree)
+void procon::ExpandedPolygon::rotatePolygon(double degree,bool calc)
 {
     polygon_t goPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
@@ -199,9 +201,10 @@ void procon::ExpandedPolygon::rotatePolygon(double degree)
     difference_of_default_degree = difference_of_default_degree + degree;
 
     polygon = backPolygon;
+    if (calc) this->updatePolygon();
 }
 
-void procon::ExpandedPolygon::translatePolygon(double x, double y)
+void procon::ExpandedPolygon::translatePolygon(double x, double y,bool calc)
 {
     polygon_t translatedPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(x,y);
@@ -211,9 +214,10 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
     centery = centery + y;
 
     polygon = translatedPolygon;
+    if (calc) this->updatePolygon();
 }
 
-void procon::ExpandedPolygon::setPolygonAngle(double degree)
+void procon::ExpandedPolygon::setPolygonAngle(double degree,bool calc)
 {
     polygon_t goPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
@@ -237,9 +241,10 @@ void procon::ExpandedPolygon::setPolygonAngle(double degree)
     difference_of_default_degree = degree;
 
     polygon = backPolygon;
+    if (calc) this->updatePolygon();
 }
 
-void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
+void procon::ExpandedPolygon::setPolygonPosition(double x, double y,bool calc)
 {
     double dx = x - centerx;
     double dy = y - centery;
@@ -253,4 +258,5 @@ void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
     centery = y;
     
     polygon = translatedPolygon;
+    if (calc) this->updatePolygon();
 }

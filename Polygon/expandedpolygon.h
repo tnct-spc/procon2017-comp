@@ -56,7 +56,7 @@ public:
     int getId() const;
 
     //setter
-    void setPolygon(polygon_t const & p);
+    void setPolygon(polygon_t const & p,bool calc = false);
 
     //operator
     ExpandedPolygon operator =  (ExpandedPolygon const& p);
@@ -65,12 +65,12 @@ public:
     //***ポリゴン変更後必ず実行のこと***
     void updatePolygon();
 
-    void inversePolygon();
-    void rotatePolygon(double degree);
-    void translatePolygon(double x,double y);
+    void inversePolygon(bool calc = false);
+    void rotatePolygon(double degree,bool calc = false);
+    void translatePolygon(double x,double y,bool calc = false);
     
-    void setPolygonAngle(double degree);
-    void setPolygonPosition(double x,double y);
+    void setPolygonAngle(double degree,bool calc = false);
+    void setPolygonPosition(double x,double y,bool calc = false);
 
 
 };

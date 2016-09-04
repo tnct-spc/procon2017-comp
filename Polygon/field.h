@@ -49,6 +49,7 @@ public:
 
     //任意の位置のピースを消去
     void removePiece(int n);
+
     //置けるかチェック
     bool isPuttable(procon::ExpandedPolygon polygon);
 
