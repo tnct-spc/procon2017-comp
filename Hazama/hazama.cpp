@@ -1,3 +1,4 @@
+
 #include "hazama.h"
 #include "ui_hazama.h"
 #include <unistd.h>
@@ -45,6 +46,9 @@ void Hazama::run()
         cv::Mat pieces;
         //get Image
         if(ui->useWebCamera->isChecked()){
+            //camera open
+            capture();
+
             cv::namedWindow("capture",cv::WINDOW_AUTOSIZE);
             cv::Mat pressentertextwindow = cv::Mat::zeros(100,700,CV_8UC3);
             cv::putText(pressentertextwindow, "Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(255,255,255),2,CV_AA);
@@ -56,6 +60,8 @@ void Hazama::run()
             cv::imshow("capture",pressentertextsecondwindow);
             while(cv::waitKey(0)==13);
             pieces = capture();
+            cv::imwrite("flame.png",flame,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
+            cv::imwrite("pieces.png",pieces,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
             cv::destroyWindow("capture");
 
         }else{
