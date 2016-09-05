@@ -108,7 +108,7 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
         count++;
     } while ((Type != 1) || (count != (Polygon1_end_pos + 1)));
 
-    // 終点を加える。
+    // 終点を足してから返す。
     x = Polygon1.getPolygon().outer()[count].x();
     y = Polygon1.getPolygon().outer()[count].y();
     new_pieces.outer().push_back(point_t(x,y));
