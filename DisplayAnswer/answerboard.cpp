@@ -121,6 +121,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         painter.setPen(QPen(Qt::black, 3));
         painter.setBrush(QBrush(QColor(color_flame)));
         drawPolygon(field->getFlame().getPolygon(),Space::LEFT);
+        drawPolygonInners(field->getFlame().getPolygon(),Space::LEFT);
 
         //draw pieces
         int pieces_size = field->getPiecesSize();
