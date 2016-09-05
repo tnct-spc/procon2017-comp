@@ -26,14 +26,14 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
     int j=0;
     int maxEva = 0;
     std::array<Fit,2> fits;
-    fit1.start_dot_or_line=Dot;
-    fit1.start_id=-1;
-    fit2.start_dot_or_line=Dot;
-    fit2.start_id=-1;
-    fit1.end_dot_or_line=Dot;
-    fit1.end_id=-1;
-    fit2.end_dot_or_line=Dot;
-    fit2.end_id=-1;
+    fits.at(0).start_dot_or_line = Dot;
+    fits.at(0).start_id=-1;
+    fits.at(0).end_dot_or_line = Dot;
+    fits.at(0).end_id=-1;
+    fits.at(1).start_dot_or_line = Dot;
+    fits.at(1).start_id=-1;
+    fits.at(1).end_dot_or_line = Dot;
+    fits.at(1).end_id=-1;
     line1=polygon1.getSize();
     line2=polygon2.getSize();
 
@@ -52,121 +52,120 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
                 int start_polygon2 = j;
                 for (int k=0; k<maxloop; ++k)
                 {
-                        start_polygon2--;
-                        if (start_polygon2 < 0)
+                    start_polygon2--;
+                    if (start_polygon2 < 0)
+                    {
+                        start_polygon2=polygon2.getSize();
+                    }
+                    comped=polygon1.getSideLength()[start_polygon1];
+                    comping=polygon2.getSideLength()[start_polygon2];
+                    if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+                    {
+                        Eva++;
+                    } else {
+                        if (start_polygon2 == polygon2.getSize())
                         {
-                            start_polygon2=polygon2.getSize();
+                            start_polygon2=-1;
                         }
-                        comped=polygon1.getSideLength()[start_polygon1];
-                        comping=polygon2.getSideLength()[start_polygon2];
-                        if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+                        fits.at(0).start_dot_or_line = Dot;
+                        fits.at(0).start_id=start_polygon1;
+                        fits.at(1).start_dot_or_line = Dot;
+                        fits.at(1).start_id=start_polygon2+1;
+                        break;
+                    }
+
+
+
+                    start_polygon1++;
+                    if (start_polygon1 > polygon1.getSize())
+                    {
+                        start_polygon1=0;
+                    }
+                    comped=polygon1.getSideAngle()[start_polygon1];
+                    comping=polygon2.getSideAngle()[start_polygon2];
+                    if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+                    {
+                        Eva++;
+                    } else {
+                        if (start_polygon1 == 0)
                         {
-                            Eva++;
-                        } else {
-                            if (start_polygon2 = polygon2.getSize())
-                            {
-                                start_polygon2=-1;
-                            }
-                            fits.at(0).start_dot_or_line = Dot;
-                            fits.at(0).start_id=start_polygon1;
-                            fits.at(1).start_dot_or_line = Dot;
-                            fits.at(1).start_id=start_polygon2+1;
-
-                            break;
+                            start_polygon1=polygon1.getSize()+1;
                         }
-
-
-                        start_polygon1++;
-                        if (start_polygon1 > polygon1.getSize())
-                        {
-                            start_polygon1=0;
-                        }
-                        comped=polygon1.getSideAngle()[start_polygon1];
-                        comping=polygon2.getSideAngle()[start_polygon2];
-                        if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
-                        {
-                            Eva++;
-                        } else {
-                            if (start_polygon1 == 0)
-                            {
-                                start_polygon1=polygon1.getSize()+1;
-                            }
-                            fits.at(0).start_dot_or_line = Line;
-                            fits.at(0).start_id=start_polygon1-1;
-                            fits.at(1).start_dot_or_line = Line;
-                            fits.at(1).start_id=start_polygon2;
-
-                            break;
-                        }
-               }
+                        fits.at(0).start_dot_or_line = Line;
+                        fits.at(0).start_id=start_polygon1-1;
+                        fits.at(1).start_dot_or_line = Line;
+                        fits.at(1).start_id=start_polygon2;
+                        break;
+                    }
+                }
 
                 start_polygon1 = i;
                 start_polygon2 = j;
                 for (int k=0; k<maxloop; ++k)
                 {
-                        start_polygon1--;
-                        if (start_polygon1 < 0)
+                    start_polygon1--;
+                    if (start_polygon1 < 0)
+                    {
+                        start_polygon1=polygon1.getSize();
+                    }
+                    comped=polygon1.getSideLength()[start_polygon1];
+                    comping=polygon2.getSideLength()[start_polygon2];
+                    if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+                    {
+                        Eva++;
+                    } else {
+                        if (start_polygon1 == polygon1.getSize())
                         {
-                            start_polygon1=polygon1.getSize();
+                        start_polygon1=-1;
                         }
-                        comped=polygon1.getSideLength()[start_polygon1];
-                        comping=polygon2.getSideLength()[start_polygon2];
-                        if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
-                        {
-                            Eva++;
-                        } else {
-                            if (start_polygon1 == polygon1.getSize())
-                            {
-                                start_polygon1=-1;
-                            }
 
-                            if (Eva < 2)
-                            {
-                                Eva = 0;
-                            } else {
-                                fits.at(0).end_dot_or_line = Dot;
-                                fits.at(0).end_id=start_polygon1+1;
-                                fits.at(1).end_dot_or_line = Dot;
-                                fits.at(1).end_id=start_polygon2;
-                                result.push_back(fits);
-                            }
-                            if (Eva > maxEva){maxEva = Eva;}
+                        if (Eva < 2)
+                        {
                             Eva = 0;
-                            break;
-                        }
-
-
-                        start_polygon2++;
-                        if (start_polygon2 > polygon2.getSize())
-                        {
-                            start_polygon2=0;
-                        }
-                        comped=polygon1.getSideAngle()[start_polygon1];
-                        comping=polygon2.getSideAngle()[start_polygon2];
-                        if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
-                        {
-                            Eva++;
                         } else {
-                            if (start_polygon2 == 0)
-                            {
-                                start_polygon2=polygon2.getSize()+1;
-                            }
-
-                            if (Eva < 2)
-                            {
-                                Eva = 0;
-                            } else {
-                                fits.at(0).end_dot_or_line = Line;
-                                fits.at(0).end_id=start_polygon1;
-                                fits.at(1).end_dot_or_line = Line;
-                                fits.at(1).end_id=start_polygon2-1;
-                                result.push_back(fits);
-                            }
-                            if (Eva > maxEva){maxEva = Eva;}
-                            Eva = 0;
-                            break;
+                            fits.at(0).end_dot_or_line = Dot;
+                            fits.at(0).end_id=start_polygon1+1;
+                            fits.at(1).end_dot_or_line = Dot;
+                            fits.at(1).end_id=start_polygon2;
+                            result.push_back(fits);
                         }
-               }
+                        if (Eva > maxEva){maxEva = Eva;}
+                        Eva = 0;
+                        break;
+                    }
+
+
+                    start_polygon2++;
+                    if (start_polygon2 > polygon2.getSize())
+                    {
+                        start_polygon2=0;
+                    }
+                    comped=polygon1.getSideAngle()[start_polygon1];
+                    comping=polygon2.getSideAngle()[start_polygon2];
+                    if (comped - (length_error*2) < comping && comping < comped + (length_error*2))
+                    {
+                        Eva++;
+                    } else {
+                        if (start_polygon2 == 0)
+                        {
+                            start_polygon2=polygon2.getSize()+1;
+                        }
+
+                        if (Eva < 2)
+                        {
+                            Eva = 0;
+                        } else {
+                            fits.at(0).end_dot_or_line = Line;
+                            fits.at(0).end_id=start_polygon1;
+                            fits.at(1).end_dot_or_line = Line;
+                            fits.at(1).end_id=start_polygon2-1;
+                            result.push_back(fits);
+                        }
+                        if (Eva > maxEva){maxEva = Eva;}
+                        Eva = 0;
+                        break;
+                    }
+                }
             }
         }
     }
