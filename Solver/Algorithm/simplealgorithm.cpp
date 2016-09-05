@@ -25,7 +25,6 @@ procon::Field SimpleAlgorithm::run(procon::Field field)
     }
     for (auto piece : field.getPieces()){
         piece.updatePolygon();
-        std::cout << "hoge" << std::endl;
     }
     return field;
 }

@@ -412,6 +412,18 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     };
     /***ここまで***/
 
+    /***一定の長さに満たない線分を消去***/
+    auto removeShortLines = [&](std::vector<cv::Vec4f> const& lines)->std::vector<cv::Vec4f>{
+        std::vector<cv::Vec4f> return_lines;
+        for(auto line : lines){
+            if (calcDistance(line[0],line[1],line[2],line[3]) * scale >= 0.5) {
+                return_lines.push_back(std::move(line));
+            }
+        }
+        return std::move(return_lines);
+    };
+    /***ここまで***/
+
     std::vector<polygon_t> polygons;
     bool flame_flag = true;
     for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
@@ -480,6 +492,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
             for (int i = 1;i < static_cast<int>(rings.size());i++){
                 rings.at(i) = repairLines(rings.at(i));
+                rings.at(i) = removeShortLines(rings.at(i));
                 inner_polygon = convertLineToPolygon(rings.at(i));
                 flame_polygon.inners().push_back(polygon_t::ring_type());
                 for (auto point : inner_polygon.outer()) {
@@ -492,6 +505,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
         } else {
             piece_lines = repairLines(piece_lines);
+            piece_lines = removeShortLines(piece_lines);
             polygons.push_back(convertLineToPolygon(piece_lines));
         }
     }
