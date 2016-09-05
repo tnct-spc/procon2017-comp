@@ -35,7 +35,8 @@ void procon::ExpandedPolygon::calcSize()
 void procon::ExpandedPolygon::calcSideLength()
 {
     if(!calcSize_flag) calcSize();
-    for(int i=0;i<size;i++){
+    side_length.clear();
+    for(int i=0;i < size;i++){
        const double length = bg::distance(polygon.outer().at(i),polygon.outer().at(i+1));
        side_length.push_back(length);
     }
@@ -64,6 +65,7 @@ void procon::ExpandedPolygon::calcSideAngle()
     };
 
     if(!calcSize_flag) calcSize();
+    side_angle.clear();
     try {
         for (int i = -1;i < size - 1;i++){
             double x1,y1;
