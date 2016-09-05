@@ -9,6 +9,7 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
     return field;
 }
 
+// 終点を抜く。
 procon::ExpandedPolygon AlgorithmWrapper::newPolygonDate(procon::ExpandedPolygon polygon)
 {
     int size = polygon.getSize();
@@ -25,16 +26,10 @@ procon::ExpandedPolygon AlgorithmWrapper::newPolygonDate(procon::ExpandedPolygon
 
 procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon1_start_pos,int Polygon1_end_pos, procon::ExpandedPolygon Polygon2,int Polygon2_start_pos,int Polygon2_end_pos)
 {
-<<<<<<< HEAD
     int size1 = Polygon1.getSize();
     int size2 = Polygon2.getSize();
     Polygon1 = newPolygonDate(Polygon1);
     Polygon2 = newPolygonDate(Polygon2);
-=======
-    // 各ポリゴンのstartからend方面の次の角までのベクトルから、ポリゴンの傾きを調べる。
-    int size1 = Polygon1.getSize() + 1;
-    int size2 = Polygon2.getSize() + 1;
->>>>>>> c65139a0e53200cd947eccfb40a318f1cedfeb6c
     double x1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].x() - Polygon1.getPolygon().outer()[Polygon1_start_pos].x();
     double y1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].y() - Polygon1.getPolygon().outer()[Polygon1_start_pos].y();
     double x2 = Polygon2.getPolygon().outer()[(Polygon2_start_pos + size2 - 1) % size2].x() - Polygon2.getPolygon().outer()[Polygon2_start_pos].x();
@@ -80,25 +75,18 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
     double x2_end = Polygon2.getPolygon().outer()[(Polygon2_end_pos + 1) % size1].x() - Polygon2.getPolygon().outer()[Polygon2_end_pos].x();
     double y2_end = Polygon2.getPolygon().outer()[(Polygon2_end_pos + 1) % size1].y() - Polygon2.getPolygon().outer()[Polygon2_end_pos].y();
 
-<<<<<<< HEAD
-    double x,y;
-    do{
-        if (Type == 1){
-=======
+
     // 新しいポリゴンに結合後の外周の角を入れる。
     // もし、結合端の辺の長さが等しくならない時はPolygon1,Polygon2ともに端の角を入力。
     // ここで回転の誤差により角が一致しない場合がある。
-    do
-    {
-        double x,y;
-        if (Type == 1)
-        {
->>>>>>> c65139a0e53200cd947eccfb40a318f1cedfeb6c
+    double x,y;
+    do{
+        if (Type == 1) {
             x = Polygon1.getPolygon().outer()[count%size1].x();
             y = Polygon1.getPolygon().outer()[count%size1].y();
             if (count % size1 == Polygon1_start_pos){
                 Type = 2;
-                if ((x1_st == x2_st) && (y1_st == y2_st)){
+                if ((x1_st == x2_st) && (y1_st == y2_st)) {
                     count = Polygon2_start_pos;
                 } else {
                     count = Polygon2_start_pos - 1;
@@ -109,7 +97,7 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
             y = Polygon2.getPolygon().outer()[count%size2].y();
             if (count % size2 == Polygon2_end_pos) {
                 Type = 1;
-                if ((x1_end == x2_end) && (y1_end == y2_end)){
+                if ((x1_end == x2_end) && (y1_end == y2_end)) {
                     count = Polygon1_end_pos;
                 } else {
                     count = Polygon1_end_pos - 1;
@@ -120,6 +108,7 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
         count++;
     } while ((Type != 1) || (count != (Polygon1_end_pos + 1)));
 
+    // 終点を加える。
     x = Polygon1.getPolygon().outer()[count].x();
     y = Polygon1.getPolygon().outer()[count].y();
     new_pieces.outer().push_back(point_t(x,y));
