@@ -77,6 +77,22 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         delete[] draw_point;
     };
 
+    auto drawPolygonInners = [&](polygon_t polygon,Space isLeftOrRight){
+        int inners_num = polygon.inners().size();
+
+        for(int inner = 0; inner < inners_num; inner++){
+
+            int dot_num = polygon.inners().at(inner).size();
+            QPointF* draw_point = new QPointF[dot_num];
+
+            for(int dot = 0; dot < dot_num; dot++){
+                draw_point[dot] = getPosition(QPointF(polygon.inners().at(inner).at(dot).x()/flame_size,polygon.inners().at(inner).at(dot).y()/flame_size),isLeftOrRight);
+            }
+            painter.drawPolygon(draw_point,dot_num);
+            delete[] draw_point;
+        }
+    };
+
     static const QString color_background = "#d4c91f";
     static const QString color_piece      = "#0f5ca0";
     static const QString color_flame      = "#d0b98d";
@@ -105,6 +121,12 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         painter.setPen(QPen(Qt::black, 3));
         painter.setBrush(QBrush(QColor(color_flame)));
         drawPolygon(field->getFlame().getPolygon(),Space::LEFT);
+
+        //draw flame inners
+        painter.setBrush(QBrush(QColor(color_background)));
+        drawPolygonInners(field->getFlame().getPolygon(),Space::LEFT);
+        //一応元に戻しとく
+        painter.setBrush(QBrush(QColor(color_flame)));
 
         //draw pieces
         int pieces_size = field->getPiecesSize();
