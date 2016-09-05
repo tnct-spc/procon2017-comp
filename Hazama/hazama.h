@@ -23,6 +23,7 @@ private:
     Ui::Hazama *ui;
     cv::Mat capture();
     std::shared_ptr<AnswerBoard> board;
+    void makeCalibrationData(std::string savefile_path);
 private slots:
     void clickedRunButton();
 };
