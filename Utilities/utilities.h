@@ -1,13 +1,13 @@
-#ifndef UTILITY_H
-#define UTILITY_H
+#ifndef UTILITIES_H
+#define UTILITIES_H
 
-#include "utility_global.h"
+#include "utilities_global.h"
 #include <cmath>
-class UTILITYSHARED_EXPORT Utility
+class UTILITIESSHARED_EXPORT Utilities
 {
 
 public:
-    Utility();
+    Utilities();
 };
 
 namespace procon {
@@ -26,9 +26,8 @@ namespace procon {
     template<typename X,typename Y>
     bool nearlyEqual(X var1,X var2,Y allowance)
     {
-
         return std::abs(var1 - var2) < allowance ? true : false;
     }
 }
 
-#endif // UTILITY_H
+#endif // UTILITIES_H

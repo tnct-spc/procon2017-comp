@@ -8,4 +8,4 @@ SUBDIRS += \
     ProbMaker \
     Hazama \
     Test \
-    Utility
+    Utilities

@@ -6,15 +6,15 @@
 
 QT       -= gui
 
-TARGET = Utility
+TARGET = Utilities
 TEMPLATE = lib
 
-DEFINES += UTILITY_LIBRARY
+DEFINES += UTILITIES_LIBRARY
 
-SOURCES += utility.cpp
+SOURCES += utilities.cpp
 
-HEADERS += utility.h\
-        utility_global.h
+HEADERS += utilities.h\
+        utilities_global.h
 
 unix {
     target.path = /usr/lib

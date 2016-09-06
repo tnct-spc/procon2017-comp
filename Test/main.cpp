@@ -5,7 +5,7 @@
 
 #include "testpolygon.h"
 #include "testdisplayanswer.h"
-#include "utility.h"
+#include "utilities.h"
 bool Test()
 {
     TestPolygon test_polygon;
