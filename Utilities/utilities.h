@@ -3,6 +3,7 @@
 
 #include "utilities_global.h"
 #include <cmath>
+
 class UTILITIESSHARED_EXPORT Utilities
 {
 
@@ -29,5 +30,4 @@ namespace procon {
         return std::abs(var1 - var2) < allowance ? true : false;
     }
 }
-
 #endif // UTILITIES_H
