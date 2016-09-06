@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <cmath>
+#include <numeric>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/ring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
@@ -37,6 +38,7 @@ class ExpandedPolygon
     void calcSize();
     void calcSideLength();
     void calcSideAngle();
+    void fixOutsideAngle();
     bool calcSize_flag = false;
     bool calcSideLength_flag = false;
     bool calcSideAngle_flag = false;
@@ -47,14 +49,14 @@ public:
     ExpandedPolygon(ExpandedPolygon const& p);
 
     //getter
-    int getSize();
-    std::vector<double> const& getSideLength();
-    std::vector<double> const& getSideAngle();
+    int getSize() const;
+    std::vector<double> const& getSideLength() const;
+    std::vector<double> const& getSideAngle() const;
     polygon_t const& getPolygon() const;
     int getId() const;
 
     //setter
-    void setPolygon(polygon_t const & p);
+    void setPolygon(polygon_t const & p,bool calc = false);
 
     //operator
     ExpandedPolygon operator =  (ExpandedPolygon const& p);
@@ -63,12 +65,12 @@ public:
     //***ポリゴン変更後必ず実行のこと***
     void updatePolygon();
 
-    void inversePolygon();
-    void rotatePolygon(double degree);
-    void translatePolygon(double x,double y);
+    void inversePolygon(bool calc = false);
+    void rotatePolygon(double degree,bool calc = false);
+    void translatePolygon(double x,double y,bool calc = false);
     
-    void setPolygonAngle(double degree);
-    void setPolygonPosition(double x,double y);
+    void setPolygonAngle(double degree,bool calc = false);
+    void setPolygonPosition(double x,double y,bool calc = false);
 
 };
 

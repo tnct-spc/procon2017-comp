@@ -1,4 +1,4 @@
-#include "expandedpolygon.h"
+ #include "expandedpolygon.h"
 
 //-------------------constructor--------------------
 procon::ExpandedPolygon::ExpandedPolygon(int id_)
@@ -44,24 +44,52 @@ void procon::ExpandedPolygon::calcSideLength()
 
 void procon::ExpandedPolygon::calcSideAngle()
 {
+    auto isMinorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
+        point_t p4((p1.x() + p3.x()) / 2 , (p1.y() + p3.y()) / 2);
+        const double alpha = 4000;
+        const double end_x = (p4.x() - p2.x()) > 0 ? alpha : -alpha;
+        const double end_y = (p4.y() - p2.y()) / (p4.x() - p2.x()) * (end_x - p2.x()) + p2.y();
+        point_t end_point(end_x,end_y);
+        bg::model::segment<point_t> judge_segment(p2,end_point);
+        int intersect_num = 0;
+
+        for (int i = 0;i < size;i++) {
+            point_t pa = polygon.outer().at(i);
+            point_t pb = polygon.outer().at(i+1);
+            bg::model::segment<point_t> side_segment(pa,pb);
+            intersect_num += static_cast<int>(bg::intersects(side_segment,judge_segment));
+        }
+
+        return (intersect_num % 2 == 0) ? true : false;
+    };
+
     if(!calcSize_flag) calcSize();
     try {
         for (int i = -1;i < size - 1;i++){
             double x1,y1;
+            point_t p1;
             if (i == -1){
                 x1 = polygon.outer().at(size - 1).x(), y1 = polygon.outer().at(size - 1).y();
+                p1 = polygon.outer().at(size - 1);
             } else {
                 x1 = polygon.outer().at(i).x(), y1 = polygon.outer().at(i).y();
+                p1 = polygon.outer().at(i);
             }
             const double x2 = polygon.outer().at(i+1).x(), y2 = polygon.outer().at(i+1).y();
             const double x3 = polygon.outer().at(i+2).x(), y3 = polygon.outer().at(i+2).y();
+            const point_t p2 = polygon.outer().at(i+1);
+            const point_t p3 = polygon.outer().at(i+2);
             const double numer = (x2 - x1) * (x2 - x3) + (y2 - y1) * (y2 - y3);
             const double denom1 = std::sqrt(std::pow(x2 - x3,2) + std::pow(y2 - y3,2));
             const double denom2 = std::sqrt(std::pow(x2 - x1,2) + std::pow(y2 - y1,2));
             if (denom1 == 0 || denom2 == 0) {
                 throw std::runtime_error("division by zero");
             }
-            const double angle = std::acos(numer / (denom1 * denom2));
+            double angle = std::acos(numer / (denom1 * denom2));
+
+            if (isMinorAngle(p1,p2,p3)) {
+                angle = (3.141592 * 2) - angle;
+            }
             side_angle.push_back(angle);
         }
     } catch (std::exception &e) {
@@ -72,21 +100,18 @@ void procon::ExpandedPolygon::calcSideAngle()
 
 //---------------------public------------------------
 // getter
-int procon::ExpandedPolygon::getSize()
+int procon::ExpandedPolygon::getSize() const
 {
-    if(!calcSize_flag) calcSize();
     return size;
 }
 
-std::vector<double> const& procon::ExpandedPolygon::getSideLength()
+std::vector<double> const& procon::ExpandedPolygon::getSideLength() const
 {
-    if(!calcSideLength_flag) calcSideLength();
     return side_length;
 }
 
-std::vector<double> const& procon::ExpandedPolygon::getSideAngle()
+std::vector<double> const& procon::ExpandedPolygon::getSideAngle() const
 {
-    if(!calcSideAngle_flag) calcSideAngle();
     return side_angle;
 }
 
@@ -101,9 +126,10 @@ int procon::ExpandedPolygon::getId() const
 }
 
 //setter
-void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
+void procon::ExpandedPolygon::setPolygon(polygon_t const& p,bool calc)
 {
     polygon = p;
+    if (calc) this->updatePolygon();
 }
 
 // operator
@@ -133,7 +159,7 @@ void procon::ExpandedPolygon::updatePolygon()
     calcSideAngle();
 }
 
-void procon::ExpandedPolygon::inversePolygon()
+void procon::ExpandedPolygon::inversePolygon(bool calc)
 {
     polygon_t translate_polygon;
 
@@ -155,9 +181,10 @@ void procon::ExpandedPolygon::inversePolygon()
     boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
 
     polygon = returnPolygon;
+    if (calc) this->updatePolygon();
 }
 
-void procon::ExpandedPolygon::rotatePolygon(double degree)
+void procon::ExpandedPolygon::rotatePolygon(double degree,bool calc)
 {
     polygon_t goPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
@@ -174,9 +201,10 @@ void procon::ExpandedPolygon::rotatePolygon(double degree)
     difference_of_default_degree = difference_of_default_degree + degree;
 
     polygon = backPolygon;
+    if (calc) this->updatePolygon();
 }
 
-void procon::ExpandedPolygon::translatePolygon(double x, double y)
+void procon::ExpandedPolygon::translatePolygon(double x, double y,bool calc)
 {
     polygon_t translatedPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(x,y);
@@ -186,9 +214,10 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
     centery = centery + y;
 
     polygon = translatedPolygon;
+    if (calc) this->updatePolygon();
 }
 
-void procon::ExpandedPolygon::setPolygonAngle(double degree)
+void procon::ExpandedPolygon::setPolygonAngle(double degree,bool calc)
 {
     polygon_t goPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
@@ -212,9 +241,10 @@ void procon::ExpandedPolygon::setPolygonAngle(double degree)
     difference_of_default_degree = degree;
 
     polygon = backPolygon;
+    if (calc) this->updatePolygon();
 }
 
-void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
+void procon::ExpandedPolygon::setPolygonPosition(double x, double y,bool calc)
 {
     double dx = x - centerx;
     double dy = y - centery;
@@ -228,4 +258,5 @@ void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
     centery = y;
     
     polygon = translatedPolygon;
+    if (calc) this->updatePolygon();
 }
