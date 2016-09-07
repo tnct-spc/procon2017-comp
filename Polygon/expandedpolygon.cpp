@@ -213,6 +213,7 @@ void procon::ExpandedPolygon::rotatePolygon(double degree)
 
     polygon_t rotated_Polygon;
     boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree,double,2,2> rotate(degree);
+
     boost::geometry::transform(goPolygon,rotated_Polygon,rotate);
 
     polygon_t backPolygon;
@@ -237,6 +238,7 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
     boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(x,y);
     boost::geometry::transform(polygon,translatedPolygon,backTranslate);
     
+
     centerx = centerx + x;
     centery = centery + y;
 
