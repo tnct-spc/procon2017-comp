@@ -90,6 +90,11 @@ std::array<bool,50> const& procon::Field::getIsPlaced() const
     return isPlaced;
 }
 
+int procon::Field::getFieldScore()
+{
+    return field_pieces.size();
+}
+
 //remove
 void procon::Field::removePiece(int n)
 {
