@@ -168,20 +168,23 @@ void procon::ExpandedPolygon::inversePolygon(bool calc)
     boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-centerx,0);
     boost::geometry::transform(polygon,translate_polygon,transformgo);
 
-    //
     polygon_t inversedPolygon;
-    const int polygon_size = polygon.outer().size();
-    for(int i=0; i < polygon_size; i++){
-        const double x = translate_polygon.outer().at(i).x();
-        const double y = translate_polygon.outer().at(i).y();
-        inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-x,y));
+
+    for(point_t point : translate_polygon.outer()){
+        inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-point.x(),point.y()));
     }
+
+    //bg::strategy::transform::ublas_transformer<double,2,2> hoge;
+    //boost::geometry::strategy::transform::inverse_transformer<double,2,2> inverse(hoge);
+    //boost::geometry::transform(translate_polygon,inversedPolygon,inverse);
 
     polygon_t returnPolygon;
 
     boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(centerx,0);
     boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
 
+    boost::geometry::reverse(returnPolygon);
+    auto ishowta = bg::area(returnPolygon);
     polygon = returnPolygon;
     if (calc) this->updatePolygon();
 }

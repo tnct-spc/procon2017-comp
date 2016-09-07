@@ -15,8 +15,11 @@ std::vector<AlgorithmWrapper::PieceAssesment> assesment_function(procon::Field f
             for(double x = 0;x < 30;x++){
                 for(double y = 0;y < 30;y++){
                     elementary_piece.setPolygonPosition(x,y);
+                    elementary_piece.inversePolygon();
+
                     for(int degree = 0; degree < 360; degree = degree + 10){
                         elementary_piece.setPolygonAngle(degree);
+
                         if(field.isPuttable(elementary_piece)){
                             PA_buf.EvaluationValue = boost::geometry::area(elementary_piece.getPolygon());
                             PA_buf.Polygon = elementary_piece;
