@@ -18,6 +18,13 @@ TestPolygon::TestPolygon()
 
 bool TestPolygon::run(){
     /*polygon*/
+    auto printVector = [](std::vector<double> vec){
+        for (auto v : vec){
+            std::cout << v << ',';
+        }
+        std::cout << std::endl;
+    };
+
     std::cout << "Hello,polygon!" << std::endl;
     polygon_t b,c,d;
     bg::exterior_ring(b) = boost::assign::list_of<point_t>(0, 0)(0, 30.14)(30.14,30.14)(15.92,15.42)(30.11, 0)(0, 0);
@@ -26,14 +33,29 @@ bool TestPolygon::run(){
     bg::model::linestring<point_t> seg2 = boost::assign::list_of<point_t>(0,0)(0,1);
     std::cout << bg::intersects(seg1,seg2) << std::endl;
     procon::ExpandedPolygon hoge;
+
     hoge.setPolygon(b);
-    hoge.updatePolygon();
-    std::cout << bg::area(b) << std::endl;
-    auto huga = hoge;
-    auto angle = huga.getSideSlope();
-    for(auto a : angle){
-        std::cout << a << std::endl;
-    }
+    hoge.updatePolygon(true);
+    std::cout << bg::dsv(hoge.getPolygon()) << std::endl;
+    printVector(hoge.getSideLength());
+
+    hoge.rotatePolygon(90);
+    hoge.updatePolygon(true);
+    std::cout << bg::dsv(hoge.getPolygon()) << std::endl;
+    printVector(hoge.getSideLength());
+
+    hoge.setPolygonAngle(180);
+    std::cout << "ang" << bg::area(hoge.getPolygon()) << std::endl;
+    hoge.updatePolygon(true);
+    std::cout << bg::dsv(hoge.getPolygon()) << std::endl;
+    printVector(hoge.getSideLength());
+
+    hoge.inversePolygon();
+    std::cout << "inv" << bg::area(hoge.getPolygon()) << std::endl;
+    hoge.updatePolygon(true);
+    std::cout << bg::dsv(hoge.getPolygon()) << std::endl;
+    printVector(hoge.getSideLength());
+
     std::cout << "end" << std::endl;
     return true;
 }
