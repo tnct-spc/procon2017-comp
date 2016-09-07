@@ -90,6 +90,16 @@ std::array<bool,50> const& procon::Field::getIsPlaced() const
     return isPlaced;
 }
 
+double procon::Field::getMinAngle()
+{
+    return min_angle;
+}
+
+double procon::Field::getMinSide()
+{
+    return min_side;
+}
+
 //remove
 void procon::Field::removePiece(int n)
 {
