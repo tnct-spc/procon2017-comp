@@ -35,6 +35,7 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
     Polygon1 = newPolygonDate(Polygon1);
     Polygon2 = newPolygonDate(Polygon2);
 
+  //結合面内の角が合計３６０度にならなかったらポリゴン１を返す
     int inner_point1 = Polygon1_start_pos + 1;
     int inner_point2 = Polygon2_start_pos - 1;
     Polygon1.getSideAngle();
