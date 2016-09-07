@@ -11,16 +11,6 @@ bool Test()
     TestPolygon test_polygon;
     TestDisplayAnswer test_displayanswer;
 
-    double e = 0.0,b = 0.5,c = - 0.7,d = 0.123;
-    std::cout << procon::nearlyEqual(e,b,0.6) << std::endl;
-    std::cout << procon::nearlyEqual(e,c,0.8) << std::endl;
-    std::cout << procon::nearlyEqual(b,c,2) << std::endl;
-    std::cout << procon::nearlyEqual(e,c,0.5) << std::endl;
-    std::cout << procon::floor(d,0) << std::endl;
-    std::cout << procon::floor(d,1) << std::endl;
-    std::cout << procon::floor(d,2) << std::endl;
-    std::cout << procon::floor(d,3) << std::endl;
-
 
     if(!test_polygon.run()){
         std::cout<<"*****Polygon error*****"<<std::endl;
@@ -41,9 +31,8 @@ int main(int argc, char *argv[])
 
     if(Test()){
         std::cout << "ok" << std::endl;
-    }else{
+    } else {
         std::cout << "error" << std::endl;
     }
-
     return a.exec();
 }
