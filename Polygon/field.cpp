@@ -138,3 +138,32 @@ polygon_t procon::Field::translatePolygon(polygon_t polygon, double x, double y)
     boost::geometry::transform(polygon,translatedPolygon,translate);
     return translatedPolygon;
 }
+
+void procon::Field::calcMinAngleSide()
+{
+    //result buffer
+    double min_anglee = 10000;
+    double min_sidee = 10000;
+
+    for(auto elementary_piece : elementary_pieces){
+        elementary_piece.updatePolygon();
+
+        std::vector<double> angles = elementary_piece.getSideAngle();
+        std::vector<double> sides = elementary_piece.getSideLength();
+
+        for(auto angle : angles){
+            if(min_anglee > angle){
+                min_anglee = angle;
+            }
+        }
+        for(auto side : sides){
+            if(min_sidee > side){
+                min_sidee = side;
+            }
+        }
+    }
+
+    //set
+    min_angle = min_anglee;
+    min_side = min_sidee;
+}
