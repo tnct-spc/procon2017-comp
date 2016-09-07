@@ -222,6 +222,13 @@ void procon::ExpandedPolygon::rotatePolygon(double degree)
     difference_of_default_degree = difference_of_default_degree + degree;
 
     polygon = backPolygon;
+
+    constexpr double pi = 3.1415926535;
+    constexpr double to_rad = pi / 180;
+    for (auto & slope : side_slope) {
+        slope += degree * to_rad;
+        if (slope > pi) slope -= pi;
+    }
 }
 
 void procon::ExpandedPolygon::translatePolygon(double x, double y)
@@ -260,6 +267,13 @@ void procon::ExpandedPolygon::setPolygonAngle(double degree)
     difference_of_default_degree = degree;
 
     polygon = backPolygon;
+
+    constexpr double pi = 3.1415926535;
+    constexpr double to_rad = pi / 180;
+    for (auto & slope : side_slope){
+        slope += degree * to_rad;
+        if (slope > pi) slope -= pi;
+    }
 }
 
 void procon::ExpandedPolygon::setPolygonPosition(double x, double y)

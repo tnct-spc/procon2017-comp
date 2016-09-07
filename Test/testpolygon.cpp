@@ -35,26 +35,22 @@ bool TestPolygon::run(){
     procon::ExpandedPolygon hoge;
 
     hoge.setPolygon(b);
-    hoge.updatePolygon(true);
     std::cout << bg::dsv(hoge.getPolygon()) << std::endl;
-    printVector(hoge.getSideLength());
+    printVector(hoge.getSideSlope());
 
     hoge.rotatePolygon(90);
-    hoge.updatePolygon(true);
     std::cout << bg::dsv(hoge.getPolygon()) << std::endl;
-    printVector(hoge.getSideLength());
+    printVector(hoge.getSideSlope());
 
-    hoge.setPolygonAngle(180);
+    hoge.setPolygonAngle(270);
     std::cout << "ang" << bg::area(hoge.getPolygon()) << std::endl;
-    hoge.updatePolygon(true);
     std::cout << bg::dsv(hoge.getPolygon()) << std::endl;
-    printVector(hoge.getSideLength());
+    printVector(hoge.getSideSlope());
 
     hoge.inversePolygon();
     std::cout << "inv" << bg::area(hoge.getPolygon()) << std::endl;
-    hoge.updatePolygon(true);
     std::cout << bg::dsv(hoge.getPolygon()) << std::endl;
-    printVector(hoge.getSideLength());
+    printVector(hoge.getSideSlope());
 
     std::cout << "end" << std::endl;
     return true;
