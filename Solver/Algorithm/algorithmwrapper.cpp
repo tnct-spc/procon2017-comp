@@ -26,10 +26,29 @@ procon::ExpandedPolygon AlgorithmWrapper::newPolygonDate(procon::ExpandedPolygon
 
 procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Polygon1,int Polygon1_start_pos,int Polygon1_end_pos, procon::ExpandedPolygon Polygon2,int Polygon2_start_pos,int Polygon2_end_pos)
 {
+    Polygon1.updatePolygon();
+    Polygon2.updatePolygon();
     int size1 = Polygon1.getSize();
     int size2 = Polygon2.getSize();
+    Polygon1.getSideLength();
+    Polygon2.getSideLength();
     Polygon1 = newPolygonDate(Polygon1);
     Polygon2 = newPolygonDate(Polygon2);
+
+    int inner_point1 = Polygon1_start_pos + 1;
+    int inner_point2 = Polygon2_start_pos - 1;
+    Polygon1.getSideAngle();
+    Polygon2.getSideAngle();
+    while (((inner_point1 % size1) != Polygon1_end_pos) && ((inner_point2 + size2) % size2 != Polygon2_end_pos)) {
+        double angle1 = Polygon1.getSideAngle()[inner_point1 % size1];
+        double angle2 = Polygon2.getSideAngle()[(inner_point2 + size2) % size2];
+        if (fabs(2 * PI - angle1 - angle2) > (PI / 180)) {
+            return Polygon1;
+        }
+        inner_point1++;
+        inner_point2--;
+    }
+
     double x1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].x() - Polygon1.getPolygon().outer()[Polygon1_start_pos].x();
     double y1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].y() - Polygon1.getPolygon().outer()[Polygon1_start_pos].y();
     double x2 = Polygon2.getPolygon().outer()[(Polygon2_start_pos + size2 - 1) % size2].x() - Polygon2.getPolygon().outer()[Polygon2_start_pos].x();
@@ -66,15 +85,10 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
     int Type = 1;
 
     // ポリゴンの結合端の辺の長さ
-    double x1_st = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].x() - Polygon1.getPolygon().outer()[Polygon1_start_pos].x();
-    double y1_st = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].y() - Polygon1.getPolygon().outer()[Polygon1_start_pos].y();
-    double x2_st = Polygon2.getPolygon().outer()[(Polygon2_start_pos + size2 - 1) % size1].x() - Polygon2.getPolygon().outer()[Polygon2_start_pos].x();
-    double y2_st = Polygon2.getPolygon().outer()[(Polygon2_start_pos + size2 - 1) % size1].y() - Polygon2.getPolygon().outer()[Polygon2_start_pos].y();
-    double x1_end = Polygon1.getPolygon().outer()[(Polygon1_end_pos + size1 - 1) % size1].x() - Polygon1.getPolygon().outer()[Polygon1_end_pos].x();
-    double y1_end = Polygon1.getPolygon().outer()[(Polygon1_end_pos + size1 - 1) % size1].y() - Polygon1.getPolygon().outer()[Polygon1_end_pos].y();
-    double x2_end = Polygon2.getPolygon().outer()[(Polygon2_end_pos + 1) % size1].x() - Polygon2.getPolygon().outer()[Polygon2_end_pos].x();
-    double y2_end = Polygon2.getPolygon().outer()[(Polygon2_end_pos + 1) % size1].y() - Polygon2.getPolygon().outer()[Polygon2_end_pos].y();
-
+    double st1 = Polygon1.getSideLength()[Polygon1_start_pos];
+    double st2 = Polygon2.getSideLength()[(Polygon2_start_pos + size2 - 1) % size2];
+    double end1 = Polygon1.getSideLength()[(Polygon1_end_pos + size1 - 1) % size1];
+    double end2 = Polygon2.getSideLength()[Polygon2_end_pos];
 
     // 新しいポリゴンに結合後の外周の角を入れる。
     // もし、結合端の辺の長さが等しくならない時はPolygon1,Polygon2ともに端の角を入力。
@@ -86,7 +100,7 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
             y = Polygon1.getPolygon().outer()[count%size1].y();
             if (count % size1 == Polygon1_start_pos){
                 Type = 2;
-                if ((x1_st == x2_st) && (y1_st == y2_st)) {
+                if (fabs(st1 - st2) <= 0.1) {
                     count = Polygon2_start_pos;
                 } else {
                     count = Polygon2_start_pos - 1;
@@ -97,7 +111,7 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
             y = Polygon2.getPolygon().outer()[count%size2].y();
             if (count % size2 == Polygon2_end_pos) {
                 Type = 1;
-                if ((x1_end == x2_end) && (y1_end == y2_end)) {
+                if (fabs(end1 - end2) <= 0.1) {
                     count = Polygon1_end_pos;
                 } else {
                     count = Polygon1_end_pos - 1;
@@ -122,25 +136,25 @@ AlgorithmWrapper::AlgorithmWrapper()
 {
     // サンプル
     polygon_t sample11;
-    sample11.outer().push_back(point_t(0,0));
-    sample11.outer().push_back(point_t(0,2));
-    sample11.outer().push_back(point_t(1,2));
-    sample11.outer().push_back(point_t(1,1));
-    sample11.outer().push_back(point_t(2,1));
-    sample11.outer().push_back(point_t(2,0));
-    sample11.outer().push_back(point_t(0,0));
+    sample11.outer().push_back(point_t(0.00000001,0.0000002));
+    sample11.outer().push_back(point_t(0.00000008,6.0000007));
+    sample11.outer().push_back(point_t(2.00000004,2.0000003));
+    sample11.outer().push_back(point_t(4.00000009,2.0000006));
+    sample11.outer().push_back(point_t(6.00000005,0.0000004));
+    sample11.outer().push_back(point_t(0.00000001,0.0000002));
 
     polygon_t sample12;
-    sample12.outer().push_back(point_t(0,0));
-    sample12.outer().push_back(point_t(0,1));
-    sample12.outer().push_back(point_t(2,2));
-    sample12.outer().push_back(point_t(2,0));
-    sample12.outer().push_back(point_t(0,0));
+    sample12.outer().push_back(point_t(0.00000004,0.00000002));
+    sample12.outer().push_back(point_t(-1.00000003,2.00000009));
+    sample12.outer().push_back(point_t(4.00000009,2.00000002));
+    sample12.outer().push_back(point_t(4.00000006,-2.00000005));
+    sample12.outer().push_back(point_t(3.00000005,0.00000004));
+    sample12.outer().push_back(point_t(0.00000004,0.00000002));
 
     procon::ExpandedPolygon polygon1(0);
     procon::ExpandedPolygon polygon2(1);
     polygon1.setPolygon(sample11);
     polygon2.setPolygon(sample12);
 
-    procon::ExpandedPolygon Joined = joinPolygon(polygon1,2,4,polygon2,1,3);
+    procon::ExpandedPolygon Joined = joinPolygon(polygon1,1,4,polygon2,1,3);
 }
