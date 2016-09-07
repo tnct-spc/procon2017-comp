@@ -18,6 +18,7 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->size = p.size;
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
+    std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));
     this->polygon.outer().reserve(32);
     this->centerx = p.centerx;
     this->centery = p.centery;
@@ -40,7 +41,6 @@ void procon::ExpandedPolygon::calcSideLength()
        const double length = bg::distance(polygon.outer().at(i),polygon.outer().at(i+1));
        side_length.push_back(length);
     }
-    calcSideLength_flag = true;
 }
 
 void procon::ExpandedPolygon::calcSideAngle()
@@ -97,7 +97,16 @@ void procon::ExpandedPolygon::calcSideAngle()
     } catch (std::exception &e) {
            std::cerr << e.what() << std::endl;
     }
-    calcSideAngle_flag = true;
+}
+
+void procon::ExpandedPolygon::calcSideSlope() {
+    calcSize();
+    side_slope.clear();
+    for (int i = 0;i < size;i++) {
+        const double x = polygon.outer().at(i).x() - polygon.outer().at(i + 1).x();
+        const double y = std::abs(polygon.outer().at(i).y() - polygon.outer().at(i + 1).y());
+        side_slope.push_back(std::atan2(y,x));
+    }
 }
 
 //---------------------public------------------------
@@ -115,6 +124,11 @@ std::vector<double> const& procon::ExpandedPolygon::getSideLength() const
 std::vector<double> const& procon::ExpandedPolygon::getSideAngle() const
 {
     return side_angle;
+}
+
+std::vector<double> const& procon::ExpandedPolygon::getSideSlope() const
+{
+    return side_slope;
 }
 
 polygon_t const& procon::ExpandedPolygon::getPolygon() const
@@ -142,6 +156,7 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->polygon = p.polygon;
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
+    std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));
     this->polygon.outer().reserve(32);
     this->size = p.size;
     this->centerx = p.centerx;
@@ -159,6 +174,7 @@ void procon::ExpandedPolygon::updatePolygon()
     calcSize();
     calcSideLength();
     calcSideAngle();
+    calcSideSlope();
 }
 
 void procon::ExpandedPolygon::inversePolygon(bool calc)

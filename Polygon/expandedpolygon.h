@@ -22,10 +22,11 @@ namespace procon {
 class ExpandedPolygon
 {
     //メンバ
-    int id;
     int size;
+    int id;
     std::vector<double> side_length;
     std::vector<double> side_angle;
+    std::vector<double> side_slope;
     polygon_t polygon;
 
     double difference_of_default_degree = 0;
@@ -38,10 +39,10 @@ class ExpandedPolygon
     void calcSize();
     void calcSideLength();
     void calcSideAngle();
-    void fixOutsideAngle();
+    void calcSideSlope();
+
+    //flag
     bool calcSize_flag = false;
-    bool calcSideLength_flag = false;
-    bool calcSideAngle_flag = false;
 
 public:
     //constructor
@@ -52,6 +53,7 @@ public:
     int getSize() const;
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
+    std::vector<double> const& getSideSlope() const;
     polygon_t const& getPolygon() const;
     int getId() const;
 
