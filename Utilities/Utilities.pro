@@ -6,7 +6,10 @@
 
 QT       -= gui
 
+CONFIG += c++14
+
 TARGET = Utilities
+
 TEMPLATE = lib
 
 DEFINES += UTILITIES_LIBRARY
