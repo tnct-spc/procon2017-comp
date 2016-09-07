@@ -183,26 +183,6 @@ void procon::ExpandedPolygon::updatePolygon(bool calc)
 
 void procon::ExpandedPolygon::inversePolygon()
 {
-    polygon_t translate_polygon;
-
-    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-centerx,0);
-    boost::geometry::transform(polygon,translate_polygon,transformgo);
-
-    //
-    polygon_t inversedPolygon;
-    const int polygon_size = polygon.outer().size();
-    for(int i=0; i < polygon_size; i++){
-        const double x = translate_polygon.outer().at(i).x();
-        const double y = translate_polygon.outer().at(i).y();
-        inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-x,y));
-    }
-
-    polygon_t returnPolygon;
-
-    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(centerx,0);
-    boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
-    std::reverse(returnPolygon.outer().begin(),returnPolygon.outer().end());
-    polygon = returnPolygon;
 }
 
 void procon::ExpandedPolygon::rotatePolygon(double degree)
