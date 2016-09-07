@@ -4,7 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
+QT       -= gui:
+
+CONFIG += c++14
 
 TARGET = Utilities
 TEMPLATE = lib
