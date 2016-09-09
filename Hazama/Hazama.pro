@@ -45,3 +45,11 @@ else:unix: LIBS += -L$$OUT_PWD/../Solver/ -lSolver
 
 INCLUDEPATH += $$PWD/../Solver
 DEPENDPATH += $$PWD/../Solver
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
+else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
+
+INCLUDEPATH += $$PWD/../Utilities
+DEPENDPATH += $$PWD/../Utilities

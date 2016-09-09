@@ -38,8 +38,8 @@ void procon::ExpandedPolygon::calcSideLength()
     if(!calcSize_flag) calcSize();
     side_length.clear();
     for(int i=0;i < size;i++){
-       const double length = bg::distance(polygon.outer().at(i),polygon.outer().at(i+1));
-       side_length.push_back(length);
+        const double length = bg::distance(polygon.outer().at(i),polygon.outer().at(i+1));
+        side_length.push_back(length);
     }
 }
 

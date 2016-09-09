@@ -1,3 +1,4 @@
+
 #include "hazama.h"
 #include "ui_hazama.h"
 #include <unistd.h>
@@ -84,8 +85,7 @@ void Hazama::run()
         //display recognized image
         board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
         board->setRandomColors(imrec.getRawRandomColors());
-
-    } else if(ui->useFileData->isChecked()) {
+    } else if (ui->useFileData->isChecked()) {
         //環境によっては動かない
         //std::string path = QFileDialog::getOpenFileName(this).toStdString();
         PDATA = procon::PolygonIO::importPolygon(path);
