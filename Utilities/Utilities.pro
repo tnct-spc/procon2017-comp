@@ -10,6 +10,8 @@ CONFIG += c++14
 
 CONFIG += c++14
 
+CONFIG += c++14
+
 TARGET = Utilities
 
 TEMPLATE = lib
