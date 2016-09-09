@@ -227,28 +227,4 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
 
 AlgorithmWrapper::AlgorithmWrapper()
 {
-    // サンプル
-    polygon_t sample11;
-    sample11.outer().push_back(point_t(0.00000001,0.0000002));
-    sample11.outer().push_back(point_t(0.00000008,6.0000007));
-    sample11.outer().push_back(point_t(2.00000004,2.0000003));
-    sample11.outer().push_back(point_t(4.00000009,2.0000006));
-    sample11.outer().push_back(point_t(6.00000005,0.0000004));
-    sample11.outer().push_back(point_t(0.00000001,0.0000002));
-
-    polygon_t sample12;
-    sample12.outer().push_back(point_t(0.00000004,0.00000002));
-    sample12.outer().push_back(point_t(-1.00000003,2.00000009));
-    sample12.outer().push_back(point_t(4.00000009,2.00000002));
-    sample12.outer().push_back(point_t(4.00000006,-2.00000005));
-    sample12.outer().push_back(point_t(3.00000005,0.00000004));
-    sample12.outer().push_back(point_t(0.00000004,0.00000002));
-
-    procon::ExpandedPolygon polygon1(0);
-    procon::ExpandedPolygon polygon2(1);
-    polygon1.setPolygon(sample11);
-    polygon2.setPolygon(sample12);
-
-    procon::ExpandedPolygon Joined = joinPolygon(polygon1,1,4,polygon2,1,3);
-    std::cout << "end" << std::endl;
 }

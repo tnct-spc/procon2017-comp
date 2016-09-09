@@ -578,8 +578,6 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
 
     field.setElementaryPieces(ex_pieces);
     field.setElementaryFlame(ex_flame);
-    field.printFlame();
-    field.printPiece();
 
     return field;
 }

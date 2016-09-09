@@ -23,8 +23,5 @@ procon::Field SimpleAlgorithm::run(procon::Field field)
         }
         next_roop:;
     }
-    for (auto piece : field.getPieces()){
-        piece.updatePolygon();
-    }
     return field;
 }
