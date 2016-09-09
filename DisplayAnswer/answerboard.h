@@ -42,11 +42,11 @@ private:
     int putid_left = -1;
     int putid_right = -1;
 
-    const int top_margin    = 10;
+    const int top_margin    = 100;
     const int bottom_margin = 10;
-    const int left_margin   = 10;
+    const int left_margin   = 100;
     const int right_margin  = 10;
-    const double flame_size = 30;
+    const double flame_size = 35;
 
     enum Space
     {
