@@ -20,3 +20,4 @@ procon::Field Solver::run(procon::Field field)
 
     return poor_field;
 }
+
