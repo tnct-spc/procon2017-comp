@@ -24,6 +24,11 @@ private:
 
     //ピースが置かれているか保存する変数
     std::array<bool,50> isPlaced;
+
+    //ピースの最小辺最小角
+    double min_angle;
+    double min_side;
+
 public:
     //constructor
     Field();
@@ -45,7 +50,10 @@ public:
     procon::ExpandedPolygon const& getElementaryFlame() const;
     std::vector<procon::ExpandedPolygon> const& getElementaryPieces() const;
     std::array<bool,50> const& getIsPlaced() const;
+    int getFieldScore();
     int getPiecesSize();
+    double getMinAngle();
+    double getMinSide();
 
     //任意の位置のピースを消去
     void removePiece(int n);
@@ -59,6 +67,9 @@ public:
 
     //translate polygon
     static polygon_t translatePolygon(polygon_t polygon, double x, double y);
+
+    //最小辺最小角を計算する
+    void calcMinAngleSide();
 };
 }
 #endif // FIELD_H

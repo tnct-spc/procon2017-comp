@@ -235,8 +235,8 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
         //if (count + 1 == 14) {
-            cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
-            cv::imshow(std::to_string(count+1), pic);
+        //    cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
+        //    cv::imshow(std::to_string(count+1), pic);
         //}
         count++;
     }
@@ -522,8 +522,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         count++;
         std::cout << "piece" << bg::dsv(po) << std::endl;
     }*/
-    std::cout << "flame" << bg::dsv(polygons.at(0)) << std::endl;
-
+    //std::cout << "flame" << bg::dsv(polygons.at(0)) << std::endl;
     return std::move(polygons);
 }
 
@@ -579,8 +578,6 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
 
     field.setElementaryPieces(ex_pieces);
     field.setElementaryFlame(ex_flame);
-    field.printFlame();
-    field.printPiece();
 
     return field;
 }

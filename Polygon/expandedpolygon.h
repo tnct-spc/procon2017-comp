@@ -22,10 +22,11 @@ namespace procon {
 class ExpandedPolygon
 {
     //メンバ
-    int id;
     int size;
+    int id;
     std::vector<double> side_length;
     std::vector<double> side_angle;
+    std::vector<double> side_slope;
     polygon_t polygon;
 
     double difference_of_default_degree = 0;
@@ -38,10 +39,10 @@ class ExpandedPolygon
     void calcSize();
     void calcSideLength();
     void calcSideAngle();
-    void fixOutsideAngle();
+    void calcSideSlope();
+
+    //flag
     bool calcSize_flag = false;
-    bool calcSideLength_flag = false;
-    bool calcSideAngle_flag = false;
 
 public:
     //constructor
@@ -52,26 +53,25 @@ public:
     int getSize() const;
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
+    std::vector<double> const& getSideSlope() const;
     polygon_t const& getPolygon() const;
     int getId() const;
 
     //setter
-    void setPolygon(polygon_t const & p,bool calc = false);
+    void setPolygon(polygon_t const & p);
 
     //operator
-    ExpandedPolygon operator =  (ExpandedPolygon const& p);
+    ExpandedPolygon operator = (ExpandedPolygon const& p);
 
     //calcAll
-    //***ポリゴン変更後必ず実行のこと***
-    void updatePolygon();
+    void updatePolygon(bool calc = false);
 
-    void inversePolygon(bool calc = false);
-    void rotatePolygon(double degree,bool calc = false);
-    void translatePolygon(double x,double y,bool calc = false);
+    void inversePolygon();
+    void rotatePolygon(double degree);
+    void translatePolygon(double x,double y);
     
-    void setPolygonAngle(double degree,bool calc = false);
-    void setPolygonPosition(double x,double y,bool calc = false);
-
+    void setPolygonAngle(double degree);
+    void setPolygonPosition(double x,double y);
 
 };
 

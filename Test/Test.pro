@@ -13,15 +13,9 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    testpolygon.cpp \
     testdisplayanswer.cpp
 
-HEADERS  += mainwindow.h \
-    testpolygon.h \
-    testdisplayanswer.h
-
-FORMS    += mainwindow.ui
+HEADERS += testdisplayanswer.h\
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
@@ -41,3 +35,15 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Solver/release/ -lSolver
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Solver/debug/ -lSolver
+else:unix: LIBS += -L$$OUT_PWD/../Solver/ -lSolver
+
+INCLUDEPATH += $$PWD/../Solver
+DEPENDPATH += $$PWD/../Solver
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
+else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+
