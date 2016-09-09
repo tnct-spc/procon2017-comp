@@ -30,10 +30,11 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
     Polygon2.updatePolygon();
     int size1 = Polygon1.getSize();
     int size2 = Polygon2.getSize();
-    Polygon1.getSideLength();
-    Polygon2.getSideLength();
     Polygon1 = newPolygonDate(Polygon1);
     Polygon2 = newPolygonDate(Polygon2);
+
+    const std::vector<point_t> ring1 = Polygon1.getPolygon().outer();
+    const std::vector<point_t> ring2 = Polygon2.getPolygon().outer();
 
   //結合面内の角が合計３６０度にならなかったらポリゴン１を返す
     int inner_point1 = Polygon1_start_pos + 1;
@@ -44,40 +45,41 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
         double angle1 = Polygon1.getSideAngle()[inner_point1 % size1];
         double angle2 = Polygon2.getSideAngle()[(inner_point2 + size2) % size2];
         if (fabs(2 * PI - angle1 - angle2) > (PI / 180)) {
+            std::cerr << "polygon error" << std::endl;
             return Polygon1;
         }
         inner_point1++;
         inner_point2--;
     }
 
-    double x1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].x() - Polygon1.getPolygon().outer()[Polygon1_start_pos].x();
-    double y1 = Polygon1.getPolygon().outer()[(Polygon1_start_pos + 1) % size1].y() - Polygon1.getPolygon().outer()[Polygon1_start_pos].y();
-    double x2 = Polygon2.getPolygon().outer()[(Polygon2_start_pos + size2 - 1) % size2].x() - Polygon2.getPolygon().outer()[Polygon2_start_pos].x();
-    double y2 = Polygon2.getPolygon().outer()[(Polygon2_start_pos + size2 - 1) % size2].y() - Polygon2.getPolygon().outer()[Polygon2_start_pos].y();
-    double degree2 = atan2(y2, x2);
-    double degree1 = atan2(y1, x1);
-    double degree = (degree1 - degree2) * 180 / PI;
+    const double x1 = ring1[(Polygon1_start_pos + 1) % size1].x() - ring1[Polygon1_start_pos].x();
+    const double y1 = ring1[(Polygon1_start_pos + 1) % size1].y() - ring1[Polygon1_start_pos].y();
+    const double x2 = ring2[(Polygon2_start_pos + size2 - 1) % size2].x() - ring2[Polygon2_start_pos].x();
+    const double y2 = ring2[(Polygon2_start_pos + size2 - 1) % size2].y() - ring2[Polygon2_start_pos].y();
+    const double degree2 = atan2(y2, x2);
+    const double degree1 = atan2(y1, x1);
+    const double degree = (degree1 - degree2) * 180 / PI;
 
     // Polygon2を回転させる。このとき誤差が生じる。
-    double rad = degree * PI / 180;
+    const double rad = degree * PI / 180;
     polygon_t turn_polygon;
     for (int i=0; i<size2; i++)
     {
-        double x = Polygon2.getPolygon().outer()[i].x() - Polygon2.getPolygon().outer()[0].x();
-        double y = Polygon2.getPolygon().outer()[i].y() - Polygon2.getPolygon().outer()[0].y();
-        double move_x = (x * cos(rad)) - (y * sin(rad));
-        double move_y = (x * sin(rad)) + (y * cos(rad));
-        double turn_x = move_x + Polygon2.getPolygon().outer()[0].x();
-        double turn_y = move_y + Polygon2.getPolygon().outer()[0].y();
+        const double x = ring2[i].x() - ring2[0].x();
+        const double y = ring2[i].y() - ring2[0].y();
+        const double move_x = (x * cos(rad)) - (y * sin(rad));
+        const double move_y = (x * sin(rad)) + (y * cos(rad));
+        const double turn_x = move_x + ring2[0].x();
+        const double turn_y = move_y + ring2[0].y();
         turn_polygon.outer().push_back(point_t(turn_x, turn_y));
     }
     Polygon2.setPolygon(turn_polygon);
 
     // 結合後完全に一致する点からポリゴンのx,y移動を調べ、Polygon2を平行移動
-    int Join_point1 = (Polygon1_start_pos + 1) % size1;
-    int Join_point2 = (Polygon2_start_pos + size2 - 1) % size2;
-    double move_x = Polygon1.getPolygon().outer()[Join_point1].x() - Polygon2.getPolygon().outer()[Join_point2].x();
-    double move_y = Polygon1.getPolygon().outer()[Join_point1].y() - Polygon2.getPolygon().outer()[Join_point2].y();
+    const int Join_point1 = (Polygon1_start_pos + 1) % size1;
+    const int Join_point2 = (Polygon2_start_pos + size2 - 1) % size2;
+    const double move_x = ring1[Join_point1].x() - ring2[Join_point2].x();
+    const double move_y = ring1[Join_point1].y() - ring2[Join_point2].y();
 
     Polygon2.translatePolygon(move_x, move_y);
 
@@ -86,10 +88,10 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
     int Type = 1;
 
     // ポリゴンの結合端の辺の長さ
-    double st1 = Polygon1.getSideLength()[Polygon1_start_pos];
-    double st2 = Polygon2.getSideLength()[(Polygon2_start_pos + size2 - 1) % size2];
-    double end1 = Polygon1.getSideLength()[(Polygon1_end_pos + size1 - 1) % size1];
-    double end2 = Polygon2.getSideLength()[Polygon2_end_pos];
+    const double st1 = Polygon1.getSideLength()[Polygon1_start_pos];
+    const double st2 = Polygon2.getSideLength()[(Polygon2_start_pos + size2 - 1) % size2];
+    const double end1 = Polygon1.getSideLength()[(Polygon1_end_pos + size1 - 1) % size1];
+    const double end2 = Polygon2.getSideLength()[Polygon2_end_pos];
 
     // 新しいポリゴンに結合後の外周の角を入れる。
     // もし、結合端の辺の長さが等しくならない時はPolygon1,Polygon2ともに端の角を入力。
@@ -97,8 +99,8 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
     double x,y;
     do{
         if (Type == 1) {
-            x = Polygon1.getPolygon().outer()[count%size1].x();
-            y = Polygon1.getPolygon().outer()[count%size1].y();
+            x = ring1[count%size1].x();
+            y = ring1[count%size1].y();
             if (count % size1 == Polygon1_start_pos){
                 Type = 2;
                 if (fabs(st1 - st2) <= 0.1) {
@@ -108,8 +110,8 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
                 }
             }
         } else if (Type == 2) {
-            x = Polygon2.getPolygon().outer()[count%size2].x();
-            y = Polygon2.getPolygon().outer()[count%size2].y();
+            x = ring2[count%size2].x();
+            y = ring2[count%size2].y();
             if (count % size2 == Polygon2_end_pos) {
                 Type = 1;
                 if (fabs(end1 - end2) <= 0.1) {
@@ -124,8 +126,8 @@ procon::ExpandedPolygon AlgorithmWrapper::joinPolygon(procon::ExpandedPolygon Po
     } while ((Type != 1) || (count != (Polygon1_end_pos + 1)));
 
     // 終点を足してから返す。
-    x = Polygon1.getPolygon().outer()[count].x();
-    y = Polygon1.getPolygon().outer()[count].y();
+    x = ring1[count].x();
+    y = ring1[count].y();
     new_pieces.outer().push_back(point_t(x,y));
 
     procon::ExpandedPolygon new_polygon;
@@ -158,4 +160,5 @@ AlgorithmWrapper::AlgorithmWrapper()
     polygon2.setPolygon(sample12);
 
     procon::ExpandedPolygon Joined = joinPolygon(polygon1,1,4,polygon2,1,3);
+    std::cout << "end" << std::endl;
 }
