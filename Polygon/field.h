@@ -45,6 +45,7 @@ public:
     procon::ExpandedPolygon const& getElementaryFlame() const;
     std::vector<procon::ExpandedPolygon> const& getElementaryPieces() const;
     std::array<bool,50> const& getIsPlaced() const;
+    int getFieldScore();
     int getPiecesSize();
 
     //任意の位置のピースを消去
