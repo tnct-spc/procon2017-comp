@@ -10,7 +10,7 @@ class SOLVERSHARED_EXPORT Solver
 
 public:
     Solver();
-    procon::Field run(procon::Field field);
+    procon::Field run(procon::Field field, int algorithm_number = 0);
 
 
 

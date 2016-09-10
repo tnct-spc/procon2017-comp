@@ -8,16 +8,18 @@ Solver::Solver()
 {
 }
 
-procon::Field Solver::run(procon::Field field)
+procon::Field Solver::run(procon::Field field, int algorithm_number)
 {
-    PoorAlgorithm poor_algo;
-    SimpleAlgorithm simple_algo;
-    //HillClibming hillclimb_algo;
+    std::vector<AlgorithmWrapper*> Algorithms;
+    Algorithms.push_back(new PoorAlgorithm());
+    Algorithms.push_back(new SimpleAlgorithm());
+    Algorithms.push_back(new HillClibming());
 
-    procon::Field poor_field = poor_algo.run(field);
-    procon::Field simple_field = simple_algo.run(field);
-    //procon::Field hillclimb_field = hillclimb_algo.run(field);
+    procon::Field result = Algorithms.at(algorithm_number)->run(field);
 
-    return simple_field;
+    for(auto algo : Algorithms) delete(algo);
+    Algorithms.clear();
+
+    return result;
 }
 
