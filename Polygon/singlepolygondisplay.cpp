@@ -11,7 +11,7 @@ SinglePolygonDisplay::SinglePolygonDisplay(QWidget *parent = 0) :
     ui->setupUi(this);
 }
 
-std::unique_ptr<SinglePolygonDisplay> SinglePolygonDisplay::create(procon::ExpandedPolygon& polygon, int scale, std::string wname_)
+std::unique_ptr<SinglePolygonDisplay> SinglePolygonDisplay::create(procon::ExpandedPolygon& polygon, std::string wname_, int scale)
 {
     std::unique_ptr<SinglePolygonDisplay> instance(new SinglePolygonDisplay());
     instance->polygon = polygon;
@@ -28,23 +28,32 @@ SinglePolygonDisplay::~SinglePolygonDisplay()
 
 void SinglePolygonDisplay::paintEvent(QPaintEvent *)
 {
-    int height = this->height();
-    int width = this->width();
+    int window_height = this->height();
+    int window_width = this->width();
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 3));
 
     auto drawPolygon = [&](std::vector<QPointF> points){
-        int size = points.size();
+        static const double margin = 10;
+        const int size = points.size();
+        const double x_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
+        const double y_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
+        const double x_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
+        const double y_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
+        const double width  = x_max - x_min;
+        const double height = y_max - y_min;
+        const double max = scale != -1 ? scale : width < height ? height : width;
+        const double y = window_height - margin;
+        const double x = window_height - margin;
+        const double y_margin = margin/2;
+        const double x_margin = (window_width-window_height)/2 + margin/2;
+        const double x_offset = - (x_min + (x_max - x_min)/2);
+        const double y_offset = - (y_min + (y_max - y_min)/2);
+        std::cout<<"xmaxmin"<<x_max<<","<<x_min<<"wid"<<width<<"hei"<<height<<"xOffset"<<x_offset<<"yOffset"<<y_offset<<"max"<<max<<"x,y"<<x<<y<<std::endl;
         QPointF* draw_point = new QPointF[points.size()];
-        static const int max = scale;
-        static const int margin = 20;
-        int y = height - margin;
-        int x = height - margin;
-        int y_margin = margin/2;
-        int x_margin = (width-height)/2 + margin/2;
         for(int i=0;i<size;i++){
-            draw_point[i].setX(((points.at(i).x())*x/max)+(x/2)+x_margin);
-            draw_point[i].setY(((points.at(i).y())*y/max)+(y/2)+y_margin);
+            draw_point[i].setX(((points.at(i).x() + x_offset)*x/max)+x/2+x_margin);
+            draw_point[i].setY(((points.at(i).y() + y_offset)*y/max)+y/2+y_margin);
         }
         painter.drawPolygon(draw_point,size);
         delete[] draw_point;
