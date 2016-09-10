@@ -9,6 +9,17 @@ procon::ExpandedPolygon::ExpandedPolygon(int id_)
     side_angle.reserve(32);
     polygon.outer().reserve(32);
 }
+procon::ExpandedPolygon::ExpandedPolygon(std::vector<int> multi_ids_)
+    : size(0),id(-1)
+{
+    //this->inners().push_back(polygon::ring_type());
+    side_length.reserve(32);
+    side_angle.reserve(32);
+    polygon.outer().reserve(32);
+
+    std::copy(multi_ids_.begin(),multi_ids_.end(), std::back_inserter(multi_ids));
+    while(0){}
+}
 
 //copy_constructor
 procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
@@ -16,6 +27,7 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->id = p.id;
     this->polygon = p.polygon;
     this->size = p.size;
+    std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
     std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));
@@ -141,6 +153,21 @@ int procon::ExpandedPolygon::getId() const
     return id;
 }
 
+std::vector<int> procon::ExpandedPolygon::getMultiIds() const
+{
+    return multi_ids;
+}
+
+std::string procon::ExpandedPolygon::makeMultiIdString() const
+{
+    std::string id_string = "";
+    for(int i=0; i < multi_ids.size() && (i == 0  || (id_string += "+") != ""); ++i){
+        id_string += std::to_string(multi_ids.at(i));
+    }
+    std::cout<<"string="<<id_string<<std::endl;
+    return id_string;
+}
+
 //setter
 void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 {
@@ -154,6 +181,7 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
 {
     this->id = p.id;
     this->polygon = p.polygon;
+    std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
     std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));

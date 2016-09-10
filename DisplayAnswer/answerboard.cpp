@@ -37,7 +37,7 @@ void AnswerBoard::setField(const procon::Field &field)
 
     //add putid_list
     for(auto piece : this->field->getPieces()){
-        if(piece.getId() != 0 && piece.getId() != 1) putid_list.push_back(piece.getId());
+        if(piece.getId() != -1 && (piece.getId() != 0 && piece.getId() != 1)) putid_list.push_back(piece.getId());
     }
     if(this->field->getPiecesSize() >= 1) putid_left = this->field->getPiece(0).getId();
     if(this->field->getPiecesSize() >= 2) putid_right = this->field->getPiece(1).getId();
@@ -148,15 +148,16 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         int pieces_size = field->getPiecesSize();
         for(int i=0;i<pieces_size;i++){
             int piece_id = field->getPiece(i).getId();
+            bool has_connector = piece_id == -1 ? false : is_set_rawpic ? true : false;
             //get polygon center pos
             point_t center = {0,0};
             boost::geometry::centroid(field->getPiece(i).getPolygon(), center);
             QPointF display_pos = getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT);
-            if(is_set_rawpic) field_pieces_pos.at(piece_id) = display_pos;
+            if(has_connector) field_pieces_pos.at(piece_id) = display_pos;
 
             //draw piece
             painter.setPen(QPen(Qt::black, 3));
-            if(is_set_rawpic) painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
+            if(has_connector) painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
             else painter.setBrush(QBrush(QColor(color_piece)));
             drawPolygon(field->getPiece(i).getPolygon(),Space::LEFT);
             //draw number
@@ -165,7 +166,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
                 QFont font = painter.font();
                 font.setPointSize(std::abs(getScale()/30));
                 painter.setFont(font);
-                painter.drawText(display_pos, QString::number(piece_id));
+                painter.drawText(display_pos, (piece_id != -1) ? QString::number(piece_id) : QString::fromStdString(field->getPiece(i).makeMultiIdString()));
             }
         }
     }

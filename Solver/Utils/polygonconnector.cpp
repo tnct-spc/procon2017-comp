@@ -122,7 +122,7 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
     y = ring1[(complete_matching_end_pos_1 + 1) % size1].y();
     new_pieces.outer().push_back(point_t(x,y));
 
-    procon::ExpandedPolygon new_polygon(0); //TODO:id
+    procon::ExpandedPolygon new_polygon(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
     new_polygon.setPolygon(new_pieces);
 
     return new_polygon;

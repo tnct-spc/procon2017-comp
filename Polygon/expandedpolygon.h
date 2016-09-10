@@ -24,6 +24,7 @@ class ExpandedPolygon
     //メンバ
     int size;
     int id;
+    std::vector<int> multi_ids;
     std::vector<double> side_length;
     std::vector<double> side_angle;
     std::vector<double> side_slope;
@@ -47,6 +48,7 @@ class ExpandedPolygon
 public:
     //constructor
     ExpandedPolygon(int id_ = -1);
+    ExpandedPolygon(std::vector<int> multi_ids_);
     ExpandedPolygon(ExpandedPolygon const& p);
 
     //getter
@@ -56,6 +58,8 @@ public:
     std::vector<double> const& getSideSlope() const;
     polygon_t const& getPolygon() const;
     int getId() const;
+    std::vector<int> getMultiIds() const;
+    std::string makeMultiIdString() const;
 
     //setter
     void setPolygon(polygon_t const & p);
