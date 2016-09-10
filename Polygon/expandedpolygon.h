@@ -27,6 +27,12 @@ class ExpandedPolygon
     std::vector<double> side_length;
     std::vector<double> side_angle;
     std::vector<double> side_slope;
+
+    int inners_size;
+    std::vector<std::vector<double>> inners_side_length;
+    std::vector<std::vector<double>> inners_side_angle;
+    std::vector<std::vector<double>> inners_side_slope;
+
     polygon_t polygon;
 
     double difference_of_default_degree = 0;
@@ -34,15 +40,16 @@ class ExpandedPolygon
     double centerx = 0;
     double centery = 0;
 
+    //flag
+    bool calcSize_flag = false;
 
+protected:
     //calc
     void calcSize();
     void calcSideLength();
     void calcSideAngle();
     void calcSideSlope();
 
-    //flag
-    bool calcSize_flag = false;
 
 public:
     //constructor
