@@ -112,6 +112,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     static const QString color_background = "#d4c91f";
     static const QString color_piece      = "#0f5ca0";
     static const QString color_flame      = "#d0b98d";
+    static const QString color_inner      = "#d4c91f";
     static const QString color_id         = "#ff33cc";
     static const QString color_arrow_left = "#ff0000";
     static const QString color_arrow_right= "#00ff00";
@@ -139,10 +140,8 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         drawPolygon(field->getFlame().getPolygon(),Space::LEFT);
 
         //draw flame inners
-        painter.setBrush(QBrush(QColor(color_background)));
+        painter.setBrush(QBrush(QColor(color_inner)));
         drawPolygonInners(field->getFlame().getPolygon(),Space::LEFT);
-        //一応元に戻しとく
-        painter.setBrush(QBrush(QColor(color_flame)));
 
         //draw pieces
         int pieces_size = field->getPiecesSize();
