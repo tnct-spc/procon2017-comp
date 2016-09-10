@@ -183,6 +183,25 @@ void procon::ExpandedPolygon::updatePolygon(bool calc)
 
 void procon::ExpandedPolygon::inversePolygon()
 {
+    polygon_t translate_polygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-centerx,0);
+    boost::geometry::transform(polygon,translate_polygon,transformgo);
+
+    polygon_t inversedPolygon;
+
+    for(point_t point : translate_polygon.outer()){
+        inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-point.x(),point.y()));
+    }
+
+    polygon_t returnPolygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(centerx,0);
+    boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
+
+    boost::geometry::reverse(returnPolygon);
+    polygon = returnPolygon;
+    this->updatePolygon(true);
 }
 
 void procon::ExpandedPolygon::rotatePolygon(double degree)
