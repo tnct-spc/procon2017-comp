@@ -2,7 +2,7 @@
 
 //-------------------constructor--------------------
 procon::ExpandedPolygon::ExpandedPolygon(int id_)
-    : size(0),id(id_)
+    : size(0),id(id_),inners_size(0)
 {
     //this->inners().push_back(polygon::ring_type());
     side_length.reserve(32);
@@ -27,10 +27,14 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->id = p.id;
     this->polygon = p.polygon;
     this->size = p.size;
+    this->inners_size = p.inners_size;
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
     std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));
+    std::copy(p.inners_side_length.begin(),p.inners_side_length.end(), std::back_inserter(this->inners_side_length));
+    std::copy(p.inners_side_angle.begin(),p.inners_side_angle.end(), std::back_inserter(this->inners_side_angle));
+    std::copy(p.inners_side_slope.begin(),p.inners_side_slope.end(), std::back_inserter(this->inners_side_slope));
     this->polygon.outer().reserve(32);
     this->centerx = p.centerx;
     this->centery = p.centery;
@@ -42,6 +46,7 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
 void procon::ExpandedPolygon::calcSize()
 {
     size = static_cast<int>(polygon.outer().size() - 1);
+    inners_size = static_cast<int>(polygon.inners().size());
     calcSize_flag = true;
 }
 
@@ -49,9 +54,20 @@ void procon::ExpandedPolygon::calcSideLength()
 {
     if(!calcSize_flag) calcSize();
     side_length.clear();
+    inners_side_length.clear();
+
     for(int i=0;i < size;i++){
         const double length = bg::distance(polygon.outer().at(i),polygon.outer().at(i+1));
         side_length.push_back(length);
+    }
+
+    for(auto inner : polygon.inners()){
+        std::vector<double> inner_side_length;
+        for(int i=0;i < static_cast<int>(inner.size() - 1);i++){
+            const double length = bg::distance(inner.at(i),inner.at(i+1));
+            inner_side_length.push_back(length);
+        }
+        inners_side_length.push_back(inner_side_length);
     }
 }
 
@@ -76,48 +92,81 @@ void procon::ExpandedPolygon::calcSideAngle()
         return (intersect_num % 2 == 0) ? true : false;
     };
 
-    if(!calcSize_flag) calcSize();
-    side_angle.clear();
-    try {
-        for (int i = -1;i < size - 1;i++){
-            double x1,y1;
-            point_t p1;
-            if (i == -1){
-                x1 = polygon.outer().at(size - 1).x(), y1 = polygon.outer().at(size - 1).y();
-                p1 = polygon.outer().at(size - 1);
-            } else {
-                x1 = polygon.outer().at(i).x(), y1 = polygon.outer().at(i).y();
-                p1 = polygon.outer().at(i);
-            }
-            const double x2 = polygon.outer().at(i+1).x(), y2 = polygon.outer().at(i+1).y();
-            const double x3 = polygon.outer().at(i+2).x(), y3 = polygon.outer().at(i+2).y();
-            const point_t p2 = polygon.outer().at(i+1);
-            const point_t p3 = polygon.outer().at(i+2);
-            const double numer = (x2 - x1) * (x2 - x3) + (y2 - y1) * (y2 - y3);
-            const double denom1 = std::sqrt(std::pow(x2 - x3,2) + std::pow(y2 - y3,2));
-            const double denom2 = std::sqrt(std::pow(x2 - x1,2) + std::pow(y2 - y1,2));
+    auto calcAngle = [&](point_t p1,point_t p2,point_t p3)->double{
+        double angle = 0;
+        try {
+            const double numer = (p2.x() - p1.x()) * (p2.x() - p3.x()) + (p2.y() - p1.y()) * (p2.y() - p3.y());
+            const double denom1 = std::sqrt(std::pow(p2.x() - p3.x(),2) + std::pow(p2.y() - p3.y(),2));
+            const double denom2 = std::sqrt(std::pow(p2.x() - p1.x(),2) + std::pow(p2.y() - p1.y(),2));
             if (denom1 == 0 || denom2 == 0) {
                 throw std::runtime_error("division by zero");
             }
-            double angle = std::acos(numer / (denom1 * denom2));
+
+            angle = std::acos(numer / (denom1 * denom2));
 
             if (isMinorAngle(p1,p2,p3)) {
                 angle = (3.141592 * 2) - angle;
             }
-            side_angle.push_back(angle);
-        }
-    } catch (std::exception &e) {
+
+        } catch (std::exception &e) {
            std::cerr << e.what() << std::endl;
+        }
+        return angle;
+    };
+
+    if(!calcSize_flag) calcSize();
+    side_angle.clear();
+    inners_side_angle.clear();
+
+    for (int i = -1;i < size - 1;i++){
+        point_t p1;
+        if (i == -1){
+            p1 = polygon.outer().at(size - 1);
+        } else {
+            p1 = polygon.outer().at(i);
+        }
+        const point_t p2 = polygon.outer().at(i+1);
+        const point_t p3 = polygon.outer().at(i+2);
+        side_angle.push_back(calcAngle(p1,p2,p3));
     }
+
+    for (auto inner : polygon.inners()) {
+        std::vector<double> inner_side_angle;
+        for (int i = -1;i < static_cast<int>(inner.size() - 2);i++){
+            point_t p1;
+            if (i == -1){
+                p1 = inner.at(size - 1);
+            } else {
+                p1 = inner.at(i);
+            }
+            const point_t p2 = inner.at(i+1);
+            const point_t p3 = inner.at(i+2);
+            inner_side_angle.push_back(calcAngle(p1,p2,p3));
+        }
+        inners_side_angle.push_back(inner_side_angle);
+    }
+
 }
 
 void procon::ExpandedPolygon::calcSideSlope() {
     calcSize();
     side_slope.clear();
+    inners_side_slope.clear();
+
     for (int i = 0;i < size;i++) {
         const double x = polygon.outer().at(i).x() - polygon.outer().at(i + 1).x();
         const double y = std::abs(polygon.outer().at(i).y() - polygon.outer().at(i + 1).y());
         side_slope.push_back(std::atan2(y,x));
+    }
+
+    for (auto inner : polygon.inners()){
+        std::vector<double> inner_side_slope;
+        for (int i = 0;i < static_cast<int>(inner.size() - 1);i++) {
+            const double x = inner.at(i).x() - inner.at(i + 1).x();
+            const double y = std::abs(inner.at(i).y() - inner.at(i + 1).y());
+            inner_side_slope.push_back(std::atan2(y,x));
+        }
+        inners_side_slope.push_back(inner_side_slope);
     }
 }
 
@@ -167,6 +216,21 @@ std::string procon::ExpandedPolygon::makeMultiIdString() const
     return id_string;
 }
 
+std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideLength() const
+{
+    return inners_side_length;
+}
+
+std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideAngle() const
+{
+    return inners_side_angle;
+}
+
+std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideSlope() const
+{
+    return inners_side_slope;
+}
+
 //setter
 void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 {
@@ -180,13 +244,16 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
 {
     this->id = p.id;
     this->polygon = p.polygon;
+    this->size = p.size;
+    this->inners_size = p.inners_size;
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
     std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));
-    this->polygon.outer().reserve(32);
-    this->size = p.size;
-    this->centerx = p.centerx;
+    std::copy(p.inners_side_length.begin(),p.inners_side_length.end(), std::back_inserter(this->inners_side_length));
+    std::copy(p.inners_side_angle.begin(),p.inners_side_angle.end(), std::back_inserter(this->inners_side_angle));
+    std::copy(p.inners_side_slope.begin(),p.inners_side_slope.end(), std::back_inserter(this->inners_side_slope));
+    this->polygon.outer().reserve(32);    this->centerx = p.centerx;
     this->centery = p.centery;
     this->difference_of_default_degree = p.difference_of_default_degree;
 
@@ -210,6 +277,25 @@ void procon::ExpandedPolygon::updatePolygon(bool calc)
 
 void procon::ExpandedPolygon::inversePolygon()
 {
+    polygon_t translate_polygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-centerx,0);
+    boost::geometry::transform(polygon,translate_polygon,transformgo);
+
+    polygon_t inversedPolygon;
+
+    for(point_t point : translate_polygon.outer()){
+        inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-point.x(),point.y()));
+    }
+
+    polygon_t returnPolygon;
+
+    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(centerx,0);
+    boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
+
+    boost::geometry::reverse(returnPolygon);
+    polygon = returnPolygon;
+    this->updatePolygon(true);
 }
 
 void procon::ExpandedPolygon::rotatePolygon(double degree)
@@ -244,7 +330,7 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
     polygon_t translatedPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(x,y);
     boost::geometry::transform(polygon,translatedPolygon,backTranslate);
-    
+
 
     centerx = centerx + x;
     centery = centery + y;
@@ -289,14 +375,14 @@ void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
 {
     double dx = x - centerx;
     double dy = y - centery;
-    
+
     polygon_t translatedPolygon;
 
     boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(dx,dy);
     boost::geometry::transform(polygon,translatedPolygon,translate);
-    
+
     centerx = x;
     centery = y;
-    
+
     polygon = translatedPolygon;
 }

@@ -14,6 +14,7 @@ procon::Field SimpleAlgorithm::run(procon::Field field)
                 elementary_piece.setPolygonPosition(x,y);
                 for(int degree = 0; degree < 360; degree = degree + 10){
                     elementary_piece.setPolygonAngle(degree);
+                    elementary_piece.inversePolygon();
                     if(field.isPuttable(elementary_piece)){
                         field.setPiece(elementary_piece);
                         goto next_roop;
