@@ -177,6 +177,11 @@ int procon::ExpandedPolygon::getSize() const
     return size;
 }
 
+int procon::ExpandedPolygon::getInnerSize() const
+{
+    return inners_size;
+}
+
 std::vector<double> const& procon::ExpandedPolygon::getSideLength() const
 {
     return side_length;

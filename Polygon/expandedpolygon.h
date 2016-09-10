@@ -60,6 +60,7 @@ public:
 
     //getter
     int getSize() const;
+    int getInnerSize() const;
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
     std::vector<double> const& getSideSlope() const;

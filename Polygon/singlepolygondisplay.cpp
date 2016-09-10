@@ -33,13 +33,16 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 3));
 
-    auto drawPolygon = [&](std::vector<QPointF> points){
+    auto drawPolygon = [&](std::vector<QPointF> points, bool set_base){
         static const double margin = 10;
         const int size = points.size();
-        const double x_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
-        const double y_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
-        const double x_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
-        const double y_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
+        static double x_max,y_max,x_min,y_min;
+        if(set_base){
+            x_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
+            y_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
+            x_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
+            y_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
+        }
         const double width  = x_max - x_min;
         const double height = y_max - y_min;
         const double max = scale != -1 ? scale : width < height ? height : width;
@@ -59,12 +62,22 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
     };
 
     //draw piece
-    int piece_size = polygon.getPolygon().outer().size()-1;
+    int piece_size = polygon.getSize();
     std::vector<QPointF> points;
     for(int i=0;i<piece_size;i++){
         points.push_back(QPointF(polygon.getPolygon().outer()[i].x(),polygon.getPolygon().outer()[i].y()));
     }
     painter.setBrush(QBrush(QColor("#0f5ca0")));
-    drawPolygon(points);
-
+    drawPolygon(points, 1);
+    int inner_size = polygon.getInnerSize();
+    for(int i=0;i<inner_size;i++){
+        auto inner = polygon.getPolygon().inners().at(i);
+        int piece_size = inner.size()-1;
+        std::vector<QPointF> points;
+        for(int i=0;i<piece_size;i++){
+            points.push_back(QPointF(inner[i].x(),inner[i].y()));
+        }
+        painter.setBrush(QBrush(QColor("#f4c342")));
+        drawPolygon(points,0);
+    }
 }
