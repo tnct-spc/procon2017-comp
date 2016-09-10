@@ -195,13 +195,13 @@ void procon::ExpandedPolygon::inversePolygon()
     }
 
     polygon_t returnPolygon;
-	
+
     boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(centerx,0);
     boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
 
     boost::geometry::reverse(returnPolygon);
-    auto ishowta = bg::area(returnPolygon);
     polygon = returnPolygon;
+    this->updatePolygon(true);
 }
 
 void procon::ExpandedPolygon::rotatePolygon(double degree)
