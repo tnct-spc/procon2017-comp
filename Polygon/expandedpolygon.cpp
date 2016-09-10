@@ -164,7 +164,6 @@ std::string procon::ExpandedPolygon::makeMultiIdString() const
     for(int i=0; i < multi_ids.size() && (i == 0  || (id_string += "+") != ""); ++i){
         id_string += std::to_string(multi_ids.at(i));
     }
-    std::cout<<"string="<<id_string<<std::endl;
     return id_string;
 }
 

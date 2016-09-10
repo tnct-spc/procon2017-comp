@@ -85,14 +85,11 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
     int Type = 1;
 
     double x,y;
-    std::cout<<"roops"<<std::endl;
     do{
         if (Type == 1) {
             x = ring1[count%size1].x();
             y = ring1[count%size1].y();
-            std::cout<<"b="<<count % size1<<" pos="<<complete_matching_start_pos_1<<std::endl;
             if (count % size1 == complete_matching_start_pos_1){
-                std::cout<<"change!"<<std::endl;
                 Type = 2;
                 if (fit1.start_dot_or_line == Fit::Dot) { //dot_or_lineはどちらのポリゴンでも同じですね…仕様が変だ
                     count = complete_matching_start_pos_2 + 1;
@@ -106,7 +103,6 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
         if (Type == 2) {
             x = ring2[count%size2].x();
             y = ring2[count%size2].y();
-            std::cout<<"c="<<count % size2<<" pos="<<complete_matching_end_pos_2<<(fit2.end_dot_or_line == Fit::Dot ? (complete_matching_end_pos_2 - 1) % size2 : complete_matching_end_pos_2)<<std::endl;
             if (count % size2 == (fit2.end_dot_or_line == Fit::Dot ? (((complete_matching_end_pos_2 - 1) % size2 + size2) % size2) : complete_matching_end_pos_2)) {
                 Type = -1;
             }else{
@@ -115,7 +111,6 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
         }
         new_pieces.outer().push_back(point_t(x,y));
     } while (Type != -1);
-    std::cout<<"roope"<<std::endl;
 
     //開始点を足してから返す。
     x = ring1[(complete_matching_end_pos_1 + 1) % size1].x();

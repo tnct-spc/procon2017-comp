@@ -49,7 +49,6 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
         const double x_margin = (window_width-window_height)/2 + margin/2;
         const double x_offset = - (x_min + (x_max - x_min)/2);
         const double y_offset = - (y_min + (y_max - y_min)/2);
-        std::cout<<"xmaxmin"<<x_max<<","<<x_min<<"wid"<<width<<"hei"<<height<<"xOffset"<<x_offset<<"yOffset"<<y_offset<<"max"<<max<<"x,y"<<x<<y<<std::endl;
         QPointF* draw_point = new QPointF[points.size()];
         for(int i=0;i<size;i++){
             draw_point[i].setX(((points.at(i).x() + x_offset)*x/max)+x/2+x_margin);
