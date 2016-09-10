@@ -61,6 +61,9 @@ public:
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
     std::vector<double> const& getSideSlope() const;
+    std::vector<std::vector<double>> const& getInnersSideLength() const;
+    std::vector<std::vector<double>> const& getInnersSideAngle() const;
+    std::vector<std::vector<double>> const& getInnersSideSlope() const;
     polygon_t const& getPolygon() const;
     int getId() const;
 

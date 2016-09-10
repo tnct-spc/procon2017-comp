@@ -190,6 +190,20 @@ int procon::ExpandedPolygon::getId() const
     return id;
 }
 
+std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideLength() const
+{
+    return inners_side_length;
+}
+
+std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideAngle() const
+{
+    return inners_side_angle;
+}
+
+std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideSlope() const
+{
+    return inners_side_slope;
+}
 //setter
 void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 {
@@ -288,7 +302,7 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
     polygon_t translatedPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(x,y);
     boost::geometry::transform(polygon,translatedPolygon,backTranslate);
-    
+
 
     centerx = centerx + x;
     centery = centery + y;
@@ -333,14 +347,14 @@ void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
 {
     double dx = x - centerx;
     double dy = y - centery;
-    
+
     polygon_t translatedPolygon;
 
     boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(dx,dy);
     boost::geometry::transform(polygon,translatedPolygon,translate);
-    
+
     centerx = x;
     centery = y;
-    
+
     polygon = translatedPolygon;
 }
