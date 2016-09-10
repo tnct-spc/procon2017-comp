@@ -549,6 +549,7 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
             translateY = minY;
         }else{
             //中心が(0,0)になるように移動
+            /*
             double sumX=0.0,sumY=0.0;
             for(auto point : polygon.outer()){
                 sumX += point.x();
@@ -556,6 +557,10 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
             }
             translateX = sumX / polygon.outer().size();
             translateY = sumY / polygon.outer().size();
+            */
+            const point_t center = bg::return_centroid<point_t>(polygon);
+            translateX = center.x();
+            translateY = center.y();
         }
         polygon_t translated_polygon;
         bg::strategy::transform::translate_transformer<double,2,2> translate(-translateX,-translateY);

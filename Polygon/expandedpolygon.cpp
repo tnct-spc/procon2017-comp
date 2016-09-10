@@ -194,12 +194,8 @@ void procon::ExpandedPolygon::inversePolygon()
         inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-point.x(),point.y()));
     }
 
-    //bg::strategy::transform::ublas_transformer<double,2,2> hoge;
-    //boost::geometry::strategy::transform::inverse_transformer<double,2,2> inverse(hoge);
-    //boost::geometry::transform(translate_polygon,inversedPolygon,inverse);
-
     polygon_t returnPolygon;
-
+	
     boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(centerx,0);
     boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
 
