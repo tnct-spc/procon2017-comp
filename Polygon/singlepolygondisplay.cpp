@@ -4,24 +4,26 @@
 #include <QPainter>
 #include <QPen>
 
-SinglePolygonDisplay::SinglePolygonDisplay(QWidget *parent) :
+SinglePolygonDisplay::SinglePolygonDisplay(QWidget *parent = 0) :
     QWidget(parent),
     ui(new Ui::SinglePolygonDisplay)
 {
     ui->setupUi(this);
 }
 
+std::unique_ptr<SinglePolygonDisplay> SinglePolygonDisplay::create(procon::ExpandedPolygon& polygon, int scale, std::string wname_)
+{
+    std::unique_ptr<SinglePolygonDisplay> instance(new SinglePolygonDisplay());
+    instance->polygon = polygon;
+    instance->scale = scale;
+    QString wname = QString::fromStdString(wname_);
+    instance->setWindowTitle(wname);
+    return std::move(instance);
+}
+
 SinglePolygonDisplay::~SinglePolygonDisplay()
 {
     delete ui;
-}
-
-void SinglePolygonDisplay::setPolygon(procon::ExpandedPolygon &polygon, int scale, std::string wname_)
-{
-    this->polygon = polygon;
-    this->scale = scale;
-    QString wname = QString::fromStdString(wname_);
-    this->setWindowTitle(wname);
 }
 
 void SinglePolygonDisplay::paintEvent(QPaintEvent *)
