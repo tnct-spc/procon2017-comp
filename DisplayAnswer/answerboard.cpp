@@ -163,7 +163,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             if(is_set_rawpic){
                 painter.setPen(QPen(QColor(color_id)));
                 QFont font = painter.font();
-                font.setPointSize(std::abs(getScale()/15));
+                font.setPointSize(std::abs(getScale()/30));
                 painter.setFont(font);
                 painter.drawText(display_pos, QString::number(piece_id));
             }
@@ -183,7 +183,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
 
             painter.setPen(QPen(QColor(color_id)));
             QFont font = painter.font();
-            font.setPointSize(std::abs(getScale()/15));
+            font.setPointSize(std::abs(getScale()/30));
             painter.setFont(font);
             painter.drawText(display_pos, QString::number(count));
             count++;
