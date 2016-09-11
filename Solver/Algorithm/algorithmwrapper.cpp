@@ -45,7 +45,7 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
                 fits.at(0).start_id=start_polygon1;
                 fits.at(1).start_dot_or_line = dot_or_line;
                 fits.at(1).start_id=start_polygon2;
-                if (Eva >= 2){
+                if (Eva >= 1){
                     result.push_back(fits);
                     if (Eva > maxEva){
                         maxEva = Eva;
