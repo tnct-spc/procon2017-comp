@@ -24,24 +24,25 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
         comped_first = polygon1.getSideAngle()[i];
         for (int j = 0; j < polygon2.getSize(); ++j) {
             comping_first = polygon2.getSideAngle()[j];
-            if (procon::nearlyEqual(comped_first,comping_first,angle_error)) {
+            //if (procon::nearlyEqual(comped_first,comping_first,angle_error)) {
+            if((M_PI * 2) - angle_error * 2 < (comping_first + comped_first) && (comping_first + comped_first) < (M_PI * 2) + angle_error * 2){
                 Eva++;
 
                 int start_polygon1 = i;
                 int start_polygon2 = j;
-                AlgorithmWrapper::findEnd(polygon2, polygon1, start_polygon2, start_polygon1,length_error, angle_error, Eva);
-                fits.at(0).start_dot_or_line = Fit::Line;
+                Fit::DotORLine dot_or_line = AlgorithmWrapper::findEnd(polygon2, polygon1, start_polygon2, start_polygon1,length_error, angle_error, Eva);
+                fits.at(0).start_dot_or_line = dot_or_line;
                 fits.at(0).start_id=start_polygon1;
-                fits.at(1).start_dot_or_line = Fit::Line;
+                fits.at(1).start_dot_or_line = dot_or_line;
                 fits.at(1).start_id=start_polygon2;
 
 
                 start_polygon1 = i;
                 start_polygon2 = j;
-                AlgorithmWrapper::findEnd(polygon1, polygon2, start_polygon1, start_polygon2,length_error, angle_error, Eva);
-                fits.at(0).end_dot_or_line = Fit::Line;
+                dot_or_line = AlgorithmWrapper::findEnd(polygon1, polygon2, start_polygon1, start_polygon2,length_error, angle_error, Eva);
+                fits.at(0).end_dot_or_line = dot_or_line;
                 fits.at(0).end_id=start_polygon1;
-                fits.at(1).end_dot_or_line = Fit::Line;//Now, It has no meaning (For aborting more bug.)
+                fits.at(1).end_dot_or_line = dot_or_line;
                 fits.at(1).end_id=start_polygon2;
                 if (Eva < 2){
                     Eva = 0;
@@ -59,7 +60,7 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
     return maxEva;
 }
 
-void AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2,int &comp1,int &comp2, double length_error, double angle_error, int &Eva)
+Fit::DotORLine AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2,int &comp1,int &comp2, double length_error, double angle_error, int &Eva)
 {
     double comped;
     double comping;
@@ -77,7 +78,8 @@ void AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, procon::Expande
                 comp1=-1;
             }
             comp1++;
-            return;
+            //return
+            return Fit::Dot;
 
         }
 
@@ -94,7 +96,8 @@ void AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, procon::Expande
                 comp2=polygon2.getSize();
             }
             comp2--;
-            return;
+            //return
+            return Fit::Line;
         }
     }
 }
