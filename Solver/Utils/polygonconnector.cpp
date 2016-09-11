@@ -119,7 +119,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
 
     // check
     bool conf=false;
-    if(hasConflict(ring1, ring2, fit1, fit2)) conf=true;
+    //TODO:未完成 if(hasConflict(ring1, ring2, fit1, fit2)) conf=true;
 
     debugRing(ring1,__LINE__);
     debugRing(ring2,__LINE__);
