@@ -7,6 +7,8 @@
 #include <cmath>
 #include <iostream>
 
+#define debugprint(S); std::cout<<"["<<__FILE__<<"]"<<"["<<std::to_string(__LINE__)<<"] "<<S<<std::endl;
+
 class UTILITIESSHARED_EXPORT Utilities
 {
 

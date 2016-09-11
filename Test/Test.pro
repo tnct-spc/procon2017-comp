@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
     testdisplayanswer.cpp \
     testjoinpolygon.cpp \
-    testerwraper.cpp
+    testerwraper.cpp \
+    testsearchsamelength.cpp
 
 HEADERS += testdisplayanswer.h\
     testjoinpolygon.h \
-    testerwraper.h
+    testerwraper.h \
+    testsearchsamelength.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon

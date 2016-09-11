@@ -1,5 +1,9 @@
 #include "testjoinpolygon.h"
 
+#include "field.h"
+#include "polygonviewer.h"
+#include "Utils/polygonconnector.h"
+
 TestJoinPolygon::TestJoinPolygon()
 {
 
@@ -48,7 +52,11 @@ bool TestJoinPolygon::run()
             join_data.at(1) = fit2;
         }
 
-        result = PolygonConnector::joinPolygon(polygon1, polygon2, join_data);
+        bool conf = PolygonConnector::joinPolygon(polygon1, polygon2, result, join_data);
+        if(conf==false){
+            debugprint("return false");
+            return false;
+        }
 
         PolygonViewer::getInstance().pushPolygon(polygon1, TO_STRING(polygon1),50);
         PolygonViewer::getInstance().pushPolygon(polygon2, TO_STRING(polygon2),50);
@@ -98,7 +106,11 @@ bool TestJoinPolygon::run()
             join_data.at(1) = fit2;
         }
 
-        result = PolygonConnector::joinPolygon(polygon1, polygon2, join_data);
+        bool conf = PolygonConnector::joinPolygon(polygon1, polygon2, result, join_data);
+        if(conf==false){
+            debugprint("return false");
+            return false;
+        }
 
         PolygonViewer::getInstance().pushPolygon(polygon1, TO_STRING(polygon1),50);
         PolygonViewer::getInstance().pushPolygon(polygon2, TO_STRING(polygon2),50);
@@ -161,7 +173,11 @@ bool TestJoinPolygon::run()
             join_data.at(1) = fit2;
         }
 
-        result = PolygonConnector::joinPolygon(polygon1, polygon2, join_data);
+        bool conf = PolygonConnector::joinPolygon(polygon1, polygon2, result, join_data);
+        if(conf==false){
+            debugprint("return false");
+            return false;
+        }
 
         PolygonViewer::getInstance().pushPolygon(polygon1, TO_STRING(polygon1));
         PolygonViewer::getInstance().pushPolygon(polygon2, TO_STRING(polygon2));

@@ -4,22 +4,25 @@
 
 #include "testdisplayanswer.h"
 #include "testjoinpolygon.h"
+#include "testsearchsamelength.h"
 
 int Test()
 {
     int ERROR_CNT = 0;
 
-    TestDisplayAnswer test_displayanswer;
-    TestJoinPolygon test_joinpolygon;
+    std::vector<TesterWraper*> TESTER;
+    TESTER.push_back(new TesterWraper);
+    TESTER.push_back(new TestDisplayAnswer);
+    TESTER.push_back(new TestJoinPolygon);
+    TESTER.push_back(new testSearchSameLength);
 
-    if(!test_displayanswer.run()){
-        std::cout<<"*****Polygon error*****"<<std::endl;
-        ERROR_CNT++;
+    for(auto tester : TESTER){
+        if(!tester->run()){
+            std::cout<<"エラーや"<<std::endl;
+            ERROR_CNT++;
+        }
     }
-    if(!test_joinpolygon.run()){
-        std::cout<<"ro"<<std::endl;
-        ERROR_CNT++;
-    }
+
     return ERROR_CNT;
 }
 

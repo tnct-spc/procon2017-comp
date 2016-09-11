@@ -37,32 +37,13 @@
 #include <unistd.h>
 #include <vector>
 
-#include "Algorithm/algorithmwrapper.h"
-#include "Algorithm/hillclibming.h"
-#include "Algorithm/pooralgorithm.h"
-#include "Algorithm/simplealgorithm.h"
-#include "Utils/fit.h"
-#include "Utils/polygonconnector.h"
-#include "answerboard.h"
-#include "expandedpolygon.h"
-#include "field.h"
-#include "imagerecognition.h"
-#include "imagerecognition_global.h"
-#include "polygon.h"
-#include "polygonio.h"
-#include "polygonviewer.h"
-#include "singlepolygondisplay.h"
-#include "solver.h"
-#include "utilities.h"
+#define print(S) std::cout<<"["<<__FILE__<<"]"<<"["<<std::to_string(__LINE__)<<"] "<<S<<std::endl;
 
 class TesterWraper
 {
 public:
     TesterWraper();
-    bool run(){return false;}
-    void print(std::string filename, int line, std::string string = "ok"){
-        std::cout<<"["<<filename<<"]"<<"["<<std::to_string(line)<<"] "<<string<<std::endl;
-    }
+    virtual bool run(){print("マクロあるで");return true;}
 };
 
 #endif // TESTERWRAPER_H

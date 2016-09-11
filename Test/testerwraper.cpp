@@ -2,5 +2,4 @@
 
 TesterWraper::TesterWraper()
 {
-
 }

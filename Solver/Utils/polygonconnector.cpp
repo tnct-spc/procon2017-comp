@@ -50,7 +50,7 @@ void PolygonConnector::pushRingToPolygon(Ring& ring, procon::ExpandedPolygon& po
     polygon.setPolygon(new_raw_polygon);
 }
 
-procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::ExpandedPolygon Polygon2, std::array<Fit,2> join_data)
+bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::ExpandedPolygon Polygon2, procon::ExpandedPolygon& new_polygon, std::array<Fit,2> join_data)
 {
     Fit fit1 = join_data[0];
     Fit fit2 = join_data[1];
@@ -61,9 +61,6 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
     int size1 = ring1.size();
     int size2 = ring2.size();
 
-    auto increment = [](int num, int size){return (num + 1) % size;};
-    auto decrement = [](int num, int size){return ((num - 1) % size + size) % size;};
-
     auto debugRing = [](Ring ring, int line){
         std::cout<<std::to_string(line)<<" : ";
         for (int i=0; i<ring.size(); i++) {
@@ -73,6 +70,9 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
         }
         std::cout<<std::endl;
     };
+
+    debugRing(ring1,__LINE__);
+    debugRing(ring2,__LINE__);
 
     //結合後完全に一致する、始点及び終点
     const int complete_matching_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? fit1.start_id : fit1.start_id                  ;
@@ -101,6 +101,10 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
     }
     ring2 = turned_ring;
 
+
+    debugRing(ring1,__LINE__);
+    debugRing(ring2,__LINE__);
+
     // 結合後完全に一致する点からポリゴンのx,y移動を調べ、Polygon2を平行移動
     const int Join_point1 = (complete_matching_start_pos_1 + 1) % size1;
     const int Join_point2 = ((complete_matching_start_pos_2 - 1) % size2 + size2) % size2;
@@ -112,6 +116,13 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
         translated_ring.push_back(point_t(point.x() + move_x, point.y() + move_y));
     }
     ring2 = translated_ring;
+
+    // check
+    bool conf=false;
+    if(hasConflict(ring1, ring2, fit1, fit2)) conf=true;
+
+    debugRing(ring1,__LINE__);
+    debugRing(ring2,__LINE__);
 
     // 新しいRingに結合後の外周の角を入れる。
     // もし、結合端の辺の長さが等しくならない時はRing1,Ring2ともに端の角を入力。
@@ -148,23 +159,64 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
         new_ring.push_back(point_t(x,y));
     } while (Type != -1);
 
+    debugRing(new_ring,__LINE__);
+
     //Push
     if(Polygon1.getInnerSize() != 0){
         pushRingToPolygon(new_ring, Polygon1, fit1.flame_inner_pos);
         Polygon1.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
 
-        return Polygon1;
+        new_polygon = std::move(Polygon1);
 
     }else if(Polygon2.getInnerSize() != 0){
         pushRingToPolygon(new_ring, Polygon2, fit2.flame_inner_pos);
         Polygon2.setMultiIds(std::vector<int>{Polygon2.getId(), Polygon1.getId()});
 
-        return Polygon2;
+        new_polygon = std::move(Polygon2);
 
     }else{
-        procon::ExpandedPolygon new_polygon(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
+        new_polygon.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
         pushRingToPolygon(new_ring, new_polygon);
-
-        return new_polygon;
     }
+    if(conf) return false;
+    return true;
+}
+
+bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
+{
+    int size1 = ring1.size();
+    int size2 = ring2.size();
+    //safe line
+    int safe_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? decrement(fit1.start_id, size1) : fit1.start_id                  ;
+    int safe_end_pos_1   = fit1.end_dot_or_line   == Fit::Dot ? increment(fit1.end_id, size1)   : increment(fit1.end_id, size1)  ;
+    int safe_start_pos_2 = fit2.start_dot_or_line == Fit::Dot ? increment(fit2.start_id, size2) : increment(fit2.start_id, size2);
+    int safe_end_pos_2   = fit2.end_dot_or_line   == Fit::Dot ? decrement(fit2.end_id, size2)   : fit2.end_id                    ;
+    safe_end_pos_1 = increment(safe_end_pos_1, size1);
+    safe_end_pos_2 = decrement(safe_end_pos_2, size2);
+
+    bool ring1_safe_zone = true;
+    bool ring1_yellow_zone = false;
+    for(int i=0;i<size1;++i){
+        if(ring1_yellow_zone){
+            ring1_yellow_zone = false;
+        }
+        if((safe_start_pos_1+i) >= size1-1){
+            ring1_yellow_zone = true;
+        }
+        if(i!=0 && (safe_start_pos_1+i)%size1 == safe_end_pos_1){
+            ring1_safe_zone = false;
+        }
+        bg::model::segment<point_t> line1(ring1[(safe_start_pos_1+i)%size1],ring1[(safe_start_pos_1+i+1)%size1]);
+        for(int j=0;j<size2;++j){
+            //jump ring2's safe zone
+            if(j==0 && ring1_safe_zone) j = safe_start_pos_2 - ( (safe_start_pos_2 >= safe_end_pos_2) ? safe_end_pos_2 : (safe_end_pos_2-size2) );
+            if((safe_end_pos_2+j) >= size2-1 && ring1_safe_zone) break;
+            if(j==0 && ring1_yellow_zone) j =                  safe_start_pos_2 - ( (safe_start_pos_2 >= safe_end_pos_2) ? safe_end_pos_2 : (safe_end_pos_2-size2) );
+            bg::model::segment<point_t> line2(ring2[(safe_end_pos_2+j)%size2],ring2[(safe_end_pos_2+j+1)%size2]);
+            if(static_cast<bool>(bg::intersects(line1, line2))){
+                return true;
+            }
+        }
+    }
+    return false;
 }

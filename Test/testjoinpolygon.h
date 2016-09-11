@@ -2,7 +2,7 @@
 #define TESTJOINPOLYGON_H
 #include "testerwraper.h"
 
-class TestJoinPolygon : TesterWraper
+class TestJoinPolygon : public TesterWraper
 {
 public:
     TestJoinPolygon();
