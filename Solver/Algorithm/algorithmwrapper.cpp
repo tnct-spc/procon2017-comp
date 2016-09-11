@@ -31,22 +31,20 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
                 int start_polygon1 = i;
                 int start_polygon2 = j;
                 Fit::DotORLine dot_or_line = AlgorithmWrapper::findEnd(polygon2, polygon1, start_polygon2, start_polygon1,length_error, angle_error, Eva);
-                fits.at(0).start_dot_or_line = dot_or_line;
-                fits.at(0).start_id=start_polygon1;
-                fits.at(1).start_dot_or_line = dot_or_line;
-                fits.at(1).start_id=start_polygon2;
+                fits.at(0).end_dot_or_line = dot_or_line;
+                fits.at(0).end_id=start_polygon1;
+                fits.at(1).end_dot_or_line = dot_or_line;
+                fits.at(1).end_id=start_polygon2;
 
 
                 start_polygon1 = i;
                 start_polygon2 = j;
                 dot_or_line = AlgorithmWrapper::findEnd(polygon1, polygon2, start_polygon1, start_polygon2,length_error, angle_error, Eva);
-                fits.at(0).end_dot_or_line = dot_or_line;
-                fits.at(0).end_id=start_polygon1;
-                fits.at(1).end_dot_or_line = dot_or_line;
-                fits.at(1).end_id=start_polygon2;
-                if (Eva < 2){
-                    Eva = 0;
-                } else {
+                fits.at(0).start_dot_or_line = dot_or_line;
+                fits.at(0).start_id=start_polygon1;
+                fits.at(1).start_dot_or_line = dot_or_line;
+                fits.at(1).start_id=start_polygon2;
+                if (Eva >= 2){
                     result.push_back(fits);
                 }
 
