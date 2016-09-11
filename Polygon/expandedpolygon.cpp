@@ -73,11 +73,12 @@ void procon::ExpandedPolygon::calcSideLength()
 
 void procon::ExpandedPolygon::calcSideAngle()
 {
-    auto isMinorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
+    auto isMaijorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
         point_t p4((p1.x() + p3.x()) / 2 , (p1.y() + p3.y()) / 2);
-        const double alpha = 4000;
+        const double alpha = 4000.667824083865;
+        const double beta  = 0.710983144633;
         const double end_x = (p4.x() - p2.x()) > 0 ? alpha : -alpha;
-        const double end_y = (p4.y() - p2.y()) / (p4.x() - p2.x()) * (end_x - p2.x()) + p2.y();
+        const double end_y = (p4.y() - p2.y()) / (p4.x() - p2.x()) * (end_x - p2.x()) + p2.y() + beta;
         point_t end_point(end_x,end_y);
         bg::model::segment<point_t> judge_segment(p2,end_point);
         int intersect_num = 0;
@@ -104,7 +105,7 @@ void procon::ExpandedPolygon::calcSideAngle()
 
             angle = std::acos(numer / (denom1 * denom2));
 
-            if (isMinorAngle(p1,p2,p3)) {
+            if (isMaijorAngle(p1,p2,p3)) {
                 angle = (3.141592 * 2) - angle;
             }
 
