@@ -73,6 +73,7 @@ public:
     std::string makeMultiIdString() const;
 
     //setter
+    void setMultiIds(std::vector<int> multi_ids_);
     void setPolygon(polygon_t const & p);
 
     //operator

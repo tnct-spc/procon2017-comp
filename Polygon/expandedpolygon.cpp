@@ -237,6 +237,11 @@ std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideSl
 }
 
 //setter
+void procon::ExpandedPolygon::setMultiIds(std::vector<int> multi_ids_)
+{
+    multi_ids = multi_ids_;
+}
+
 void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 {
     polygon = p;

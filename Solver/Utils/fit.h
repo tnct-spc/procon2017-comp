@@ -10,6 +10,7 @@ public:
     int start_id = -1;
     DotORLine end_dot_or_line = Dot;
     int end_id = -1;
+    int flame_inner_pos = -1;
     Fit();
 };
 
