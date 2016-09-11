@@ -2,6 +2,7 @@
 #define ALGORITHMWRAPPER_H
 
 #include "field.h"
+#include "utilities.h"
 #include "Utils/polygonconnector.h"
 #include "Utils/fit.h"
 #include "polygonviewer.h"

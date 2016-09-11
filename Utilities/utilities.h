@@ -1,8 +1,11 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
+#define TO_STRING(VariableName) # VariableName
+
 #include "utilities_global.h"
 #include <cmath>
+#include <iostream>
 
 class UTILITIESSHARED_EXPORT Utilities
 {
