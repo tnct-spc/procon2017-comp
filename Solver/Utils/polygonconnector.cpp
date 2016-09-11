@@ -75,10 +75,10 @@ procon::ExpandedPolygon PolygonConnector::joinPolygon(procon::ExpandedPolygon Po
     };
 
     //結合後完全に一致する、始点及び終点
-    const int complete_matching_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? fit1.start_id : fit1.start_id                ;
-    const int complete_matching_end_pos_1   = fit1.end_dot_or_line   == Fit::Dot ? fit1.end_id   : increment(fit1.end_id, size1);
-    const int complete_matching_start_pos_2 = fit2.start_dot_or_line == Fit::Dot ? fit2.start_id : increment(fit1.end_id, size1);
-    const int complete_matching_end_pos_2   = fit2.start_dot_or_line == Fit::Dot ? fit2.end_id   : fit2.end_id                  ;
+    const int complete_matching_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? fit1.start_id : fit1.start_id                  ;
+    const int complete_matching_end_pos_1   = fit1.end_dot_or_line   == Fit::Dot ? fit1.end_id   : increment(fit1.end_id, size1)  ;
+    const int complete_matching_start_pos_2 = fit2.start_dot_or_line == Fit::Dot ? fit2.start_id : increment(fit2.start_id, size1);
+    const int complete_matching_end_pos_2   = fit2.start_dot_or_line == Fit::Dot ? fit2.end_id   : fit2.end_id                    ;
 
     // Ring2を回転させる。このとき誤差が生じる。
     const double x1 = ring1[complete_matching_start_pos_1].x() - ring1[increment(complete_matching_start_pos_1, size1)].x();
