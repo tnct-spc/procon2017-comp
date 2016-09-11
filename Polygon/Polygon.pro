@@ -17,14 +17,16 @@ SOURCES += \
     field.cpp \
     polygonio.cpp \
     expandedpolygon.cpp \
-    singlepolygondisplay.cpp
+    singlepolygondisplay.cpp \
+    polygonviewer.cpp
 
 HEADERS += \
         polygon_global.h \
     field.h \
     polygonio.h \
     expandedpolygon.h \
-    singlepolygondisplay.h
+    singlepolygondisplay.h \
+    polygonviewer.h
 
 LIBS += -lboost_system -lboost_thread
 

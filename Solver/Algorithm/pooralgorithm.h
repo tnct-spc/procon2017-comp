@@ -9,9 +9,6 @@ class PoorAlgorithm : public AlgorithmWrapper
 public:
     PoorAlgorithm();
     procon::Field run(procon::Field field);
-
-    SinglePolygonDisplay Displayyy;
-
 };
 
 #endif // POORALGORITHM_H

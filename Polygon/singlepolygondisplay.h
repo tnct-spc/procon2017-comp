@@ -14,11 +14,11 @@ class SinglePolygonDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit SinglePolygonDisplay(QWidget *parent = 0);
+    static std::unique_ptr<SinglePolygonDisplay> create(procon::ExpandedPolygon& polygon, std::string wname_, int scale);
     ~SinglePolygonDisplay();
-    void setPolygon(procon::ExpandedPolygon& polygon, int scale = 30,std::string wname_ = "kinironote");
 
 private:
+    explicit SinglePolygonDisplay(QWidget *parent);
     Ui::SinglePolygonDisplay *ui;
     procon::ExpandedPolygon polygon;
     int scale;

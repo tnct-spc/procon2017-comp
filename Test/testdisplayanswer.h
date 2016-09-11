@@ -1,8 +1,8 @@
 #ifndef TESTDISPLAYANSWER_H
 #define TESTDISPLAYANSWER_H
 #include "stdio.h"
-
-class TestDisplayAnswer
+#include "testerwraper.h"
+class TestDisplayAnswer : public TesterWraper
 {
 public:
     TestDisplayAnswer();
