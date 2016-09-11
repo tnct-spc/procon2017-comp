@@ -20,6 +20,7 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
     int Eva = 0;
     int maxEva = 0;
     std::array<Fit,2> fits;
+
     for (int i = 0; i < polygon1.getSize(); ++i) { //角度のみ探索
         comped_first = polygon1.getSideAngle()[i];
         for (int j = 0; j < polygon2.getSize(); ++j) {
@@ -46,10 +47,9 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
                 fits.at(1).start_id=start_polygon2;
                 if (Eva >= 2){
                     result.push_back(fits);
-                }
-
-                if (Eva > maxEva){
-                    maxEva = Eva;
+                    if (Eva > maxEva){
+                        maxEva = Eva;
+                    }
                 }
                 Eva = 0;
             }
@@ -63,15 +63,19 @@ Fit::DotORLine AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, proco
     double comped;
     double comping;
     for (int r=0; r<polygon1.getSize(); r++){
+        //decrement comp1
         comp1--;
         if (comp1 < 0) {
             comp1=polygon1.getSize()-1;
         }
+        //compare LENGTH comp1 <=> comp2
         comped=polygon1.getSideLength()[comp1];
         comping=polygon2.getSideLength()[comp2];
         if (comped - (length_error*2) < comping && comping < comped + (length_error*2)){
+            //increment Eva
             Eva++;
         } else {
+            //increment comp1
             if (comp1 == polygon1.getSize()-1){
                 comp1=-1;
             }
@@ -81,15 +85,19 @@ Fit::DotORLine AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, proco
 
         }
 
+        //increment comp2
         comp2++;
         if (comp2 > polygon2.getSize()-1){
             comp2=0;
         }
+        //compare ANGLE comp1 <=> comp2
         comped=polygon1.getSideAngle()[comp1];
         comping=polygon2.getSideAngle()[comp2];
         if ((M_PI * 2) - angle_error * 2 < (comping + comped) && (comping + comped) < (M_PI * 2) + angle_error * 2){
+            //increment Eva
             Eva++;
         } else {
+            //decrement comp2
             if (comp2 == 0){
                 comp2=polygon2.getSize();
             }
