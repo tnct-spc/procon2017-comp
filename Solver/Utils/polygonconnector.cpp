@@ -5,7 +5,7 @@ PolygonConnector::PolygonConnector()
 
 }
 
-//
+//ピースならouterを、フレームなら指定のinner(反転する)を返す（最後の点は消す）
 Ring PolygonConnector::popRingByPolygon(procon::ExpandedPolygon& polygon, int inner_position)
 {
     if(inner_position == -1){
@@ -23,7 +23,7 @@ Ring PolygonConnector::popRingByPolygon(procon::ExpandedPolygon& polygon, int in
     }
 }
 
-//
+//ピースならouterを、フレームなら指定のinner(反転させる)とringを置き換える（最後の点を追加する）
 void PolygonConnector::pushRingToPolygon(Ring& ring, procon::ExpandedPolygon& polygon, int inner_position)
 {
     ring.push_back(*ring.begin());
@@ -50,14 +50,16 @@ void PolygonConnector::pushRingToPolygon(Ring& ring, procon::ExpandedPolygon& po
     polygon.setPolygon(new_raw_polygon);
 }
 
+//ポリゴンを合体する関数本体
 bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::ExpandedPolygon Polygon2, procon::ExpandedPolygon& new_polygon, std::array<Fit,2> join_data)
 {
+    //結合情報
     Fit fit1 = join_data[0];
     Fit fit2 = join_data[1];
 
+    //それぞれOuterとして持つ
     Ring ring1 = popRingByPolygon(Polygon1, Polygon1.getInnerSize() == 0 ? -1 : fit1.flame_inner_pos);
     Ring ring2 = popRingByPolygon(Polygon2, Polygon2.getInnerSize() == 0 ? -1 : fit2.flame_inner_pos);
-
     int size1 = ring1.size();
     int size2 = ring2.size();
 
@@ -74,13 +76,13 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     debugRing(ring1,__LINE__);
     debugRing(ring2,__LINE__);
 
-    //結合後完全に一致する、始点及び終点
+    //結合後に座標が一致する始点及び終点を取得
     const int complete_matching_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? fit1.start_id : fit1.start_id                  ;
     const int complete_matching_end_pos_1   = fit1.end_dot_or_line   == Fit::Dot ? fit1.end_id   : increment(fit1.end_id, size1)  ;
     const int complete_matching_start_pos_2 = fit2.start_dot_or_line == Fit::Dot ? fit2.start_id : increment(fit2.start_id, size2);
     const int complete_matching_end_pos_2   = fit2.end_dot_or_line   == Fit::Dot ? fit2.end_id   : fit2.end_id                    ;
 
-    // Ring2を回転させる。このとき誤差が生じる。
+    // 回転　Ring2を回転させる。このとき誤差が生じる。
     const double x1 = ring1[complete_matching_start_pos_1].x() - ring1[increment(complete_matching_start_pos_1, size1)].x();
     const double y1 = ring1[complete_matching_start_pos_1].y() - ring1[increment(complete_matching_start_pos_1, size1)].y();
     const double x2 = ring2[complete_matching_start_pos_2].x() - ring2[decrement(complete_matching_start_pos_2, size2)].x();
@@ -105,7 +107,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     debugRing(ring1,__LINE__);
     debugRing(ring2,__LINE__);
 
-    // 結合後完全に一致する点からポリゴンのx,y移動を調べ、Polygon2を平行移動
+    // 移動　結合後に一致する点とその次の点を用いて、ポリゴンのx,y移動を調べ、Polygon2を平行移動
     const int Join_point1 = (complete_matching_start_pos_1 + 1) % size1;
     const int Join_point2 = ((complete_matching_start_pos_2 - 1) % size2 + size2) % size2;
     const double move_x = ring1[Join_point1].x() - ring2[Join_point2].x();
@@ -117,14 +119,14 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     }
     ring2 = translated_ring;
 
-    // check
+    // 重複チェック！
     bool conf=false;
     //TODO:未完成 if(hasConflict(ring1, ring2, fit1, fit2)) conf=true;
 
     debugRing(ring1,__LINE__);
     debugRing(ring2,__LINE__);
 
-    // 新しいRingに結合後の外周の角を入れる。
+    // 結合　新しいRingに結合後の外周の角を入れる。
     // もし、結合端の辺の長さが等しくならない時はRing1,Ring2ともに端の角を入力。
     // ここで回転の誤差により角が一致しない場合がある。
     Ring new_ring;
@@ -132,6 +134,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     int Type = 1;
 
     double x,y;
+    //TODO:ここバグでループしてそう。。。sorry
     do{
         if (Type == 1) {
             x = ring1[count%size1].x();
@@ -161,7 +164,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
 
     debugRing(new_ring,__LINE__);
 
-    //Push
+    //　ポリゴンにRingを出力しておしまい
     if(Polygon1.getInnerSize() != 0){
         pushRingToPolygon(new_ring, Polygon1, fit1.flame_inner_pos);
         Polygon1.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
@@ -182,6 +185,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     return true;
 }
 
+//重複を見つける。実装途中なのでとても汚い
 bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
 {
     int size1 = ring1.size();
@@ -191,6 +195,7 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
     int safe_end_pos_1   = fit1.end_dot_or_line   == Fit::Dot ? increment(fit1.end_id, size1)   : increment(fit1.end_id, size1)  ;
     int safe_start_pos_2 = fit2.start_dot_or_line == Fit::Dot ? increment(fit2.start_id, size2) : increment(fit2.start_id, size2);
     int safe_end_pos_2   = fit2.end_dot_or_line   == Fit::Dot ? decrement(fit2.end_id, size2)   : fit2.end_id                    ;
+    //↓ここおかしいのでいろいろ変える
     safe_end_pos_1 = increment(safe_end_pos_1, size1);
     safe_end_pos_2 = decrement(safe_end_pos_2, size2);
 
