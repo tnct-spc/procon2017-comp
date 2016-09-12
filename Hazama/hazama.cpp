@@ -49,6 +49,8 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
     using namespace cv;
     using namespace std;
 
+    namedWindow("debugwindow", CV_WINDOW_AUTOSIZE);
+
     int horizonalCrossCount = 10;
     int verticalCrossCount = 7;
 
