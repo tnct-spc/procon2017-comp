@@ -9,6 +9,17 @@ procon::ExpandedPolygon::ExpandedPolygon(int id_)
     side_angle.reserve(32);
     polygon.outer().reserve(32);
 }
+procon::ExpandedPolygon::ExpandedPolygon(std::vector<int> multi_ids_)
+    : size(0),id(-1)
+{
+    //this->inners().push_back(polygon::ring_type());
+    side_length.reserve(32);
+    side_angle.reserve(32);
+    polygon.outer().reserve(32);
+
+    std::copy(multi_ids_.begin(),multi_ids_.end(), std::back_inserter(multi_ids));
+    while(0){}
+}
 
 //copy_constructor
 procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
@@ -17,6 +28,7 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->polygon = p.polygon;
     this->size = p.size;
     this->inners_size = p.inners_size;
+    std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
     std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));
@@ -61,11 +73,12 @@ void procon::ExpandedPolygon::calcSideLength()
 
 void procon::ExpandedPolygon::calcSideAngle()
 {
-    auto isMinorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
+    auto isMaijorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
         point_t p4((p1.x() + p3.x()) / 2 , (p1.y() + p3.y()) / 2);
-        const double alpha = 4000;
+        const double alpha = 4000.667824083865;
+        const double beta  = 0.710983144633;
         const double end_x = (p4.x() - p2.x()) > 0 ? alpha : -alpha;
-        const double end_y = (p4.y() - p2.y()) / (p4.x() - p2.x()) * (end_x - p2.x()) + p2.y();
+        const double end_y = (p4.y() - p2.y()) / (p4.x() - p2.x()) * (end_x - p2.x()) + p2.y() + beta;
         point_t end_point(end_x,end_y);
         bg::model::segment<point_t> judge_segment(p2,end_point);
         int intersect_num = 0;
@@ -92,7 +105,7 @@ void procon::ExpandedPolygon::calcSideAngle()
 
             angle = std::acos(numer / (denom1 * denom2));
 
-            if (isMinorAngle(p1,p2,p3)) {
+            if (isMaijorAngle(p1,p2,p3)) {
                 angle = (3.141592 * 2) - angle;
             }
 
@@ -165,6 +178,11 @@ int procon::ExpandedPolygon::getSize() const
     return size;
 }
 
+int procon::ExpandedPolygon::getInnerSize() const
+{
+    return inners_size;
+}
+
 std::vector<double> const& procon::ExpandedPolygon::getSideLength() const
 {
     return side_length;
@@ -190,6 +208,20 @@ int procon::ExpandedPolygon::getId() const
     return id;
 }
 
+std::vector<int> procon::ExpandedPolygon::getMultiIds() const
+{
+    return multi_ids;
+}
+
+std::string procon::ExpandedPolygon::makeMultiIdString() const
+{
+    std::string id_string = "";
+    for(int i=0; i < multi_ids.size() && (i == 0  || (id_string += "+") != ""); ++i){
+        id_string += std::to_string(multi_ids.at(i));
+    }
+    return id_string;
+}
+
 std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideLength() const
 {
     return inners_side_length;
@@ -204,7 +236,13 @@ std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideSl
 {
     return inners_side_slope;
 }
+
 //setter
+void procon::ExpandedPolygon::setMultiIds(std::vector<int> multi_ids_)
+{
+    multi_ids = multi_ids_;
+}
+
 void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
 {
     polygon = p;
@@ -219,6 +257,7 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->polygon = p.polygon;
     this->size = p.size;
     this->inners_size = p.inners_size;
+    std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
     std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));

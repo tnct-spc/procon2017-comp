@@ -17,7 +17,6 @@ SOURCES += \
     answerboard.cpp
 
 HEADERS +=\
-        displayanswer_global.h \
     answerboard.h
 
 LIBS += -L/usr/local/lib `pkg-config --libs opencv`

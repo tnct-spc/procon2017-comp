@@ -12,6 +12,7 @@
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/geometry/algorithms/transform.hpp>
 #include <boost/assign/list_of.hpp>
+#include "utility"
 namespace bg = boost::geometry;
 using point_t = bg::model::d2::point_xy<double>;
 using ring_t = bg::model::ring<point_t>;
@@ -24,6 +25,7 @@ class ExpandedPolygon
     //メンバ
     int size;
     int id;
+    std::vector<int> multi_ids;
     std::vector<double> side_length;
     std::vector<double> side_angle;
     std::vector<double> side_slope;
@@ -54,10 +56,12 @@ protected:
 public:
     //constructor
     ExpandedPolygon(int id_ = -1);
+    ExpandedPolygon(std::vector<int> multi_ids_);
     ExpandedPolygon(ExpandedPolygon const& p);
 
     //getter
     int getSize() const;
+    int getInnerSize() const;
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
     std::vector<double> const& getSideSlope() const;
@@ -66,8 +70,11 @@ public:
     std::vector<std::vector<double>> const& getInnersSideSlope() const;
     polygon_t const& getPolygon() const;
     int getId() const;
+    std::vector<int> getMultiIds() const;
+    std::string makeMultiIdString() const;
 
     //setter
+    void setMultiIds(std::vector<int> multi_ids_);
     void setPolygon(polygon_t const & p);
 
     //operator
