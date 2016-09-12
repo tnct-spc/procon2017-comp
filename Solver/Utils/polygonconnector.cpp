@@ -121,7 +121,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
 
     // 重複チェック！
     bool conf=false;
-    //TODO:未完成 if(hasConflict(ring1, ring2, fit1, fit2)) conf=true;
+    if(hasConflict(ring1, ring2, fit1, fit2)) conf=true;
 
     debugRing(ring1,__LINE__);
     debugRing(ring2,__LINE__);
@@ -185,42 +185,99 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     return true;
 }
 
-//重複を見つける。実装途中なのでとても汚い
+//重複を見つける。実装途中なのでとても汚い akkasita
 bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
 {
     int size1 = ring1.size();
     int size2 = ring2.size();
-    //safe line
-    int safe_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? decrement(fit1.start_id, size1) : fit1.start_id                  ;
-    int safe_end_pos_1   = fit1.end_dot_or_line   == Fit::Dot ? increment(fit1.end_id, size1)   : increment(fit1.end_id, size1)  ;
-    int safe_start_pos_2 = fit2.start_dot_or_line == Fit::Dot ? increment(fit2.start_id, size2) : increment(fit2.start_id, size2);
-    int safe_end_pos_2   = fit2.end_dot_or_line   == Fit::Dot ? decrement(fit2.end_id, size2)   : fit2.end_id                    ;
-    //↓ここおかしいのでいろいろ変える
-    safe_end_pos_1 = increment(safe_end_pos_1, size1);
-    safe_end_pos_2 = decrement(safe_end_pos_2, size2);
+    //結合後に座標が一致する始点及び終点を取得
+    const int cmstart1 = fit1.start_dot_or_line == Fit::Dot ? fit1.start_id : fit1.start_id                  ;
+    const int cmend1   = fit1.end_dot_or_line   == Fit::Dot ? fit1.end_id   : increment(fit1.end_id, size1)  ;
+    const int cmstart2 = fit2.start_dot_or_line == Fit::Dot ? fit2.start_id : increment(fit2.start_id, size2);
+    const int cmend2   = fit2.end_dot_or_line   == Fit::Dot ? fit2.end_id   : fit2.end_id                    ;
 
-    bool ring1_safe_zone = true;
-    bool ring1_yellow_zone = false;
+    bool ring1_yello_start_zone = false;
+    bool ring1_orange_start_zone = false;
+    bool ring1_red_zone = false;
+    bool ring1_orange_end_zone = true;
+    bool ring1_yellow_end_zone = false;
+    bool ring1_white_zone = false;
+
     for(int i=0;i<size1;++i){
-        if(ring1_yellow_zone){
-            ring1_yellow_zone = false;
-        }
-        if((safe_start_pos_1+i) >= size1-1){
-            ring1_yellow_zone = true;
-        }
-        if(i!=0 && (safe_start_pos_1+i)%size1 == safe_end_pos_1){
-            ring1_safe_zone = false;
-        }
-        bg::model::segment<point_t> line1(ring1[(safe_start_pos_1+i)%size1],ring1[(safe_start_pos_1+i+1)%size1]);
+        int ring1_pos = (cmstart1+1) % size1; //orange end zone
+
+        //make ring
+        bg::model::segment<point_t> line1(ring1[ring1_pos],ring1[(ring1_pos+1)%size1]);
+
+        bool ring2_yello_start_zone = false;
+        bool ring2_orange_start_zone = false;
+        bool ring2_red_zone = false;
+        bool ring2_orange_end_zone = true;
+        bool ring2_yellow_end_zone = false;
+        bool ring2_white_zone = false;
+
         for(int j=0;j<size2;++j){
-            //jump ring2's safe zone
-            if(j==0 && ring1_safe_zone) j = safe_start_pos_2 - ( (safe_start_pos_2 >= safe_end_pos_2) ? safe_end_pos_2 : (safe_end_pos_2-size2) );
-            if((safe_end_pos_2+j) >= size2-1 && ring1_safe_zone) break;
-            if(j==0 && ring1_yellow_zone) j =                  safe_start_pos_2 - ( (safe_start_pos_2 >= safe_end_pos_2) ? safe_end_pos_2 : (safe_end_pos_2-size2) );
-            bg::model::segment<point_t> line2(ring2[(safe_end_pos_2+j)%size2],ring2[(safe_end_pos_2+j+1)%size2]);
-            if(static_cast<bool>(bg::intersects(line1, line2))){
-                return true;
+            int ring2_pos = (cmstart2+1) % size1; //orange end zone
+
+            //skip check
+            if(     ring1_white_zone ||
+                    (ring1_yellow_end_zone && (ring2_white_zone || ring2_red_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
+                    (ring1_orange_end_zone && (ring2_white_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
+                    (ring1_red_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_yellow_end_zone)) ||
+                    (ring1_orange_start_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_orange_start_zone)) ||
+                    (ring1_yello_start_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_orange_end_zone || ring2_red_zone))
+              ){
+                //make ring
+                bg::model::segment<point_t> line2(ring2[ring2_pos],ring2[(ring2_pos + 1)%size2]);
+
+                //check conflict
+                if(static_cast<bool>(bg::intersects(line1, line2))){
+                    return true;
+                }
             }
+
+            //inc
+            ring2_pos++;
+            if(ring2_pos == size2) ring2_pos = 0;
+
+            //toggle
+            if(ring2_orange_end_zone){
+                ring2_orange_end_zone = false;
+                ring2_yellow_end_zone = true;
+            }else if(ring2_yellow_end_zone){
+                ring2_yellow_end_zone = false;
+                ring2_white_zone = true;
+            }else if((ring2_pos+2)%size2 == cmstart1){
+                ring2_white_zone = false;
+                ring2_yello_start_zone = true;
+            }else if(ring2_yello_start_zone){
+                ring2_yello_start_zone = false;
+                ring2_orange_start_zone = true;
+            }else if(ring2_orange_start_zone){
+                ring2_orange_start_zone = false;
+                ring2_red_zone = true;
+            }
+        }
+        //inc
+        ring1_pos++;
+        if(ring1_pos == size1) ring1_pos = 0;
+
+        //toggle
+        if(ring1_orange_end_zone){
+            ring1_orange_end_zone = false;
+            ring1_yellow_end_zone = true;
+        }else if(ring1_yellow_end_zone){
+            ring1_yellow_end_zone = false;
+            ring1_white_zone = true;
+        }else if((ring1_pos+2)%size1 == cmstart1){
+            ring1_white_zone = false;
+            ring1_yello_start_zone = true;
+        }else if(ring1_yello_start_zone){
+            ring1_yello_start_zone = false;
+            ring1_orange_start_zone = true;
+        }else if(ring1_orange_start_zone){
+            ring1_orange_start_zone = false;
+            ring1_red_zone = true;
         }
     }
     return false;
