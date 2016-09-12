@@ -168,12 +168,13 @@ void Hazama::run()
     /*Display answer*/
     board->setField(field);
 
-    std::cout<<"finish"<<std::endl;
+
+std::cout<<"finish"<<std::endl;
 }
 
 cv::Mat Hazama::capture()
 {
-    const std::string calibration_data_file_path = "/projects/calibration.yml";
+    const std::string calibration_data_file_path = "./../../procon2016-comp/calibration/calibration.yml";
     static bool init_calibration_flag = false;
 
     static cv::Mat mtx,dist;
