@@ -10,15 +10,14 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
     return field;
 }
 
-int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result)
+std::vector<int> AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result)
 {
     /*許容誤差指定*/
-    constexpr double length_error = 0.05; // 単位CM
-    constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
     double comped_first = 0;
     double comping_first = 0;
     int Eva = 0;
-    int maxEva = 0;
+    //int maxEva = 0;
+    std::vector<int> evaluation;
     std::array<Fit,2> fits;
 
     for (int i = 0; i < polygon1.getSize(); ++i) { //角度のみ探索
@@ -31,7 +30,7 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
 
                 int start_polygon1 = i;
                 int start_polygon2 = j;
-                Fit::DotORLine dot_or_line = AlgorithmWrapper::findEnd(polygon2, polygon1, start_polygon2, start_polygon1,length_error, angle_error, Eva);
+                Fit::DotORLine dot_or_line = AlgorithmWrapper::findEnd(polygon2, polygon1, start_polygon2, start_polygon1, Eva);
                 fits.at(0).end_dot_or_line = dot_or_line;
                 fits.at(0).end_id=start_polygon1;
                 fits.at(1).end_dot_or_line = dot_or_line;
@@ -50,26 +49,22 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
                 if(!isDuplicate){
                     start_polygon1 = i;
                     start_polygon2 = j;
-                    dot_or_line = AlgorithmWrapper::findEnd(polygon1, polygon2, start_polygon1, start_polygon2,length_error, angle_error, Eva);
+                    dot_or_line = AlgorithmWrapper::findEnd(polygon1, polygon2, start_polygon1, start_polygon2, Eva);
                     fits.at(0).start_dot_or_line = dot_or_line;
                     fits.at(0).start_id=start_polygon1;
                     fits.at(1).start_dot_or_line = dot_or_line;
                     fits.at(1).start_id=start_polygon2;
-                    if (Eva >= 1){
-                        result.push_back(fits);
-                        if (Eva > maxEva){
-                            maxEva = Eva;
-                        }
-                    }
+                    evaluation.push_back(Eva);
+                    result.push_back(fits);
                 }
                 Eva = 0;
             }
         }
     }
-    return maxEva;
+    return evaluation;
 }
 
-Fit::DotORLine AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2,int &comp1,int &comp2, double length_error, double angle_error, int &Eva)
+Fit::DotORLine AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2,int &comp1,int &comp2, int &Eva)
 {
     double comped;
     double comping;
