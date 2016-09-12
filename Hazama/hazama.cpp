@@ -103,6 +103,10 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
 
 void Hazama::run()
 {
+    //When you want to calibrate webcamera,please comment out this line!!!
+    //makeCalibrationData("./../../procon2016-comp/calibration/calibration.yml",24);
+
+
     std::cout << "Run" << std::endl;
 
     procon::Field PDATA;
