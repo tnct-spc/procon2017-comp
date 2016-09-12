@@ -216,7 +216,7 @@ std::vector<int> procon::ExpandedPolygon::getMultiIds() const
 std::string procon::ExpandedPolygon::makeMultiIdString() const
 {
     std::string id_string = "";
-    for(int i=0; i < multi_ids.size() && (i == 0  || (id_string += "+") != ""); ++i){
+    for(int i=0; i < static_cast<int>(multi_ids.size()) && (i == 0  || (id_string += "+") != ""); ++i){
         id_string += std::to_string(multi_ids.at(i));
     }
     return id_string;

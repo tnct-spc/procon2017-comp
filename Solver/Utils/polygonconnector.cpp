@@ -65,7 +65,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
 
     auto debugRing = [](Ring ring, int line){
         std::cout<<std::to_string(line)<<" : ";
-        for (int i=0; i<ring.size(); i++) {
+        for (int i=0; i < static_cast<int>(ring.size()); i++) {
             double x = ring[i].x();
             double y = ring[i].y();
             std::cout<<"<"<<x<<","<<y<<">";

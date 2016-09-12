@@ -117,6 +117,7 @@ Fit::DotORLine AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, proco
             return Fit::Line;
         }
     }
+    return Fit::Dot;
 }
 
 AlgorithmWrapper::AlgorithmWrapper()
