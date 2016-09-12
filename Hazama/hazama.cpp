@@ -63,7 +63,7 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
     for(unsigned int i=1; i<numberOfImages; i++) {
 
         char filename[128];
-        sprintf(filename, "../../procon2016-comp/sample/calibration/%d.jpg", i);
+        sprintf(filename, "../../procon2016-comp/calibration/%d.jpg", i);
         Mat frame = imread(filename);
         Mat gray;
 
