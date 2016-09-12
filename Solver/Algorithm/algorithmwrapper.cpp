@@ -10,13 +10,14 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
     return field;
 }
 
-int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result)
+std::vector<int> AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result)
 {
     /*許容誤差指定*/
     double comped_first = 0;
     double comping_first = 0;
     int Eva = 0;
-    int maxEva = 0;
+    //int maxEva = 0;
+    std::vector<int> evaluation;
     std::array<Fit,2> fits;
 
     for (int i = 0; i < polygon1.getSize(); ++i) { //角度のみ探索
@@ -53,18 +54,14 @@ int AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon polygon1, procon:
                     fits.at(0).start_id=start_polygon1;
                     fits.at(1).start_dot_or_line = dot_or_line;
                     fits.at(1).start_id=start_polygon2;
-                    if (Eva >= 1){
-                        result.push_back(fits);
-                        if (Eva > maxEva){
-                            maxEva = Eva;
-                        }
-                    }
+                    evaluation.push_back(Eva);
+                    result.push_back(fits);
                 }
                 Eva = 0;
             }
         }
     }
-    return maxEva;
+    return evaluation;
 }
 
 Fit::DotORLine AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2,int &comp1,int &comp2, int &Eva)
