@@ -41,7 +41,7 @@ void Hazama::init()
     capture();
 }
 
-void Hazama::makeCalibrationData(std::string savefile_path)
+void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
 {
     //This is Library... Black box
     //Reference : http://yuki-sato.com/wordpress/2016/04/15/opencv-%E3%82%AB%E3%83%A1%E3%83%A9%E3%81%AE%E6%AD%AA%E3%81%BF%E3%82%92%E3%81%AA%E3%81%8A%E3%81%99%E3%82%AD%E3%83%A3%E3%83%AA%E3%83%96%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3-c/
@@ -60,14 +60,14 @@ void Hazama::makeCalibrationData(std::string savefile_path)
         obj.push_back(Point3f(j/horizonalCrossCount, j%horizonalCrossCount, 0.0f));
     }
 
-    unsigned int numberOfImages = 7;
-    for(unsigned int i=0; i<numberOfImages; i++) {
+    for(unsigned int i=1; i<numberOfImages; i++) {
 
         char filename[128];
-        sprintf(filename, "../../procon2016-comp/sample/cal/pic%d.png", i);
+        sprintf(filename, "../../procon2016-comp/sample/calibration/%d.jpg", i);
         Mat frame = imread(filename);
         Mat gray;
 
+        flip(frame, frame, -1);
         cvtColor(frame, gray, CV_BGR2GRAY);
 
         // 10-7 チェスを探す
@@ -79,6 +79,11 @@ void Hazama::makeCalibrationData(std::string savefile_path)
             cornerSubPix(gray, centers, Size(11,11), Size(-1,-1), TermCriteria (TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1));
             object_points.push_back(obj);
             image_points.push_back(centers);
+
+            // draw
+            drawChessboardCorners(gray, chessboardPatterns, Mat(centers), true);
+            imshow("debugWindow", gray);
+
         } else {
             cout << "not found" << endl;
         }
