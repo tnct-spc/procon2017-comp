@@ -19,7 +19,8 @@ SOURCES += solver.cpp \
     Algorithm/pooralgorithm.cpp \
     Algorithm/hillclibming.cpp \
     Utils/polygonconnector.cpp \
-    Utils/fit.cpp
+    Utils/fit.cpp \
+    Utils/evaluation.cpp
 
 HEADERS += solver.h\
         solver_global.h \
@@ -28,7 +29,8 @@ HEADERS += solver.h\
     Algorithm/pooralgorithm.h \
     Algorithm/hillclibming.h \
     Utils/polygonconnector.h \
-    Utils/fit.h
+    Utils/fit.h \
+    Utils/evaluation.h
 
 unix {
     target.path = /usr/lib
