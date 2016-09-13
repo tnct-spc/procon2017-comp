@@ -203,8 +203,8 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
     bool ring1_yellow_end_zone = false;
     bool ring1_white_zone = false;
 
+    int ring1_pos = cmend1; //orange end zone
     for(int i=0;i<size1;++i){
-        int ring1_pos = (cmstart1+1) % size1; //orange end zone
 
         //make ring
         bg::model::segment<point_t> line1(ring1[ring1_pos],ring1[(ring1_pos+1)%size1]);
@@ -216,19 +216,20 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
         bool ring2_yellow_end_zone = false;
         bool ring2_white_zone = false;
 
+        int ring2_pos = cmend2; //orange end zone
+
         for(int j=0;j<size2;++j){
-            int ring2_pos = (cmstart2+1) % size1; //orange end zone
 
             //skip check
             if(     ring1_white_zone ||
                     (ring1_yellow_end_zone && (ring2_white_zone || ring2_red_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
-                    (ring1_orange_end_zone && (ring2_white_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
+                    (ring1_orange_end_zone && (ring2_white_zone || (ring2_orange_start_zone && (cmstart1!=cmend1)) || ring2_yello_start_zone)) ||
                     (ring1_red_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_yellow_end_zone)) ||
-                    (ring1_orange_start_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_orange_start_zone)) ||
+                    (ring1_orange_start_zone && (ring2_white_zone || ring2_yellow_end_zone || (ring2_orange_end_zone && (cmstart1 != cmend1)))) ||
                     (ring1_yello_start_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_orange_end_zone || ring2_red_zone))
               ){
                 //make ring
-                bg::model::segment<point_t> line2(ring2[ring2_pos],ring2[(ring2_pos + 1)%size2]);
+                bg::model::segment<point_t> line2(ring2[ring2_pos],ring2[((ring2_pos - 1)%size2+size2)%size2]);
 
                 //check conflict
                 if(static_cast<bool>(bg::intersects(line1, line2))){
@@ -236,20 +237,28 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
                 }
             }
 
-            //inc
-            ring2_pos++;
-            if(ring2_pos == size2) ring2_pos = 0;
+            //dec
+            ring2_pos--;
+            if(ring2_pos == -1) ring2_pos = size2 - 1;
 
             //toggle
             if(ring2_orange_end_zone){
                 ring2_orange_end_zone = false;
-                ring2_yellow_end_zone = true;
+                if(fit2.end_dot_or_line == Fit::Dot){
+                    ring2_yellow_end_zone = true;
+                }else{
+                    ring2_white_zone = true;
+                }
             }else if(ring2_yellow_end_zone){
                 ring2_yellow_end_zone = false;
                 ring2_white_zone = true;
-            }else if((ring2_pos+2)%size2 == cmstart1){
+            }else if(((ring2_pos-2)%size2+size2)%size2 == cmstart2){
                 ring2_white_zone = false;
-                ring2_yello_start_zone = true;
+                if(fit2.start_dot_or_line == Fit::Dot){
+                    ring2_yello_start_zone = true;
+                }else{
+                    ring2_orange_start_zone = true;
+                }
             }else if(ring2_yello_start_zone){
                 ring2_yello_start_zone = false;
                 ring2_orange_start_zone = true;
@@ -265,13 +274,21 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
         //toggle
         if(ring1_orange_end_zone){
             ring1_orange_end_zone = false;
-            ring1_yellow_end_zone = true;
+            if(fit1.end_dot_or_line == Fit::Dot){
+                ring1_yellow_end_zone = true;
+            }else{
+                ring1_white_zone = true;
+            }
         }else if(ring1_yellow_end_zone){
             ring1_yellow_end_zone = false;
             ring1_white_zone = true;
         }else if((ring1_pos+2)%size1 == cmstart1){
             ring1_white_zone = false;
-            ring1_yello_start_zone = true;
+            if(fit1.start_dot_or_line == Fit::Dot){
+                ring1_yello_start_zone = true;
+            }else{
+                ring1_orange_start_zone = true;
+            }
         }else if(ring1_yello_start_zone){
             ring1_yello_start_zone = false;
             ring1_orange_start_zone = true;
