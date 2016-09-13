@@ -108,8 +108,8 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     debugRing(ring2,__LINE__);
 
     // 移動　結合後に一致する点とその次の点を用いて、ポリゴンのx,y移動を調べ、Polygon2を平行移動
-    const int Join_point1 = (complete_matching_start_pos_1 + 1) % size1;
-    const int Join_point2 = ((complete_matching_start_pos_2 - 1) % size2 + size2) % size2;
+    const int Join_point1 = complete_matching_start_pos_1;
+    const int Join_point2 = complete_matching_start_pos_2;
     const double move_x = ring1[Join_point1].x() - ring2[Join_point2].x();
     const double move_y = ring1[Join_point1].y() - ring2[Join_point2].y();
     Ring translated_ring;
