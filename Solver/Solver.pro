@@ -21,7 +21,7 @@ SOURCES += solver.cpp \
     Utils/polygonconnector.cpp \
     Utils/fit.cpp \
     Utils/evaluation.cpp \
-    Algorithm/beamsearch.cpp
+    Algorithm/beamsearch.cpp \
 
 HEADERS += solver.h\
         solver_global.h \
@@ -32,7 +32,7 @@ HEADERS += solver.h\
     Utils/polygonconnector.h \
     Utils/fit.h \
     Utils/evaluation.h \
-    Algorithm/beamsearch.h
+    Algorithm/beamsearch.h \
 
 unix {
     target.path = /usr/lib

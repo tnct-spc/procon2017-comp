@@ -10,6 +10,8 @@
 
 class BeamSearch : public AlgorithmWrapper
 {
+protected:
+    std::vector<Evaluation> fieldSearch(procon::Field field);
 public:
     BeamSearch();
     procon::Field run(procon::Field field);
