@@ -39,8 +39,10 @@ std::vector<int> AlgorithmWrapper::searchSameLength(procon::ExpandedPolygon poly
                 //重複していたら追加しない
                 bool isDuplicate = false;
                 for(auto accept_fits : result){
-                    if(fits[0].end_id == accept_fits[0].end_id &&
-                       fits[1].end_id == accept_fits[1].end_id){
+                    if(fits[0].end_dot_or_line == accept_fits[0].end_dot_or_line &&
+                       fits[0].end_id == accept_fits[0].end_id &&
+                       fits[1].end_id == accept_fits[1].end_id &&
+                       fits[1].end_dot_or_line == accept_fits[1].end_dot_or_line){
                         isDuplicate = true;
                         break;
                     }

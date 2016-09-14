@@ -84,10 +84,11 @@ bool testSearchSameLength::run(){
             ++cnt;
             bool conf = PolygonConnector::joinPolygon(polygon1, polygon2, result, join_data);
             if(conf==false){
-                debugprint(std::to_string(cnt)+"is fail! return false");
+                debugprint(std::to_string(cnt)+"is fail! it's can't connect.");
                 //return false;
+            }else{
+                PolygonViewer::getInstance().pushPolygon(result, std::to_string(cnt),50);
             }
-            PolygonViewer::getInstance().pushPolygon(result, std::to_string(cnt),50);
         }
         //PolygonViewer::getInstance().pushPolygon(polygon1, TO_STRING(polygon1),50);
         //PolygonViewer::getInstance().pushPolygon(polygon2, TO_STRING(polygon2),50);
