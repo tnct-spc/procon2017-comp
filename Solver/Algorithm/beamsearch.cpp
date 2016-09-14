@@ -1,0 +1,63 @@
+#include "beamsearch.h"
+
+BeamSearch::BeamSearch()
+{
+
+}
+
+procon::Field run(procon::Field field,double beam_width)
+{
+
+    auto fieldSearch = [&](procon::Field field)->std::vector<Evaluation>{
+        std::vector<Evaluation> evaluations;
+        for (int j = 0;j < field.getPiecesSize();j++){
+            if (!field.getIsPlaced().at(j)) continue;
+            std::vector<Evaluation> eva = searchSameLength(field.getFlame(),field.getPieces().at(j));
+            for (auto & e : eva){
+                e.piece_id = j;
+            }
+            std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+        }
+        return evaluations;
+    };
+
+    auto sortEvaLambda = [&](Evaluation const& a,Evaluation const& b)->bool {
+        return a.evaluation < b.evaluation;
+    };
+
+    std::vector<procon::Field> field_vec;
+    std::vector<procon::Field> next_field_vec;
+    field_vec.push_back(field);
+    procon::Field buckup_field;
+
+    //ピースが全部置かれたら終了
+    for (int i = 0;i < field.getElementaryPieces().size();i++){
+
+        buckup_field = field_vec.at(0);
+        std::vector<Evaluation> evaluations;
+
+        for (int j = 0;j < static_cast<int>(field_vec.size());j++) {
+            std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
+            for (auto & e : eva){
+                e.vector_id = j;
+            }
+            std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+        }
+
+        //それより先がなければその1手前の最高評価値のフィールドを返す
+        if (evaluations.size() == 0) return buckup_field;
+
+        sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
+
+        for (int j = 0;j < beam_width && j < static_cast<int>(evaluations.size());j++) {
+            procon::ExpandedPolygon new_frame;
+            const int vec_id = evaluations.at(j).vector_id;
+            const int piece_id = evaluations.at(j).piece_id;
+            procon::Field new_field = field_vec.at(vec_id);
+            joinPolygon(field_vec.at(vec_id).getFlame(),field_vec.at(vec_id).getPieces().at(piece_id),new_frame,evaluations.at(j).fits);
+            next_field_vec.push_back(std::move(new_field));
+        }
+        field_vec = std::move(next_field_vec);
+    }
+    return field_vec.at(0);
+}

@@ -20,7 +20,8 @@ SOURCES += solver.cpp \
     Algorithm/hillclibming.cpp \
     Utils/polygonconnector.cpp \
     Utils/fit.cpp \
-    Utils/evaluation.cpp
+    Utils/evaluation.cpp \
+    Algorithm/beamsearch.cpp
 
 HEADERS += solver.h\
         solver_global.h \
@@ -30,7 +31,8 @@ HEADERS += solver.h\
     Algorithm/hillclibming.h \
     Utils/polygonconnector.h \
     Utils/fit.h \
-    Utils/evaluation.h
+    Utils/evaluation.h \
+    Algorithm/beamsearch.h
 
 unix {
     target.path = /usr/lib
