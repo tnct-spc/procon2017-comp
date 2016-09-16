@@ -119,63 +119,10 @@ Fit::DotORLine AlgorithmWrapper::findEnd(procon::ExpandedPolygon polygon1, proco
 
 std::vector<Evaluation> AlgorithmWrapper::evaluateCombination(procon::ExpandedPolygon frame, procon::ExpandedPolygon piece)
 {
-
-    auto findEndPoint = [&](int k,int & comp1,int & comp2,int & Eva)->Fit::DotORLine{
-        double comp_frame;
-        double comp_piece;
-        const int frame_size = static_cast<int>(frame.getPolygon().inners().at(k).size() - 1);
-        for (int r = 0; r < frame_size; r++){
-            //decrement comp1
-            comp1--;
-            if (comp1 < 0) {
-                comp1 = frame_size - 1;
-            }
-            //compare LENGTH comp1 <=> comp2
-            comp_frame = frame.getInnersSideLength().at(k).at(comp1);
-            comp_piece = piece.getSideLength().at(comp2);
-            if (comp_frame - (length_error * 2) < comp_piece && comp_piece < comp_frame + (length_error * 2)) {
-                //increment Eva
-                Eva++;
-            } else {
-                //increment comp1
-                if (comp1 == frame_size - 1){
-                    comp1--;
-                }
-                comp1++;
-                //return
-                return Fit::Dot;
-
-            }
-
-            //increment comp2
-            comp2++;
-            if (comp2 > piece.getSize() - 1){
-                comp2 = 0;
-            }
-            //compare ANGLE comp1 <=> comp2
-            comp_frame = frame.getInnersSideAngle().at(k).at(comp1);
-            comp_piece = piece.getSideAngle().at(comp2);
-            if ((M_PI * 2) - angle_error * 2 < (comp_piece + comp_frame) && (comp_piece + comp_frame) < (M_PI * 2) + angle_error * 2){
-                //increment Eva
-                Eva++;
-            } else {
-                //decrement comp2
-                if (comp2 == 0){
-                    comp2 = piece.getSize();
-                }
-                comp2--;
-                //return
-                return Fit::Line;
-            }
-        }
-        return Fit::Dot;
-    };
-
     double frame_first = 0;
     double piece_first = 0;
     int Eva = 0;
     std::vector<Evaluation> evaluations;
-    std::array<Fit,2> fits;
 
     for (int k = 0; k < frame.getPolygon().inners().size(); ++k){
         const int inner_size = static_cast<int>(frame.getPolygon().inners().at(k).size() - 1);
@@ -185,49 +132,21 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombination(procon::ExpandedPo
                 piece_first = piece.getSideAngle()[j];
 
                 if(procon::nearlyEqual(frame_first,piece_first,angle_error)){
-
-                    Eva++;
-
-                    int start_frame = i;
-                    int start_piece = j;
-                    Fit::DotORLine dot_or_line = findEndPoint(k,start_frame,start_piece,Eva);
-                    fits.at(0).end_dot_or_line = dot_or_line;
-                    fits.at(0).end_id = start_frame;
-                    fits.at(1).end_dot_or_line = dot_or_line;
-                    fits.at(1).end_id = start_piece;
-
-                    //重複していたら追加しない
-
-                    bool isDuplicate = false;
-                    /*
-                    for(auto accept_fits : result){
-                        if(fits[0].end_dot_or_line == accept_fits[0].end_dot_or_line &&
-                           fits[0].end_id == accept_fits[0].end_id &&
-                           fits[1].end_id == accept_fits[1].end_id &&
-                           fits[1].end_dot_or_line == accept_fits[1].end_dot_or_line){
-                            isDuplicate = true;
-                            break;
-                        }
-                    }
-                    */
-
-                    if(!isDuplicate){
-                        start_frame = i;
-                        start_piece = j;
-                        dot_or_line = findEndPoint(k, start_frame, start_piece, Eva);
-                        fits.at(0).start_dot_or_line = dot_or_line;
-                        fits.at(0).start_id=start_frame;
-                        fits.at(1).start_dot_or_line = dot_or_line;
-                        fits.at(1).start_id=start_piece;
-
-                        Evaluation tmp_eva;
-                        tmp_eva.evaluation = Eva;
-                        tmp_eva.fits = fits;
-                        tmp_eva.piece_id = piece.getId();
-                        tmp_eva.frame_id = k;
-                        evaluations.push_back(tmp_eva);
-                    }
-                    Eva = 0;
+                    std::array<Fit,2> fits;
+                    fits.at(0).start_id = i;
+                    fits.at(0).end_id = i;
+                    fits.at(0).flame_inner_pos = k;
+                    fits.at(0).start_dot_or_line = Fit::Dot;
+                    fits.at(0).end_dot_or_line = Fit::Dot;
+                    fits.at(1).start_id = j;
+                    fits.at(1).end_id = j;
+                    fits.at(1).start_dot_or_line = Fit::Dot;
+                    fits.at(1).end_dot_or_line = Fit::Dot;
+                    Evaluation eva;
+                    eva.frame_id = k;
+                    eva.fits = fits;
+                    eva.evaluation = bg::area(piece.getPolygon());
+                    evaluations.push_back(eva);
                 }
             }
         }

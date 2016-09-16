@@ -23,7 +23,7 @@ procon::Field BeamSearch::run(procon::Field field)
 {
     constexpr double beam_width = 10;
     auto sortEvaLambda = [&](Evaluation const& a,Evaluation const& b)->bool {
-        return a.evaluation < b.evaluation;
+        return a.evaluation > b.evaluation;
     };
 
     std::vector<procon::Field> field_vec;
@@ -56,10 +56,30 @@ procon::Field BeamSearch::run(procon::Field field)
             const int vec_id = evaluations.at(j).vector_id;
             const int piece_id = evaluations.at(j).piece_id;
             procon::Field new_field = field_vec.at(vec_id);
-            //joinPolygon(field_vec.at(vec_id).getFlame(),field_vec.at(vec_id).getPieces().at(piece_id),new_frame,evaluations.at(j).fits);
+            PolygonConnector::joinPolygon(field_vec.at(vec_id).getFlame(),field_vec.at(vec_id).getElementaryPieces().at(piece_id),new_frame,evaluations.at(j).fits);
+            new_field.setFlame(new_frame);
             next_field_vec.push_back(std::move(new_field));
         }
         field_vec = std::move(next_field_vec);
     }
     return field_vec.at(0);
+    /*
+    procon::ExpandedPolygon ret_expol;
+    procon::Field ret_field;
+    std::array<Fit,2> fits;
+    fits.at(0).start_id = 5;
+    fits.at(0).end_id = 5;
+    fits.at(0).flame_inner_pos = 0;
+    fits.at(0).start_dot_or_line = Fit::Dot;
+    fits.at(0).end_dot_or_line = Fit::Dot;
+    fits.at(1).start_id = 1;
+    fits.at(1).end_id = 1;
+    fits.at(1).start_dot_or_line = Fit::Dot;
+    fits.at(1).end_dot_or_line = Fit::Dot;
+    fits.at(1).flame_inner_pos = -1;
+    PolygonConnector::joinPolygon(field.getFlame(),field.getElementaryPieces().at(13),ret_expol,fits);
+    ret_field = field;
+    ret_field.setFlame(ret_expol);
+    return ret_field;
+    */
 }
