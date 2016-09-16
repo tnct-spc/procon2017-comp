@@ -208,12 +208,7 @@ cv::Mat Hazama::capture()
     //setting
     cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
-<<<<<<< HEAD
     cap.set(cv::CAP_PROP_BRIGHTNESS,0.4);
-=======
-    cap.set(cv::CAP_PROP_SATURATION, 200); //OK?
-    cap.set(cv::CAP_PROP_BRIGHTNESS,0.3);
->>>>>>> feature/calibration
     cap.set(cv::CAP_PROP_FOCUS,0.3);
     cap.set(cv::CAP_PROP_SATURATION,80);
     cap.set(cv::CAP_PROP_BACKLIGHT,20);
