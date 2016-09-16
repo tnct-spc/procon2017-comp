@@ -8,6 +8,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "field.h"
 #include "imagerecognition.h"
@@ -35,11 +36,14 @@ void Hazama::init()
 
     //problem: need set box before hazama run. and too too too slow...
     //camera open
-    capture(device_number);
+    capture(0);
     //camera open!
-    capture(device_number);
+    capture(0);
     //camera open!!
-    capture(device_number);
+    capture(0
+            );
+
+    //selectWebCamera();
 }
 
 void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
@@ -113,6 +117,10 @@ void Hazama::run()
 
 
     std::cout << "Run" << std::endl;
+
+    //slectWebCamra device number
+    device_number = selectWebCamera();
+
 
     procon::Field PDATA;
 
@@ -222,7 +230,7 @@ cv::Mat Hazama::capture(int deviceNumber)
 
     //calibrate
     cv::Mat calibration_src;
-    undistort(src, calibration_src, mtx, dist);
+    cv::undistort(src, calibration_src, mtx, dist);
 
     return calibration_src;
 }
@@ -230,4 +238,45 @@ cv::Mat Hazama::capture(int deviceNumber)
 void Hazama::clickedRunButton()
 {
     run();
+}
+
+int Hazama::selectWebCamera()
+{
+    /*
+    QPushButton *Button1 = new QPushButton(tr("&WebCamera1"));
+    QPushButton *Button2 = new QPushButton(tr("&WebCamera2"));
+    QMessageBox MessageBox;
+    MessageBox.setText("Please Select WebCamera's device number");
+    MessageBox.addButton(Button1,QMessageBox::ApplyRole);
+    MessageBox.addButton(Button2,QMessageBox::RejectRole);
+    //int result =  MessageBox.exec();
+    int result = 0;
+    std::cout << MessageBox.exec() << std::endl;
+
+    switch(result){
+        case QMessageBox::Accepted:
+            std::cout << "1" << std::endl;
+            break;
+        case QMessageBox::Discard:
+            std::cout << "2" << std::endl;
+            break;
+        default:
+            break;
+    }
+    */
+    QMessageBox MsgBox;
+    QPushButton *button0 = MsgBox.addButton(tr("WebCamera0"),QMessageBox::ActionRole);
+    QPushButton *button1 = MsgBox.addButton(tr("WebCamera1"),QMessageBox::ActionRole);
+
+    MsgBox.exec();
+
+    if(MsgBox.clickedButton() == button0){
+        std::cout << "0" << std::endl;
+        return 0;
+    }else if(MsgBox.clickedButton() == button1){
+        std::cout << "1" << std::endl;
+        return 1;
+    }
+    MsgBox.deleteLater();
+
 }

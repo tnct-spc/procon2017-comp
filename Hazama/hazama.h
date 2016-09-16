@@ -27,7 +27,7 @@ private:
     int selectWebCamera();
 
     //webcamera deviceNumber[
-    int device_number = 1;
+    int device_number = 0;
 private slots:
     void clickedRunButton();
 };
