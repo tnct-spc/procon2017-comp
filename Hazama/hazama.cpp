@@ -32,10 +32,86 @@ void Hazama::init()
 {
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();
+
+    //problem: need set box before hazama run. and too too too slow...
+    //camera open
+    capture();
+    //camera open!
+    capture();
+    //camera open!!
+    capture();
+}
+
+void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
+{
+    //This is Library... Black box
+    //Reference : http://yuki-sato.com/wordpress/2016/04/15/opencv-%E3%82%AB%E3%83%A1%E3%83%A9%E3%81%AE%E6%AD%AA%E3%81%BF%E3%82%92%E3%81%AA%E3%81%8A%E3%81%99%E3%82%AD%E3%83%A3%E3%83%AA%E3%83%96%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3-c/
+
+    using namespace cv;
+    using namespace std;
+
+    namedWindow("debugwindow", CV_WINDOW_AUTOSIZE);
+
+    int horizonalCrossCount = 10;
+    int verticalCrossCount = 7;
+
+    // calibrate points
+    vector<vector<Point3f>> object_points;
+    vector<vector<Point2f>> image_points;
+    vector<Point3f> obj;
+    for(int j=0;j< horizonalCrossCount * verticalCrossCount;j++) {
+        obj.push_back(Point3f(j/horizonalCrossCount, j%horizonalCrossCount, 0.0f));
+    }
+
+    for(unsigned int i=1; i<numberOfImages; i++) {
+
+        std::cout << "now:" << i << std::endl;
+
+        char filename[128];
+        sprintf(filename, "../../procon2016-comp/calibration/%d.jpg", i);
+        Mat frame = imread(filename);
+        Mat gray;
+
+        flip(frame, frame, -1);
+        cvtColor(frame, gray, CV_BGR2GRAY);
+
+        // 10-7 チェスを探す
+        Size chessboardPatterns(horizonalCrossCount, verticalCrossCount);
+        vector<Point2f> centers;
+        bool found = findChessboardCorners(gray, chessboardPatterns, centers, CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE);
+        if (found) {
+            // 見つけたpointを高精度化する
+            cornerSubPix(gray, centers, Size(11,11), Size(-1,-1), TermCriteria (TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1));
+            object_points.push_back(obj);
+            image_points.push_back(centers);
+
+            // draw
+            drawChessboardCorners(gray, chessboardPatterns, Mat(centers), true);
+            imshow("debugWindow", gray);
+
+        } else {
+            cout << "not found" << endl;
+        }
+    }
+
+    // calibrate
+    vector<Mat> rvecs, tvecs;
+    Mat mtx, dist;
+    calibrateCamera(object_points, image_points, Size(1920,1080), mtx, dist, rvecs, tvecs);
+
+    // save
+    FileStorage fs(savefile_path, FileStorage::WRITE);
+    fs << "mtx" << mtx;
+    fs << "dist" << dist;
+    fs.release();
 }
 
 void Hazama::run()
 {
+    //When you want to calibrate webcamera,please comment out this line!!!
+    //makeCalibrationData("./../../procon2016-comp/calibration/calibration.yml",24);
+
+
     std::cout << "Run" << std::endl;
 
     procon::Field PDATA;
@@ -100,12 +176,29 @@ void Hazama::run()
     /*Display answer*/
     board->setField(field);
 
-    std::cout<<"finish"<<std::endl;
+
+std::cout<<"finish"<<std::endl;
 }
 
 cv::Mat Hazama::capture()
 {
-    cv::VideoCapture cap(1);//デバイスのオープン
+    const std::string calibration_data_file_path = "./../../procon2016-comp/calibration/calibration.yml";
+    static bool init_calibration_flag = false;
+
+    static cv::Mat mtx,dist;
+
+    //init
+    if(!init_calibration_flag){
+        init_calibration_flag = true;
+
+        cv::FileStorage fs(calibration_data_file_path, cv::FileStorage::READ);
+        fs["mtx"] >> mtx;
+        fs["dist"] >> dist;
+        fs.release();
+    }
+
+
+    cv::VideoCapture cap(0);//デバイスのオープン
     //cap.open(0);//こっちでも良い．
 
     if(!cap.isOpened()){
@@ -115,27 +208,28 @@ cv::Mat Hazama::capture()
     //setting
     cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
+<<<<<<< HEAD
     cap.set(cv::CAP_PROP_BRIGHTNESS,0.4);
+=======
+    cap.set(cv::CAP_PROP_SATURATION, 200); //OK?
+    cap.set(cv::CAP_PROP_BRIGHTNESS,0.3);
+>>>>>>> feature/calibration
     cap.set(cv::CAP_PROP_FOCUS,0.3);
     cap.set(cv::CAP_PROP_SATURATION,80);
     cap.set(cv::CAP_PROP_BACKLIGHT,20);
 
     cv::Mat src;
 
+    //too slow...
     for(int i=0;i<30;i++){
         cap >> src;
     }
 
-    return src;
+    //calibrate
+    cv::Mat calibration_src;
+    undistort(src, calibration_src, mtx, dist);
 
-    //===convert cv::Mat to QImage===//
-    /*
-    cv::Mat dst;
-    cv::cvtColor(src, dst, CV_RGB2BGR);
-    QImage tmp((uchar *)dst.data, dst.cols, dst.rows, dst.step, QImage::Format_RGB888);
-    QImage viewImage = tmp.copy();
-    */
-    //===end===//
+    return calibration_src;
 }
 
 void Hazama::clickedRunButton()
