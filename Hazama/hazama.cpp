@@ -242,28 +242,6 @@ void Hazama::clickedRunButton()
 
 int Hazama::selectWebCamera()
 {
-    /*
-    QPushButton *Button1 = new QPushButton(tr("&WebCamera1"));
-    QPushButton *Button2 = new QPushButton(tr("&WebCamera2"));
-    QMessageBox MessageBox;
-    MessageBox.setText("Please Select WebCamera's device number");
-    MessageBox.addButton(Button1,QMessageBox::ApplyRole);
-    MessageBox.addButton(Button2,QMessageBox::RejectRole);
-    //int result =  MessageBox.exec();
-    int result = 0;
-    std::cout << MessageBox.exec() << std::endl;
-
-    switch(result){
-        case QMessageBox::Accepted:
-            std::cout << "1" << std::endl;
-            break;
-        case QMessageBox::Discard:
-            std::cout << "2" << std::endl;
-            break;
-        default:
-            break;
-    }
-    */
     QMessageBox MsgBox;
     QPushButton *button0 = MsgBox.addButton(tr("WebCamera0"),QMessageBox::ActionRole);
     QPushButton *button1 = MsgBox.addButton(tr("WebCamera1"),QMessageBox::ActionRole);
@@ -280,5 +258,4 @@ int Hazama::selectWebCamera()
         return 1;
     }
     MsgBox.deleteLater();
-
 }
