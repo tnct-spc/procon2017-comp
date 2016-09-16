@@ -268,6 +268,8 @@ int Hazama::selectWebCamera()
     QPushButton *button0 = MsgBox.addButton(tr("WebCamera0"),QMessageBox::ActionRole);
     QPushButton *button1 = MsgBox.addButton(tr("WebCamera1"),QMessageBox::ActionRole);
 
+    MsgBox.setText("Please select deveice number");
+
     MsgBox.exec();
 
     if(MsgBox.clickedButton() == button0){
