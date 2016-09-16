@@ -21,7 +21,7 @@ std::vector<Evaluation> BeamSearch::fieldSearch(procon::Field field)
 
 procon::Field BeamSearch::run(procon::Field field)
 {
-    double beam_width = 10;
+    constexpr double beam_width = 10;
     auto sortEvaLambda = [&](Evaluation const& a,Evaluation const& b)->bool {
         return a.evaluation < b.evaluation;
     };
@@ -33,7 +33,7 @@ procon::Field BeamSearch::run(procon::Field field)
     procon::Field buckup_field;
 
     //ピースが全部置かれたら終了
-    for (int i = 0;i < field.getElementaryPieces().size();i++){
+    for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++){
 
         buckup_field = field_vec.at(0);
         std::vector<Evaluation> evaluations;
