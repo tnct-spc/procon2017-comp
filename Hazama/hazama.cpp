@@ -109,15 +109,16 @@ cv::Mat Hazama::capture()
     //cap.open(0);//こっちでも良い．
 
     if(!cap.isOpened()){
-        std::cerr << "Can't open camera!" << std::endl;
+        std::cerr << "Couldn't open camera!" << std::endl;
     }
 
     //setting
     cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
-    cap.set(cv::CAP_PROP_BRIGHTNESS,0.3);
+    cap.set(cv::CAP_PROP_BRIGHTNESS,0.4);
     cap.set(cv::CAP_PROP_FOCUS,0.3);
-    cap.set(cv::CAP_PROP_SATURATION,200);
+    cap.set(cv::CAP_PROP_SATURATION,80);
+    cap.set(cv::CAP_PROP_BACKLIGHT,20);
 
     cv::Mat src;
 
