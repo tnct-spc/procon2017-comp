@@ -35,11 +35,11 @@ void Hazama::init()
 
     //problem: need set box before hazama run. and too too too slow...
     //camera open
-    capture();
+    capture(device_number);
     //camera open!
-    capture();
+    capture(device_number);
     //camera open!!
-    capture();
+    capture(device_number);
 }
 
 void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
@@ -127,7 +127,7 @@ void Hazama::run()
         //get Image
         if(ui->useWebCamera->isChecked()){
             //camera open
-            capture();
+            capture(device_number);
 
             cv::namedWindow("capture",cv::WINDOW_AUTOSIZE);
             cv::Mat pressentertextwindow = cv::Mat::zeros(100,700,CV_8UC3);
@@ -136,10 +136,10 @@ void Hazama::run()
             cv::putText(pressentertextsecondwindow,"Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(0,255,255),2,CV_AA);
             cv::imshow("capture",pressentertextwindow);
             while(cv::waitKey(0)==13);
-            flame = capture();
+            flame = capture(device_number);
             cv::imshow("capture",pressentertextsecondwindow);
             while(cv::waitKey(0)==13);
-            pieces = capture();
+            pieces = capture(device_number);
             cv::imwrite("flame.png",flame,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
             cv::imwrite("pieces.png",pieces,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
             cv::destroyWindow("capture");
@@ -180,7 +180,7 @@ void Hazama::run()
 std::cout<<"finish"<<std::endl;
 }
 
-cv::Mat Hazama::capture()
+cv::Mat Hazama::capture(int deviceNumber)
 {
     const std::string calibration_data_file_path = "./../../procon2016-comp/calibration/calibration.yml";
     static bool init_calibration_flag = false;
@@ -198,7 +198,7 @@ cv::Mat Hazama::capture()
     }
 
 
-    cv::VideoCapture cap(0);//デバイスのオープン
+    cv::VideoCapture cap(deviceNumber);//デバイスのオープン
     //cap.open(0);//こっちでも良い．
 
     if(!cap.isOpened()){
@@ -208,12 +208,7 @@ cv::Mat Hazama::capture()
     //setting
     cap.set(cv::CAP_PROP_FRAME_WIDTH,1920);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT,1080);
-<<<<<<< HEAD
     cap.set(cv::CAP_PROP_BRIGHTNESS,0.4);
-=======
-    cap.set(cv::CAP_PROP_SATURATION, 200); //OK?
-    cap.set(cv::CAP_PROP_BRIGHTNESS,0.3);
->>>>>>> feature/calibration
     cap.set(cv::CAP_PROP_FOCUS,0.3);
     cap.set(cv::CAP_PROP_SATURATION,80);
     cap.set(cv::CAP_PROP_BACKLIGHT,20);
