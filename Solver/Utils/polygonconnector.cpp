@@ -235,7 +235,7 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
                     (ring1_orange_end_zone && (ring2_white_zone || (ring2_orange_start_zone && (cmstart1!=cmend1)) || (ring2_yello_start_zone && !ring2_yellow_end_zone))) ||
                     (ring1_red_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_yellow_end_zone)) ||
                     (ring1_orange_start_zone && (ring2_white_zone || ring2_yellow_end_zone || (ring2_orange_end_zone && (cmstart1 != cmend1)))) ||
-                    (ring1_yello_start_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_orange_end_zone || ring2_red_zone))
+                    (ring1_yello_start_zone && (ring2_yello_start_zone || ring2_white_zone || ring2_yellow_end_zone || ring2_orange_end_zone || ring2_red_zone))
               ){
                 //make ring
                 bg::model::segment<point_t> line2(ring2[ring2_pos],ring2[((ring2_pos - 1)%size2+size2)%size2]);
