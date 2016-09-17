@@ -11,10 +11,16 @@ std::vector<Evaluation> BeamSearch::fieldSearch(procon::Field field)
     for (int j = 0;j < static_cast<int>(field.getElementaryPieces().size());j++){
         if (field.getIsPlaced().at(j)) continue;
         std::vector<Evaluation> eva = evaluateCombination(field.getFlame(),field.getElementaryPieces().at(j));
+        std::vector<Evaluation> eva_inverse = evaluateCombination(field.getFlame(),field.getElementaryInversePieces().at(j));
         for (auto & e : eva){
             e.piece_id = j;
         }
+        for (auto & e : eva_inverse) {
+            e.piece_id = j;
+            e.inverse_flag = true;
+        }
         std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+        std::copy(eva_inverse.begin(),eva_inverse.end(),std::back_inserter(evaluations));
     }
     return evaluations;
 }
@@ -54,11 +60,21 @@ procon::Field BeamSearch::run(procon::Field field)
         sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
 
         for (int j = 0;j < beam_width && j < static_cast<int>(evaluations.size());j++) {
+            int const& vec_id = evaluations.at(j).vector_id;
+            int const& piece_id = evaluations.at(j).piece_id;
+            std::array<Fit,2> const& fits = evaluations.at(j).fits;
+            procon::ExpandedPolygon const& old_frame = field_vec.at(vec_id).getFlame();
+            procon::ExpandedPolygon old_piece;
+            if (evaluations.at(j).inverse_flag){
+                old_piece = field_vec.at(vec_id).getElementaryInversePieces().at(piece_id);
+            } else {
+                old_piece = field_vec.at(vec_id).getElementaryPieces().at(piece_id);
+            }
             procon::ExpandedPolygon new_frame;
-            const int vec_id = evaluations.at(j).vector_id;
-            const int piece_id = evaluations.at(j).piece_id;
             procon::Field new_field = field_vec.at(vec_id);
-            bool hasJoinSuccess = PolygonConnector::joinPolygon(field_vec.at(vec_id).getFlame(),field_vec.at(vec_id).getElementaryPieces().at(piece_id),new_frame,evaluations.at(j).fits);
+
+            bool hasJoinSuccess = PolygonConnector::joinPolygon(old_frame,old_piece,new_frame,fits);
+
             if (hasJoinSuccess) {
                 new_field.setFlame(new_frame);
                 new_field.setIsPlaced(piece_id);

@@ -21,6 +21,7 @@ private:
     //素のピース&フレーム
     procon::ExpandedPolygon elementary_flame;
     std::vector<procon::ExpandedPolygon> elementary_pieces;
+    std::vector<procon::ExpandedPolygon> elementary_inverse_pieces;
 
     //ピースが置かれているか保存する変数
     std::array<bool,50> isPlaced;
@@ -50,6 +51,7 @@ public:
     procon::ExpandedPolygon const& getFlame() const;
     procon::ExpandedPolygon const& getElementaryFlame() const;
     std::vector<procon::ExpandedPolygon> const& getElementaryPieces() const;
+    std::vector<procon::ExpandedPolygon> const& getElementaryInversePieces() const;
     std::array<bool,50> const& getIsPlaced() const;
     int getFieldScore();
     int getPiecesSize();

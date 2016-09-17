@@ -46,6 +46,11 @@ void procon::Field::setElementaryFlame(procon::ExpandedPolygon const& flame)
 void procon::Field::setElementaryPieces(std::vector<procon::ExpandedPolygon> const& pieces)
 {
     elementary_pieces = pieces;
+    elementary_inverse_pieces.clear();
+    for (auto piece : elementary_pieces) {
+        piece.inversePolygon();
+        elementary_inverse_pieces.emplace_back(piece);
+    }
 }
 
 void procon::Field::setIsPlaced(const std::array<bool,50> &IsPlaced)
@@ -79,9 +84,16 @@ procon::ExpandedPolygon const& procon::Field::getElementaryFlame() const
     return elementary_flame;
 }
 
+
 std::vector<procon::ExpandedPolygon> const& procon::Field::getElementaryPieces() const
 {
     return elementary_pieces;
+}
+
+
+std::vector<procon::ExpandedPolygon> const& procon::Field::getElementaryInversePieces() const
+{
+    return elementary_inverse_pieces;
 }
 
 int procon::Field::getPiecesSize()

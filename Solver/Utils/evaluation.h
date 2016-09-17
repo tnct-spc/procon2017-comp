@@ -13,6 +13,7 @@ public:
     int piece_id;
     int frame_id;
     int vector_id;
+    bool inverse_flag;
     double evaluation;
 };
 
