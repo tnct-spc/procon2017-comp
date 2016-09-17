@@ -54,6 +54,9 @@ protected:
 
 
 public:
+    // Public Member
+    std::vector<procon::ExpandedPolygon> jointed_pieces;
+
     //constructor
     ExpandedPolygon(int id_ = -1);
     ExpandedPolygon(std::vector<int> multi_ids_);

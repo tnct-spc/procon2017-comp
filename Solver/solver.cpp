@@ -18,6 +18,10 @@ procon::Field Solver::run(procon::Field field, int algorithm_number)
     Algorithms.push_back(new BeamSearch());
 
     procon::Field result = Algorithms.at(algorithm_number)->run(field);
+    if(algorithm_number == 3){
+        result.setElementaryFlame(result.getFlame());
+        result = Algorithms.at(1)->run(result);
+    }
 
     for(auto algo : Algorithms) delete(algo);
     Algorithms.clear();
