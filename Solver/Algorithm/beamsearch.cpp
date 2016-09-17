@@ -56,11 +56,13 @@ procon::Field BeamSearch::run(procon::Field field)
             const int vec_id = evaluations.at(j).vector_id;
             const int piece_id = evaluations.at(j).piece_id;
             procon::Field new_field = field_vec.at(vec_id);
-            PolygonConnector::joinPolygon(field_vec.at(vec_id).getFlame(),field_vec.at(vec_id).getElementaryPieces().at(piece_id),new_frame,evaluations.at(j).fits);
+            bool hasJoinSuccess = PolygonConnector::joinPolygon(field_vec.at(vec_id).getFlame(),field_vec.at(vec_id).getElementaryPieces().at(piece_id),new_frame,evaluations.at(j).fits);
+            if(!hasJoinSuccess) continue;
             new_field.setFlame(new_frame);
             next_field_vec.push_back(std::move(new_field));
         }
         field_vec = std::move(next_field_vec);
+        if(field_vec.empty()) return buckup_field;
     }
     return field_vec.at(0);
     /*
