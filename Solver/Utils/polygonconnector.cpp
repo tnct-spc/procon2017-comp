@@ -223,7 +223,7 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
             //skip check
             if(     ring1_white_zone ||
                     (ring1_yellow_end_zone && (ring2_white_zone || ring2_red_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
-                    (ring1_orange_end_zone && (ring2_white_zone || (ring2_orange_start_zone && (cmstart1!=cmend1)) || ring2_yello_start_zone)) ||
+                    (ring1_orange_end_zone && (ring2_white_zone || (ring2_orange_start_zone && (cmstart1!=cmend1)) || (ring2_yello_start_zone && !ring2_yellow_end_zone))) ||
                     (ring1_red_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_yellow_end_zone)) ||
                     (ring1_orange_start_zone && (ring2_white_zone || ring2_yellow_end_zone || (ring2_orange_end_zone && (cmstart1 != cmend1)))) ||
                     (ring1_yello_start_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_orange_end_zone || ring2_red_zone))
@@ -249,7 +249,7 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
                 }else{
                     ring2_white_zone = true;
                 }
-            }else if(ring2_yellow_end_zone){
+            }else if(ring2_yellow_end_zone && (fit2.start_dot_or_line == Fit::Dot ? ring2_yello_start_zone == false : ring2_orange_start_zone == false)){
                 ring2_yellow_end_zone = false;
                 ring2_white_zone = true;
             }
@@ -261,9 +261,11 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
                     ring2_orange_start_zone = true;
                 }
             }else if(ring2_yello_start_zone){
+                ring2_yellow_end_zone = false;
                 ring2_yello_start_zone = false;
                 ring2_orange_start_zone = true;
             }else if(ring2_orange_start_zone){
+                ring2_yellow_end_zone = false;
                 ring2_orange_start_zone = false;
                 ring2_red_zone = true;
             }
@@ -280,10 +282,11 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
             }else{
                 ring1_white_zone = true;
             }
-        }else if(ring1_yellow_end_zone){
+        }else if(ring1_yellow_end_zone && (fit1.start_dot_or_line == Fit::Dot ? ring1_yello_start_zone == false : ring1_orange_start_zone == false)){
             ring1_yellow_end_zone = false;
             ring1_white_zone = true;
-        }else if((ring1_pos+2)%size1 == cmstart1){
+        }
+        if((ring1_pos+2)%size1 == cmstart1){
             ring1_white_zone = false;
             if(fit1.start_dot_or_line == Fit::Dot){
                 ring1_yello_start_zone = true;
@@ -291,9 +294,11 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
                 ring1_orange_start_zone = true;
             }
         }else if(ring1_yello_start_zone){
+            ring1_yellow_end_zone = false;
             ring1_yello_start_zone = false;
             ring1_orange_start_zone = true;
         }else if(ring1_orange_start_zone){
+            ring1_yellow_end_zone = false;
             ring1_orange_start_zone = false;
             ring1_red_zone = true;
         }
