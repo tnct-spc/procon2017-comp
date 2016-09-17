@@ -42,6 +42,7 @@ public:
     void setElementaryFlame(procon::ExpandedPolygon const& flame);
     void setElementaryPieces(std::vector<procon::ExpandedPolygon> const& pieces);
     void setIsPlaced(std::array<bool,50> const& IsPlaced);
+    void setIsPlaced(int const& piece_id);
 
     //getter
     std::vector<procon::ExpandedPolygon> const& getPieces() const;

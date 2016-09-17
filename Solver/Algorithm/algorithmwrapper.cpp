@@ -121,10 +121,9 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombination(procon::ExpandedPo
 {
     double frame_first = 0;
     double piece_first = 0;
-    int Eva = 0;
     std::vector<Evaluation> evaluations;
 
-    for (int k = 0; k < frame.getPolygon().inners().size(); ++k){
+    for (int k = 0; k < static_cast<int>(frame.getPolygon().inners().size()); ++k){
         const int inner_size = static_cast<int>(frame.getPolygon().inners().at(k).size() - 1);
         for (int i = 0; i < inner_size; ++i) {
             frame_first = frame.getInnersSideAngle().at(k).at(i);

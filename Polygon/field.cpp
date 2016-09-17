@@ -53,6 +53,10 @@ void procon::Field::setIsPlaced(const std::array<bool,50> &IsPlaced)
     isPlaced = IsPlaced;
 }
 
+void procon::Field::setIsPlaced(int const& piece_id){
+    isPlaced.at(piece_id) = true;
+}
+
 //getter
 std::vector<procon::ExpandedPolygon> const& procon::Field::getPieces() const
 {

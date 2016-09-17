@@ -21,13 +21,15 @@ std::vector<Evaluation> BeamSearch::fieldSearch(procon::Field field)
 
 procon::Field BeamSearch::run(procon::Field field)
 {
-    constexpr double beam_width = 10;
     auto sortEvaLambda = [&](Evaluation const& a,Evaluation const& b)->bool {
         return a.evaluation > b.evaluation;
     };
+    //ビーム幅
+    const double beam_width = 100;
 
     std::vector<procon::Field> field_vec;
     std::vector<procon::Field> next_field_vec;
+
     field.setFlame(field.getElementaryFlame());
     field_vec.push_back(field);
     procon::Field buckup_field;
@@ -47,7 +49,7 @@ procon::Field BeamSearch::run(procon::Field field)
         }
 
         //それより先がなければその1手前の最高評価値のフィールドを返す
-        if (evaluations.size() == 0) return buckup_field;
+        if (evaluations.empty()) return buckup_field;
 
         sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
 
@@ -57,31 +59,16 @@ procon::Field BeamSearch::run(procon::Field field)
             const int piece_id = evaluations.at(j).piece_id;
             procon::Field new_field = field_vec.at(vec_id);
             bool hasJoinSuccess = PolygonConnector::joinPolygon(field_vec.at(vec_id).getFlame(),field_vec.at(vec_id).getElementaryPieces().at(piece_id),new_frame,evaluations.at(j).fits);
-            if(!hasJoinSuccess) continue;
-            new_field.setFlame(new_frame);
-            next_field_vec.push_back(std::move(new_field));
+            if (hasJoinSuccess) {
+                new_field.setFlame(new_frame);
+                new_field.setIsPlaced(piece_id);
+                next_field_vec.push_back(std::move(new_field));
+            }
         }
         field_vec = std::move(next_field_vec);
+
+        //結合できるものがなければその１手前の最高評価地のフィールドを返す
         if(field_vec.empty()) return buckup_field;
     }
     return field_vec.at(0);
-    /*
-    procon::ExpandedPolygon ret_expol;
-    procon::Field ret_field;
-    std::array<Fit,2> fits;
-    fits.at(0).start_id = 5;
-    fits.at(0).end_id = 5;
-    fits.at(0).flame_inner_pos = 0;
-    fits.at(0).start_dot_or_line = Fit::Dot;
-    fits.at(0).end_dot_or_line = Fit::Dot;
-    fits.at(1).start_id = 1;
-    fits.at(1).end_id = 1;
-    fits.at(1).start_dot_or_line = Fit::Dot;
-    fits.at(1).end_dot_or_line = Fit::Dot;
-    fits.at(1).flame_inner_pos = -1;
-    PolygonConnector::joinPolygon(field.getFlame(),field.getElementaryPieces().at(13),ret_expol,fits);
-    ret_field = field;
-    ret_field.setFlame(ret_expol);
-    return ret_field;
-    */
 }
