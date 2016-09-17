@@ -126,6 +126,30 @@ void AnswerBoard::paintEvent(QPaintEvent *)
 
     //draw field
     if(is_set_field){
+        auto drawPiece = [&](procon::ExpandedPolygon piece){
+            int piece_id = piece.getId();
+            bool has_connector = piece_id == -1 ? false : is_set_rawpic ? true : false;
+            //get polygon center pos
+            point_t center = {0,0};
+            boost::geometry::centroid(piece.getPolygon(), center);
+            QPointF display_pos = getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT);
+            if(has_connector) field_pieces_pos.at(piece_id) = display_pos;
+
+            //draw piece
+            painter.setPen(QPen(Qt::black, 3));
+            if(has_connector) painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
+            else painter.setBrush(QBrush(QColor(color_piece)));
+            drawPolygon(piece.getPolygon(),Space::LEFT);
+            //draw number
+            if(is_set_rawpic){
+                painter.setPen(QPen(QColor(color_id)));
+                QFont font = painter.font();
+                font.setPointSize(std::abs(getScale()/30));
+                painter.setFont(font);
+                painter.drawText(display_pos, (piece_id != -1) ? QString::number(piece_id) : QString::fromStdString(piece.makeMultiIdString()));
+            }
+        };
+
         //
         //int count = 0;
         //for(auto piece : field->getElementaryPieces()){
@@ -139,34 +163,18 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         painter.setBrush(QBrush(QColor(color_flame)));
         drawPolygon(field->getFlame().getPolygon(),Space::LEFT);
 
+        //draw flame-jointed pieces
+        for(auto piece : field->getFlame().jointed_pieces){
+            drawPiece(piece);
+        }
+
         //draw flame inners
         painter.setBrush(QBrush(QColor(color_inner)));
         drawPolygonInners(field->getFlame().getPolygon(),Space::LEFT);
 
         //draw pieces
-        int pieces_size = field->getPiecesSize();
-        for(int i=0;i<pieces_size;i++){
-            int piece_id = field->getPiece(i).getId();
-            bool has_connector = piece_id == -1 ? false : is_set_rawpic ? true : false;
-            //get polygon center pos
-            point_t center = {0,0};
-            boost::geometry::centroid(field->getPiece(i).getPolygon(), center);
-            QPointF display_pos = getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT);
-            if(has_connector) field_pieces_pos.at(piece_id) = display_pos;
-
-            //draw piece
-            painter.setPen(QPen(Qt::black, 3));
-            if(has_connector) painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
-            else painter.setBrush(QBrush(QColor(color_piece)));
-            drawPolygon(field->getPiece(i).getPolygon(),Space::LEFT);
-            //draw number
-            if(is_set_rawpic){
-                painter.setPen(QPen(QColor(color_id)));
-                QFont font = painter.font();
-                font.setPointSize(std::abs(getScale()/30));
-                painter.setFont(font);
-                painter.drawText(display_pos, (piece_id != -1) ? QString::number(piece_id) : QString::fromStdString(field->getPiece(i).makeMultiIdString()));
-            }
+        for(auto piece : field->getPieces()){
+            drawPiece(piece);
         }
     }
 

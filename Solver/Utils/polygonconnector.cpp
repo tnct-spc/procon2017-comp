@@ -170,18 +170,27 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
         Polygon1.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
 
         new_polygon = std::move(Polygon1);
+        pushRingToPolygon(ring2, Polygon2);
+        new_polygon.jointed_pieces.push_back(Polygon2);
 
     }else if(Polygon2.getInnerSize() != 0){
         pushRingToPolygon(new_ring, Polygon2, fit2.flame_inner_pos);
         Polygon2.setMultiIds(std::vector<int>{Polygon2.getId(), Polygon1.getId()});
 
         new_polygon = std::move(Polygon2);
+        pushRingToPolygon(ring1, Polygon1);
+        new_polygon.jointed_pieces.push_back(Polygon1);
 
     }else{
         new_polygon.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
         pushRingToPolygon(new_ring, new_polygon);
+        pushRingToPolygon(ring1, Polygon1);
+        pushRingToPolygon(ring2, Polygon2);
+        new_polygon.jointed_pieces.push_back(Polygon1);
+        new_polygon.jointed_pieces.push_back(Polygon2);
     }
     if(conf) return false;
+
     return true;
 }
 
