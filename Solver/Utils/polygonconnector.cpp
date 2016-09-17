@@ -252,7 +252,8 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
             }else if(ring2_yellow_end_zone){
                 ring2_yellow_end_zone = false;
                 ring2_white_zone = true;
-            }else if(((ring2_pos-2)%size2+size2)%size2 == cmstart2){
+            }
+            if(((ring2_pos-2)%size2+size2)%size2 == cmstart2){
                 ring2_white_zone = false;
                 if(fit2.start_dot_or_line == Fit::Dot){
                     ring2_yello_start_zone = true;
