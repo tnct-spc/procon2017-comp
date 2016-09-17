@@ -231,7 +231,7 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
 
             //skip check
             if(     ring1_white_zone ||
-                    (ring1_yellow_end_zone && (ring2_white_zone || ring2_red_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
+                    (ring1_yellow_end_zone && (ring2_yellow_end_zone || ring2_white_zone || ring2_red_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
                     (ring1_orange_end_zone && (ring2_white_zone || (ring2_orange_start_zone && (cmstart1!=cmend1)) || (ring2_yello_start_zone && !ring2_yellow_end_zone))) ||
                     (ring1_red_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_yellow_end_zone)) ||
                     (ring1_orange_start_zone && (ring2_white_zone || ring2_yellow_end_zone || (ring2_orange_end_zone && (cmstart1 != cmend1)))) ||
