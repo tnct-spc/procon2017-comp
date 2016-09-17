@@ -16,7 +16,7 @@ Ring PolygonConnector::popRingByPolygon(procon::ExpandedPolygon& polygon, int in
         Ring inner = polygon.getPolygon().inners().at(inner_position);
         Ring outer;
         int inner_size = inner.size();
-        for(int i=inner_size-1; i > 0; --i){ //not copy i==0
+        for(int i=0; i < inner_size-1; ++i){ //not copy last
             outer.push_back(inner[i]);
         }
         return outer;
@@ -38,7 +38,7 @@ void PolygonConnector::pushRingToPolygon(Ring& ring, procon::ExpandedPolygon& po
     }else{
         Ring inner;
         int ring_size = ring.size();
-        for(int i=ring_size-1; i >= 0; --i){
+        for(int i=0; i < ring_size; ++i){
             inner.push_back(ring[i]);
         }
         new_raw_polygon.inners().at(inner_position).clear();
