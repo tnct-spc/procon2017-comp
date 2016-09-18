@@ -80,10 +80,12 @@ void procon::ExpandedPolygon::calcSideAngle()
 
         auto isMajorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
             point_t p4((p1.x() + p3.x()) / 2 , (p1.y() + p3.y()) / 2);
-            const double alpha = 4000.667824083865;
-            const double beta  = 0.710983144633;
-            const double end_x = (p4.x() - p2.x()) > 0 ? alpha : -alpha;
-            const double end_y = (p4.y() - p2.y()) / (p4.x() - p2.x()) * (end_x - p2.x()) + p2.y() + beta;
+            const double alpha = 4000.000000283865;
+            const double beta  = 0.000001446343;
+            const double ganma = 0.000002532443;
+            const double end_x = (p4.x() - p2.x() + ganma) > 0 ? alpha : -alpha;
+            const double end_y_length = abs((p4.y() - p2.y()) / (p4.x() - p2.x() + ganma) * (end_x - p2.x()) + p2.y() + beta);
+            const double end_y = p4.y() - p2.y() > 0 ? end_y_length : -end_y_length;
             point_t end_point(end_x,end_y);
             bg::model::segment<point_t> judge_segment(p2,end_point);
             int intersect_num = 0,points_size = size;
