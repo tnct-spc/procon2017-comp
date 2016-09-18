@@ -29,6 +29,7 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->size = p.size;
     this->inners_size = p.inners_size;
     this->jointed_pieces = p.jointed_pieces;
+    /*
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
@@ -36,6 +37,15 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     std::copy(p.inners_side_length.begin(),p.inners_side_length.end(), std::back_inserter(this->inners_side_length));
     std::copy(p.inners_side_angle.begin(),p.inners_side_angle.end(), std::back_inserter(this->inners_side_angle));
     std::copy(p.inners_side_slope.begin(),p.inners_side_slope.end(), std::back_inserter(this->inners_side_slope));
+    */
+    this->multi_ids = p.multi_ids;
+    this->side_length = p.side_length;
+    this->side_angle = p.side_angle;
+    this->side_slope = p.side_slope;
+    this->inners_side_length = p.inners_side_length;
+    this->inners_side_angle = p.inners_side_angle;
+    this->inners_side_slope = p.inners_side_slope;
+
     this->polygon.outer().reserve(32);
     this->centerx = p.centerx;
     this->centery = p.centery;
