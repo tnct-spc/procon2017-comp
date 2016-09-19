@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    board = std::make_shared<AnswerBoard>();
+    board->showMaximized();
 }
 
 MainWindow::~MainWindow()
@@ -51,7 +53,10 @@ bool MainWindow::get()
 
     //solve puzzle
     Solver solver;
-    procon::Field field = solver.run(PDATA);
+    procon::Field field = solver.run(PDATA, 3);
+
+    //Display answer
+    board->setField(field);
 
     //io
     procon::PolygonIO::exportAnswer(field,SAVE_ANSWER_PATH);

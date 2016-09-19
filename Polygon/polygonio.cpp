@@ -11,14 +11,27 @@ procon::Field procon::PolygonIO::importPolygon(std::string file_path)
     std::ifstream inputfile(file_path);
 
     std::string str;
+
     //flame
     polygon_t flame;
     std::getline(inputfile, str);
     std::string tmpX,tmpY;
     std::istringstream stream(str);
-    while(std::getline(stream,tmpX,',')){
+    while(std::getline(stream,tmpX,',')){ //flame outer
         std::getline(stream,tmpY,',');
         flame.outer().push_back(point_t(std::stof(tmpX),std::stof(tmpY)));
+    }
+    std::getline(inputfile, str);
+    int inner_size = std::stoi(str);
+    for(int i=0;i<inner_size;++i){ //flame inners
+        std::getline(inputfile, str);
+        std::string tmpX,tmpY;
+        std::istringstream stream(str);
+        flame.inners().push_back(polygon_t::ring_type());
+        while(std::getline(stream,tmpX,',')){
+            std::getline(stream,tmpY,',');
+            flame.inners().at(i).push_back(point_t(std::stof(tmpX),std::stof(tmpY)));
+        }
     }
     ExpandedPolygon ex_flame;
     ex_flame.setPolygon(flame);
@@ -47,7 +60,8 @@ procon::Field procon::PolygonIO::importPolygon(std::string file_path)
 void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path)
 {
     std::ofstream outputfile(file_path);
-    //flame
+
+    //flame outer
     procon::ExpandedPolygon raw_ex_flame = field.getElementaryFlame();
     polygon_t raw_flame = raw_ex_flame.getPolygon();
     int flame_size = raw_ex_flame.getSize();
@@ -56,6 +70,26 @@ void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path
         outputfile << raw_flame.outer()[i].x() << "," << raw_flame.outer()[i].y();
     }
     outputfile << "\n";
+
+    //flame inner
+    outputfile << raw_ex_flame.getInnerSize() << "\n";
+    for(auto inner : raw_flame.inners()){
+
+        bool line_begin_flag = true;
+
+        for(auto corner : inner){
+
+            if(line_begin_flag){
+                line_begin_flag = false;
+            }else{
+                outputfile << ",";
+            }
+
+            outputfile << corner.x() << "," << corner.y();
+        }
+        outputfile << "\n";
+    }
+
     //piece
     std::vector<polygon_t> raw_pieces;
     int pieces_size = field.getElementaryPieces().size();
@@ -65,7 +99,7 @@ void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path
     for(int i=0;i<pieces_size;i++){
         procon::ExpandedPolygon raw_ex_piece = field.getElementaryPieces().at(i);
         int piece_size = raw_ex_piece.getSize();
-        for(int j=0;j<piece_size;j++){
+        for(int j=0;j<piece_size+1;j++){ //becareful output +1 corner!
             if(j!=0) outputfile << ",";
             outputfile << raw_pieces.at(i).outer()[j].x() << "," << raw_pieces.at(i).outer()[j].y();
         }
@@ -76,6 +110,11 @@ void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path
 
 void procon::PolygonIO::exportAnswer(procon::Field field, std::string file_path)
 {
+    //flame jointed piece to normal piece
+    for(auto piece : field.getFlame().jointed_pieces){
+        field.setPiece(piece);
+    }
+
     std::ofstream outputfile(file_path);
 
     for(procon::ExpandedPolygon piece : field.getPieces()){
@@ -108,7 +147,7 @@ procon::Field procon::PolygonIO::importAnswer(std::string file_path, procon::Fie
 
             procon::ExpandedPolygon tmpPolygon = field.getElementaryPieces().at(std::stoi(tmpID));
             tmpPolygon.setPolygonPosition(std::stod(tmpX),std::stod(tmpY));
-            tmpPolygon.setPolygonAngle(std::stod(tmpR));
+            tmpPolygon.rotatePolygon(std::stoi(tmpI) == true ? -std::stod(tmpR) : std::stod(tmpR));
             if(std::stoi(tmpI) == true) tmpPolygon.inversePolygon();
             field.setPiece(tmpPolygon);
         }

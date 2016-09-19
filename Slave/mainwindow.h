@@ -18,6 +18,7 @@
 
 #include "solver.h"
 #include "polygonio.h"
+#include "answerboard.h"
 
 namespace Ui {
 class MainWindow;
@@ -32,6 +33,7 @@ public:
     ~MainWindow();
 
 private:
+        std::shared_ptr<AnswerBoard> board;
     Ui::MainWindow *ui;
     bool get();
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);

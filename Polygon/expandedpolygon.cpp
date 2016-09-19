@@ -29,6 +29,7 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->size = p.size;
     this->inners_size = p.inners_size;
     this->jointed_pieces = p.jointed_pieces;
+    this->is_inverse = p.is_inverse;
     /*
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
@@ -282,6 +283,7 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->polygon = p.polygon;
     this->size = p.size;
     this->inners_size = p.inners_size;
+    this->is_inverse = p.is_inverse;
     /*
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
