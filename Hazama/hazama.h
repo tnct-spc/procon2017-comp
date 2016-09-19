@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <opencv2/core/core.hpp>
 #include "answerboard.h"
+#include "http/request_mapper.h"
 
 namespace Ui {
 class Hazama;
@@ -23,8 +24,13 @@ private:
     Ui::Hazama *ui;
     cv::Mat capture();
     std::shared_ptr<AnswerBoard> board;
+    RequestMapper request_mapper;
+    procon::Field PDATA;
+    bool first_answer_flag = true;
+    procon::Field best_answer;
 private slots:
     void clickedRunButton();
+    void acceptAnswer(QString file_path);
 };
 
 #endif // HAZAMA_H

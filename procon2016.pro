@@ -7,4 +7,5 @@ SUBDIRS += \
     Solver \
     ProbMaker \
     Hazama \
-    Test
+    Test \
+    Slave

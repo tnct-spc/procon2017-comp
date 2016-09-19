@@ -28,12 +28,6 @@ class ExpandedPolygon
     std::vector<double> side_angle;
     polygon_t polygon;
 
-    double difference_of_default_degree = 0;
-
-    double centerx = 0;
-    double centery = 0;
-
-
     //calc
     void calcSize();
     void calcSideLength();
@@ -72,6 +66,12 @@ public:
     void setPolygonAngle(double degree);
     void setPolygonPosition(double x,double y);
 
+    double difference_of_default_degree = 0;
+
+    double centerx = 0;
+    double centery = 0;
+
+    bool is_inverse = false;
 
 };
 
