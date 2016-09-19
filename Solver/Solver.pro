@@ -22,7 +22,8 @@ SOURCES += solver.cpp \
     Utils/fit.cpp \
     Utils/evaluation.cpp \
     Algorithm/beamsearch.cpp \
-    Evaluation/searchsamelength.cpp
+    Evaluation/searchsamelength.cpp \
+    Algorithm/beamsearchbylength.cpp
 
 HEADERS += solver.h\
         solver_global.h \
@@ -34,7 +35,8 @@ HEADERS += solver.h\
     Utils/fit.h \
     Utils/evaluation.h \
     Algorithm/beamsearch.h \
-    Evaluation/searchsamelength.h
+    Evaluation/searchsamelength.h \
+    Algorithm/beamsearchbylength.h
 
 unix {
     target.path = /usr/lib
