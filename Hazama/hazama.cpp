@@ -180,19 +180,19 @@ void Hazama::run()
         return;
     }
 
-    /*Save Puzzle*/
-    std::string PROBLEM_SAVE_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
-    std::cout<<PROBLEM_SAVE_PATH<<std::endl;
-    procon::PolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
+    if(ui->server_mode_radio->isChecked()){
+        /*Save Puzzle*/
+        std::string PROBLEM_SAVE_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
+        std::cout<<PROBLEM_SAVE_PATH<<std::endl;
+        procon::PolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
+    }else{
+        //Solve puzzle
+        Solver solver;
+        procon::Field field = solver.run(PDATA,3);
 
-    /*
-    //Solve puzzle
-    Solver solver;
-    procon::Field field = solver.run(PDATA,3);
-
-    //Display answer
-    board->setField(field);
-    */
+        //Display answer
+        board->setField(field);
+    }
 
 
 std::cout<<"finish"<<std::endl;
