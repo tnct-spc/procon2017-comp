@@ -29,6 +29,7 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->size = p.size;
     this->inners_size = p.inners_size;
     this->jointed_pieces = p.jointed_pieces;
+    this->is_inverse = p.is_inverse;
     /*
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
@@ -282,6 +283,7 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->polygon = p.polygon;
     this->size = p.size;
     this->inners_size = p.inners_size;
+    this->is_inverse = p.is_inverse;
     /*
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
@@ -299,8 +301,8 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->inners_side_length = p.inners_side_length;
     this->inners_side_angle = p.inners_side_angle;
     this->inners_side_slope = p.inners_side_slope;
-
-    this->polygon.outer().reserve(32);    this->centerx = p.centerx;
+    this->polygon.outer().reserve(32);
+    this->centerx = p.centerx;
     this->centery = p.centery;
     this->difference_of_default_degree = p.difference_of_default_degree;
 
@@ -324,6 +326,12 @@ void procon::ExpandedPolygon::updatePolygon(bool calc)
 
 void procon::ExpandedPolygon::inversePolygon()
 {
+    if(is_inverse == true){
+        is_inverse = false;
+    }else{
+        is_inverse = true;
+    }
+
     polygon_t translate_polygon;
 
     boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-centerx,0);

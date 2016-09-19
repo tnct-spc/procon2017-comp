@@ -510,9 +510,6 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     for (auto po:polygons){
         procon::ExpandedPolygon ishowta;
         ishowta.setPolygon(po);
-        disp.push_back(new SinglePolygonDisplay());
-        disp.at(count)->setPolygon(ishowta,4000,std::to_string(count + 1));
-        disp.at(count)->show();
         count++;
         std::cout << "piece" << bg::dsv(po) << std::endl;
     }*/

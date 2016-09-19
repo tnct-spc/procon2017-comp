@@ -34,15 +34,28 @@ void Hazama::init()
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();
 
-    //problem: need set box before hazama run. and too too too slow...
-    //camera open
-    capture(0);
-    //camera open!
-    capture(0);
-    //camera open!!
-    capture(0);
+    //selectWebCamera(); <- ha?
 
-    //selectWebCamera();
+    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
+}
+
+void Hazama::acceptAnswer(QString file_path)
+{
+    std::cout<<"accept!!!!!!!!!!!!!!!!!"<<std::endl;
+    //get POST puzzle answer data
+    procon::Field field = procon::PolygonIO::importAnswer(file_path.toStdString(),PDATA);
+
+    if(first_answer_flag){
+        first_answer_flag = false;
+        best_answer = field;
+    }else{
+        if(field.getPiecesSize() > best_answer.getPiecesSize()){
+            best_answer = field;
+        }
+    }
+
+    //Display answer
+    board->setField(best_answer);
 }
 
 void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
@@ -117,10 +130,6 @@ void Hazama::run()
 
     std::cout << "Run" << std::endl;
 
-
-
-    procon::Field PDATA;
-
     std::string flame_path = "./../../procon2016-comp/sample/1_flame.png";
     std::string pieces_path = "./../../procon2016-comp/sample/1_pieces.png";
     std::string path = "./../../procon2016-comp/sample/data.csv";
@@ -178,15 +187,21 @@ void Hazama::run()
         return;
     }
 
-    /*Solve puzzle*/
-    Solver solver;
-    procon::Field field = solver.run(PDATA,4);
+    if(ui->server_mode_radio->isChecked()){
+        /*Save Puzzle*/
+        std::string PROBLEM_SAVE_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
+        std::cout<<PROBLEM_SAVE_PATH<<std::endl;
+        procon::PolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
+    }else{
+        //Solve puzzle
+        Solver solver;
+        procon::Field field = solver.run(PDATA,0);
 
-    /*Display answer*/
-    board->setField(field);
+        //Display answer
+        board->setField(field);
+    }
 
-
-std::cout<<"finish"<<std::endl;
+    std::cout<<"finish"<<std::endl;
 }
 
 cv::Mat Hazama::capture(int deviceNumber)

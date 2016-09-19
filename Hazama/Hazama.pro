@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui widgets network
 
 CONFIG += c++14
 
@@ -13,9 +13,17 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        hazama.cpp
+        hazama.cpp \
+    http/answer_form.cpp \
+    http/help_page.cpp \
+    http/output_problem_page.cpp \
+    http/request_mapper.cpp
 
-HEADERS  += hazama.h
+HEADERS  += hazama.h \
+    http/answer_form.h \
+    http/help_page.h \
+    http/output_problem_page.h \
+    http/request_mapper.h
 
 FORMS    += hazama.ui
 
@@ -53,3 +61,10 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+include(qhttpserver/qhttpserver.pri)
+
+unix {
+    target.path = /usr/local/bin
+    INSTALLS += target
+}
