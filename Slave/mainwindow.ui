@@ -67,6 +67,9 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="text">
+     <string>hihumi</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">

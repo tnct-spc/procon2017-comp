@@ -147,8 +147,8 @@ procon::Field procon::PolygonIO::importAnswer(std::string file_path, procon::Fie
 
             procon::ExpandedPolygon tmpPolygon = field.getElementaryPieces().at(std::stoi(tmpID));
             tmpPolygon.setPolygonPosition(std::stod(tmpX),std::stod(tmpY));
-            tmpPolygon.rotatePolygon(std::stoi(tmpI) == true ? -std::stod(tmpR) : std::stod(tmpR));
             if(std::stoi(tmpI) == true) tmpPolygon.inversePolygon();
+            tmpPolygon.setPolygonAngle(std::stod(tmpR));
             field.setPiece(tmpPolygon);
         }
     }
