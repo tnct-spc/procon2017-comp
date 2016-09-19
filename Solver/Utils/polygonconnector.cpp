@@ -51,18 +51,8 @@ void PolygonConnector::pushRingToPolygon(Ring& ring, procon::ExpandedPolygon& po
 }
 
 //ポリゴンを合体する関数本体 !!!!!!polygon2 mast piece
-bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::ExpandedPolygon Polygon2, procon::ExpandedPolygon& new_polygon, std::array<Fit,2> join_data)
+bool PolygonConnector::joinPolygon(procon::ExpandedPolygon joined_polygon, procon::ExpandedPolygon piece, procon::ExpandedPolygon& new_polygon, std::array<Fit,2> join_data)
 {
-    //結合情報
-    Fit fit1 = join_data[0];
-    Fit fit2 = join_data[1];
-
-    //それぞれOuterとして持つ
-    Ring ring1 = popRingByPolygon(Polygon1, Polygon1.getInnerSize() == 0 ? -1 : fit1.flame_inner_pos);
-    Ring ring2 = popRingByPolygon(Polygon2, -1);
-    int size1 = ring1.size();
-    int size2 = ring2.size();
-
     auto debugRing = [](Ring ring, int line){
         std::cout<<std::to_string(line)<<" : ";
         for (int i=0; i < static_cast<int>(ring.size()); i++) {
@@ -72,6 +62,16 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
         }
         std::cout<<std::endl;
     };
+
+    //結合情報
+    Fit fit1 = join_data[0];
+    Fit fit2 = join_data[1];
+
+    //それぞれOuterとして持つ
+    Ring ring1 = popRingByPolygon(joined_polygon, joined_polygon.getInnerSize() == 0 ? -1 : fit1.flame_inner_pos);
+    Ring ring2 = popRingByPolygon(piece, -1);
+    int size1 = ring1.size();
+    int size2 = ring2.size();
 
     //debugRing(ring1,__LINE__);
     //debugRing(ring2,__LINE__);
@@ -90,9 +90,8 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     const double degree2 = atan2(y2, x2);
     const double degree1 = atan2(y1, x1);
     const double rotate_radian = (degree1 - degree2);
-
-    Polygon2.rotatePolygon(-rotate_radian*(360/(M_PI*2)));
-    ring2 = popRingByPolygon(Polygon2,-1);
+    piece.rotatePolygon(-rotate_radian*(360/(M_PI*2))); //rotate piece
+    ring2 = popRingByPolygon(piece,-1); //update ring2
 
     //debugRing(ring1,__LINE__);
     //debugRing(ring2,__LINE__);
@@ -102,12 +101,8 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     const int Join_point2 = complete_matching_start_pos_2;
     const double move_x = ring1[Join_point1].x() - ring2[Join_point2].x();
     const double move_y = ring1[Join_point1].y() - ring2[Join_point2].y();
-    Ring translated_ring;
-    for (auto point : ring2)
-    {
-        translated_ring.push_back(point_t(point.x() + move_x, point.y() + move_y));
-    }
-    ring2 = translated_ring;
+    piece.translatePolygon(move_x, move_y); //translate piece
+    ring2 = popRingByPolygon(piece,-1); //update ring2
 
     // 重複チェック！
     if(hasConflict(ring1, ring2, fit1, fit2)){
@@ -125,7 +120,6 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     int Type = 1;
 
     double x,y;
-    //TODO:ここバグでループしてそう。。。sorry
     do{
         if (Type == 1) {
             x = ring1[count%size1].x();
@@ -155,24 +149,17 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
 
     //debugRing(new_ring,__LINE__);
 
-    //move and rotate polygon
-    //Polygon2.rotatePolygon(rotate_radian*(360/(M_PI*2)));
-    //Polygon2.translatePolygon(move_x, move_y);
-
     //　ポリゴンにRingを出力しておしまい
-    if(Polygon1.getInnerSize() != 0){
-        pushRingToPolygon(new_ring, Polygon1, fit1.flame_inner_pos);
-        Polygon1.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
-
-        new_polygon = std::move(Polygon1);
-        Polygon2.translatePolygon(move_x, move_y);
-        new_polygon.jointed_pieces.push_back(Polygon2);
-
-    }else{
-        new_polygon.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
+    if(joined_polygon.getInnerSize() != 0){ //flame-piece
+        pushRingToPolygon(new_ring, joined_polygon, fit1.flame_inner_pos);
+        joined_polygon.setMultiIds(std::vector<int>{joined_polygon.getId(), piece.getId()});
+        new_polygon = std::move(joined_polygon);
+        new_polygon.jointed_pieces.push_back(piece);
+    }else{ //piece-piece
+        new_polygon.setMultiIds(std::vector<int>{joined_polygon.getId(), piece.getId()});
         pushRingToPolygon(new_ring, new_polygon);
-        Polygon2.translatePolygon(move_x, move_y);
-        new_polygon.jointed_pieces.push_back(Polygon2);
+        new_polygon.jointed_pieces.push_back(joined_polygon);
+        new_polygon.jointed_pieces.push_back(piece);
     }
 
     return true;
