@@ -15,6 +15,7 @@
 #include <QSharedPointer>
 #include <QMainWindow>
 #include <QFile>
+#include <QDir>
 
 #include "solver.h"
 #include "polygonio.h"

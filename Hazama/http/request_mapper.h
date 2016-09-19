@@ -9,6 +9,7 @@
 #include <src/qhttprequest.h>
 #include <src/qhttpresponse.h>
 #include <QObject>
+#include <QDir>
 
 class RequestMapper : public QObject
 {

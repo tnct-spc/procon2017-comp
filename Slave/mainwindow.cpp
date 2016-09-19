@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    QDir().mkdir("docroot");
     ui->setupUi(this);
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();

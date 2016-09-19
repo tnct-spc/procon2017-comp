@@ -1,6 +1,10 @@
 #include "request_mapper.h"
 
 RequestMapper::RequestMapper(QObject *parent) : QObject(parent){
+
+    QDir().mkdir("docroot");
+    QDir().mkdir("docroot/answer");
+
     QHttpServer *server = new QHttpServer;
     QObject::connect(server, SIGNAL(newRequest(QHttpRequest*,QHttpResponse*)), this, SLOT(service(QHttpRequest*,QHttpResponse*)));
 
