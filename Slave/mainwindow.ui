@@ -143,6 +143,19 @@
      <string>BeamAlgorithm</string>
     </property>
    </widget>
+   <widget class="QRadioButton" name="algo4">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>220</y>
+      <width>281</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>BeamAlgorithmWithSearchSameLength</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
