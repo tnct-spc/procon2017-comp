@@ -13,6 +13,8 @@ public:
     PolygonIO();
     static procon::Field importPolygon(std::string file_path);
     static void exportPolygon(procon::Field field, std::string file_path);
+    static procon::Field importAnswer(std::string file_path, procon::Field field);
+    static void exportAnswer(procon::Field field, std::string file_path);
 };
 
 }

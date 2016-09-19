@@ -58,7 +58,6 @@ private:
     QPointF getPosition(QPointF point_percent, Space space);
 
     double getScale();
-    std::vector<SinglePolygonDisplay*> displays;
 
 protected:
     void paintEvent(QPaintEvent *);

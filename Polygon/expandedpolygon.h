@@ -37,11 +37,6 @@ class ExpandedPolygon
 
     polygon_t polygon;
 
-    double difference_of_default_degree = 0;
-
-    double centerx = 0;
-    double centery = 0;
-
     //flag
     bool calcSize_flag = false;
 
@@ -93,6 +88,12 @@ public:
     void setPolygonAngle(double degree);
     void setPolygonPosition(double x,double y);
 
+    double difference_of_default_degree = 0;
+
+    double centerx = 0;
+    double centery = 0;
+
+    bool is_inverse = false;
 };
 
 }

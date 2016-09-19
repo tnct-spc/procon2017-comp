@@ -324,6 +324,12 @@ void procon::ExpandedPolygon::updatePolygon(bool calc)
 
 void procon::ExpandedPolygon::inversePolygon()
 {
+    if(is_inverse == true){
+        is_inverse = false;
+    }else{
+        is_inverse = true;
+    }
+
     polygon_t translate_polygon;
 
     boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-centerx,0);

@@ -35,7 +35,7 @@ procon::Field procon::PolygonIO::importPolygon(std::string file_path)
             std::getline(stream,tmpY,',');
             piece.outer().push_back(point_t(std::stof(tmpX),std::stof(tmpY)));
         }
-        procon::ExpandedPolygon ex_piece;
+        procon::ExpandedPolygon ex_piece(pieces_cnt);
         ex_piece.setPolygon(piece);
         ex_pieces.push_back(ex_piece);
         pieces_cnt++;
@@ -72,4 +72,46 @@ void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path
         outputfile << "\n";
     }
     outputfile.close();
+}
+
+void procon::PolygonIO::exportAnswer(procon::Field field, std::string file_path)
+{
+    std::ofstream outputfile(file_path);
+
+    for(procon::ExpandedPolygon piece : field.getPieces()){
+        outputfile << piece.getId() << ","
+                   << piece.centerx << ","
+                   << piece.centery << ","
+                   << piece.difference_of_default_degree << ","
+                   << piece.is_inverse << "\n";
+    }
+    outputfile.close();
+}
+
+procon::Field procon::PolygonIO::importAnswer(std::string file_path, procon::Field field)
+{
+    field.setFlame(field.getElementaryFlame());
+
+    std::ifstream inputfile(file_path);
+
+    std::string str;
+    while(std::getline(inputfile, str)){
+        std::istringstream stream(str);
+
+        std::string tmpID,tmpX,tmpY,tmpR,tmpI;
+
+        while(std::getline(stream,tmpID,',')){
+            std::getline(stream,tmpX,',');
+            std::getline(stream,tmpY,',');
+            std::getline(stream,tmpR,',');
+            std::getline(stream,tmpI,',');
+
+            procon::ExpandedPolygon tmpPolygon = field.getElementaryPieces().at(std::stoi(tmpID));
+            tmpPolygon.setPolygonPosition(std::stod(tmpX),std::stod(tmpY));
+            tmpPolygon.setPolygonAngle(std::stod(tmpR));
+            if(std::stoi(tmpI) == true) tmpPolygon.inversePolygon();
+            field.setPiece(tmpPolygon);
+        }
+    }
+    return field;
 }
