@@ -299,8 +299,8 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->inners_side_length = p.inners_side_length;
     this->inners_side_angle = p.inners_side_angle;
     this->inners_side_slope = p.inners_side_slope;
-
-    this->polygon.outer().reserve(32);    this->centerx = p.centerx;
+    this->polygon.outer().reserve(32);
+    this->centerx = p.centerx;
     this->centery = p.centery;
     this->difference_of_default_degree = p.difference_of_default_degree;
 

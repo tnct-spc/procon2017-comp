@@ -21,19 +21,13 @@ void procon::Field::setPiece(procon::ExpandedPolygon piece)
 
 void procon::Field::setPiece(ExpandedPolygon piece, double x, double y)
 {
-    polygon_t translated_polygon;
-    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
-    boost::geometry::transform(piece.getPolygon(),translated_polygon,translate);
-    piece.setPolygon(translated_polygon);
+    piece.setPolygonPosition(x,y);
     field_pieces.push_back(piece);
 }
 
 void procon::Field::setPiece(procon::ExpandedPolygon piece, int n, double x, double y)
 {
-    polygon_t translated_polygon;
-    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
-    boost::geometry::transform(piece.getPolygon(),translated_polygon,translate);
-    piece.setPolygon(translated_polygon);
+    piece.setPolygonPosition(x,y);
     field_pieces.at(n) = piece;
 }
 
