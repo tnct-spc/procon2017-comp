@@ -116,6 +116,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     static const QString color_id         = "#ff33cc";
     static const QString color_arrow_left = "#ff0000";
     static const QString color_arrow_right= "#00ff00";
+    static const QString color_corner_begin_id = "#00ffff";
 
     std::array<QPointF,50> field_pieces_pos;
     std::array<QPointF,50> rawpic_pieces_pos;
@@ -147,6 +148,13 @@ void AnswerBoard::paintEvent(QPaintEvent *)
                 font.setPointSize(std::abs(getScale()/30));
                 painter.setFont(font);
                 painter.drawText(display_pos, (piece_id != -1) ? QString::number(piece_id) : QString::fromStdString(piece.makeMultiIdString()));
+                //draw corner begin ID
+                auto corner = piece.getPolygon().outer()[0];
+                QPointF display_pos = getPosition(QPointF((corner.x()/flame_size)-0.0125, (corner.y()/flame_size)+0.0125), Space::LEFT);
+                painter.setPen(QPen(QColor(color_corner_begin_id)));
+                font.setPointSize(std::abs(getScale()/50));
+                painter.setFont(font);
+                painter.drawText(display_pos, "s"+QString::number(piece.getId()));
             }
         };
 
