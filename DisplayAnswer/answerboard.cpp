@@ -163,17 +163,17 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         painter.setBrush(QBrush(QColor(color_flame)));
         drawPolygon(field->getFlame().getPolygon(),Space::LEFT);
 
-        //draw flame-jointed pieces
-        for(auto piece : field->getFlame().jointed_pieces){
-            drawPiece(piece);
-        }
-
         //draw flame inners
         painter.setBrush(QBrush(QColor(color_inner)));
         drawPolygonInners(field->getFlame().getPolygon(),Space::LEFT);
 
         //draw pieces
         for(auto piece : field->getPieces()){
+            drawPiece(piece);
+        }
+
+        //draw flame-jointed pieces
+        for(auto piece : field->getFlame().jointed_pieces){
             drawPiece(piece);
         }
     }
