@@ -62,6 +62,8 @@ bool MainWindow::get()
         algorithm_number = 2;
     }else if(ui->algo3->isChecked()){
         algorithm_number = 3;
+    }else if(ui->algo4->isChecked()){
+        algorithm_number = 4;
     }else{
         throw "poa";
         //poa
