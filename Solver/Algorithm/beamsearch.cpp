@@ -64,18 +64,18 @@ procon::Field BeamSearch::run(procon::Field field)
             int const& piece_id = evaluations.at(j).piece_id;
             std::array<Fit,2> const& fits = evaluations.at(j).fits;
             procon::ExpandedPolygon const& old_frame = field_vec.at(vec_id).getFlame();
-            procon::ExpandedPolygon old_piece;
-            if (evaluations.at(j).inverse_flag){
-                old_piece = field_vec.at(vec_id).getElementaryInversePieces().at(piece_id);
-            } else {
-                old_piece = field_vec.at(vec_id).getElementaryPieces().at(piece_id);
-            }
+            procon::ExpandedPolygon const& old_piece =
+            (evaluations.at(j).inverse_flag)?
+                field_vec.at(vec_id).getElementaryInversePieces().at(piece_id)
+            :
+                field_vec.at(vec_id).getElementaryPieces().at(piece_id)
+            ;
             procon::ExpandedPolygon new_frame;
-            procon::Field new_field = field_vec.at(vec_id);
 
             bool hasJoinSuccess = PolygonConnector::joinPolygon(old_frame,old_piece,new_frame,fits);
 
             if (hasJoinSuccess) {
+                procon::Field new_field = field_vec.at(vec_id);
                 new_field.setFlame(new_frame);
                 new_field.setIsPlaced(piece_id);
                 next_field_vec.push_back(std::move(new_field));

@@ -1,6 +1,6 @@
 #include "searchsamelength.h"
 
-std::vector<int> SearchSameLength::evaluateMatching(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result)
+std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygon& polygon1, const procon::ExpandedPolygon& polygon2, std::vector<std::array<Fit,2>> &result)
 {
     auto isMatchAngle = [](double left, double right, bool is_inner_left, bool is_inner_right){
         if(is_inner_left) left = (M_PI * 2) - left;
@@ -139,13 +139,10 @@ std::vector<int> SearchSameLength::evaluateMatching(procon::ExpandedPolygon poly
                 for (int j = polygon2_size-1; j >= 0; --j, ++p1_pos) {
                     if(p1_pos == polygon1_size) p1_pos = 0;
                     p2_pos = j;
-                    std::cout<<p1_pos<<","<<p2_pos<<std::endl;
                     if(isMatchAngle(polygon1_angles[p1_pos], polygon2_angles[p2_pos], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0)){
-                        std::cout<<std::endl;
                         calcSameShape(p1_pos, p2_pos, Fit::Dot);
                     }
                     if(isMatchLength(polygon1_lengths[p1_pos], polygon2_lengths[p2_pos == 0 ? polygon2_size-1 : p2_pos-1])){
-                        std::cout<<std::endl;
                         calcSameShape(p1_pos, p2_pos == 0 ? polygon2_size-1 : p2_pos-1, Fit::Line);
                     }
                 }

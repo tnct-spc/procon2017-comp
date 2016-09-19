@@ -11,7 +11,7 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
     return field;
 }
 
-std::vector<Evaluation> AlgorithmWrapper::evaluateCombination(procon::ExpandedPolygon frame, procon::ExpandedPolygon piece)
+std::vector<Evaluation> AlgorithmWrapper::evaluateCombination(const procon::ExpandedPolygon& frame, const procon::ExpandedPolygon& piece)
 {
     std::vector<Evaluation> evaluations;
 

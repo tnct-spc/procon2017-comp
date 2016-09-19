@@ -15,13 +15,13 @@ public:
     static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
 
     AlgorithmWrapper();
-    virtual ~AlgorithmWrapper(){}
+    virtual ~AlgorithmWrapper() = default;
 
     virtual procon::Field run(procon::Field field);
 
     Fit fit1,fit2;
 
-    std::vector<Evaluation> evaluateCombination(procon::ExpandedPolygon frame, procon::ExpandedPolygon piece);
+    std::vector<Evaluation> evaluateCombination(const procon::ExpandedPolygon& frame, const procon::ExpandedPolygon& piece);
 
     typedef struct PieceAssesment{
         //評価値

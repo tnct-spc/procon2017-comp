@@ -73,8 +73,8 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
         std::cout<<std::endl;
     };
 
-    debugRing(ring1,__LINE__);
-    debugRing(ring2,__LINE__);
+    //debugRing(ring1,__LINE__);
+    //debugRing(ring2,__LINE__);
 
     //結合後に座標が一致する始点及び終点を取得
     const int complete_matching_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? fit1.start_id : fit1.start_id                  ;
@@ -104,8 +104,8 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     ring2 = turned_ring;
 
 
-    debugRing(ring1,__LINE__);
-    debugRing(ring2,__LINE__);
+    //debugRing(ring1,__LINE__);
+    //debugRing(ring2,__LINE__);
 
     // 移動　結合後に一致する点とその次の点を用いて、ポリゴンのx,y移動を調べ、Polygon2を平行移動
     const int Join_point1 = complete_matching_start_pos_1;
@@ -120,11 +120,12 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     ring2 = translated_ring;
 
     // 重複チェック！
-    bool conf=false;
-    if(hasConflict(ring1, ring2, fit1, fit2)) conf=true;
+    if(hasConflict(ring1, ring2, fit1, fit2)){
+        return false;
+    }
 
-    debugRing(ring1,__LINE__);
-    debugRing(ring2,__LINE__);
+    //debugRing(ring1,__LINE__);
+    //debugRing(ring2,__LINE__);
 
     // 結合　新しいRingに結合後の外周の角を入れる。
     // もし、結合端の辺の長さが等しくならない時はRing1,Ring2ともに端の角を入力。
@@ -162,7 +163,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
         new_ring.push_back(point_t(x,y));
     } while (Type != -1);
 
-    debugRing(new_ring,__LINE__);
+    //debugRing(new_ring,__LINE__);
 
     //　ポリゴンにRingを出力しておしまい
     if(Polygon1.getInnerSize() != 0){
@@ -189,7 +190,6 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
         new_polygon.jointed_pieces.push_back(Polygon1);
         new_polygon.jointed_pieces.push_back(Polygon2);
     }
-    if(conf) return false;
 
     return true;
 }
