@@ -12,8 +12,8 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         std::vector<Evaluation> evaluations;
         for (int j = 0;j < static_cast<int>(field.getElementaryPieces().size());j++){
             if (field.getIsPlaced().at(j)) continue;
-            std::vector<Evaluation> eva = evaluateCombination(field.getFlame(),field.getElementaryPieces().at(j));
-            std::vector<Evaluation> eva_inverse = evaluateCombination(field.getFlame(),field.getElementaryInversePieces().at(j));
+            std::vector<Evaluation> eva = evaluateCombinationByAngle(field.getFlame(),field.getElementaryPieces().at(j));
+            std::vector<Evaluation> eva_inverse = evaluateCombinationByAngle(field.getFlame(),field.getElementaryInversePieces().at(j));
             for (auto & e : eva){
                 e.piece_id = j;
             }
@@ -45,11 +45,11 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         int const& piece_id = evaluations.at(j).piece_id;
         std::array<Fit,2> const& fits = evaluations.at(j).fits;
         procon::ExpandedPolygon const& old_frame = field_vec.at(vec_id).getFlame();
-        procon::ExpandedPolygon old_piece =
-        (evaluations.at(j).inverse_flag)?
-            old_piece = field_vec.at(vec_id).getElementaryInversePieces().at(piece_id)
+        procon::ExpandedPolygon const& old_piece =
+        (evaluations.at(j).inverse_flag) ?
+            field_vec.at(vec_id).getElementaryInversePieces().at(piece_id)
         :
-            old_piece = field_vec.at(vec_id).getElementaryPieces().at(piece_id)
+            field_vec.at(vec_id).getElementaryPieces().at(piece_id)
         ;
         procon::ExpandedPolygon new_frame;
 
