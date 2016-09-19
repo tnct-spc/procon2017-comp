@@ -8,6 +8,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "field.h"
 #include "imagerecognition.h"
@@ -32,6 +33,16 @@ void Hazama::init()
 {
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();
+
+    //problem: need set box before hazama run. and too too too slow...
+    //camera open
+    capture(0);
+    //camera open!
+    capture(0);
+    //camera open!!
+    capture(0);
+
+    //selectWebCamera();
 }
 
 void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
@@ -106,6 +117,8 @@ void Hazama::run()
 
     std::cout << "Run" << std::endl;
 
+
+
     procon::Field PDATA;
 
     std::string flame_path = "./../../procon2016-comp/sample/1_flame.png";
@@ -118,8 +131,12 @@ void Hazama::run()
         cv::Mat pieces;
         //get Image
         if(ui->useWebCamera->isChecked()){
+
+            //slectWebCamra device number
+            device_number = selectWebCamera();
+
             //camera open
-            capture();
+            capture(device_number);
 
             cv::namedWindow("capture",cv::WINDOW_AUTOSIZE);
             cv::Mat pressentertextwindow = cv::Mat::zeros(100,700,CV_8UC3);
@@ -128,10 +145,10 @@ void Hazama::run()
             cv::putText(pressentertextsecondwindow,"Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(0,255,255),2,CV_AA);
             cv::imshow("capture",pressentertextwindow);
             while(cv::waitKey(0)==13);
-            flame = capture();
+            flame = capture(device_number);
             cv::imshow("capture",pressentertextsecondwindow);
             while(cv::waitKey(0)==13);
-            pieces = capture();
+            pieces = capture(device_number);
             cv::imwrite("flame.png",flame,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
             cv::imwrite("pieces.png",pieces,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
             cv::destroyWindow("capture");
@@ -172,7 +189,7 @@ void Hazama::run()
 std::cout<<"finish"<<std::endl;
 }
 
-cv::Mat Hazama::capture()
+cv::Mat Hazama::capture(int deviceNumber)
 {
     const std::string calibration_data_file_path = "./../../procon2016-comp/calibration/calibration.yml";
     static bool init_calibration_flag = false;
@@ -190,7 +207,7 @@ cv::Mat Hazama::capture()
     }
 
 
-    cv::VideoCapture cap(0);//デバイスのオープン
+    cv::VideoCapture cap(deviceNumber);//デバイスのオープン
     //cap.open(0);//こっちでも良い．
 
     if(!cap.isOpened()){
@@ -214,7 +231,7 @@ cv::Mat Hazama::capture()
 
     //calibrate
     cv::Mat calibration_src;
-    undistort(src, calibration_src, mtx, dist);
+    cv::undistort(src, calibration_src, mtx, dist);
 
     return calibration_src;
 }
@@ -222,4 +239,25 @@ cv::Mat Hazama::capture()
 void Hazama::clickedRunButton()
 {
     run();
+}
+
+int Hazama::selectWebCamera()
+{
+    QMessageBox MsgBox;
+    QPushButton *button0 = MsgBox.addButton(tr("WebCamera0"),QMessageBox::ActionRole);
+    QPushButton *button1 = MsgBox.addButton(tr("WebCamera1"),QMessageBox::ActionRole);
+
+    MsgBox.setText("Please select deveice number");
+
+    MsgBox.exec();
+
+    if (MsgBox.clickedButton() == button0) {
+        std::cout << "0" << std::endl;
+        return 0;
+    } else if(MsgBox.clickedButton() == button1) {
+        std::cout << "1" << std::endl;
+        return 1;
+    }
+    MsgBox.deleteLater();
+    return 0;
 }

@@ -21,9 +21,13 @@ public:
 
 private:
     Ui::Hazama *ui;
-    cv::Mat capture();
+    cv::Mat capture(int deviceNumber);
     std::shared_ptr<AnswerBoard> board;
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
+    int selectWebCamera();
+
+    //webcamera deviceNumber[
+    int device_number = 0;
 private slots:
     void clickedRunButton();
 };
