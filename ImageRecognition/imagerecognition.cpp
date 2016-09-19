@@ -234,10 +234,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         //描画
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
-        //if (count + 1 == 14) {
-            cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
-            cv::imshow(std::to_string(count+1), pic);
-        //}
+
         count++;
     }
 
@@ -467,9 +464,6 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     for (auto po:polygons){
         procon::ExpandedPolygon ishowta;
         ishowta.setPolygon(po);
-        disp.push_back(new SinglePolygonDisplay());
-        disp.at(count)->setPolygon(ishowta,4000,std::to_string(count + 1));
-        disp.at(count)->show();
         count++;
     }
     std::cout << bg::dsv(polygons.at(0)) << std::endl;

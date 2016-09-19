@@ -102,14 +102,6 @@ void AnswerBoard::paintEvent(QPaintEvent *)
 
     //draw field
     if(is_set_field){
-        //
-        int count = 0;
-        for(auto piece : field->getElementaryPieces()){
-            displays.push_back(new SinglePolygonDisplay());
-            displays[count]->setPolygon(piece,30,std::to_string(count));
-            displays[count]->show();
-            count++;
-        }
         //draw flame
         painter.setPen(QPen(Qt::black, 3));
         painter.setBrush(QBrush(QColor(color_flame)));
