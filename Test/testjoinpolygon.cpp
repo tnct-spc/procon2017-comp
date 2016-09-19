@@ -136,10 +136,10 @@ bool TestJoinPolygon::run()
         sample11.inners().at(0).push_back(point_t(2,1));
         sample11.inners().push_back(polygon_t::ring_type());
         sample11.inners().at(1).push_back(point_t(4,1));
-        sample11.inners().at(1).push_back(point_t(3,1));
-        sample11.inners().at(1).push_back(point_t(2,2));
-        sample11.inners().at(1).push_back(point_t(2,3));
         sample11.inners().at(1).push_back(point_t(4,3));
+        sample11.inners().at(1).push_back(point_t(2,3));
+        sample11.inners().at(1).push_back(point_t(2,2));
+        sample11.inners().at(1).push_back(point_t(3,1));
         sample11.inners().at(1).push_back(point_t(4,1));
 
         polygon_t sample12;

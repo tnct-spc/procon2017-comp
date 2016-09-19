@@ -5,21 +5,23 @@
 #include "utilities.h"
 #include "Utils/polygonconnector.h"
 #include "Utils/fit.h"
+#include "Utils/evaluation.h"
 #include "polygonviewer.h"
 
 class AlgorithmWrapper
 {
-    const double length_error = 0.05; // 単位CM
-    const double angle_error = 0.017; //単位rad 0.017rad=1°
 public:
+    static constexpr double length_error = 0.05; // 単位CM
+    static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
+
     AlgorithmWrapper();
+    virtual ~AlgorithmWrapper() = default;
 
     virtual procon::Field run(procon::Field field);
 
     Fit fit1,fit2;
 
-    std::vector<int> searchSameLength(procon::ExpandedPolygon polygon1 ,procon::ExpandedPolygon polygon2, std::vector<std::array<Fit,2>> &result);
-    Fit::DotORLine findEnd(procon::ExpandedPolygon polygon1, procon::ExpandedPolygon polygon2,int &comp1,int &comp2,int &Eva);
+    std::vector<Evaluation> evaluateCombination(const procon::ExpandedPolygon& frame, const procon::ExpandedPolygon& piece);
 
     typedef struct PieceAssesment{
         //評価値

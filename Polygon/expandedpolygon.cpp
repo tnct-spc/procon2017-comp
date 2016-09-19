@@ -28,6 +28,8 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->polygon = p.polygon;
     this->size = p.size;
     this->inners_size = p.inners_size;
+    this->jointed_pieces = p.jointed_pieces;
+    /*
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
@@ -35,6 +37,15 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     std::copy(p.inners_side_length.begin(),p.inners_side_length.end(), std::back_inserter(this->inners_side_length));
     std::copy(p.inners_side_angle.begin(),p.inners_side_angle.end(), std::back_inserter(this->inners_side_angle));
     std::copy(p.inners_side_slope.begin(),p.inners_side_slope.end(), std::back_inserter(this->inners_side_slope));
+    */
+    this->multi_ids = p.multi_ids;
+    this->side_length = p.side_length;
+    this->side_angle = p.side_angle;
+    this->side_slope = p.side_slope;
+    this->inners_side_length = p.inners_side_length;
+    this->inners_side_angle = p.inners_side_angle;
+    this->inners_side_slope = p.inners_side_slope;
+
     this->polygon.outer().reserve(32);
     this->centerx = p.centerx;
     this->centery = p.centery;
@@ -73,27 +84,40 @@ void procon::ExpandedPolygon::calcSideLength()
 
 void procon::ExpandedPolygon::calcSideAngle()
 {
-    auto isMaijorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
-        point_t p4((p1.x() + p3.x()) / 2 , (p1.y() + p3.y()) / 2);
-        const double alpha = 4000.667824083865;
-        const double beta  = 0.710983144633;
-        const double end_x = (p4.x() - p2.x()) > 0 ? alpha : -alpha;
-        const double end_y = (p4.y() - p2.y()) / (p4.x() - p2.x()) * (end_x - p2.x()) + p2.y() + beta;
-        point_t end_point(end_x,end_y);
-        bg::model::segment<point_t> judge_segment(p2,end_point);
-        int intersect_num = 0;
 
-        for (int i = 0;i < size;i++) {
-            point_t pa = polygon.outer().at(i);
-            point_t pb = polygon.outer().at(i+1);
-            bg::model::segment<point_t> side_segment(pa,pb);
-            intersect_num += static_cast<int>(bg::intersects(side_segment,judge_segment));
-        }
 
-        return (intersect_num % 2 == 0) ? true : false;
-    };
+    auto calcAngle = [&](point_t p1,point_t p2,point_t p3,std::vector<point_t> inner = {})->double{
 
-    auto calcAngle = [&](point_t p1,point_t p2,point_t p3)->double{
+        auto isMajorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
+            point_t p4((p1.x() + p3.x()) / 2 , (p1.y() + p3.y()) / 2);
+            const double alpha = 4000.000000283865;
+            const double beta  = 0.000001446343;
+            const double ganma = 0.000002532443;
+            const double end_x = (p4.x() - p2.x() + ganma) > 0 ? alpha : -alpha;
+            const double end_y_length = abs((p4.y() - p2.y()) / (p4.x() - p2.x() + ganma) * (end_x - p2.x()) + p2.y() + beta);
+            const double end_y = p4.y() - p2.y() > 0 ? end_y_length : -end_y_length;
+            point_t end_point(end_x,end_y);
+            bg::model::segment<point_t> judge_segment(p2,end_point);
+            int intersect_num = 0,points_size = size;
+            if (!inner.empty()){
+                points_size = static_cast<int>(inner.size() - 1);
+            }
+            for (int i = 0;i < points_size;i++) {
+                point_t pa,pb;
+                if (!inner.empty()) {
+                    pa = inner.at(i);
+                    pb = inner.at(i+1);
+                } else {
+                    pa = polygon.outer().at(i);
+                    pb = polygon.outer().at(i+1);
+                }
+                bg::model::segment<point_t> side_segment(pa,pb);
+                intersect_num += static_cast<int>(bg::intersects(side_segment,judge_segment));
+            }
+
+            return (intersect_num % 2 == 0) ? true : false;
+        };
+
         double angle = 0;
         try {
             const double numer = (p2.x() - p1.x()) * (p2.x() - p3.x()) + (p2.y() - p1.y()) * (p2.y() - p3.y());
@@ -105,7 +129,7 @@ void procon::ExpandedPolygon::calcSideAngle()
 
             angle = std::acos(numer / (denom1 * denom2));
 
-            if (isMaijorAngle(p1,p2,p3)) {
+            if (isMajorAngle(p1,p2,p3)) {
                 angle = (3.141592 * 2) - angle;
             }
 
@@ -133,16 +157,17 @@ void procon::ExpandedPolygon::calcSideAngle()
 
     for (auto inner : polygon.inners()) {
         std::vector<double> inner_side_angle;
-        for (int i = -1;i < static_cast<int>(inner.size() - 2);i++){
+        const int inner_size = static_cast<int>(inner.size() - 1);
+        for (int i = -1;i < inner_size - 1;i++){
             point_t p1;
             if (i == -1){
-                p1 = inner.at(size - 1);
+                p1 = inner.at(inner_size - 1);
             } else {
                 p1 = inner.at(i);
             }
             const point_t p2 = inner.at(i+1);
             const point_t p3 = inner.at(i+2);
-            inner_side_angle.push_back(calcAngle(p1,p2,p3));
+            inner_side_angle.push_back(calcAngle(p1,p2,p3,inner));
         }
         inners_side_angle.push_back(inner_side_angle);
     }
@@ -257,6 +282,7 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->polygon = p.polygon;
     this->size = p.size;
     this->inners_size = p.inners_size;
+    /*
     std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
     std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
     std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
@@ -264,6 +290,16 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     std::copy(p.inners_side_length.begin(),p.inners_side_length.end(), std::back_inserter(this->inners_side_length));
     std::copy(p.inners_side_angle.begin(),p.inners_side_angle.end(), std::back_inserter(this->inners_side_angle));
     std::copy(p.inners_side_slope.begin(),p.inners_side_slope.end(), std::back_inserter(this->inners_side_slope));
+    */
+    this->jointed_pieces = p.jointed_pieces;
+    this->multi_ids = p.multi_ids;
+    this->side_length = p.side_length;
+    this->side_angle = p.side_angle;
+    this->side_slope = p.side_slope;
+    this->inners_side_length = p.inners_side_length;
+    this->inners_side_angle = p.inners_side_angle;
+    this->inners_side_slope = p.inners_side_slope;
+
     this->polygon.outer().reserve(32);    this->centerx = p.centerx;
     this->centery = p.centery;
     this->difference_of_default_degree = p.difference_of_default_degree;

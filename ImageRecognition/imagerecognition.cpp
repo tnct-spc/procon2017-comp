@@ -297,30 +297,20 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         std::vector<cv::Vec4f> ret_lines;
 
         //連続して線が切れている回数
-        double connection_failure_count = 0;
+        int connection_failure_count = 0;
+        const int lines_size = static_cast<int>(lines.size());
 
-        for (int i = -1;i < static_cast<int>(lines.size() - 1);i++) {
+        for (int i = 0;i < lines_size;i++) {
 
             //1本め(現在)の線分の始点(x1,y1)，終点(x2,y2)
             double x1,x2,y1,y2;
-            if (i == -1) {
-                x1 = lines.at(static_cast<int>(lines.size() - 1))[0];
-                y1 = lines.at(static_cast<int>(lines.size() - 1))[1];
-                x2 = lines.at(static_cast<int>(lines.size() - 1))[2];
-                y2 = lines.at(static_cast<int>(lines.size() - 1))[3];
-            } else {
-                x1 = lines.at(i)[0];
-                y1 = lines.at(i)[1];
-                x2 = lines.at(i)[2];
-                y2 = lines.at(i)[3];
-            }
+            x1 = lines.at(i % lines_size)[0];
+            y1 = lines.at(i % lines_size)[1];
+            x2 = lines.at(i % lines_size)[2];
+            y2 = lines.at(i % lines_size)[3];
 
             //2本めの線分に当たる添字を失敗回数から算出
-            int next_i = i + 1 + connection_failure_count;
-            //out_of_range対策
-            if (next_i >= static_cast<int>(lines.size())) {
-                next_i -= static_cast<int>(lines.size());
-            }
+            int next_i = (i + 1 + connection_failure_count) % lines_size;
 
             //2本め(次)の線分の始点(x3,y3)，終点(x4,y4)
             const double x3 = lines.at(next_i)[0];
@@ -334,7 +324,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
             //許容角度
             //(3.141592 / 180)でdeg -> radに
-            constexpr double allowable_angle = 5 * (3.141592 / 180);
+            constexpr double allowable_angle = 1 * (3.141592 / 180);
 
             //二つの線分の角度の差が許容角度以下ならば次の線分を更新する
             if (std::abs(angle1-angle2) < allowable_angle) {
@@ -343,15 +333,19 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             } else {
                 double last_x,last_y;
                 if (next_i == 0) {
-                    last_x = lines.at(static_cast<int>(lines.size() - 1))[2];
-                    last_y = lines.at(static_cast<int>(lines.size() - 1))[3];
+                    last_x = lines.at(lines_size - 1)[2];
+                    last_y = lines.at(lines_size - 1)[3];
                 } else {
                     last_x = lines.at(next_i - 1)[2];
                     last_y = lines.at(next_i - 1)[3];
                 }
                 cv::Vec4f tmp(x1,y1,last_x,last_y);
                 ret_lines.push_back(tmp);
+                i += connection_failure_count;
                 connection_failure_count = 0;
+                if (i >= lines_size) {
+                    ret_lines.erase(ret_lines.begin());
+                }
             }
         }
         return ret_lines;
@@ -416,7 +410,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     auto removeShortLines = [&](std::vector<cv::Vec4f> const& lines)->std::vector<cv::Vec4f>{
         std::vector<cv::Vec4f> return_lines;
         for(auto line : lines){
-            if (calcDistance(line[0],line[1],line[2],line[3]) * scale >= 0.5) {
+            if ((calcDistance(line[0],line[1],line[2],line[3]) * scale) >= 0.5) {
                 return_lines.push_back(std::move(line));
             }
         }

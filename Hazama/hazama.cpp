@@ -171,7 +171,7 @@ void Hazama::run()
 
     /*Solve puzzle*/
     Solver solver;
-    procon::Field field = solver.run(PDATA,1);
+    procon::Field field = solver.run(PDATA,3);
 
     /*Display answer*/
     board->setField(field);

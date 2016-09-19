@@ -16,7 +16,7 @@ Ring PolygonConnector::popRingByPolygon(procon::ExpandedPolygon& polygon, int in
         Ring inner = polygon.getPolygon().inners().at(inner_position);
         Ring outer;
         int inner_size = inner.size();
-        for(int i=inner_size-1; i > 0; --i){ //not copy i==0
+        for(int i=0; i < inner_size-1; ++i){ //not copy last
             outer.push_back(inner[i]);
         }
         return outer;
@@ -38,7 +38,7 @@ void PolygonConnector::pushRingToPolygon(Ring& ring, procon::ExpandedPolygon& po
     }else{
         Ring inner;
         int ring_size = ring.size();
-        for(int i=ring_size-1; i >= 0; --i){
+        for(int i=0; i < ring_size; ++i){
             inner.push_back(ring[i]);
         }
         new_raw_polygon.inners().at(inner_position).clear();
@@ -73,8 +73,8 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
         std::cout<<std::endl;
     };
 
-    debugRing(ring1,__LINE__);
-    debugRing(ring2,__LINE__);
+    //debugRing(ring1,__LINE__);
+    //debugRing(ring2,__LINE__);
 
     //結合後に座標が一致する始点及び終点を取得
     const int complete_matching_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? fit1.start_id : fit1.start_id                  ;
@@ -104,8 +104,8 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     ring2 = turned_ring;
 
 
-    debugRing(ring1,__LINE__);
-    debugRing(ring2,__LINE__);
+    //debugRing(ring1,__LINE__);
+    //debugRing(ring2,__LINE__);
 
     // 移動　結合後に一致する点とその次の点を用いて、ポリゴンのx,y移動を調べ、Polygon2を平行移動
     const int Join_point1 = complete_matching_start_pos_1;
@@ -120,11 +120,12 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
     ring2 = translated_ring;
 
     // 重複チェック！
-    bool conf=false;
-    if(hasConflict(ring1, ring2, fit1, fit2)) conf=true;
+    if(hasConflict(ring1, ring2, fit1, fit2)){
+        return false;
+    }
 
-    debugRing(ring1,__LINE__);
-    debugRing(ring2,__LINE__);
+    //debugRing(ring1,__LINE__);
+    //debugRing(ring2,__LINE__);
 
     // 結合　新しいRingに結合後の外周の角を入れる。
     // もし、結合端の辺の長さが等しくならない時はRing1,Ring2ともに端の角を入力。
@@ -162,7 +163,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
         new_ring.push_back(point_t(x,y));
     } while (Type != -1);
 
-    debugRing(new_ring,__LINE__);
+    //debugRing(new_ring,__LINE__);
 
     //　ポリゴンにRingを出力しておしまい
     if(Polygon1.getInnerSize() != 0){
@@ -170,18 +171,26 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon Polygon1, procon::Exp
         Polygon1.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
 
         new_polygon = std::move(Polygon1);
+        pushRingToPolygon(ring2, Polygon2);
+        new_polygon.jointed_pieces.push_back(Polygon2);
 
     }else if(Polygon2.getInnerSize() != 0){
         pushRingToPolygon(new_ring, Polygon2, fit2.flame_inner_pos);
         Polygon2.setMultiIds(std::vector<int>{Polygon2.getId(), Polygon1.getId()});
 
         new_polygon = std::move(Polygon2);
+        pushRingToPolygon(ring1, Polygon1);
+        new_polygon.jointed_pieces.push_back(Polygon1);
 
     }else{
         new_polygon.setMultiIds(std::vector<int>{Polygon1.getId(), Polygon2.getId()});
         pushRingToPolygon(new_ring, new_polygon);
+        pushRingToPolygon(ring1, Polygon1);
+        pushRingToPolygon(ring2, Polygon2);
+        new_polygon.jointed_pieces.push_back(Polygon1);
+        new_polygon.jointed_pieces.push_back(Polygon2);
     }
-    if(conf) return false;
+
     return true;
 }
 
@@ -222,11 +231,11 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
 
             //skip check
             if(     ring1_white_zone ||
-                    (ring1_yellow_end_zone && (ring2_white_zone || ring2_red_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
-                    (ring1_orange_end_zone && (ring2_white_zone || (ring2_orange_start_zone && (cmstart1!=cmend1)) || ring2_yello_start_zone)) ||
+                    (ring1_yellow_end_zone && (ring2_yellow_end_zone || ring2_white_zone || ring2_red_zone || ring2_orange_start_zone || ring2_yello_start_zone)) ||
+                    (ring1_orange_end_zone && (ring2_white_zone || (ring2_orange_start_zone && (cmstart1!=cmend1 || fit2.start_dot_or_line == Fit::Line)) || (ring2_yello_start_zone && !ring2_yellow_end_zone))) ||
                     (ring1_red_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_yellow_end_zone)) ||
-                    (ring1_orange_start_zone && (ring2_white_zone || ring2_yellow_end_zone || (ring2_orange_end_zone && (cmstart1 != cmend1)))) ||
-                    (ring1_yello_start_zone && (ring2_white_zone || ring2_yellow_end_zone || ring2_orange_end_zone || ring2_red_zone))
+                    (ring1_orange_start_zone && (ring2_white_zone || ring2_yellow_end_zone || (ring2_orange_end_zone && (cmstart1 != cmend1 || fit2.start_dot_or_line == Fit::Line)))) ||
+                    (ring1_yello_start_zone && (ring2_yello_start_zone || ring2_white_zone || ring2_yellow_end_zone || ring2_orange_end_zone || ring2_red_zone))
               ){
                 //make ring
                 bg::model::segment<point_t> line2(ring2[ring2_pos],ring2[((ring2_pos - 1)%size2+size2)%size2]);
@@ -249,20 +258,22 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
                 }else{
                     ring2_white_zone = true;
                 }
-            }else if(ring2_yellow_end_zone){
+            }else if(ring2_yellow_end_zone && (fit2.start_dot_or_line == Fit::Dot ? ring2_yello_start_zone == false : ring2_orange_start_zone == false)){
                 ring2_yellow_end_zone = false;
                 ring2_white_zone = true;
-            }else if(((ring2_pos-2)%size2+size2)%size2 == cmstart2){
+            }
+            if(((ring2_pos-2)%size2+size2)%size2 == cmstart2 && fit2.start_dot_or_line == Fit::Dot){
                 ring2_white_zone = false;
-                if(fit2.start_dot_or_line == Fit::Dot){
-                    ring2_yello_start_zone = true;
-                }else{
-                    ring2_orange_start_zone = true;
-                }
+                ring2_yello_start_zone = true;
+            }else if(((ring2_pos-1)%size2+size2)%size2 == cmstart2 && fit2.start_dot_or_line == Fit::Line){
+                ring2_white_zone = false;
+                ring2_orange_start_zone = true;
             }else if(ring2_yello_start_zone){
+                ring2_yellow_end_zone = false;
                 ring2_yello_start_zone = false;
                 ring2_orange_start_zone = true;
             }else if(ring2_orange_start_zone){
+                ring2_yellow_end_zone = false;
                 ring2_orange_start_zone = false;
                 ring2_red_zone = true;
             }
@@ -279,20 +290,22 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
             }else{
                 ring1_white_zone = true;
             }
-        }else if(ring1_yellow_end_zone){
+        }else if(ring1_yellow_end_zone && (fit1.start_dot_or_line == Fit::Dot ? ring1_yello_start_zone == false : ring1_orange_start_zone == false)){
             ring1_yellow_end_zone = false;
             ring1_white_zone = true;
-        }else if((ring1_pos+2)%size1 == cmstart1){
+        }
+        if((ring1_pos+2)%size1 == cmstart1 && fit1.start_dot_or_line == Fit::Dot){
             ring1_white_zone = false;
-            if(fit1.start_dot_or_line == Fit::Dot){
-                ring1_yello_start_zone = true;
-            }else{
-                ring1_orange_start_zone = true;
-            }
+            ring1_yello_start_zone = true;
+        }else if((ring1_pos+1)%size1 == cmstart1 && fit1.start_dot_or_line == Fit::Line){
+            ring1_white_zone = false;
+            ring1_orange_start_zone = true;
         }else if(ring1_yello_start_zone){
+            ring1_yellow_end_zone = false;
             ring1_yello_start_zone = false;
             ring1_orange_start_zone = true;
         }else if(ring1_orange_start_zone){
+            ring1_yellow_end_zone = false;
             ring1_orange_start_zone = false;
             ring1_red_zone = true;
         }
