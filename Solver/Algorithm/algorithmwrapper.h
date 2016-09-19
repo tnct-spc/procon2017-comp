@@ -15,6 +15,7 @@ public:
     static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
 
     AlgorithmWrapper();
+    virtual ~AlgorithmWrapper(){}
 
     virtual procon::Field run(procon::Field field);
 

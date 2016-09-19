@@ -108,7 +108,7 @@ std::vector<int> SearchSameLength::evaluateMatching(procon::ExpandedPolygon poly
 
                 //重複していたらcompare erase
                 bool is_apply = true;
-                for(int i = 0; i < result.size(); ++i){
+                for(unsigned int i = 0; i < result.size(); ++i){
                     if( fits[0].flame_inner_pos == result[i][0].flame_inner_pos &&
                         fits[1].flame_inner_pos == result[i][1].flame_inner_pos &&
                         fits[0].end_dot_or_line == result[i][0].end_dot_or_line &&

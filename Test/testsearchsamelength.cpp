@@ -34,7 +34,7 @@ bool testSearchSameLength::run(){
         std::vector<std::array<Fit,2>> fits;
         //SearchSameLength::evaluateMatching(polygon1, polygon2, fits);
 
-        int cnt=0;
+        //int cnt=0;
         for(auto join_data : fits){
               bool conf = PolygonConnector::joinPolygon(polygon1, polygon2, result, join_data);
               if(conf==false){

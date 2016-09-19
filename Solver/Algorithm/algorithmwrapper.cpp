@@ -18,7 +18,7 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombination(procon::ExpandedPo
     std::vector<std::array<Fit,2>> fits;
     std::vector<int> eva_point = SearchSameLength::evaluateMatching(frame, piece, fits);
 
-    for(int fit_number=0; fit_number < fits.size(); ++fit_number){
+    for(unsigned int fit_number=0; fit_number < fits.size(); ++fit_number){
         if(eva_point[fit_number] > 0){
             Evaluation eva;
             eva.frame_id = fits[fit_number].at(0).flame_inner_pos;
