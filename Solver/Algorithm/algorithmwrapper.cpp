@@ -10,7 +10,7 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
 {
     return field;
 }
-std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::ExpandedPolygon frame, procon::ExpandedPolygon piece)
+std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece)
 {
     double frame_first = 0;
     double piece_first = 0;
@@ -47,7 +47,7 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::Exp
 }
 
 
-std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByLength(procon::ExpandedPolygon frame, procon::ExpandedPolygon piece)
+std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByLength(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece)
 {
     std::vector<Evaluation> evaluations;
 

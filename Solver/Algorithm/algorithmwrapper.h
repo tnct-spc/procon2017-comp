@@ -20,8 +20,8 @@ public:
     virtual procon::Field run(procon::Field field);
 
     Fit fit1,fit2;
-    std::vector<Evaluation> evaluateCombinationByAngle(procon::ExpandedPolygon frame, procon::ExpandedPolygon piece);
-    std::vector<Evaluation> evaluateCombinationByLength(procon::ExpandedPolygon frame, procon::ExpandedPolygon piece);
+    std::vector<Evaluation> evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
+    std::vector<Evaluation> evaluateCombinationByLength(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
 
     typedef struct PieceAssesment{
         //評価値
