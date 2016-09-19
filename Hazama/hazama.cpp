@@ -32,14 +32,6 @@ void Hazama::init()
 {
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();
-
-    //problem: need set box before hazama run. and too too too slow...
-    //camera open
-    capture();
-    //camera open!
-    capture();
-    //camera open!!
-    capture();
 }
 
 void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
