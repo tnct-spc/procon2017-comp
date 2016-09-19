@@ -95,6 +95,24 @@
      <string>UseImageData</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="server_mode_radio">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>230</y>
+      <width>181</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>ServerMode</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -102,7 +120,7 @@
      <x>0</x>
      <y>0</y>
      <width>589</width>
-     <height>17</height>
+     <height>27</height>
     </rect>
    </property>
   </widget>

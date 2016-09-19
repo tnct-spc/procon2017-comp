@@ -53,7 +53,20 @@ bool MainWindow::get()
 
     //solve puzzle
     Solver solver;
-    procon::Field field = solver.run(PDATA, 3);
+    int algorithm_number = -1;
+    if(ui->algo0->isChecked()){
+        algorithm_number = 0;
+    }else if(ui->algo1->isChecked()){
+        algorithm_number = 1;
+    }else if(ui->algo2->isChecked()){
+        algorithm_number = 2;
+    }else if(ui->algo3->isChecked()){
+        algorithm_number = 3;
+    }else{
+        throw "poa";
+        //poa
+    }
+    procon::Field field = solver.run(PDATA, algorithm_number);
 
     //Display answer
     board->setField(field);
