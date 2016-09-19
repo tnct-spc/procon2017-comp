@@ -133,9 +133,10 @@ QString AnswerForm::SimulateAnswerPoint(QString filename_answer){
     //return
     return QString::number(point);
 */
+    return filename_answer;
 }
 
 
 bool AnswerForm::PutStone(){
-
+    return false;
 }
