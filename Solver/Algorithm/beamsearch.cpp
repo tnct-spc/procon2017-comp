@@ -7,7 +7,7 @@ BeamSearch::BeamSearch()
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
 {
-    auto fieldSearch = [&](procon::Field field)
+    auto fieldSearch = [&](procon::Field const& field)
     {
         std::vector<Evaluation> evaluations;
         for (int j = 0;j < static_cast<int>(field.getElementaryPieces().size());j++){
