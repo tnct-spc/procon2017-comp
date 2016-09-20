@@ -53,7 +53,7 @@
      <string>UseWebCamera</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="useFileData">
@@ -93,6 +93,9 @@
     </property>
     <property name="text">
      <string>UseImageData</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="server_mode_radio">
