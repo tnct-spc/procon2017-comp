@@ -165,7 +165,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon joined_polygon, proco
     return true;
 }
 
-//重複を見つける。実装途中なのでとても汚い akkasita
+//重複を見つける。
 bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
 {
     int size1 = ring1.size();
@@ -195,7 +195,9 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
     for(int i=0;i<size1;++i){
 
         //make ring
-        bg::model::segment<point_t> line1(ring1[ring1_pos],ring1[(ring1_pos+1)%size1]);
+        point_t line1_start = ring1[ring1_pos];
+        point_t line1_end = ring1[(ring1_pos+1)%size1];
+
 
         bool ring2_yello_start_zone = false;
         bool ring2_orange_start_zone = false;
@@ -224,10 +226,11 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
                     (ring1_yello_start_zone && !ring2_orange_end_zone && (ring2_yello_start_zone || ring2_white_zone || ring2_yellow_end_zone || ring2_orange_end_zone || ring2_red_zone))
               ){
                 //make ring
-                bg::model::segment<point_t> line2(ring2[ring2_pos],ring2[((ring2_pos - 1)%size2+size2)%size2]);
+                point_t line2_start = ring2[ring2_pos];
+                point_t line2_end = ring2[((ring2_pos - 1)%size2+size2)%size2];
 
                 //check conflict
-                if(static_cast<bool>(bg::intersects(line1, line2))){
+                if(static_cast<bool>(Utilities::cross_check(line1_start, line1_end, line2_start, line2_end))){
                     return true;
                 }
             }

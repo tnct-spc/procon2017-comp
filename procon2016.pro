@@ -1,8 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    Polygon \
     Utilities\
+    Polygon \
     ImageRecognition \
     DisplayAnswer \
     Solver \

@@ -1,4 +1,5 @@
- #include "expandedpolygon.h"
+#include "expandedpolygon.h"
+#include "utilities.h"
 
 //-------------------constructor--------------------
 procon::ExpandedPolygon::ExpandedPolygon(int id_)
@@ -85,9 +86,7 @@ void procon::ExpandedPolygon::calcSideLength()
 
 void procon::ExpandedPolygon::calcSideAngle()
 {
-
-
-    auto calcAngle = [&](point_t p1,point_t p2,point_t p3,std::vector<point_t> inner = {})->double{
+    auto calcAngle = [&](point_t p1,point_t p2,point_t p3,int pos,std::vector<point_t> inner = {})->double{
 
         auto isMajorAngle = [&](point_t p1,point_t p2,point_t p3)->bool {
             point_t p4((p1.x() + p3.x()) / 2 , (p1.y() + p3.y()) / 2);
@@ -98,12 +97,14 @@ void procon::ExpandedPolygon::calcSideAngle()
             const double end_y_length = abs((p4.y() - p2.y()) / (p4.x() - p2.x() + ganma) * (end_x - p2.x()) + p2.y() + beta);
             const double end_y = p4.y() - p2.y() > 0 ? end_y_length : -end_y_length;
             point_t end_point(end_x,end_y);
-            bg::model::segment<point_t> judge_segment(p2,end_point);
+            //bg::model::segment<point_t> judge_segment(p2,end_point);
             int intersect_num = 0,points_size = size;
             if (!inner.empty()){
                 points_size = static_cast<int>(inner.size() - 1);
             }
             for (int i = 0;i < points_size;i++) {
+                // skip tonari
+                if(i==pos || i+1 == pos || (pos==0 && i==points_size-1)) continue;
                 point_t pa,pb;
                 if (!inner.empty()) {
                     pa = inner.at(i);
@@ -112,8 +113,9 @@ void procon::ExpandedPolygon::calcSideAngle()
                     pa = polygon.outer().at(i);
                     pb = polygon.outer().at(i+1);
                 }
-                bg::model::segment<point_t> side_segment(pa,pb);
-                intersect_num += static_cast<int>(bg::intersects(side_segment,judge_segment));
+                //bg::model::segment<point_t> side_segment(pa,pb);
+                intersect_num += static_cast<int>(Utilities::cross_check(p2,end_point,pa,pb));
+                //intersect_num += static_cast<int>(bg::intersects(side_segment,judge_segment));
             }
 
             return (intersect_num % 2 == 0) ? true : false;
@@ -153,7 +155,7 @@ void procon::ExpandedPolygon::calcSideAngle()
         }
         const point_t p2 = polygon.outer().at(i+1);
         const point_t p3 = polygon.outer().at(i+2);
-        side_angle.push_back(calcAngle(p1,p2,p3));
+        side_angle.push_back(calcAngle(p1,p2,p3,i+1));
     }
 
     for (auto inner : polygon.inners()) {
@@ -168,7 +170,7 @@ void procon::ExpandedPolygon::calcSideAngle()
             }
             const point_t p2 = inner.at(i+1);
             const point_t p3 = inner.at(i+2);
-            inner_side_angle.push_back(calcAngle(p1,p2,p3,inner));
+            inner_side_angle.push_back(calcAngle(p1,p2,p3,i+1,inner));
         }
         inners_side_angle.push_back(inner_side_angle);
     }

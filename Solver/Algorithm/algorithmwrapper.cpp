@@ -23,7 +23,7 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::Exp
             for (int j = 0; j < piece.getSize(); ++j) {
                 piece_first = piece.getSideAngle()[j];
 
-                if(procon::nearlyEqual(frame_first,piece_first,angle_error)){
+                if(Utilities::nearlyEqual(frame_first,piece_first,angle_error)){
                     std::array<Fit,2> fits;
                     fits.at(0).start_id = i;
                     fits.at(0).end_id = i;
