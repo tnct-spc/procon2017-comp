@@ -1,18 +1,6 @@
 #ifndef EXPANDEDPOLYGON_H
 #define EXPANDEDPOLYGON_H
-#include <iostream>
-#include <exception>
-#include <stdexcept>
-#include <vector>
-#include <cmath>
-#include <numeric>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/ring.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/algorithms/distance.hpp>
-#include <boost/geometry/algorithms/transform.hpp>
-#include <boost/assign/list_of.hpp>
-#include "utility"
+
 namespace bg = boost::geometry;
 using point_t = bg::model::d2::point_xy<double>;
 using ring_t = bg::model::ring<point_t>;

@@ -1,4 +1,5 @@
 #include "searchsamelength.h"
+#include "Algorithm/algorithmwrapper.h"
 
 std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygon& polygon1, const procon::ExpandedPolygon& polygon2, std::vector<std::array<Fit,2>> &result)
 {

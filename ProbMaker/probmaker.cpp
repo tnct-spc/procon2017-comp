@@ -1,19 +1,6 @@
 #include "probmaker.h"
 #include "ui_probmaker.h"
 
-#include <math.h>
-#include <iostream>
-#include <random>
-#include <vector>
-#include <memory>
-#include <algorithm>
-#include <functional>
-
-#include <QPainter>
-
-#include "polygon.h"
-#include "polygonio.h"
-
 ProbMaker::ProbMaker(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ProbMaker)

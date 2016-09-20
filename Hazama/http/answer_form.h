@@ -4,10 +4,6 @@
 #include <src/qhttpserver.h>
 #include <src/qhttprequest.h>
 #include <src/qhttpresponse.h>
-#include <QCoreApplication>
-#include <QFile>
-#include <QUrlQuery>
-
 
 class AnswerForm : public QObject
 {

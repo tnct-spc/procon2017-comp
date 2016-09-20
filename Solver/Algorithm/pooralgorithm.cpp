@@ -1,5 +1,7 @@
 #include "pooralgorithm.h"
 
+#include "singlepolygondisplay.h"
+
 PoorAlgorithm::PoorAlgorithm()
 {
 

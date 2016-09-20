@@ -2,7 +2,7 @@
 #define SEARCHSAMELENGTH_H
 
 #include "expandedpolygon.h"
-#include "Algorithm/algorithmwrapper.h"
+#include "Utils/fit.h"
 
 class SearchSameLength
 {

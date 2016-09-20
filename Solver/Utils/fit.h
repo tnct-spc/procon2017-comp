@@ -1,7 +1,6 @@
 #ifndef FIT_H
 #define FIT_H
 
-
 class Fit
 {
 public:

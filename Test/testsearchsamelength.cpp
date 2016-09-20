@@ -2,6 +2,8 @@
 
 #include "polygonviewer.h"
 #include "Utils/polygonconnector.h"
+#include "Evaluation/searchsamelength.h"
+#include "utilities.h"
 
 testSearchSameLength::testSearchSameLength()
 {

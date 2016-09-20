@@ -11,6 +11,11 @@ CONFIG += c++14
 TARGET = Solver
 TEMPLATE = lib
 
+CONFIG   += precompile_header
+
+# Use Precompiled headers (PCH)
+PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
+
 DEFINES += SOLVER_LIBRARY
 
 SOURCES += solver.cpp \

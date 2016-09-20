@@ -1,9 +1,6 @@
 #include "singlepolygondisplay.h"
 #include "ui_singlepolygondisplay.h"
 
-#include <QPainter>
-#include <QPen>
-
 SinglePolygonDisplay::SinglePolygonDisplay(QWidget *parent = 0) :
     QWidget(parent),
     ui(new Ui::SinglePolygonDisplay)

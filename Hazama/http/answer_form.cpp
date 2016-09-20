@@ -1,6 +1,4 @@
 #include "answer_form.h"
-#include <http/request_mapper.h>
-
 
 AnswerForm::AnswerForm(QObject *parent) : QObject(parent) {
     // empty

@@ -1,5 +1,6 @@
 #include "solver.h"
 
+#include "singlepolygondisplay.h"
 #include "Algorithm/pooralgorithm.h"
 #include "Algorithm/simplealgorithm.h"
 #include "Algorithm/hillclibming.h"

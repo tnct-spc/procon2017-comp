@@ -2,9 +2,6 @@
 #define POLYGONIO_H
 
 #include "field.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 namespace procon {
 class PolygonIO

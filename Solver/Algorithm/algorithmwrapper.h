@@ -2,11 +2,9 @@
 #define ALGORITHMWRAPPER_H
 
 #include "field.h"
-#include "utilities.h"
-#include "Utils/polygonconnector.h"
-#include "Utils/fit.h"
+#include "expandedpolygon.h"
 #include "Utils/evaluation.h"
-#include "polygonviewer.h"
+#include "Utils/fit.h"
 
 class AlgorithmWrapper
 {

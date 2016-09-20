@@ -4,14 +4,6 @@
 #define TO_STRING(VariableName) # VariableName
 
 #include "utilities_global.h"
-#include <cmath>
-#include <iostream>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/ring.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/algorithms/distance.hpp>
-#include <boost/geometry/algorithms/transform.hpp>
-#include <boost/assign/list_of.hpp>
 
 #define debugprint(S); std::cout<<"["<<__FILE__<<"]"<<"["<<std::to_string(__LINE__)<<"] "<<S<<std::endl;
 

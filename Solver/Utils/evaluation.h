@@ -2,8 +2,6 @@
 #define EVALUATION_H
 
 #include "Utils/fit.h"
-#include "field.h"
-#include <array>
 
 class Evaluation
 {

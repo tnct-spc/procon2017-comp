@@ -1,5 +1,7 @@
 #include "polygonconnector.h"
 
+#include "utilities.h"
+
 PolygonConnector::PolygonConnector()
 {
 

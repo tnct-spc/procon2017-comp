@@ -2,7 +2,6 @@
 #define POORALGORITHM_H
 
 #include "algorithmwrapper.h"
-#include "singlepolygondisplay.h"
 
 class PoorAlgorithm : public AlgorithmWrapper
 {

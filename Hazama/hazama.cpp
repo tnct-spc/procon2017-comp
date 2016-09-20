@@ -1,19 +1,5 @@
-
 #include "hazama.h"
 #include "ui_hazama.h"
-#include <unistd.h>
-#include <iostream>
-#include <string>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <QFileDialog>
-#include <QMessageBox>
-
-#include "field.h"
-#include "imagerecognition.h"
-#include "polygonio.h"
-#include "solver.h"
 
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),

@@ -1,24 +1,10 @@
 #ifndef IMAGERECOGNITION_H
 #define IMAGERECOGNITION_H
 
-
-#include "expandedpolygon.h"
 #include "imagerecognition_global.h"
-#include "expandedpolygon.h"
-#include "singlepolygondisplay.h"
+
 #include "field.h"
-#include <iostream>
-#include <random>
-#include <algorithm>
-#include <string>
-#include <exception>
-#include <stdexcept>
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/photo/photo.hpp>
-#include <opencv2/photo.hpp>
+#include "expandedpolygon.h"
 
 class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {

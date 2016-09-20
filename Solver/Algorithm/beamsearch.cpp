@@ -1,5 +1,9 @@
 #include "beamsearch.h"
 
+#include "field.h"
+#include "Utils/evaluation.h"
+#include "Utils/polygonconnector.h"
+
 BeamSearch::BeamSearch()
 {
 

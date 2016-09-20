@@ -1,12 +1,8 @@
 #ifndef POLYGONCONNECTOR_H
 #define POLYGONCONNECTOR_H
 
-#include <array>
-#include <vector>
-#include "field.h"
-#include "Algorithm/algorithmwrapper.h"
+#include "expandedpolygon.h"
 #include "Utils/fit.h"
-#include <cmath>
 
 using Ring = std::vector<point_t>;
 

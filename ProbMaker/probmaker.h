@@ -1,15 +1,10 @@
 #ifndef PROBMAKER_H
 #define PROBMAKER_H
 
-#include <random>
-#include <vector>
-#include <memory>
-#include <algorithm>
-
-#include <QMainWindow>
-
 #include "field.h"
 #include "expandedpolygon.h"
+#include "polygon.h"
+#include "polygonio.h"
 
 //prototype
 class Dot;

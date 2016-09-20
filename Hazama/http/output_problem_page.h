@@ -1,10 +1,6 @@
 #ifndef OUTPUTPROBLEMPAGE_H
 #define OUTPUTPROBLEMPAGE_H
 
-#include <iostream>
-#include <QObject>
-#include <QCoreApplication>
-#include <QFile>
 #include <src/qhttpserver.h>
 #include <src/qhttprequest.h>
 #include <src/qhttpresponse.h>

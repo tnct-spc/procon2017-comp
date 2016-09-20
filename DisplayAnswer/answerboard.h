@@ -1,19 +1,7 @@
 #ifndef ANSWERBOARD_H
 #define ANSWERBOARD_H
 
-#include <memory>
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-
-#include <QPainter>
-#include <QPen>
-#include <QWidget>
-#include <QKeyEvent>
-
 #include "field.h"
-#include "singlepolygondisplay.h"
 
 namespace Ui {
 class AnswerBoard;

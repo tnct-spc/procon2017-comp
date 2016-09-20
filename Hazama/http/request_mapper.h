@@ -4,12 +4,9 @@
 #include <http/help_page.h>
 #include <http/answer_form.h>
 #include <http/output_problem_page.h>
-
 #include <src/qhttpserver.h>
 #include <src/qhttprequest.h>
 #include <src/qhttpresponse.h>
-#include <QObject>
-#include <QDir>
 
 class RequestMapper : public QObject
 {

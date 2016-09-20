@@ -1,5 +1,7 @@
 #include "expandedpolygon.h"
+
 #include "utilities.h"
+#include "utility"
 
 //-------------------constructor--------------------
 procon::ExpandedPolygon::ExpandedPolygon(int id_)

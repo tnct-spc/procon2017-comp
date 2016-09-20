@@ -3,6 +3,7 @@
 #include "field.h"
 #include "polygonviewer.h"
 #include "Utils/polygonconnector.h"
+#include "utilities.h"
 
 TestJoinPolygon::TestJoinPolygon()
 {

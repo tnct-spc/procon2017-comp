@@ -1,10 +1,12 @@
 #ifndef HAZAMA_H
 #define HAZAMA_H
 
-#include <QMainWindow>
-#include <opencv2/core/core.hpp>
 #include "answerboard.h"
 #include "http/request_mapper.h"
+#include "field.h"
+#include "imagerecognition.h"
+#include "polygonio.h"
+#include "solver.h"
 
 namespace Ui {
 class Hazama;

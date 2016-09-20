@@ -1,5 +1,7 @@
 #include "simplealgorithm.h"
 
+#include "singlepolygondisplay.h"
+
 SimpleAlgorithm::SimpleAlgorithm()
 {
 

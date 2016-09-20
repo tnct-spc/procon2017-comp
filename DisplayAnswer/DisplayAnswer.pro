@@ -11,6 +11,11 @@ CONFIG += c++14
 TARGET = DisplayAnswer
 TEMPLATE = lib
 
+CONFIG   += precompile_header
+
+# Use Precompiled headers (PCH)
+PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
+
 DEFINES += DISPLAYANSWER_LIBRARY
 
 SOURCES += \

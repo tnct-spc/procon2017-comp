@@ -2,13 +2,6 @@
 #define FIELD_H
 
 #include "expandedpolygon.h"
-#include <iostream>
-#include <vector>
-#include <array>
-#include <boost/geometry.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/algorithms/disjoint.hpp>
 
 namespace procon {
 class Field

@@ -1,7 +1,7 @@
 #ifndef POLYGONVIEWER_H
 #define POLYGONVIEWER_H
 
-#include <QWidget>
+#include "expandedpolygon.h"
 #include "field.h"
 #include "singlepolygondisplay.h"
 

@@ -1,5 +1,4 @@
 #include "hazama.h"
-#include <QApplication>
 #include "polygonviewer.h"
 
 int main(int argc, char *argv[])

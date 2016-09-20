@@ -1,10 +1,10 @@
 #include "algorithmwrapper.h"
+
+#include "utilities.h"
+#include "Utils/polygonconnector.h"
+#include "polygonviewer.h"
 #include "utilities.h"
 #include "Evaluation/searchsamelength.h"
-
-#include <math.h>
-
-#define PI 3.141592
 
 procon::Field AlgorithmWrapper::run(procon::Field field)
 {

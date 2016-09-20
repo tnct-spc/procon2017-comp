@@ -11,6 +11,11 @@ CONFIG += c++14
 TARGET = ImageRecognition
 TEMPLATE = lib
 
+CONFIG   += precompile_header
+
+# Use Precompiled headers (PCH)
+PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
+
 DEFINES += IMAGERECOGNITION_LIBRARY
 
 SOURCES += imagerecognition.cpp

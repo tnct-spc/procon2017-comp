@@ -1,25 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <string>
-#include <QObject>
-#include <QUrl>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QByteArray>
-#include <QEventLoop>
-#include <QUrlQuery>
-#include <iostream>
-#include <stdexcept>
-#include <QSharedPointer>
-#include <QMainWindow>
-#include <QFile>
-#include <QDir>
-
 #include "solver.h"
 #include "polygonio.h"
 #include "answerboard.h"
+#include "QNetworkAccessManager"
+#include "QNetworkReply"
+#include "QNetworkRequest"
 
 namespace Ui {
 class MainWindow;
@@ -34,7 +21,7 @@ public:
     ~MainWindow();
 
 private:
-        std::shared_ptr<AnswerBoard> board;
+    std::shared_ptr<AnswerBoard> board;
     Ui::MainWindow *ui;
     bool get();
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);

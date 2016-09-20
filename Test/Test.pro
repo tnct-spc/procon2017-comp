@@ -11,6 +11,10 @@ CONFIG += c++14
 TARGET = Test
 TEMPLATE = app
 
+CONFIG   += precompile_header
+
+# Use Precompiled headers (PCH)
+PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
 SOURCES += main.cpp\
     testdisplayanswer.cpp \

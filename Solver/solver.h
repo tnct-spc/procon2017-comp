@@ -2,7 +2,7 @@
 #define SOLVER_H
 
 #include "solver_global.h"
-#include "singlepolygondisplay.h"
+
 #include "field.h"
 
 class SOLVERSHARED_EXPORT Solver

@@ -2,7 +2,6 @@
 #define SIMPLEALGORITHM_H
 
 #include "algorithmwrapper.h"
-#include "singlepolygondisplay.h"
 
 class SimpleAlgorithm : public AlgorithmWrapper
 {
