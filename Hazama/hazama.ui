@@ -189,6 +189,9 @@
      <property name="text">
       <string>PoorAlgorithm</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
    </widget>
   </widget>
