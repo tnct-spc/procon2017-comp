@@ -46,10 +46,10 @@ public:
     std::vector<procon::ExpandedPolygon> const& getElementaryPieces() const;
     std::vector<procon::ExpandedPolygon> const& getElementaryInversePieces() const;
     std::array<bool,50> const& getIsPlaced() const;
-    int getFieldScore();
-    int getPiecesSize();
-    double getMinAngle();
-    double getMinSide();
+    int getFieldScore() const;
+    int getPiecesSize() const;
+    double getMinAngle() const;
+    double getMinSide() const;
 
     //任意の位置のピースを消去
     void removePiece(int n);

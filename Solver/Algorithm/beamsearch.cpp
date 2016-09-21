@@ -58,8 +58,9 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         procon::ExpandedPolygon new_frame;
 
         bool hasJoinSuccess = PolygonConnector::joinPolygon(old_frame,old_piece,new_frame,fits);
+        double const min_angle = field_vec.at(vec_id).getMinAngle();
 
-        if (hasJoinSuccess) {
+        if (hasJoinSuccess && !canPrune(new_frame,min_angle)) {
             procon::Field new_field = field_vec.at(vec_id);
             new_field.setFlame(new_frame);
             new_field.setIsPlaced(piece_id);
@@ -67,6 +68,18 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         }
     }
     return next_field_vec;
+}
+
+bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double const& min_angle) {
+    bool can_prune = false;
+    for (auto const& angles : next_frame.getInnersSideAngle()) {
+        for (auto const& angle : angles){
+            if (angle < min_angle) {
+                can_prune = true;
+            }
+        }
+    }
+    return  can_prune;
 }
 
 procon::Field BeamSearch::run(procon::Field field)
@@ -87,6 +100,9 @@ procon::Field BeamSearch::run(procon::Field field)
     //このiは添字として使ってるわけではない（ただの回数ループ）
     for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++){
         evaluations.clear();
+        for (int j = 0;j < static_cast<int>(field_vec.size());j++){
+            field_vec.at(j).calcMinAngleSide();
+        }
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
         //それより先がなければその1手前の最高評価値のフィールドを返す

@@ -90,7 +90,7 @@ std::vector<procon::ExpandedPolygon> const& procon::Field::getElementaryInverseP
     return elementary_inverse_pieces;
 }
 
-int procon::Field::getPiecesSize()
+int procon::Field::getPiecesSize() const
 {
     return static_cast<int>(field_pieces.size());
 }
@@ -100,17 +100,17 @@ std::array<bool,50> const& procon::Field::getIsPlaced() const
     return isPlaced;
 }
 
-int procon::Field::getFieldScore()
+int procon::Field::getFieldScore() const
 {
     return field_pieces.size();
 }
 
-double procon::Field::getMinAngle()
+double procon::Field::getMinAngle() const
 {
     return min_angle;
 }
 
-double procon::Field::getMinSide()
+double procon::Field::getMinSide() const
 {
     return min_side;
 }
