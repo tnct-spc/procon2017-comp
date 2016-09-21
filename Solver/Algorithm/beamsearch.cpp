@@ -32,32 +32,26 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
     };
 
     tbb::task_scheduler_init tbb;
-    tbb::concurrent_vector<Evaluation> tbb_evaluations;
-    tbb::concurrent_vector<procon::Field> tbb_field_vec;
-
-    for (auto const& field : field_vec) {
-        tbb_field_vec.push_back(field);
-    }
+    std::mutex mutex;
 
     int const field_vec_size = static_cast<int>(field_vec.size());
 
     auto evaluateRange = [&](tbb::blocked_range<int> const& range)
     {
         for (auto j = range.begin();j < range.end();j++) {
-            std::vector<Evaluation> eva = fieldSearch(tbb_field_vec.at(j));
+            mutex.lock();
+            std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
+            mutex.unlock();
             for (auto & e : eva) {
                 e.vector_id = j;
             }
-            std::copy(eva.begin(),eva.end(),std::back_inserter(tbb_evaluations));
+            mutex.lock();
+            std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+            mutex.unlock();
         }
     };
 
     tbb::parallel_for(tbb::blocked_range<int>(0,field_vec_size,(field_vec_size / 4) + 1),evaluateRange);
-
-    for (auto & eva : tbb_evaluations) {
-        evaluations.emplace_back(eva);
-    }
-
     tbb.terminate();
 }
 
