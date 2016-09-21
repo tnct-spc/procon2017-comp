@@ -3,6 +3,8 @@
 #include "field.h"
 #include "Utils/evaluation.h"
 #include "Utils/polygonconnector.h"
+#include <mutex>
+#include <thread>
 
 BeamSearch::BeamSearch()
 {
@@ -31,39 +33,43 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         return evaluations;
     };
 
-    tbb::task_scheduler_init tbb;
+    std::vector<std::thread> threads;
     std::mutex mutex;
 
     int const field_vec_size = static_cast<int>(field_vec.size());
 
-    auto evaluateRange = [&](tbb::blocked_range<int> const& range)
+    auto evaluateRange = [&](int const& j)
     {
-        for (auto j = range.begin();j < range.end();j++) {
-            mutex.lock();
-            std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
-            mutex.unlock();
-            for (auto & e : eva) {
-                e.vector_id = j;
-            }
-            mutex.lock();
-            std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
-            mutex.unlock();
+        std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
+        for (auto & e : eva) {
+            e.vector_id = j;
         }
+        mutex.lock();
+        std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+        mutex.unlock();
     };
 
-    tbb::parallel_for(tbb::blocked_range<int>(0,field_vec_size,(field_vec_size / 4) + 1),evaluateRange);
-    tbb.terminate();
+    for (int j = 0;j < field_vec_size;j++) {
+        std::thread thread(evaluateRange,j);
+        threads.emplace_back(std::move(thread));
+    }
+    for (int j = 0;j < field_vec_size;j++) {
+        threads.at(j).join();
+    }
 }
 
 std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> const& evaluations,std::vector<procon::Field> const& field_vec)
 {
     std::vector<procon::Field> next_field_vec;
-    for (int j = 0;j < beam_width && j < static_cast<int>(evaluations.size());j++) {
+    std::vector<std::thread> threads;
+    std::mutex mutex;
+
+    auto makeField = [&](int j){
         int const& vec_id = evaluations.at(j).vector_id;
         int const& piece_id = evaluations.at(j).piece_id;
-        std::array<Fit,2> const& fits = evaluations.at(j).fits;
-        procon::ExpandedPolygon const& old_frame = field_vec.at(vec_id).getFlame();
-        procon::ExpandedPolygon const& old_piece =
+        std::array<Fit,2> const fits = evaluations.at(j).fits;
+        procon::ExpandedPolygon const old_frame = field_vec.at(vec_id).getFlame();
+        procon::ExpandedPolygon const old_piece =
         (evaluations.at(j).inverse_flag) ?
             field_vec.at(vec_id).getElementaryInversePieces().at(piece_id)
         :
@@ -78,9 +84,21 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             procon::Field new_field = field_vec.at(vec_id);
             new_field.setFlame(new_frame);
             new_field.setIsPlaced(piece_id);
+
+            mutex.lock();
             next_field_vec.emplace_back(new_field);
+            mutex.unlock();
         }
+    };
+    double const width = beam_width < static_cast<int>(evaluations.size()) ? beam_width : static_cast<int>(evaluations.size());
+    for (int j = 0;j < width;j++) {
+        std::thread thread(makeField,j);
+        threads.emplace_back(std::move(thread));
     }
+    for (int j = 0;j < width;j++) {
+        threads.at(j).join();
+    }
+
     return next_field_vec;
 }
 
