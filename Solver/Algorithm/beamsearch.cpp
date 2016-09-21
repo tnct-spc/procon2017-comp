@@ -31,14 +31,34 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         return evaluations;
     };
 
-    for (int j = 0;j < static_cast<int>(field_vec.size());j++) {
-        std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
-        for (auto & e : eva) {
-            e.vector_id = j;
-        }
-        std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+    tbb::task_scheduler_init tbb;
+    tbb::concurrent_vector<Evaluation> tbb_evaluations;
+    tbb::concurrent_vector<procon::Field> tbb_field_vec;
+
+    for (auto const& field : field_vec) {
+        tbb_field_vec.push_back(field);
     }
 
+    int const field_vec_size = static_cast<int>(field_vec.size());
+
+    auto evaluateRange = [&](tbb::blocked_range<int> const& range)
+    {
+        for (auto j = range.begin();j < range.end();j++) {
+            std::vector<Evaluation> eva = fieldSearch(tbb_field_vec.at(j));
+            for (auto & e : eva) {
+                e.vector_id = j;
+            }
+            std::copy(eva.begin(),eva.end(),std::back_inserter(tbb_evaluations));
+        }
+    };
+
+    tbb::parallel_for(tbb::blocked_range<int>(0,field_vec_size,(field_vec_size / 4) + 1),evaluateRange);
+
+    for (auto & eva : tbb_evaluations) {
+        evaluations.emplace_back(eva);
+    }
+
+    tbb.terminate();
 }
 
 std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> const& evaluations,std::vector<procon::Field> const& field_vec)
@@ -60,11 +80,11 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         bool hasJoinSuccess = PolygonConnector::joinPolygon(old_frame,old_piece,new_frame,fits);
         double const min_angle = field_vec.at(vec_id).getMinAngle();
 
-        if (hasJoinSuccess && !canPrune(new_frame,min_angle)) {
+        if (hasJoinSuccess  && !canPrune(new_frame,min_angle) ) {
             procon::Field new_field = field_vec.at(vec_id);
             new_field.setFlame(new_frame);
             new_field.setIsPlaced(piece_id);
-            next_field_vec.push_back(std::move(new_field));
+            next_field_vec.emplace_back(new_field);
         }
     }
     return next_field_vec;

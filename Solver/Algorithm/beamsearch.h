@@ -2,13 +2,18 @@
 #define BEAMSEARCH_H
 
 #include "algorithmwrapper.h"
+#include <thread>
+#include <tbb/task_scheduler_init.h>
+#include <tbb/parallel_for.h>
+#include <tbb/concurrent_vector.h>
+
 
 class BeamSearch : public AlgorithmWrapper
 {
 private:
 protected:
     //ビーム幅
-    const double beam_width = 100;
+    const double beam_width = 1000;
 
     virtual void evaluateNextMove
     (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec);
