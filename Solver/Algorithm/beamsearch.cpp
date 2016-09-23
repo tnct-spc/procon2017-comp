@@ -1,12 +1,19 @@
 #include "beamsearch.h"
-
 #include "field.h"
 #include "Utils/evaluation.h"
 #include "Utils/polygonconnector.h"
+#include <mutex>
+#include <thread>
+#include "parallel.h"
 
 BeamSearch::BeamSearch()
 {
+    this->initialization();
+}
 
+void BeamSearch::initialization()
+{
+    cpu_num = std::thread::hardware_concurrency();
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -31,43 +38,75 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         return evaluations;
     };
 
-    for (int j = 0;j < static_cast<int>(field_vec.size());j++) {
-        std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
-        for (auto & e : eva) {
-            e.vector_id = j;
+    procon::Parallel parallel;
+
+    int const field_vec_size = static_cast<int>(field_vec.size());
+
+    auto evaluateRange = [&](int start_id,int end_id)
+    {
+        for (int j = start_id;j < end_id;j++) {
+            std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
+            for (auto & e : eva) {
+                e.vector_id = j;
+            }
+            {
+                //std::lock_guard<std::mutex> ld(parallel.mutex());と同じ
+                MUTEX_LOCK(parallel);
+                std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+            }
         }
-        std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
-    }
+    };
+
+    /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
+    parallel.generateThreads(evaluateRange,cpu_num,0,field_vec_size);
+    /**スレッド終わるの待ち**/
+    parallel.joinThreads();
 
 }
 
 std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> const& evaluations,std::vector<procon::Field> const& field_vec)
 {
     std::vector<procon::Field> next_field_vec;
-    for (int j = 0;j < beam_width && j < static_cast<int>(evaluations.size());j++) {
-        int const& vec_id = evaluations.at(j).vector_id;
-        int const& piece_id = evaluations.at(j).piece_id;
-        std::array<Fit,2> const& fits = evaluations.at(j).fits;
-        procon::ExpandedPolygon const& old_frame = field_vec.at(vec_id).getFlame();
-        procon::ExpandedPolygon const& old_piece =
-        (evaluations.at(j).inverse_flag) ?
-            field_vec.at(vec_id).getElementaryInversePieces().at(piece_id)
-        :
-            field_vec.at(vec_id).getElementaryPieces().at(piece_id)
-        ;
-        procon::ExpandedPolygon new_frame;
+    procon::Parallel parallel;
 
-        bool hasJoinSuccess = PolygonConnector::joinPolygon(old_frame,old_piece,new_frame,fits);
-        double const min_angle = field_vec.at(vec_id).getMinAngle();
+    auto makeField = [&](int start_id,int end_id){
+        for (int j = start_id;j < end_id;j++) {
+            int const vec_id = evaluations.at(j).vector_id;
+            int const piece_id = evaluations.at(j).piece_id;
+            std::array<Fit,2> const fits = evaluations.at(j).fits;
+            procon::ExpandedPolygon const old_frame = field_vec.at(vec_id).getFlame();
+            procon::ExpandedPolygon const old_piece =
+            (evaluations.at(j).inverse_flag) ?
+                field_vec.at(vec_id).getElementaryInversePieces().at(piece_id)
+            :
+                field_vec.at(vec_id).getElementaryPieces().at(piece_id)
+            ;
+            procon::ExpandedPolygon new_frame;
 
-        if (hasJoinSuccess && !canPrune(new_frame,min_angle)) {
-            procon::Field new_field = field_vec.at(vec_id);
-            new_field.setFlame(new_frame);
-            new_field.setIsPlaced(piece_id);
-            next_field_vec.push_back(std::move(new_field));
+            bool hasJoinSuccess = PolygonConnector::joinPolygon(old_frame,old_piece,new_frame,fits);
+            double const min_angle = field_vec.at(vec_id).getMinAngle();
+
+            if (hasJoinSuccess  && !canPrune(new_frame,min_angle) ) {
+                procon::Field new_field = field_vec.at(vec_id);
+                new_field.setFlame(new_frame);
+                new_field.setIsPlaced(piece_id);
+
+                {
+                    MUTEX_LOCK(parallel);
+                    next_field_vec.push_back(new_field);
+                }
+            }
         }
-    }
+    };
+
+    int const width = beam_width < static_cast<int>(evaluations.size()) ? beam_width : static_cast<int>(evaluations.size());
+    /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
+    parallel.generateThreads(makeField,cpu_num,0,width);
+
+    /**スレッド終わるの待ち**/
+    parallel.joinThreads();
     return next_field_vec;
+
 }
 
 bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double const& min_angle) {
@@ -97,7 +136,7 @@ procon::Field BeamSearch::run(procon::Field field)
     procon::Field buckup_field;
 
     //ピースが全部置かれたら終了
-    //このiは添字として使ってるわけではない（ただの回数ループ）
+    //このiは添字として使ってるわけではない（ただの回数ルーブ）
     for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++){
         evaluations.clear();
         for (int j = 0;j < static_cast<int>(field_vec.size());j++){
