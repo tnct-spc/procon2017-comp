@@ -8,7 +8,7 @@ SinglePolygonDisplay::SinglePolygonDisplay(QWidget *parent = 0) :
     ui->setupUi(this);
 }
 
-std::unique_ptr<SinglePolygonDisplay> SinglePolygonDisplay::create(procon::ExpandedPolygon& polygon, std::string wname_, int scale)
+std::unique_ptr<SinglePolygonDisplay> SinglePolygonDisplay::create(procon::ExpandedPolygon const& polygon, std::string wname_, int scale)
 {
     std::unique_ptr<SinglePolygonDisplay> instance(new SinglePolygonDisplay());
     instance->polygon = polygon;
@@ -30,7 +30,7 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 3));
 
-    auto drawPolygon = [&](std::vector<QPointF> points, bool set_base){
+    auto drawPolygon = [&](procon::ExpandedPolygon const& polygon, std::vector<QPointF> points, bool set_base){
         static const double margin = 10;
         const int size = points.size();
         static double x_max,y_max,x_min,y_min;
@@ -54,7 +54,23 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
             draw_point[i].setX(((points.at(i).x() + x_offset)*x/max)+x/2+x_margin);
             draw_point[i].setY(((points.at(i).y() + y_offset)*y/max)+y/2+y_margin);
         }
+        //draw polygon
         painter.drawPolygon(draw_point,size);
+        //draw number
+        painter.setPen(QPen(QColor("#00ff00")));
+        QFont font = painter.font();
+        font.setPointSize(std::abs(y/30));
+        painter.setFont(font);
+        for(int count=0; count<size;++count){
+            painter.drawText(draw_point[count], QString::number(count));
+        }
+        font.setPointSize(std::abs(y/60));
+        painter.setFont(font);
+        if(polygon.getInnerSize() != 0){
+            for(int count=0; count<size;++count){
+                painter.drawText(QPointF((draw_point[count].x()+draw_point[(count+1)%size].x())/2, (draw_point[count].y()+draw_point[(count+1)%size].y())/2), QString::number(polygon.getFrameJoinLineIds().at(count).polygon_id)+":"+QString::number(polygon.getFrameJoinLineIds().at(count).line_id));
+            }
+        }
         delete[] draw_point;
     };
 
@@ -65,7 +81,7 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
         points.push_back(QPointF(polygon.getPolygon().outer()[i].x(),polygon.getPolygon().outer()[i].y()));
     }
     painter.setBrush(QBrush(QColor("#0f5ca0")));
-    drawPolygon(points, 1);
+    drawPolygon(polygon, points, 1);
     int inner_size = polygon.getInnerSize();
     for(int i=0;i<inner_size;i++){
         auto inner = polygon.getPolygon().inners().at(i);
@@ -75,6 +91,6 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
             points.push_back(QPointF(inner[i].x(),inner[i].y()));
         }
         painter.setBrush(QBrush(QColor("#f4c342")));
-        drawPolygon(points,0);
+        drawPolygon(polygon,points,0);
     }
 }

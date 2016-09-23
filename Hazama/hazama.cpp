@@ -1,6 +1,8 @@
 #include "hazama.h"
 #include "ui_hazama.h"
 
+#include "polygonviewer.h"
+
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Hazama)
@@ -200,6 +202,7 @@ void Hazama::run()
 
         //Display answer
         board->setField(field);
+        PolygonViewer::getInstance().pushPolygon(field.getFlame(),std::string("Answer Frame"));
     }
 
     std::cout<<"finish"<<std::endl;

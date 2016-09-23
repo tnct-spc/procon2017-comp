@@ -154,7 +154,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         //int count = 0;
         //for(auto piece : field->getElementaryPieces()){
         //    displays.push_back(new SinglePolygonDisplay());
-        //    displays[count]->setPolygon(piece,30,std::to_string(count));
+        //    displays[count]->resetPolygonForce(piece,30,std::to_string(count));
         //    displays[count]->show();
         //    count++;
         //}
@@ -173,7 +173,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         }
 
         //draw flame-jointed pieces
-        for(auto piece : field->getFlame().jointed_pieces){
+        for(auto piece : field->getFlame().getJointedPieces()){
             drawPiece(piece);
         }
     }

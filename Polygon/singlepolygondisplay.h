@@ -12,7 +12,7 @@ class SinglePolygonDisplay : public QWidget
     Q_OBJECT
 
 public:
-    static std::unique_ptr<SinglePolygonDisplay> create(procon::ExpandedPolygon& polygon, std::string wname_, int scale);
+    static std::unique_ptr<SinglePolygonDisplay> create(procon::ExpandedPolygon const& polygon, std::string wname_, int scale);
     ~SinglePolygonDisplay();
 
 private:

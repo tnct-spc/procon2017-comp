@@ -1,6 +1,8 @@
 #ifndef EXPANDEDPOLYGON_H
 #define EXPANDEDPOLYGON_H
 
+#include "fit.h"
+
 namespace bg = boost::geometry;
 using point_t = bg::model::d2::point_xy<double>;
 using ring_t = bg::model::ring<point_t>;
@@ -25,6 +27,20 @@ class ExpandedPolygon
 
     polygon_t polygon;
 
+    //jointed pieces data
+    typedef struct POLYGON_LINE_ID_TYPE{
+        int polygon_id;
+        int line_id;
+    } polygon_line_id_type;
+    typedef std::array<polygon_line_id_type,2> join_id_type;
+    friend bool operator<(const polygon_line_id_type &lhs, const polygon_line_id_type &rhs){return lhs.polygon_id == rhs.polygon_id ? lhs.line_id < rhs.line_id : lhs.polygon_id < rhs.polygon_id;}
+    friend bool operator==(const polygon_line_id_type &lhs, const polygon_line_id_type &rhs){return lhs.polygon_id == rhs.polygon_id && lhs.line_id == rhs.line_id;}
+    friend bool operator<(const join_id_type &lhs, const join_id_type &rhs){return lhs[0] == rhs[0] ? lhs[1] < rhs[1] : lhs[0] < rhs[0];}
+
+    std::set<join_id_type> jointed_pieces_id_set;
+    std::vector<procon::ExpandedPolygon> jointed_pieces;
+    std::vector<polygon_line_id_type> frame_join_line_ids;
+
     //flag
     bool calcSize_flag = false;
 
@@ -38,7 +54,6 @@ protected:
 
 public:
     // Public Member
-    std::vector<procon::ExpandedPolygon> jointed_pieces;
 
     //constructor
     ExpandedPolygon(int id_ = -1);
@@ -58,10 +73,13 @@ public:
     int getId() const;
     std::vector<int> getMultiIds() const;
     std::string makeMultiIdString() const;
+    std::vector<procon::ExpandedPolygon> const& getJointedPieces() const;
+    std::vector<procon::ExpandedPolygon::polygon_line_id_type> const& getFrameJoinLineIds() const;
 
     //setter
     void setMultiIds(std::vector<int> multi_ids_);
-    void setPolygon(polygon_t const & p);
+    void resetPolygonForce(polygon_t const & p);
+    void pushNewJointedPolygon(polygon_t const & new_frame, procon::ExpandedPolygon const& jointed_polygon, std::array<Fit,2> fits);
 
     //operator
     ExpandedPolygon operator = (ExpandedPolygon const& p);
@@ -72,9 +90,9 @@ public:
     void inversePolygon();
     void rotatePolygon(double degree);
     void translatePolygon(double x,double y);
-    
-    void setPolygonAngle(double degree);
-    void setPolygonPosition(double x,double y);
+
+    void resetPolygonForceAngle(double degree);
+    void resetPolygonForcePosition(double x,double y);
 
     double difference_of_default_degree = 0;
 

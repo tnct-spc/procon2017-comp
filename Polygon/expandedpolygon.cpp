@@ -33,15 +33,9 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->inners_size = p.inners_size;
     this->jointed_pieces = p.jointed_pieces;
     this->is_inverse = p.is_inverse;
-    /*
-    std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
-    std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
-    std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
-    std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));
-    std::copy(p.inners_side_length.begin(),p.inners_side_length.end(), std::back_inserter(this->inners_side_length));
-    std::copy(p.inners_side_angle.begin(),p.inners_side_angle.end(), std::back_inserter(this->inners_side_angle));
-    std::copy(p.inners_side_slope.begin(),p.inners_side_slope.end(), std::back_inserter(this->inners_side_slope));
-    */
+    this->jointed_pieces_id_set = p.jointed_pieces_id_set;
+    this->jointed_pieces = p.jointed_pieces;
+    this->frame_join_line_ids = p.frame_join_line_ids;
     this->multi_ids = p.multi_ids;
     this->side_length = p.side_length;
     this->side_angle = p.side_angle;
@@ -49,7 +43,6 @@ procon::ExpandedPolygon::ExpandedPolygon(ExpandedPolygon const& p)
     this->inners_side_length = p.inners_side_length;
     this->inners_side_angle = p.inners_side_angle;
     this->inners_side_slope = p.inners_side_slope;
-
     this->polygon.outer().reserve(32);
     this->centerx = p.centerx;
     this->centery = p.centery;
@@ -267,16 +260,66 @@ std::vector<std::vector<double>> const& procon::ExpandedPolygon::getInnersSideSl
     return inners_side_slope;
 }
 
+std::vector<procon::ExpandedPolygon> const& procon::ExpandedPolygon::getJointedPieces() const
+{
+    return jointed_pieces;
+}
+
+std::vector<procon::ExpandedPolygon::polygon_line_id_type> const& procon::ExpandedPolygon::getFrameJoinLineIds() const
+{
+    return frame_join_line_ids;
+}
+
 //setter
 void procon::ExpandedPolygon::setMultiIds(std::vector<int> multi_ids_)
 {
     multi_ids = multi_ids_;
 }
 
-void procon::ExpandedPolygon::setPolygon(polygon_t const& p)
+void procon::ExpandedPolygon::resetPolygonForce(polygon_t const& p)
 {
     polygon = p;
     this->updatePolygon(true);
+
+    // Reset join data
+    jointed_pieces_id_set.clear();
+    jointed_pieces.clear();
+    frame_join_line_ids.clear();
+    if(this->getInnerSize() != 0){
+        for(unsigned int i=0;i<polygon.inners()[0].size()-1;++i){
+            polygon_line_id_type buffer;
+            buffer.polygon_id = getId();
+            buffer.line_id = i;
+            frame_join_line_ids.emplace_back(buffer);
+        }
+    }
+}
+
+void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, const procon::ExpandedPolygon &jointed_polygon, std::array<Fit, 2> fits)
+{
+    polygon = new_frame;
+    this->updatePolygon(true);
+    if(this->getInnerSize() != 0){
+        for(unsigned int i=0;i<polygon.inners()[0].size()-1;++i){
+            polygon_line_id_type buffer;
+            buffer.polygon_id = getId();
+            buffer.line_id = i;
+            frame_join_line_ids.emplace_back(buffer);
+        }
+    }
+    // Add piece to jointed_pieces
+    jointed_pieces.push_back(jointed_polygon);
+
+    // Add id to jointed_pieces_id_set
+    //join_id_type new_id;
+    //new_id.polygon_id = ;
+    //new_id.line_id = ;
+    //jointed_pieces_id_set.insert();
+
+    //TODO idに新しいものを追加する
+    //std::set<join_id_type> jointed_pieces_id_set;
+    //std::vector<procon::ExpandedPolygon> jointed_pieces;
+    //std::vector<polygon_line_id_type> frame_join_line_ids;
 }
 
 // operator
@@ -288,15 +331,9 @@ procon::ExpandedPolygon procon::ExpandedPolygon::operator =
     this->size = p.size;
     this->inners_size = p.inners_size;
     this->is_inverse = p.is_inverse;
-    /*
-    std::copy(p.multi_ids.begin(),p.multi_ids.end(), std::back_inserter(this->multi_ids));
-    std::copy(p.side_length.begin(),p.side_length.end(), std::back_inserter(this->side_length));
-    std::copy(p.side_angle.begin(),p.side_angle.end(), std::back_inserter(this->side_angle));
-    std::copy(p.side_slope.begin(),p.side_slope.end(), std::back_inserter(this->side_slope));
-    std::copy(p.inners_side_length.begin(),p.inners_side_length.end(), std::back_inserter(this->inners_side_length));
-    std::copy(p.inners_side_angle.begin(),p.inners_side_angle.end(), std::back_inserter(this->inners_side_angle));
-    std::copy(p.inners_side_slope.begin(),p.inners_side_slope.end(), std::back_inserter(this->inners_side_slope));
-    */
+    this->jointed_pieces_id_set = p.jointed_pieces_id_set;
+    this->jointed_pieces = p.jointed_pieces;
+    this->frame_join_line_ids = p.frame_join_line_ids;
     this->jointed_pieces = p.jointed_pieces;
     this->multi_ids = p.multi_ids;
     this->side_length = p.side_length;
@@ -397,7 +434,7 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
     polygon = translatedPolygon;
 }
 
-void procon::ExpandedPolygon::setPolygonAngle(double degree)
+void procon::ExpandedPolygon::resetPolygonForceAngle(double degree)
 {
     polygon_t goPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
@@ -430,7 +467,7 @@ void procon::ExpandedPolygon::setPolygonAngle(double degree)
     }
 }
 
-void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
+void procon::ExpandedPolygon::resetPolygonForcePosition(double x, double y)
 {
     double dx = x - centerx;
     double dy = y - centery;

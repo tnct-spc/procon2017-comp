@@ -183,7 +183,7 @@ procon::Field ProbMaker::PolygonToExPolygon()
         flame.outer().push_back(point_t(Polygons.at(0).at(j).s_dot->x/30,Polygons.at(0).at(j).s_dot->y/30));
     }
     flame.outer().push_back(point_t(Polygons.at(0).at(0).s_dot->x/30,Polygons.at(0).at(0).s_dot->y/30));
-    ex_flame.setPolygon(flame);
+    ex_flame.resetPolygonForce(flame);
     field.setElementaryFlame(ex_flame);
 
     //polygon
@@ -204,7 +204,7 @@ procon::Field ProbMaker::PolygonToExPolygon()
         }
         pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(0).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(0).s_dot->y/30)-reference_point_y));
         ex_pieces.push_back(buff2);
-        ex_pieces.at(i-1).setPolygon(pieces.at(i-1));
+        ex_pieces.at(i-1).resetPolygonForce(pieces.at(i-1));
     }
     field.setElementaryPieces(ex_pieces);
 
