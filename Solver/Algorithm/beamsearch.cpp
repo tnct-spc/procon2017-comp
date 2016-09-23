@@ -5,7 +5,7 @@
 #include "Utils/polygonconnector.h"
 #include <mutex>
 #include <thread>
-#include <iterator>
+#include "parallel.h"
 
 BeamSearch::BeamSearch()
 {
@@ -39,8 +39,7 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         return evaluations;
     };
 
-    std::vector<std::thread> threads;
-    std::mutex mutex;
+    procon::Parallel parallel;
 
     int const field_vec_size = static_cast<int>(field_vec.size());
 
@@ -51,41 +50,30 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
             for (auto & e : eva) {
                 e.vector_id = j;
             }
-            mutex.lock();
-            std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
-            mutex.unlock();
+            {
+                //std::lock_guard<std::mutex> ld(parallel.mutex());と同じ
+                MUTEX_LOCK(parallel);
+                std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+            }
         }
     };
 
     /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
-    const int split_num = field_vec_size / cpu_num;
-    int j = 0;
-    if (!(field_vec_size < cpu_num)) {
-        for (j = 0;j < cpu_num - 1;j++) {
-            std::thread thread(evaluateRange,split_num * j, split_num * (j + 1));
-            threads.emplace_back(std::move(thread));
-        }
-    }
-    std::thread thread(evaluateRange,split_num * j, field_vec_size);
-    threads.emplace_back(std::move(thread));
-    /*****/
+    parallel.generateThreads(evaluateRange,cpu_num,0,field_vec_size);
     /**スレッド終わるの待ち**/
-    for (int j = 0;j < threads.size();j++) {
-        threads.at(j).join();
-    }
-    /*****/
+    parallel.joinThreads();
+
 }
 
 std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> const& evaluations,std::vector<procon::Field> const& field_vec)
 {
     std::vector<procon::Field> next_field_vec;
-    std::vector<std::thread> threads;
-    std::mutex mutex;
+    procon::Parallel parallel;
 
     auto makeField = [&](int start_id,int end_id){
         for (int j = start_id;j < end_id;j++) {
-            int const& vec_id = evaluations.at(j).vector_id;
-            int const& piece_id = evaluations.at(j).piece_id;
+            int const vec_id = evaluations.at(j).vector_id;
+            int const piece_id = evaluations.at(j).piece_id;
             std::array<Fit,2> const fits = evaluations.at(j).fits;
             procon::ExpandedPolygon const old_frame = field_vec.at(vec_id).getFlame();
             procon::ExpandedPolygon const old_piece =
@@ -104,31 +92,21 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
                 new_field.setFlame(new_frame);
                 new_field.setIsPlaced(piece_id);
 
-                mutex.lock();
-                next_field_vec.emplace_back(new_field);
-                mutex.unlock();
+                {
+                    MUTEX_LOCK(parallel);
+                    next_field_vec.push_back(new_field);
+                }
             }
         }
     };
 
-    /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
     int const width = beam_width < static_cast<int>(evaluations.size()) ? beam_width : static_cast<int>(evaluations.size());
-    const int split_num = width / cpu_num;
-    int j = 0;
-    if (!(width < cpu_num)) {
-        for (j = 0;j < cpu_num - 1;j++) {
-            std::thread thread(makeField,split_num * j, split_num * (j + 1));
-            threads.emplace_back(std::move(thread));
-        }
-    }
-    std::thread thread(makeField,split_num * j, width);
-    threads.emplace_back(std::move(thread));
-    /*****/
+    /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
+    parallel.generateThreads(makeField,cpu_num,0,width);
+
     /**スレッド終わるの待ち**/
-    for (int j = 0;j < threads.size();j++) {
-        threads.at(j).join();
-    }
-    /*****/
+    parallel.joinThreads();
+    std::cout << cpu_num << std::endl;
     return next_field_vec;
 
 }

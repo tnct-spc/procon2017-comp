@@ -12,7 +12,7 @@ class BeamSearch : public AlgorithmWrapper
 private:
 protected:
     //ビーム幅
-    const double beam_width = 10000;
+    const double beam_width = 1000;
     int cpu_num;
     void initialization();
     virtual void evaluateNextMove
