@@ -1,4 +1,5 @@
 #include "beamsearchbylength.h"
+#include "parallel.h"
 
 BeamSearchByLength::BeamSearchByLength()
 {
@@ -7,7 +8,7 @@ BeamSearchByLength::BeamSearchByLength()
 
 void BeamSearchByLength::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
 {
-    auto fieldSearch = [&](procon::Field field)
+    auto fieldSearch = [&](procon::Field const& field)
     {
         std::vector<Evaluation> evaluations;
         for (int j = 0;j < static_cast<int>(field.getElementaryPieces().size());j++){
@@ -27,12 +28,28 @@ void BeamSearchByLength::evaluateNextMove (std::vector<Evaluation> & evaluations
         return evaluations;
     };
 
-    for (int j = 0;j < static_cast<int>(field_vec.size());j++) {
-        std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
-        for (auto & e : eva) {
-            e.vector_id = j;
+    procon::Parallel parallel;
+
+    int const field_vec_size = static_cast<int>(field_vec.size());
+
+    auto evaluateRange = [&](int start_id,int end_id)
+    {
+        for (int j = start_id;j < end_id;j++) {
+            std::vector<Evaluation> eva = fieldSearch(field_vec.at(j));
+            for (auto & e : eva) {
+                e.vector_id = j;
+            }
+            {
+                //std::lock_guard<std::mutex> ld(parallel.mutex());と同じ
+                MUTEX_LOCK(parallel);
+                std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
+            }
         }
-        std::copy(eva.begin(),eva.end(),std::back_inserter(evaluations));
-    }
+    };
+
+    /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
+    parallel.generateThreads(evaluateRange,cpu_num,0,field_vec_size);
+    /**スレッド終わるの待ち**/
+    parallel.joinThreads();
 
 }

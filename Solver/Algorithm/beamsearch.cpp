@@ -1,5 +1,4 @@
 #include "beamsearch.h"
-
 #include "field.h"
 #include "Utils/evaluation.h"
 #include "Utils/polygonconnector.h"
@@ -106,7 +105,6 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 
     /**スレッド終わるの待ち**/
     parallel.joinThreads();
-    std::cout << cpu_num << std::endl;
     return next_field_vec;
 
 }
@@ -138,7 +136,7 @@ procon::Field BeamSearch::run(procon::Field field)
     procon::Field buckup_field;
 
     //ピースが全部置かれたら終了
-    //このiは添字として使ってるわけではない（ただの回数ループ）
+    //このiは添字として使ってるわけではない（ただの回数ルーブリブリ）
     for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++){
         evaluations.clear();
         for (int j = 0;j < static_cast<int>(field_vec.size());j++){
