@@ -2,9 +2,6 @@
 #define BEAMSEARCH_H
 
 #include "algorithmwrapper.h"
-#include <tbb/task_scheduler_init.h>
-#include <tbb/parallel_for.h>
-#include <tbb/concurrent_vector.h>
 
 
 class BeamSearch : public AlgorithmWrapper
