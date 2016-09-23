@@ -136,7 +136,7 @@ procon::Field BeamSearch::run(procon::Field field)
     procon::Field buckup_field;
 
     //ピースが全部置かれたら終了
-    //このiは添字として使ってるわけではない（ただの回数ルーブリブリ）
+    //このiは添字として使ってるわけではない（ただの回数ルーブ）
     for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++){
         evaluations.clear();
         for (int j = 0;j < static_cast<int>(field_vec.size());j++){
