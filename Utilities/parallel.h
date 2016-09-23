@@ -19,7 +19,7 @@ public:
     void generateThreads(Lambda lambda,Split split,Range start,Range end) {
         Split split_num = (end - start) / split;
         Range i = 0;
-        if (split_num >= split) {
+        if (split_num > 0) {
             for (i = 0;i < split - 1;i++) {
                 std::thread thread(lambda,start + split_num * i,start + split_num * (i + 1));
                 threads.emplace_back(std::move(thread));
