@@ -91,8 +91,8 @@ public:
     void rotatePolygon(double degree);
     void translatePolygon(double x,double y);
 
-    void resetPolygonForceAngle(double degree);
-    void resetPolygonForcePosition(double x,double y);
+    void setPolygonAngle(double degree);
+    void setPolygonPosition(double x,double y);
 
     double difference_of_default_degree = 0;
 

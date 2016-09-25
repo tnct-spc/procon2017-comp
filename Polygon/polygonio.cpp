@@ -146,9 +146,9 @@ procon::Field procon::PolygonIO::importAnswer(std::string file_path, procon::Fie
             std::getline(stream,tmpI,',');
 
             procon::ExpandedPolygon tmpPolygon = field.getElementaryPieces().at(std::stoi(tmpID));
-            tmpPolygon.resetPolygonForcePosition(std::stod(tmpX),std::stod(tmpY));
+            tmpPolygon.setPolygonPosition(std::stod(tmpX),std::stod(tmpY));
             if(std::stoi(tmpI) == true) tmpPolygon.inversePolygon();
-            tmpPolygon.resetPolygonForceAngle(std::stod(tmpR));
+            tmpPolygon.setPolygonAngle(std::stod(tmpR));
             field.setPiece(tmpPolygon);
         }
     }

@@ -203,6 +203,7 @@ void Hazama::run()
         //Display answer
         board->setField(field);
         PolygonViewer::getInstance().pushPolygon(field.getFlame(),std::string("Answer Frame"));
+        //PolygonViewer::getInstance().pushPolygon(field.getFlame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
     }
 
     std::cout<<"finish"<<std::endl;

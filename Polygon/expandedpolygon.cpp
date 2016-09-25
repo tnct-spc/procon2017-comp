@@ -278,6 +278,7 @@ void procon::ExpandedPolygon::setMultiIds(std::vector<int> multi_ids_)
 
 void procon::ExpandedPolygon::resetPolygonForce(polygon_t const& p)
 {
+    std::cout<<"Force"<<std::endl;
     polygon = p;
     this->updatePolygon(true);
 
@@ -292,13 +293,104 @@ void procon::ExpandedPolygon::resetPolygonForce(polygon_t const& p)
             buffer.line_id = i;
             frame_join_line_ids.emplace_back(buffer);
         }
+    }else{
+        for(unsigned int i=0;i<polygon.outer().size()-1;++i){
+            polygon_line_id_type buffer;
+            buffer.polygon_id = getId();
+            buffer.line_id = i;
+            frame_join_line_ids.emplace_back(buffer);
+        }
     }
 }
 
 void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, const procon::ExpandedPolygon &jointed_polygon, std::array<Fit, 2> fits)
 {
-    polygon = new_frame;
+    static int cnt=0;
+    std::cout<<++cnt<<std::endl;
+    // Update polygon
     this->updatePolygon(true);
+
+    // Add piece to jointed_pieces
+    jointed_pieces.push_back(jointed_polygon);
+
+    /*insert line id*/
+
+    //yabai
+    int line_start_long_is_this_polygon = this->getInnersSideLength().at(0).at(Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1)) > jointed_polygon.getSideLength().at(fits[1].start_id);
+    int line_end_long_is_this_polygon = this->getInnersSideLength().at(0).at(fits[0].end_id) > jointed_polygon.getSideLength().at(Utilities::dec(fits[1].end_id,jointed_polygon.getSize()));
+
+    auto old_frame_join_line_ids = frame_join_line_ids;
+    int this_polygon_start_prev_line_id  = fits[0].start_dot_or_line == Fit::Dot ? line_start_long_is_this_polygon==true ? Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1,2):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1);
+    int this_polygon_start_begin_line_id = fits[0].start_dot_or_line == Fit::Dot ? line_start_long_is_this_polygon==true ? Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1):fits[0].start_id;
+    int this_polygon_end_finish_line_id  = fits[0].end_dot_or_line   == Fit::Dot ? line_end_long_is_this_polygon==true   ? fits[0].end_id:fits[0].end_id:fits[0].end_id;
+    int this_polygon_end_next_line_id    = fits[0].end_dot_or_line   == Fit::Dot ? line_end_long_is_this_polygon==true   ? fits[0].end_id:Utilities::inc(fits[0].end_id,this->getPolygon().inners().at(0).size()-1):Utilities::inc(fits[0].end_id,this->getPolygon().inners().at(0).size()-1);
+
+    polygon_line_id_type jointed_polygon_id_buffer;
+    jointed_polygon_id_buffer.polygon_id = jointed_polygon.getId();
+    int jointed_polygon_end_next_line_id    = fits[1].end_dot_or_line     == Fit::Dot ? line_end_long_is_this_polygon==false   ? Utilities::dec(fits[1].end_id,jointed_polygon.getSize()):Utilities::dec(fits[1].end_id,jointed_polygon.getSize(),2):Utilities::dec(fits[1].end_id,jointed_polygon.getSize());
+    int jointed_polygon_end_finish_line_id  = fits[1].end_dot_or_line     == Fit::Dot ? line_end_long_is_this_polygon==false   ? Utilities::dec(fits[1].end_id,jointed_polygon.getSize()):Utilities::dec(fits[1].end_id,jointed_polygon.getSize()):fits[1].end_id;
+    int jointed_polygon_start_begin_line_id = fits[1].start_dot_or_line   == Fit::Dot ? line_start_long_is_this_polygon==false ? fits[1].start_id:fits[1].start_id:fits[1].start_id;
+    int jointed_polygon_start_prev_line_id  = fits[1].start_dot_or_line   == Fit::Dot ? line_start_long_is_this_polygon==false ? fits[1].start_id:Utilities::inc(fits[1].start_id,jointed_polygon.getSize()):Utilities::inc(fits[1].start_id,jointed_polygon.getSize());
+
+    int line_length = [&]()->int{
+        if(this_polygon_start_begin_line_id < this_polygon_end_finish_line_id){
+            return this_polygon_end_finish_line_id - this_polygon_start_begin_line_id + 1;
+        }else{
+            return (this_polygon_end_finish_line_id + this->getPolygon().inners().at(0).size()-1) - this_polygon_start_begin_line_id + 1;
+        }
+    }();
+
+    // Insert id-set
+    for(int cnt = 0; cnt < line_length; ++cnt){
+        polygon_line_id_type this_polygon_id_buffer = old_frame_join_line_ids.at(Utilities::inc(this_polygon_start_begin_line_id,this->getSize(),cnt));
+        jointed_polygon_id_buffer.line_id = Utilities::dec(jointed_polygon_start_begin_line_id,jointed_polygon.getSize(),cnt);
+        jointed_pieces_id_set.insert({this_polygon_id_buffer,jointed_polygon_id_buffer});
+        jointed_pieces_id_set.insert({jointed_polygon_id_buffer,this_polygon_id_buffer});
+    }
+
+    // Update frame-line-ids
+    frame_join_line_ids.clear();
+    int new_polygon_start_pos=fits[0].end_dot_or_line == Fit::Dot ? Utilities::inc(this_polygon_end_finish_line_id,this->getPolygon().inners().at(0).size()-1) : Utilities::inc(this_polygon_end_finish_line_id,this->getPolygon().inners().at(0).size()-1,2);
+        //0-frame_end
+    {
+        int frame_line_cnt = new_polygon_start_pos - 1; //soon increase. so back 1
+        do{
+            frame_line_cnt = Utilities::inc(frame_line_cnt,this->getPolygon().inners().at(0).size()-1);
+            frame_join_line_ids.push_back(old_frame_join_line_ids.at(frame_line_cnt));
+        }while(frame_line_cnt != this_polygon_start_prev_line_id);
+    }
+        //jointed_polygon area
+    {
+        int piece_line_cnt = jointed_polygon_start_prev_line_id - 1; // soon increase. so back 1
+        do{
+            piece_line_cnt = Utilities::inc(piece_line_cnt,jointed_polygon.getSize());
+            jointed_polygon_id_buffer.line_id = piece_line_cnt;
+            frame_join_line_ids.push_back(jointed_polygon_id_buffer);
+        }while(piece_line_cnt != jointed_polygon_end_next_line_id);
+    }
+        //frame_start-<0
+    if(fits[0].end_dot_or_line == Fit::Dot && line_end_long_is_this_polygon==false){
+        //frame_join_line_ids.push_back(old_frame_join_line_ids.at(this_polygon_end_finish_line_id));
+        //frame_join_line_ids.push_back(old_frame_join_line_ids.at(this_polygon_end_next_line_id));
+    }else{
+        frame_join_line_ids.push_back(old_frame_join_line_ids.at(this_polygon_end_next_line_id));
+    }
+
+    // Replace raw polygon
+    polygon = new_frame;
+
+    if(frame_join_line_ids.size() != new_frame.inners().at(0).size()-1){
+        throw "TURAMI ERROR";
+    }
+
+    //for(int frame_line_cnt = 0; frame_line_cnt != this_polygon_start_prev_line_id; ++frame_line_cnt)
+    //    frame_join_line_ids.push_back(old_frame_join_line_ids.at(frame_line_cnt));
+    //}
+
+
+
+
+    /*
     if(this->getInnerSize() != 0){
         for(unsigned int i=0;i<polygon.inners()[0].size()-1;++i){
             polygon_line_id_type buffer;
@@ -307,9 +399,7 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
             frame_join_line_ids.emplace_back(buffer);
         }
     }
-    // Add piece to jointed_pieces
-    jointed_pieces.push_back(jointed_polygon);
-
+    */
     // Add id to jointed_pieces_id_set
     //join_id_type new_id;
     //new_id.polygon_id = ;
@@ -434,7 +524,7 @@ void procon::ExpandedPolygon::translatePolygon(double x, double y)
     polygon = translatedPolygon;
 }
 
-void procon::ExpandedPolygon::resetPolygonForceAngle(double degree)
+void procon::ExpandedPolygon::setPolygonAngle(double degree)
 {
     polygon_t goPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
@@ -467,7 +557,7 @@ void procon::ExpandedPolygon::resetPolygonForceAngle(double degree)
     }
 }
 
-void procon::ExpandedPolygon::resetPolygonForcePosition(double x, double y)
+void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
 {
     double dx = x - centerx;
     double dy = y - centery;

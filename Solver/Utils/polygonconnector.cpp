@@ -1,6 +1,7 @@
 #include "polygonconnector.h"
 
 #include "utilities.h"
+#include "polygonviewer.h"
 
 PolygonConnector::PolygonConnector()
 {
@@ -49,7 +50,6 @@ polygon_t PolygonConnector::pushRingToPolygonT(Ring& ring, procon::ExpandedPolyg
         }
     }
 
-    //TODO
     return new_raw_polygon;
 }
 
@@ -160,6 +160,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         new_polygon = std::move(jointed_polygon);
         new_polygon.pushNewJointedPolygon(new_raw_polygon, piece, join_data);
     }else{ //piece-piece
+        throw "Not supported!";
         new_polygon.setMultiIds(std::vector<int>{jointed_polygon.getId(), piece.getId()});
         polygon_t new_raw_polygon = pushRingToPolygonT(new_ring, new_polygon);
         //new_polygon.pushNewJointedPolygon(jointed_polygon, join_data);

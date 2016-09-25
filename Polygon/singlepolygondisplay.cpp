@@ -64,12 +64,8 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
         for(int count=0; count<size;++count){
             painter.drawText(draw_point[count], QString::number(count));
         }
-        font.setPointSize(std::abs(y/60));
-        painter.setFont(font);
-        if(polygon.getInnerSize() != 0){
-            for(int count=0; count<size;++count){
-                painter.drawText(QPointF((draw_point[count].x()+draw_point[(count+1)%size].x())/2, (draw_point[count].y()+draw_point[(count+1)%size].y())/2), QString::number(polygon.getFrameJoinLineIds().at(count).polygon_id)+":"+QString::number(polygon.getFrameJoinLineIds().at(count).line_id));
-            }
+        for(int count=0; count<size;++count){
+            painter.drawText(QPointF((draw_point[count].x()+draw_point[(count+1)%size].x())/2, (draw_point[count].y()+draw_point[(count+1)%size].y())/2), QString::number(polygon.getFrameJoinLineIds().at(count).polygon_id)+":"+QString::number(polygon.getFrameJoinLineIds().at(count).line_id));
         }
         delete[] draw_point;
     };

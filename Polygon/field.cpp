@@ -21,13 +21,13 @@ void procon::Field::setPiece(procon::ExpandedPolygon piece)
 
 void procon::Field::setPiece(ExpandedPolygon piece, double x, double y)
 {
-    piece.resetPolygonForcePosition(x,y);
+    piece.setPolygonPosition(x,y);
     field_pieces.push_back(piece);
 }
 
 void procon::Field::setPiece(procon::ExpandedPolygon piece, int n, double x, double y)
 {
-    piece.resetPolygonForcePosition(x,y);
+    piece.setPolygonPosition(x,y);
     field_pieces.at(n) = piece;
 }
 
