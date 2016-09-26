@@ -315,15 +315,17 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
 
     /*insert line id*/
 
+    int inner_id = fits[0].flame_inner_pos;
+
     //yabai
-    int line_start_long_is_this_polygon = this->getInnersSideLength().at(0).at(Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1)) > jointed_polygon.getSideLength().at(fits[1].start_id);
-    int line_end_long_is_this_polygon = this->getInnersSideLength().at(0).at(fits[0].end_id) > jointed_polygon.getSideLength().at(Utilities::dec(fits[1].end_id,jointed_polygon.getSize()));
+    int line_start_long_is_this_polygon = this->getInnersSideLength().at(inner_id).at(Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(inner_id).size()-1)) > jointed_polygon.getSideLength().at(fits[1].start_id);
+    int line_end_long_is_this_polygon = this->getInnersSideLength().at(inner_id).at(fits[0].end_id) > jointed_polygon.getSideLength().at(Utilities::dec(fits[1].end_id,jointed_polygon.getSize()));
 
     auto old_frame_join_line_ids = frame_join_line_ids;
-    int this_polygon_start_prev_line_id  = fits[0].start_dot_or_line == Fit::Dot ? line_start_long_is_this_polygon==true ? Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1,2):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1);
-    int this_polygon_start_begin_line_id = fits[0].start_dot_or_line == Fit::Dot ? line_start_long_is_this_polygon==true ? Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(0).size()-1):fits[0].start_id;
+    int this_polygon_start_prev_line_id  = fits[0].start_dot_or_line == Fit::Dot ? line_start_long_is_this_polygon==true ? Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(inner_id).size()-1):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(inner_id).size()-1,2):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(inner_id).size()-1);
+    int this_polygon_start_begin_line_id = fits[0].start_dot_or_line == Fit::Dot ? line_start_long_is_this_polygon==true ? Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(inner_id).size()-1):Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(inner_id).size()-1):fits[0].start_id;
     int this_polygon_end_finish_line_id  = fits[0].end_dot_or_line   == Fit::Dot ? line_end_long_is_this_polygon==true   ? fits[0].end_id:fits[0].end_id:fits[0].end_id;
-    int this_polygon_end_next_line_id    = fits[0].end_dot_or_line   == Fit::Dot ? line_end_long_is_this_polygon==true   ? fits[0].end_id:Utilities::inc(fits[0].end_id,this->getPolygon().inners().at(0).size()-1):Utilities::inc(fits[0].end_id,this->getPolygon().inners().at(0).size()-1);
+    int this_polygon_end_next_line_id    = fits[0].end_dot_or_line   == Fit::Dot ? line_end_long_is_this_polygon==true   ? fits[0].end_id:Utilities::inc(fits[0].end_id,this->getPolygon().inners().at(inner_id).size()-1):Utilities::inc(fits[0].end_id,this->getPolygon().inners().at(inner_id).size()-1);
 
     polygon_line_id_type jointed_polygon_id_buffer;
     jointed_polygon_id_buffer.polygon_id = jointed_polygon.getId();
@@ -336,13 +338,13 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
         if(this_polygon_start_begin_line_id <= this_polygon_end_finish_line_id){
             return this_polygon_end_finish_line_id - this_polygon_start_begin_line_id + 1;
         }else{
-            return (this_polygon_end_finish_line_id + this->getPolygon().inners().at(0).size()-1) - this_polygon_start_begin_line_id + 1;
+            return (this_polygon_end_finish_line_id + this->getPolygon().inners().at(inner_id).size()-1) - this_polygon_start_begin_line_id + 1;
         }
     }();
 
     // Insert id-set
     for(int cnt = 0; cnt < line_length; ++cnt){
-        polygon_line_id_type this_polygon_id_buffer = old_frame_join_line_ids.at(Utilities::inc(this_polygon_start_begin_line_id,this->getPolygon().inners().at(0).size()-1,cnt));
+        polygon_line_id_type this_polygon_id_buffer = old_frame_join_line_ids.at(Utilities::inc(this_polygon_start_begin_line_id,this->getPolygon().inners().at(inner_id).size()-1,cnt));
         jointed_polygon_id_buffer.line_id = Utilities::dec(jointed_polygon_start_begin_line_id,jointed_polygon.getSize(),cnt);
         jointed_pieces_id_set.insert({this_polygon_id_buffer,jointed_polygon_id_buffer});
         jointed_pieces_id_set.insert({jointed_polygon_id_buffer,this_polygon_id_buffer});
@@ -350,12 +352,12 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
 
     // Update frame-line-ids
     frame_join_line_ids.clear();
-    int new_polygon_start_pos=fits[0].end_dot_or_line == Fit::Dot ? Utilities::inc(this_polygon_end_finish_line_id,this->getPolygon().inners().at(0).size()-1) : Utilities::inc(this_polygon_end_finish_line_id,this->getPolygon().inners().at(0).size()-1,2);
+    int new_polygon_start_pos=fits[0].end_dot_or_line == Fit::Dot ? Utilities::inc(this_polygon_end_finish_line_id,this->getPolygon().inners().at(inner_id).size()-1) : Utilities::inc(this_polygon_end_finish_line_id,this->getPolygon().inners().at(inner_id).size()-1,2);
         //0-frame_end
     {
         int frame_line_cnt = new_polygon_start_pos - 1; //soon increase. so back 1
         do{
-            frame_line_cnt = Utilities::inc(frame_line_cnt,this->getPolygon().inners().at(0).size()-1);
+            frame_line_cnt = Utilities::inc(frame_line_cnt,this->getPolygon().inners().at(inner_id).size()-1);
             frame_join_line_ids.push_back(old_frame_join_line_ids.at(frame_line_cnt));
         }while(frame_line_cnt != this_polygon_start_prev_line_id);
     }
@@ -376,7 +378,7 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
         frame_join_line_ids.push_back(old_frame_join_line_ids.at(this_polygon_end_next_line_id));
     }
 
-    if(frame_join_line_ids.size() != new_frame.inners().at(0).size()-1){
+    if(frame_join_line_ids.size() != new_frame.inners().at(inner_id).size()-1){
         throw "TURAMI ERROR";
     }
 
