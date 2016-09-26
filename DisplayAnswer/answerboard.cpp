@@ -28,11 +28,14 @@ void AnswerBoard::setField(const procon::Field &field)
     this->update();
 
     //add putid_list
-    for(auto piece : this->field->getPieces()){
-        if(piece.getId() != -1 && (piece.getId() != 0 && piece.getId() != 1)) putid_list.push_back(piece.getId());
+    for(auto piece : this->field->getFlame().getJointedPieces()){
+        if(piece.getId() != -1) putid_list.push_back(piece.getId());
     }
-    if(this->field->getPiecesSize() >= 1) putid_left = this->field->getPiece(0).getId();
-    if(this->field->getPiecesSize() >= 2) putid_right = this->field->getPiece(1).getId();
+    putid_list.erase(putid_list.begin());
+    putid_list.erase(putid_list.begin());
+    int jointed_pieces_size = this->field->getFlame().getJointedPieces().size();
+    if(jointed_pieces_size >= 1) putid_left = this->field->getFlame().getJointedPieces().at(0).getId();
+    if(jointed_pieces_size >= 2) putid_right = this->field->getFlame().getJointedPieces().at(1).getId();
 }
 
 void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos)
@@ -218,8 +221,8 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
             if(putid_list.size() == 0){
                 putid_left = -1;
             }else{
-                putid_left = putid_list.back();
-                putid_list.pop_back();
+                putid_left = putid_list.front();
+                putid_list.erase(putid_list.begin());
             }
             this->update();
             break;
@@ -227,8 +230,8 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
             if(putid_list.size() == 0){
                 putid_right = -1;
             }else{
-                putid_right = putid_list.back();
-                putid_list.pop_back();
+                putid_right = putid_list.front();
+                putid_list.erase(putid_list.begin());
             }
             this->update();
             break;
