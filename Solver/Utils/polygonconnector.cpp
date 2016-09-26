@@ -3,6 +3,8 @@
 #include "utilities.h"
 #include "polygonviewer.h"
 
+//#define DEBUG_RING
+
 PolygonConnector::PolygonConnector()
 {
 
@@ -76,8 +78,10 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     int size1 = ring1.size();
     int size2 = ring2.size();
 
-    //debugRing(ring1,__LINE__);
-    //debugRing(ring2,__LINE__);
+#ifdef DEBUG_RING
+    debugRing(ring1,__LINE__);
+    debugRing(ring2,__LINE__);
+#endif
 
     //結合後に座標が一致する始点及び終点を取得
     const int complete_matching_start_pos_1 = fit1.start_dot_or_line == Fit::Dot ? fit1.start_id : fit1.start_id                  ;
@@ -112,8 +116,10 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         return false;
     }
 
-    //debugRing(ring1,__LINE__);
-    //debugRing(ring2,__LINE__);
+#ifdef DEBUG_RING
+    debugRing(ring1,__LINE__);
+    debugRing(ring2,__LINE__);
+#endif
 
     // 結合　新しいRingに結合後の外周の角を入れる。
     // もし、結合端の辺の長さが等しくならない時はRing1,Ring2ともに端の角を入力。
@@ -150,7 +156,9 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         new_ring.push_back(point_t(x,y));
     } while (Type != -1);
 
-    //debugRing(new_ring,__LINE__);
+#ifdef DEBUG_RING
+    debugRing(new_ring,__LINE__);
+#endif
 
     //　ポリゴンにRingを出力しておしまい
     //TODO
