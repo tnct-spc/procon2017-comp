@@ -509,7 +509,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     int count = 0;
     for (auto po:polygons){
         procon::ExpandedPolygon ishowta;
-        ishowta.setPolygon(po);
+        ishowta.resetPolygonForce(po);
         count++;
         std::cout << "piece" << bg::dsv(po) << std::endl;
     }*/
@@ -562,10 +562,10 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
         bg::transform(translated_polygon,polygon,reduction);
         bg::reverse(polygon);
         if (flame_flag){
-            ex_flame.setPolygon(polygon);
+            ex_flame.resetPolygonForce(polygon);
         } else {
             procon::ExpandedPolygon ex_polygon(piece_count);
-            ex_polygon.setPolygon(polygon);
+            ex_polygon.resetPolygonForce(polygon);
             ex_pieces.push_back(ex_polygon);
             piece_count++;
         }

@@ -59,5 +59,12 @@ public:
         }
         return cr1 && cr2;
     }
+
+    static int inc(int num,int size, int len=1){
+        return (num+len) % size;
+    }
+    static int dec(int num,int size, int len=1){
+        return ((num-len)%size + size) % size;
+    }
 };
 #endif // UTILITIES_H

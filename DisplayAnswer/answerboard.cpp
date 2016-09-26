@@ -28,11 +28,24 @@ void AnswerBoard::setField(const procon::Field &field)
     this->update();
 
     //add putid_list
-    for(auto piece : this->field->getPieces()){
-        if(piece.getId() != -1 && (piece.getId() != 0 && piece.getId() != 1)) putid_list.push_back(piece.getId());
+    std::vector<procon::ExpandedPolygon> pieces = this->field->getFlame().getJointedPieces();
+    std::sort(pieces.begin(),pieces.end(),[](procon::ExpandedPolygon const& rhs, procon::ExpandedPolygon const& lhs)->bool{
+        const point_t r_center = bg::return_centroid<point_t>(rhs.getPolygon());
+        const point_t l_center = bg::return_centroid<point_t>(lhs.getPolygon());
+        return r_center.y() == l_center.y() ? r_center.x() < l_center.x() : r_center.y() < l_center.y();
+    });
+    for(auto piece : pieces){
+        if(piece.getId() != -1) putid_list.push_back(piece.getId());
     }
-    if(this->field->getPiecesSize() >= 1) putid_left = this->field->getPiece(0).getId();
-    if(this->field->getPiecesSize() >= 2) putid_right = this->field->getPiece(1).getId();
+    int jointed_pieces_size = pieces.size();
+    if(jointed_pieces_size >= 1){
+        putid_list.erase(putid_list.begin());
+        putid_left = pieces.at(0).getId();
+    }
+    if(jointed_pieces_size >= 2){
+        putid_list.pop_back();
+        putid_right = pieces.back().getId();
+    }
 }
 
 void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos)
@@ -154,7 +167,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         //int count = 0;
         //for(auto piece : field->getElementaryPieces()){
         //    displays.push_back(new SinglePolygonDisplay());
-        //    displays[count]->setPolygon(piece,30,std::to_string(count));
+        //    displays[count]->resetPolygonForce(piece,30,std::to_string(count));
         //    displays[count]->show();
         //    count++;
         //}
@@ -173,7 +186,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         }
 
         //draw flame-jointed pieces
-        for(auto piece : field->getFlame().jointed_pieces){
+        for(auto piece : field->getFlame().getJointedPieces()){
             drawPiece(piece);
         }
     }
@@ -218,8 +231,8 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
             if(putid_list.size() == 0){
                 putid_left = -1;
             }else{
-                putid_left = putid_list.back();
-                putid_list.pop_back();
+                putid_left = putid_list.front();
+                putid_list.erase(putid_list.begin());
             }
             this->update();
             break;

@@ -10,7 +10,7 @@ class PolygonViewer : public QWidget
     Q_OBJECT
 public:
     static PolygonViewer& getInstance();
-    void pushPolygon(procon::ExpandedPolygon& polygon, std::string wname_ = "", int scale = -1);
+    void pushPolygon(procon::ExpandedPolygon const& polygon, std::string wname_ = "", int scale = -1);
 private:
     explicit PolygonViewer(QWidget *parent = 0);
     std::vector<std::unique_ptr<SinglePolygonDisplay>> Displays;

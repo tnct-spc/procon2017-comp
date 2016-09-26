@@ -1,7 +1,7 @@
 #ifndef EVALUATION_H
 #define EVALUATION_H
 
-#include "Utils/fit.h"
+#include "fit.h"
 
 class Evaluation
 {

@@ -4,7 +4,7 @@
 #include "field.h"
 #include "expandedpolygon.h"
 #include "Utils/evaluation.h"
-#include "Utils/fit.h"
+#include "fit.h"
 
 class AlgorithmWrapper
 {

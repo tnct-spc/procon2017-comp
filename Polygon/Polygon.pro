@@ -23,7 +23,8 @@ SOURCES += \
     polygonio.cpp \
     expandedpolygon.cpp \
     singlepolygondisplay.cpp \
-    polygonviewer.cpp
+    polygonviewer.cpp \
+    fit.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -31,7 +32,8 @@ HEADERS += \
     polygonio.h \
     expandedpolygon.h \
     singlepolygondisplay.h \
-    polygonviewer.h
+    polygonviewer.h \
+    fit.h
 
 LIBS += -lboost_system -lboost_thread
 

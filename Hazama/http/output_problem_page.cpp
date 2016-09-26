@@ -6,7 +6,7 @@ OutputProblemPage::OutputProblemPage(QObject *parent) : QObject(parent)
 }
 
 void OutputProblemPage::Service(QHttpRequest *request, QHttpResponse *response){
-    std::cout<<"getRequest get"<<std::endl;
+    std::cout<<"getRequest get with body="<<request->body().data()<<std::endl;
     /*
     //get addless
     QString addless =request->url().toString();

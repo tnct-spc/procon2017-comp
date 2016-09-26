@@ -13,8 +13,8 @@ bool TestDisplayAnswer::run()
     bg::exterior_ring(c) = boost::assign::list_of<point_t>(0, 0)(0,1)(1,0)(0,0);
     Field f;
     PolygonExpansion hoge,huga;
-    hoge.setPolygon(b);
-    huga.setPolygon(c);
+    hoge.resetPolygonForce(b);
+    huga.resetPolygonForce(c);
     f.setFlame(hoge);
     f.pushPiece(huga);
     f.setPiece(huga,1919);

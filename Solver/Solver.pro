@@ -24,7 +24,6 @@ SOURCES += solver.cpp \
     Algorithm/pooralgorithm.cpp \
     Algorithm/hillclibming.cpp \
     Utils/polygonconnector.cpp \
-    Utils/fit.cpp \
     Utils/evaluation.cpp \
     Algorithm/beamsearch.cpp \
     Evaluation/searchsamelength.cpp \
@@ -37,7 +36,6 @@ HEADERS += solver.h\
     Algorithm/pooralgorithm.h \
     Algorithm/hillclibming.h \
     Utils/polygonconnector.h \
-    Utils/fit.h \
     Utils/evaluation.h \
     Algorithm/beamsearch.h \
     Evaluation/searchsamelength.h \

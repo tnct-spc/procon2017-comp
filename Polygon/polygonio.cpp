@@ -34,7 +34,7 @@ procon::Field procon::PolygonIO::importPolygon(std::string file_path)
         }
     }
     ExpandedPolygon ex_flame;
-    ex_flame.setPolygon(flame);
+    ex_flame.resetPolygonForce(flame);
     field.setElementaryFlame(ex_flame);
 
     //pieces
@@ -49,7 +49,7 @@ procon::Field procon::PolygonIO::importPolygon(std::string file_path)
             piece.outer().push_back(point_t(std::stof(tmpX),std::stof(tmpY)));
         }
         procon::ExpandedPolygon ex_piece(pieces_cnt);
-        ex_piece.setPolygon(piece);
+        ex_piece.resetPolygonForce(piece);
         ex_pieces.push_back(ex_piece);
         pieces_cnt++;
     }
@@ -111,7 +111,7 @@ void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path
 void procon::PolygonIO::exportAnswer(procon::Field field, std::string file_path)
 {
     //flame jointed piece to normal piece
-    for(auto piece : field.getFlame().jointed_pieces){
+    for(auto piece : field.getFlame().getJointedPieces()){
         field.setPiece(piece);
     }
 
