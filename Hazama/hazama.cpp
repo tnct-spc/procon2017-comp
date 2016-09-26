@@ -163,6 +163,24 @@ void Hazama::run()
         /*Image Recognition*/
         ImageRecognition imrec;
         PDATA = imrec.run(flame, pieces);
+        procon::ExpandedPolygon frame = PDATA.getElementaryFlame();
+        polygon_t rframe = frame.getPolygon();
+        polygon_t nframe;
+        for(auto ring:rframe.outer()){
+            nframe.outer().push_back(ring);
+        }
+
+        nframe.inners().push_back(polygon_t::ring_type());
+        nframe.inners().at(0).push_back(point_t{0.12434,0.12533});
+        nframe.inners().at(0).push_back(point_t{1.13242,1.134342});
+        nframe.inners().at(0).push_back(point_t{0.234431,1.3231});
+
+        nframe.inners().push_back(polygon_t::ring_type());
+        for(auto ring:rframe.inners().at(0)){
+            nframe.inners().at(1).push_back(ring);
+        }
+        frame.resetPolygonForce(nframe);
+        PDATA.setElementaryFlame(frame);
 
         //display recognized image
         board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());

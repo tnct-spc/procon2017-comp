@@ -30,7 +30,7 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 3));
 
-    auto drawPolygon = [&](procon::ExpandedPolygon const& polygon, std::vector<QPointF> points, bool set_base){
+    auto drawPolygon = [&](procon::ExpandedPolygon const& polygon, std::vector<QPointF> points, bool set_base, int inner_id = -1){
         static const double margin = 10;
         const int size = points.size();
         static double x_max,y_max,x_min,y_min;
@@ -64,8 +64,10 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
         for(int count=0; count<size;++count){
             painter.drawText(draw_point[count], QString::number(count));
         }
-        for(int count=0; count<size;++count){
-            painter.drawText(QPointF((draw_point[count].x()+draw_point[(count+1)%size].x())/2, (draw_point[count].y()+draw_point[(count+1)%size].y())/2), QString::number(polygon.getFrameJoinLineIds().at(count).polygon_id)+":"+QString::number(polygon.getFrameJoinLineIds().at(count).line_id));
+        if(inner_id!=-1){
+            for(int count=0; count<size;++count){
+                painter.drawText(QPointF((draw_point[count].x()+draw_point[(count+1)%size].x())/2, (draw_point[count].y()+draw_point[(count+1)%size].y())/2), QString::number(polygon.getFrameJoinLineIdss().at(inner_id).at(count).polygon_id)+":"+QString::number(polygon.getFrameJoinLineIdss().at(inner_id).at(count).line_id));
+            }
         }
         delete[] draw_point;
     };
@@ -87,6 +89,6 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
             points.push_back(QPointF(inner[i].x(),inner[i].y()));
         }
         painter.setBrush(QBrush(QColor("#f4c342")));
-        drawPolygon(polygon,points,0);
+        drawPolygon(polygon,points,0,i);
     }
 }
