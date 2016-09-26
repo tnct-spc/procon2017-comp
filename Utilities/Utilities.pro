@@ -19,12 +19,14 @@ PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 DEFINES += UTILITIES_LIBRARY
 
 SOURCES += utilities.cpp \
-    parallel.cpp
+    parallel.cpp \
+    threshold.cpp
 
 HEADERS += utilities.h\
         utilities_global.h \
     precompile.h \
-    parallel.h
+    parallel.h \
+    threshold.h
 
 unix {
     target.path = /usr/lib
