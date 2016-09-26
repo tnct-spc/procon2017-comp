@@ -333,7 +333,7 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
     int jointed_polygon_start_prev_line_id  = fits[1].start_dot_or_line   == Fit::Dot ? line_start_long_is_this_polygon==false ? fits[1].start_id:Utilities::inc(fits[1].start_id,jointed_polygon.getSize()):Utilities::inc(fits[1].start_id,jointed_polygon.getSize());
 
     int line_length = [&]()->int{
-        if(this_polygon_start_begin_line_id < this_polygon_end_finish_line_id){
+        if(this_polygon_start_begin_line_id <= this_polygon_end_finish_line_id){
             return this_polygon_end_finish_line_id - this_polygon_start_begin_line_id + 1;
         }else{
             return (this_polygon_end_finish_line_id + this->getPolygon().inners().at(0).size()-1) - this_polygon_start_begin_line_id + 1;
@@ -342,7 +342,7 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
 
     // Insert id-set
     for(int cnt = 0; cnt < line_length; ++cnt){
-        polygon_line_id_type this_polygon_id_buffer = old_frame_join_line_ids.at(Utilities::inc(this_polygon_start_begin_line_id,this->getSize(),cnt));
+        polygon_line_id_type this_polygon_id_buffer = old_frame_join_line_ids.at(Utilities::inc(this_polygon_start_begin_line_id,this->getPolygon().inners().at(0).size()-1,cnt));
         jointed_polygon_id_buffer.line_id = Utilities::dec(jointed_polygon_start_begin_line_id,jointed_polygon.getSize(),cnt);
         jointed_pieces_id_set.insert({this_polygon_id_buffer,jointed_polygon_id_buffer});
         jointed_pieces_id_set.insert({jointed_polygon_id_buffer,this_polygon_id_buffer});
