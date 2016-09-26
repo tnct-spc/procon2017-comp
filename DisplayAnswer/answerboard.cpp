@@ -28,14 +28,24 @@ void AnswerBoard::setField(const procon::Field &field)
     this->update();
 
     //add putid_list
-    for(auto piece : this->field->getFlame().getJointedPieces()){
+    std::vector<procon::ExpandedPolygon> pieces = this->field->getFlame().getJointedPieces();
+    std::sort(pieces.begin(),pieces.end(),[](procon::ExpandedPolygon const& rhs, procon::ExpandedPolygon const& lhs)->bool{
+        const point_t r_center = bg::return_centroid<point_t>(rhs.getPolygon());
+        const point_t l_center = bg::return_centroid<point_t>(lhs.getPolygon());
+        return r_center.y() == l_center.y() ? r_center.x() < l_center.x() : r_center.y() < l_center.y();
+    });
+    for(auto piece : pieces){
         if(piece.getId() != -1) putid_list.push_back(piece.getId());
     }
-    putid_list.erase(putid_list.begin());
-    putid_list.erase(putid_list.begin());
-    int jointed_pieces_size = this->field->getFlame().getJointedPieces().size();
-    if(jointed_pieces_size >= 1) putid_left = this->field->getFlame().getJointedPieces().at(0).getId();
-    if(jointed_pieces_size >= 2) putid_right = this->field->getFlame().getJointedPieces().at(1).getId();
+    int jointed_pieces_size = pieces.size();
+    if(jointed_pieces_size >= 1){
+        putid_list.erase(putid_list.begin());
+        putid_left = pieces.at(0).getId();
+    }
+    if(jointed_pieces_size >= 2){
+        putid_list.pop_back();
+        putid_right = pieces.back().getId();
+    }
 }
 
 void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos)
@@ -230,8 +240,8 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
             if(putid_list.size() == 0){
                 putid_right = -1;
             }else{
-                putid_right = putid_list.front();
-                putid_list.erase(putid_list.begin());
+                putid_right = putid_list.back();
+                putid_list.pop_back();
             }
             this->update();
             break;
