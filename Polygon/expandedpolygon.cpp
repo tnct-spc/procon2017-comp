@@ -376,12 +376,14 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
         frame_join_line_ids.push_back(old_frame_join_line_ids.at(this_polygon_end_next_line_id));
     }
 
-    // Replace raw polygon
-    polygon = new_frame;
-
     if(frame_join_line_ids.size() != new_frame.inners().at(0).size()-1){
         throw "TURAMI ERROR";
     }
+
+    // Replace raw polygon
+    polygon = new_frame;
+    // Update polygon
+    this->updatePolygon(true);
 
     //for(int frame_line_cnt = 0; frame_line_cnt != this_polygon_start_prev_line_id; ++frame_line_cnt)
     //    frame_join_line_ids.push_back(old_frame_join_line_ids.at(frame_line_cnt));
