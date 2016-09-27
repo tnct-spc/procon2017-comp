@@ -27,6 +27,7 @@ private:
     cv::Mat capture(int deviceNumber);
     std::shared_ptr<AnswerBoard> board;
 
+
     //Calibration
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
     int selectWebCamera();

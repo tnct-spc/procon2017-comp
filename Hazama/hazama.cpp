@@ -20,6 +20,8 @@ Hazama::~Hazama()
 
 void Hazama::init()
 {
+
+
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();
 
