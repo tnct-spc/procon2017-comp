@@ -119,6 +119,9 @@ void Hazama::run()
 
     std::cout << "Run" << std::endl;
 
+    //disable threshold UI
+    disableThresholdUI();
+
     std::string flame_path = "./../../procon2016-comp/sample/1_flame.png";
     std::string pieces_path = "./../../procon2016-comp/sample/1_pieces.png";
     std::string path = "./../../procon2016-comp/sample/data.csv";
@@ -204,6 +207,9 @@ void Hazama::run()
         //Display answer
         board->setField(field);
     }
+
+    //enable thresholdUI
+    enableThresholdUI();
 
     std::cout<<"finish"<<std::endl;
 }
