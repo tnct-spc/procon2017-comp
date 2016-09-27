@@ -268,12 +268,136 @@ int Hazama::selectWebCamera()
     MsgBox.exec();
 
     if (MsgBox.clickedButton() == button0) {
+
         std::cout << "0" << std::endl;
         return 0;
+
     } else if(MsgBox.clickedButton() == button1) {
+
         std::cout << "1" << std::endl;
         return 1;
+
     }
+
     MsgBox.deleteLater();
+
     return 0;
 }
+
+void Hazama::thresholdGUIinit()
+{
+    //set label
+    ui->label_1->setText("kido");
+    ui->label_2->setText("kaiaiai");
+    ui->label_3->setText("iikannzi");
+    ui->label_4->setText("yabai");
+
+    //set 上限,下限
+    ui->horizontalSlider_1->setRange(0,500);
+    ui->horizontalSlider_2->setRange(0,500);
+    ui->horizontalSlider_3->setRange(0,500);
+    ui->horizontalSlider_4->setRange(0,500);
+
+    //set stayle
+    ui->horizontalSlider_1->setStyleSheet("QSlider::groove::horizontal {border: 1px solid #999999;height: 8px;background: white;margin: 2px 0;}QSlider::handle::horizontal{background: blue;border: red;width: 18px;width: 18px;border-radius: 3px;}");
+    ui->horizontalSlider_2->setStyleSheet("QSlider::groove::horizontal {border: 1px solid #999999;height: 8px;background: white;margin: 2px 0;}QSlider::handle::horizontal{background: red;border: red;width: 18px;width: 18px;border-radius: 3px;}");
+    ui->horizontalSlider_3->setStyleSheet("QSlider::groove::horizontal {border: 1px solid #999999;height: 8px;background: white;margin: 2px 0;}QSlider::handle::horizontal{background: green;border: red;width: 18px;width: 18px;border-radius: 3px;}");
+    ui->horizontalSlider_4->setStyleSheet("QSlider::groove::horizontal {border: 1px solid #999999;height: 8px;background: white;margin: 2px 0;}QSlider::handle::horizontal{background: gray;border: red;width: 18px;width: 18px;border-radius: 3px;}");
+
+    //if slideber`s value changed call thresholdValueChanged()
+    connect(ui->horizontalSlider_1, &QSlider::valueChanged, this, &Hazama::thresholdValueChanged);
+    connect(ui->horizontalSlider_2, &QSlider::valueChanged, this, &Hazama::thresholdValueChanged);
+    connect(ui->horizontalSlider_3, &QSlider::valueChanged, this, &Hazama::thresholdValueChanged);
+    connect(ui->horizontalSlider_4, &QSlider::valueChanged, this, &Hazama::thresholdValueChanged);
+
+    //if applay button clicked value insert threshold class
+    connect(ui->pushButton_1, &QPushButton::clicked, this, &Hazama::clickedApply_1_Button);
+    connect(ui->pushButton_2, &QPushButton::clicked, this, &Hazama::clickedApply_2_Button);
+    connect(ui->pushButton_3, &QPushButton::clicked, this, &Hazama::clickedApply_3_Button);
+    connect(ui->pushButton_4, &QPushButton::clicked, this, &Hazama::clickedApply_4_Button);
+
+    ui->pushButton_1->setText("Apply");
+    ui->pushButton_2->setText("Apply");
+    ui->pushButton_3->setText("Apply");
+    ui->pushButton_4->setText("Apply");
+
+
+}
+
+void Hazama::thresholdValueChanged()
+{
+
+    //get value
+    int lcdNumber_1_value = ui->horizontalSlider_1->value();
+    int lcdNumber_2_value = ui->horizontalSlider_2->value();
+    int lcdNumber_3_value = ui->horizontalSlider_3->value();
+    int lcdNumber_4_value = ui->horizontalSlider_4->value();
+
+    //display lcdNumber
+    ui->lcdNumber_1->display(lcdNumber_1_value);
+    ui->lcdNumber_2->display(lcdNumber_2_value);
+    ui->lcdNumber_3->display(lcdNumber_3_value);
+    ui->lcdNumber_4->display(lcdNumber_4_value);
+
+}
+
+
+void Hazama::clickedApply_1_Button()
+{
+
+    //threshold::test_threshold_san = 99999;
+    std::cout << "clicked_1_button" << std::endl;
+
+}
+
+void Hazama::clickedApply_2_Button()
+{
+
+    std::cout << "clicked_2_button" << std::endl;
+
+}
+
+void Hazama::clickedApply_3_Button()
+{
+
+    std::cout << "clicked_3_button" << std::endl;
+
+}
+
+void Hazama::clickedApply_4_Button()
+{
+
+    std::cout << "clicked_4_button" << std::endl;
+
+}
+
+void Hazama::enableThresholdUI()
+{
+
+    ui->horizontalSlider_1->setEnabled(true);
+    ui->horizontalSlider_2->setEnabled(true);
+    ui->horizontalSlider_3->setEnabled(true);
+    ui->horizontalSlider_4->setEnabled(true);
+
+    ui->pushButton_1->setEnabled(true);
+    ui->pushButton_2->setEnabled(true);
+    ui->pushButton_3->setEnabled(true);
+    ui->pushButton_4->setEnabled(true);
+
+}
+
+void Hazama::disableThresholdUI()
+{
+
+    ui->horizontalSlider_1->setEnabled(false);
+    ui->horizontalSlider_2->setEnabled(false);
+    ui->horizontalSlider_3->setEnabled(false);
+    ui->horizontalSlider_4->setEnabled(false);
+
+    ui->pushButton_1->setEnabled(false);
+    ui->pushButton_2->setEnabled(false);
+    ui->pushButton_3->setEnabled(false);
+    ui->pushButton_4->setEnabled(false);
+
+}
+
