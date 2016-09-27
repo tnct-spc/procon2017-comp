@@ -7,6 +7,9 @@ Hazama::Hazama(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->RunButton, &QPushButton::clicked, this, &Hazama::clickedRunButton);
+
+    thresholdGUIinit();
+
     init();
 }
 
