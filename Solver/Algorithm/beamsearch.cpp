@@ -23,8 +23,8 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         std::vector<Evaluation> evaluations;
         for (int j = 0;j < static_cast<int>(field.getElementaryPieces().size());j++){
             if (field.getIsPlaced().at(j)) continue;
-            std::vector<Evaluation> eva = evaluateCombinationByAngle(field.getFlame(),field.getElementaryPieces().at(j));
-            std::vector<Evaluation> eva_inverse = evaluateCombinationByAngle(field.getFlame(),field.getElementaryInversePieces().at(j));
+            std::vector<Evaluation> eva = evaluateCombinationByAngle(field.getFrame(),field.getElementaryPieces().at(j));
+            std::vector<Evaluation> eva_inverse = evaluateCombinationByAngle(field.getFrame(),field.getElementaryInversePieces().at(j));
             for (auto & e : eva){
                 e.piece_id = j;
             }
@@ -74,7 +74,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             int const vec_id = evaluations.at(j).vector_id;
             int const piece_id = evaluations.at(j).piece_id;
             std::array<Fit,2> const fits = evaluations.at(j).fits;
-            procon::ExpandedPolygon const old_frame = field_vec.at(vec_id).getFlame();
+            procon::ExpandedPolygon const old_frame = field_vec.at(vec_id).getFrame();
             procon::ExpandedPolygon const old_piece =
             (evaluations.at(j).inverse_flag) ?
                 field_vec.at(vec_id).getElementaryInversePieces().at(piece_id)
@@ -88,7 +88,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 
             if (hasJoinSuccess  && !canPrune(new_frame,min_angle) ) {
                 procon::Field new_field = field_vec.at(vec_id);
-                new_field.setFlame(new_frame);
+                new_field.setFrame(new_frame);
                 new_field.setIsPlaced(piece_id);
 
                 {
@@ -131,7 +131,7 @@ procon::Field BeamSearch::run(procon::Field field)
     std::vector<procon::Field> field_vec;
     std::vector<Evaluation> evaluations;
 
-    field.setFlame(field.getElementaryFlame());
+    field.setFrame(field.getElementaryFrame());
     field_vec.push_back(field);
     procon::Field buckup_field;
 

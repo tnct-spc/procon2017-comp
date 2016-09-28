@@ -164,7 +164,7 @@ bool TestJoinPolygon::run()
             fit1.start_id = 2;
             fit1.end_dot_or_line = Fit::Dot;
             fit1.end_id = 4;
-            fit1.flame_inner_pos = 1;
+            fit1.frame_inner_pos = 1;
             fit2.start_dot_or_line = Fit::Dot;
             fit2.start_id = 3;
             fit2.end_dot_or_line = Fit::Dot;

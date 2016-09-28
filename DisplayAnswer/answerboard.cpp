@@ -28,7 +28,7 @@ void AnswerBoard::setField(const procon::Field &field)
     this->update();
 
     //add putid_list
-    std::vector<procon::ExpandedPolygon> pieces = this->field->getFlame().getJointedPieces();
+    std::vector<procon::ExpandedPolygon> pieces = this->field->getFrame().getJointedPieces();
     std::sort(pieces.begin(),pieces.end(),[](procon::ExpandedPolygon const& rhs, procon::ExpandedPolygon const& lhs)->bool{
         const point_t r_center = bg::return_centroid<point_t>(rhs.getPolygon());
         const point_t l_center = bg::return_centroid<point_t>(lhs.getPolygon());
@@ -92,7 +92,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         int dot_num = polygon.outer().size();
         QPointF* draw_point = new QPointF[dot_num];
         for(int i=0;i<dot_num;i++){
-            draw_point[i] = getPosition(QPointF(polygon.outer()[i].x()/flame_size,polygon.outer()[i].y()/flame_size), isLeftOrRight);
+            draw_point[i] = getPosition(QPointF(polygon.outer()[i].x()/frame_size,polygon.outer()[i].y()/frame_size), isLeftOrRight);
         }
         painter.drawPolygon(draw_point,dot_num);
         delete[] draw_point;
@@ -107,7 +107,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             QPointF* draw_point = new QPointF[dot_num];
 
             for(int dot = 0; dot < dot_num; dot++){
-                draw_point[dot] = getPosition(QPointF(polygon.inners().at(inner).at(dot).x()/flame_size,polygon.inners().at(inner).at(dot).y()/flame_size),isLeftOrRight);
+                draw_point[dot] = getPosition(QPointF(polygon.inners().at(inner).at(dot).x()/frame_size,polygon.inners().at(inner).at(dot).y()/frame_size),isLeftOrRight);
             }
             painter.drawPolygon(draw_point,dot_num);
             delete[] draw_point;
@@ -116,7 +116,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
 
     static const QString color_background = "#d4c91f";
     static const QString color_piece      = "#0f5ca0";
-    static const QString color_flame      = "#d0b98d";
+    static const QString color_frame      = "#d0b98d";
     static const QString color_inner      = "#d4c91f";
     static const QString color_id         = "#ff33cc";
     static const QString color_arrow_left = "#ff0000";
@@ -138,7 +138,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             //get polygon center pos
             point_t center = {0,0};
             boost::geometry::centroid(piece.getPolygon(), center);
-            QPointF display_pos = getPosition(QPointF((center.x()/flame_size)-0.025, (center.y()/flame_size)+0.025), Space::LEFT);
+            QPointF display_pos = getPosition(QPointF((center.x()/frame_size)-0.025, (center.y()/frame_size)+0.025), Space::LEFT);
             if(has_connector) field_pieces_pos.at(piece_id) = display_pos;
 
             //draw piece
@@ -155,7 +155,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
                 painter.drawText(display_pos, (piece_id != -1) ? QString::number(piece_id) : QString::fromStdString(piece.makeMultiIdString()));
                 //draw corner begin ID
                 auto corner = piece.getPolygon().outer()[0];
-                QPointF display_pos = getPosition(QPointF((corner.x()/flame_size)-0.0125, (corner.y()/flame_size)+0.0125), Space::LEFT);
+                QPointF display_pos = getPosition(QPointF((corner.x()/frame_size)-0.0125, (corner.y()/frame_size)+0.0125), Space::LEFT);
                 painter.setPen(QPen(QColor(color_corner_begin_id)));
                 font.setPointSize(std::abs(getScale()/50));
                 painter.setFont(font);
@@ -171,22 +171,22 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         //    displays[count]->show();
         //    count++;
         //}
-        //draw flame
+        //draw frame
         painter.setPen(QPen(Qt::black, 3));
-        painter.setBrush(QBrush(QColor(color_flame)));
-        drawPolygon(field->getFlame().getPolygon(),Space::LEFT);
+        painter.setBrush(QBrush(QColor(color_frame)));
+        drawPolygon(field->getFrame().getPolygon(),Space::LEFT);
 
-        //draw flame inners
+        //draw frame inners
         painter.setBrush(QBrush(QColor(color_inner)));
-        drawPolygonInners(field->getFlame().getPolygon(),Space::LEFT);
+        drawPolygonInners(field->getFrame().getPolygon(),Space::LEFT);
 
         //draw pieces
         for(auto piece : field->getPieces()){
             drawPiece(piece);
         }
 
-        //draw flame-jointed pieces
-        for(auto piece : field->getFlame().getJointedPieces()){
+        //draw frame-jointed pieces
+        for(auto piece : field->getFrame().getJointedPieces()){
             drawPiece(piece);
         }
     }

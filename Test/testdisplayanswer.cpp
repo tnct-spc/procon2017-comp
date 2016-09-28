@@ -15,10 +15,10 @@ bool TestDisplayAnswer::run()
     PolygonExpansion hoge,huga;
     hoge.resetPolygonForce(b);
     huga.resetPolygonForce(c);
-    f.setFlame(hoge);
+    f.setFrame(hoge);
     f.pushPiece(huga);
     f.setPiece(huga,1919);
-    f.printFlame();
+    f.printFrame();
     f.printPiece();
     disp->setField(f);
     */

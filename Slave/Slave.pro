@@ -13,6 +13,8 @@ TEMPLATE = app
 
 CONFIG   += precompile_header
 
+CONFIG += c++14
+
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 

@@ -13,8 +13,8 @@ void BeamSearchByLength::evaluateNextMove (std::vector<Evaluation> & evaluations
         std::vector<Evaluation> evaluations;
         for (int j = 0;j < static_cast<int>(field.getElementaryPieces().size());j++){
             if (field.getIsPlaced().at(j)) continue;
-            std::vector<Evaluation> eva = evaluateCombinationByLength(field.getFlame(),field.getElementaryPieces().at(j));
-            std::vector<Evaluation> eva_inverse = evaluateCombinationByLength(field.getFlame(),field.getElementaryInversePieces().at(j));
+            std::vector<Evaluation> eva = evaluateCombinationByLength(field.getFrame(),field.getElementaryPieces().at(j));
+            std::vector<Evaluation> eva_inverse = evaluateCombinationByLength(field.getFrame(),field.getElementaryInversePieces().at(j));
             for (auto & e : eva){
                 e.piece_id = j;
             }

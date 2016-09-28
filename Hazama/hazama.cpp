@@ -118,14 +118,14 @@ void Hazama::run()
 
     std::cout << "Run" << std::endl;
 
-    std::string flame_path = "./../../procon2016-comp/sample/1_flame.png";
+    std::string frame_path = "./../../procon2016-comp/sample/1_frame.png";
     std::string pieces_path = "./../../procon2016-comp/sample/1_pieces.png";
     std::string path = "./../../procon2016-comp/sample/data.csv";
 
     /*Get puzzle data*/
     if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
-        cv::Mat flame;
-        cv::Mat pieces;
+        cv::Mat raw_frame;
+        cv::Mat raw_pieces;
         //get Image
         if(ui->useWebCamera->isChecked()){
 
@@ -142,28 +142,28 @@ void Hazama::run()
             cv::putText(pressentertextsecondwindow,"Please Press Enter",cv::Point(0,100),cv::FONT_HERSHEY_SCRIPT_SIMPLEX,2.4,cv::Scalar(0,255,255),2,CV_AA);
             cv::imshow("capture",pressentertextwindow);
             while(cv::waitKey(0)==13);
-            flame = capture(device_number);
+            raw_frame = capture(device_number);
             cv::imshow("capture",pressentertextsecondwindow);
             while(cv::waitKey(0)==13);
-            pieces = capture(device_number);
-            cv::imwrite("flame.png",flame,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
-            cv::imwrite("pieces.png",pieces,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
+            raw_pieces = capture(device_number);
+            cv::imwrite("frame.png",raw_frame,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
+            cv::imwrite("pieces.png",raw_pieces,std::vector<int>(CV_IMWRITE_PNG_COMPRESSION,0));
             cv::destroyWindow("capture");
 
         } else {
 
             //環境によっては動かない
-            //std::string flame_path = QFileDialog::getOpenFileName(this,"input flame picture","./../../procon2016-comp/picture/").toStdString();
+            //std::string frame_path = QFileDialog::getOpenFileName(this,"input frame picture","./../../procon2016-comp/picture/").toStdString();
             //std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
 
-            flame = cv::imread(flame_path, 1);
-            pieces = cv::imread(pieces_path, 1);
+            raw_frame = cv::imread(frame_path, 1);
+            raw_pieces = cv::imread(pieces_path, 1);
         }
 
         /*Image Recognition*/
         ImageRecognition imrec;
-        PDATA = imrec.run(flame, pieces);
-        procon::ExpandedPolygon frame = PDATA.getElementaryFlame();
+        PDATA = imrec.run(raw_frame, raw_pieces);
+        procon::ExpandedPolygon frame = PDATA.getElementaryFrame();
         polygon_t rframe = frame.getPolygon();
         polygon_t nframe;
         for(auto ring:rframe.outer()){
@@ -180,7 +180,7 @@ void Hazama::run()
             nframe.inners().at(1).push_back(ring);
         }
         frame.resetPolygonForce(nframe);
-        PDATA.setElementaryFlame(frame);
+        PDATA.setElementaryFrame(frame);
 
         //display recognized image
         board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
@@ -220,8 +220,8 @@ void Hazama::run()
 
         //Display answer
         board->setField(field);
-        PolygonViewer::getInstance().pushPolygon(field.getFlame(),std::string("Answer Frame"));
-        //PolygonViewer::getInstance().pushPolygon(field.getFlame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
+        PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
+        //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
     }
 
     std::cout<<"finish"<<std::endl;

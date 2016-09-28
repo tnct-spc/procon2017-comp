@@ -73,7 +73,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     Fit fit2 = join_data[1];
 
     //それぞれOuterとして持つ
-    Ring ring1 = popRingByPolygon(jointed_polygon, jointed_polygon.getInnerSize() == 0 ? -1 : fit1.flame_inner_pos);
+    Ring ring1 = popRingByPolygon(jointed_polygon, jointed_polygon.getInnerSize() == 0 ? -1 : fit1.frame_inner_pos);
     Ring ring2 = popRingByPolygon(piece, -1);
     int size1 = ring1.size();
     int size2 = ring2.size();
@@ -162,8 +162,8 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
 
     //　ポリゴンにRingを出力しておしまい
     //TODO
-    if(jointed_polygon.getInnerSize() != 0){ //flame-piece
-        polygon_t new_raw_polygon = pushRingToPolygonT(new_ring, jointed_polygon, fit1.flame_inner_pos);
+    if(jointed_polygon.getInnerSize() != 0){ //frame-piece
+        polygon_t new_raw_polygon = pushRingToPolygonT(new_ring, jointed_polygon, fit1.frame_inner_pos);
         jointed_polygon.setMultiIds(std::vector<int>{jointed_polygon.getId(), piece.getId()});
         new_polygon = std::move(jointed_polygon);
         new_polygon.pushNewJointedPolygon(new_raw_polygon, piece, join_data);

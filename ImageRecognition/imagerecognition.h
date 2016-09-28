@@ -10,7 +10,7 @@ class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
 
 public:
-    procon::Field run(cv::Mat raw_flame_image, cv::Mat raw_pieces_image);
+    procon::Field run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
 
     inline cv::Mat getRawPiecesPic(){
         return std::move(raw_colored_pic);
@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    cv::Mat preprocessingFlame(cv::Mat image);
+    cv::Mat preprocessingFrame(cv::Mat image);
     std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
     std::vector<std::vector<cv::Vec4f>> LineDetection(std::vector<cv::Mat> const& images);
     std::vector<polygon_t> Vectored(std::vector<std::vector<cv::Vec4f>> const& lines);

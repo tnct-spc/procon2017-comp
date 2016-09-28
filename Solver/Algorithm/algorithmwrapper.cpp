@@ -27,7 +27,7 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::Exp
                     std::array<Fit,2> fits;
                     fits.at(0).start_id = i;
                     fits.at(0).end_id = i;
-                    fits.at(0).flame_inner_pos = k;
+                    fits.at(0).frame_inner_pos = k;
                     fits.at(0).start_dot_or_line = Fit::Dot;
                     fits.at(0).end_dot_or_line = Fit::Dot;
                     fits.at(1).start_id = j;
@@ -57,7 +57,7 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByLength(procon::Ex
     for(unsigned int fit_number=0; fit_number < fits.size(); ++fit_number){
         if(eva_point[fit_number] > 0){
             Evaluation eva;
-            eva.frame_id = fits[fit_number].at(0).flame_inner_pos;
+            eva.frame_id = fits[fit_number].at(0).frame_inner_pos;
             eva.fits = fits[fit_number];
             eva.evaluation = eva_point[fit_number];
             evaluations.push_back(eva);

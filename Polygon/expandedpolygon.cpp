@@ -321,7 +321,7 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
 
     /*insert line id*/
 
-    int inner_id = fits[0].flame_inner_pos;
+    int inner_id = fits[0].frame_inner_pos;
 
     //yabai
     int line_start_long_is_this_polygon = this->getInnersSideLength().at(inner_id).at(Utilities::dec(fits[0].start_id,this->getPolygon().inners().at(inner_id).size()-1)) > jointed_polygon.getSideLength().at(fits[1].start_id);

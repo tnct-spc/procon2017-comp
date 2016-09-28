@@ -9,9 +9,9 @@ procon::Field::Field()
 
 /*---------------------public--------------------------*/
 //setter
-void procon::Field::setFlame(ExpandedPolygon const& flame)
+void procon::Field::setFrame(ExpandedPolygon const& frame)
 {
-    field_flame = flame;
+    field_frame = frame;
 }
 
 void procon::Field::setPiece(procon::ExpandedPolygon piece)
@@ -31,9 +31,9 @@ void procon::Field::setPiece(procon::ExpandedPolygon piece, int n, double x, dou
     field_pieces.at(n) = piece;
 }
 
-void procon::Field::setElementaryFlame(procon::ExpandedPolygon const& flame)
+void procon::Field::setElementaryFrame(procon::ExpandedPolygon const& frame)
 {
-    elementary_flame = flame;
+    elementary_frame = frame;
 }
 
 
@@ -67,15 +67,15 @@ procon::ExpandedPolygon const& procon::Field::getPiece(const int &n) const
     return field_pieces.at(n);
 }
 
-procon::ExpandedPolygon const& procon::Field::getFlame() const
+procon::ExpandedPolygon const& procon::Field::getFrame() const
 {
-    return field_flame;
+    return field_frame;
 }
 
 
-procon::ExpandedPolygon const& procon::Field::getElementaryFlame() const
+procon::ExpandedPolygon const& procon::Field::getElementaryFrame() const
 {
-    return elementary_flame;
+    return elementary_frame;
 }
 
 
@@ -124,19 +124,19 @@ void procon::Field::removePiece(int n)
 //is_
 bool procon::Field::isPuttable(procon::ExpandedPolygon polygon)
 {
-    for (auto inner_ring : field_flame.getPolygon().inners()){
+    for (auto inner_ring : field_frame.getPolygon().inners()){
         if(!boost::geometry::within(polygon.getPolygon(),inner_ring)) return false;
     }
-    //if(!boost::geometry::within(polygon.getPolygon(), field_flame.getPolygon())) return false;
+    //if(!boost::geometry::within(polygon.getPolygon(), field_frame.getPolygon())) return false;
     for(auto p : field_pieces){
         if(!boost::geometry::disjoint(polygon.getPolygon(), p.getPolygon())) return false;
     }
     return true;
 }
 
-void procon::Field::printFlame()
+void procon::Field::printFrame()
 {
-    std::cout << bg::dsv(elementary_flame.getPolygon()) << std::endl;
+    std::cout << bg::dsv(elementary_frame.getPolygon()) << std::endl;
 }
 
 void procon::Field::printPiece()

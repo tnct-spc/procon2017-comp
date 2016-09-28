@@ -42,7 +42,7 @@ procon::Field HillClibming::run(procon::Field field)
     std::array<bool,50> isPlaced;
     PieceAssesment piece_assesment_buf;
 
-    field.setFlame(field.getElementaryFlame());
+    field.setFrame(field.getElementaryFrame());
 
     for(auto elementary_piece : field.getElementaryPieces()){
 

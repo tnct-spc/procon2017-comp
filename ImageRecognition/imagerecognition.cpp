@@ -1,15 +1,15 @@
 #include "imagerecognition.h"
 
-procon::Field ImageRecognition::run(cv::Mat raw_flame_image, cv::Mat raw_pieces_image)
+procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
     raw_pieces_pic = cv::Mat(raw_pieces_image,cv::Rect(250,0,1450,1080));
 
     //前処理
-    cv::Mat flame_image = preprocessingFlame(raw_flame_image);
+    cv::Mat frame_image = preprocessingFrame(raw_frame_image);
     std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
 
     std::vector<cv::Mat> images;
-    images.push_back(flame_image);
+    images.push_back(frame_image);
     for(cv::Mat& piece : pieces_images) images.push_back(piece);
 
     //線分検出
@@ -36,7 +36,7 @@ void ImageRecognition::threshold(cv::Mat& image)
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
 }
 
-cv::Mat ImageRecognition::preprocessingFlame(cv::Mat image)
+cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
 {
     threshold(image);
     int rows = image.rows;
@@ -419,11 +419,11 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     /***ここまで***/
 
     std::vector<polygon_t> polygons;
-    bool flame_flag = true;
+    bool frame_flag = true;
     for (std::vector<cv::Vec4f> piece_lines : pieces_lines) {
         polygon_t polygon,translated_polygon;
 
-        if (flame_flag == true){
+        if (frame_flag == true){
             double min = piece_lines.at(0)[0];
             double min_subscript = 0;
             for (int i = 0;i < static_cast<int>(piece_lines.size());i++){
@@ -439,7 +439,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
         piece_lines = sortLines(piece_lines);
 
-        if (flame_flag == true){
+        if (frame_flag == true){
 
             std::vector<std::vector<cv::Vec4f>> rings;
             std::vector<cv::Vec4f> ring;
@@ -461,7 +461,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             }
             scale =  30 * 4 / sum;
 
-            polygon_t outer_polygon,inner_polygon,flame_polygon;
+            polygon_t outer_polygon,inner_polygon,frame_polygon;
 
             for (int i = 0;i < static_cast<int>(piece_lines.size());i++){
                 double distance = 0;
@@ -482,20 +482,20 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             }
             rings.push_back(ring);
             rings.at(0) = repairLines(rings.at(0));
-            flame_polygon = convertLineToPolygon(rings.at(0));
+            frame_polygon = convertLineToPolygon(rings.at(0));
 
             for (int i = 1;i < static_cast<int>(rings.size());i++){
                 rings.at(i) = repairLines(rings.at(i));
                 rings.at(i) = removeShortLines(rings.at(i));
                 inner_polygon = convertLineToPolygon(rings.at(i));
-                flame_polygon.inners().push_back(polygon_t::ring_type());
+                frame_polygon.inners().push_back(polygon_t::ring_type());
                 for (auto point : inner_polygon.outer()) {
-                    flame_polygon.inners().back().push_back(point);
+                    frame_polygon.inners().back().push_back(point);
                 }
             }
 
-            polygons.push_back(flame_polygon);
-            flame_flag = false;
+            polygons.push_back(frame_polygon);
+            frame_flag = false;
 
         } else {
             piece_lines = repairLines(piece_lines);
@@ -513,23 +513,23 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         count++;
         std::cout << "piece" << bg::dsv(po) << std::endl;
     }*/
-    //std::cout << "flame" << bg::dsv(polygons.at(0)) << std::endl;
+    //std::cout << "frame" << bg::dsv(polygons.at(0)) << std::endl;
     return std::move(polygons);
 }
 
 procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
 
     std::vector<procon::ExpandedPolygon> ex_pieces;
-    procon::ExpandedPolygon ex_flame;
+    procon::ExpandedPolygon ex_frame;
     procon::Field field;
-    bool flame_flag = true;
+    bool frame_flag = true;
 
     int piece_count = 0;
     for (auto polygon : polygons){
         //座標移動
         double translateX = 0;
         double translateY = 0;
-        if (flame_flag){
+        if (frame_flag){
             //左上が(0,0)になるように移動
             double minX=30.0,minY=30.0;
             for(auto point : polygon.outer()){
@@ -561,19 +561,19 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
         bg::strategy::transform::scale_transformer<double, 2, 2> reduction(scale);
         bg::transform(translated_polygon,polygon,reduction);
         bg::reverse(polygon);
-        if (flame_flag){
-            ex_flame.resetPolygonForce(polygon);
+        if (frame_flag){
+            ex_frame.resetPolygonForce(polygon);
         } else {
             procon::ExpandedPolygon ex_polygon(piece_count);
             ex_polygon.resetPolygonForce(polygon);
             ex_pieces.push_back(ex_polygon);
             piece_count++;
         }
-        if (flame_flag) flame_flag = false;
+        if (frame_flag) frame_flag = false;
     }
 
     field.setElementaryPieces(ex_pieces);
-    field.setElementaryFlame(ex_flame);
+    field.setElementaryFrame(ex_frame);
 
     return field;
 }

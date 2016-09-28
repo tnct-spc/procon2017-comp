@@ -34,7 +34,7 @@ private:
     const int bottom_margin = 10;
     const int left_margin   = 100;
     const int right_margin  = 10;
-    const double flame_size = 35;
+    const double frame_size = 35;
 
     enum Space
     {

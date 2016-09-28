@@ -13,6 +13,7 @@ TEMPLATE = app
 
 CONFIG   += precompile_header
 
+
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
