@@ -9,6 +9,7 @@ QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Slave
+
 TEMPLATE = app
 
 CONFIG   += precompile_header
