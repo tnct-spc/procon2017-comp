@@ -3,6 +3,12 @@
 
 #include "polygonviewer.h"
 
+#include <iostream>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/optional.hpp>
+
 Hazama::Hazama(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Hazama)
@@ -25,6 +31,7 @@ void Hazama::init()
     //selectWebCamera(); <- ha?
 
     QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
+
 }
 
 void Hazama::acceptAnswer(QString file_path)
@@ -298,4 +305,42 @@ int Hazama::selectWebCamera()
     }
     MsgBox.deleteLater();
     return 0;
+}
+
+void Hazama::makeInIFile()
+{
+    boost::property_tree::ptree config;
+
+    //put
+    config.put("test.test",13);
+
+    //write
+    boost::property_tree::write_ini("./../../procon2016-comp/config/threshold.ini",config);
+
+    /* threhsold.ini write example
+     *
+     * [test]
+     * test=13
+     */
+}
+
+void Hazama::loadInIFile()
+{
+    boost::property_tree::ptree config;
+
+    //read
+    boost::property_tree::read_ini("./../../procon2016-comp/config/threshold.ini",config);
+
+    if(boost::optional<int> value_test = config.get_optional<int>("test.test")){
+
+        std::cout << "test.test = " << value_test.get() << std::endl;
+
+    }else{
+
+        std::cerr << "cannot read config file" << std::endl;
+
+    }
+
+
+
 }
