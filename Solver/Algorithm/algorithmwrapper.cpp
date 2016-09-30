@@ -10,6 +10,40 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
 {
     return field;
 }
+
+void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
+{
+    angle_frequency.resize(72);
+    constexpr double to_deg = 180 / 3.1415926535;
+    int count = 0;
+    auto pieces = field.getElementaryPieces();
+    for (auto piece : pieces) {
+        auto angles = piece.getSideAngle();
+        for (auto angle : angles) {
+            int num = static_cast<int>(angle * to_deg / 5);
+            angle_frequency.at(num) += 1;
+            count++;
+        }
+    }
+    for (auto& angle : angle_frequency) {
+        if (angle == 0) {
+            angle = 1;
+        }
+    }
+
+    double real_max = *(std::max_element(angle_frequency.begin(),angle_frequency.end()));
+    double real_min = *(std::min_element(angle_frequency.begin(),angle_frequency.end()));
+
+    for (auto& angle : angle_frequency) {
+        auto linerFunction = [&](double x)->double
+        {
+            return ((ideal_max - ideal_min) / (real_min - real_max)) * (x - real_max) + ideal_min;
+        };
+
+        angle = linerFunction(angle);
+    }
+}
+
 std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece)
 {
     double frame_first = 0;
@@ -37,7 +71,7 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::Exp
                     Evaluation eva;
                     eva.frame_id = k;
                     eva.fits = fits;
-                    eva.evaluation = bg::area(piece.getPolygon());
+                    eva.evaluation = bg::area(piece.getPolygon()) * angle_frequency.at((int)piece_first / 5);
                     evaluations.push_back(eva);
                 }
             }
