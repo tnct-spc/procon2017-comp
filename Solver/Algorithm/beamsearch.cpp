@@ -167,7 +167,7 @@ procon::Field BeamSearch::run(procon::Field field)
     {
         return a.evaluation > b.evaluation;
     };
-
+    calcAngleFrequency(field);
     std::vector<procon::Field> field_vec;
     std::vector<Evaluation> evaluations;
 
