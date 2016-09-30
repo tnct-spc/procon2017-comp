@@ -34,6 +34,9 @@ private:
     //webcamera deviceNumber
     int device_number = 0;
 
+    void makeInIFile();
+    void loadInIFile();
+
     //Network
     RequestMapper request_mapper;
     procon::Field PDATA;
