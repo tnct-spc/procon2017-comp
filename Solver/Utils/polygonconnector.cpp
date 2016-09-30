@@ -141,7 +141,6 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
                     count = complete_matching_start_pos_2;
                 }
                 if(fit1.start_dot_or_line == Fit::Line && fit1.is_start_straight == true){
-                    std::cout<<"piks"<<std::endl;
                     // Line is straight. Skip.
                     count++;
                 }
@@ -154,7 +153,6 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
             y = ring2[count%size2].y();
             if (count % size2 == (fit2.end_dot_or_line == Fit::Dot ? (((complete_matching_end_pos_2 - 1) % size2 + size2) % size2) : complete_matching_end_pos_2)) {
                 if(fit1.end_dot_or_line == Fit::Line && fit1.is_end_straight == true){
-                    std::cout<<"skip"<<std::endl;
                     // Line is straight. Skip.
                     break;
                 }else{
