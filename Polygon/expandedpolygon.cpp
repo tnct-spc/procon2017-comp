@@ -278,7 +278,6 @@ void procon::ExpandedPolygon::setMultiIds(std::vector<int> multi_ids_)
 
 void procon::ExpandedPolygon::resetPolygonForce(polygon_t const& p)
 {
-    std::cout<<"Force"<<std::endl;
     polygon = p;
     this->updatePolygon(true);
 
@@ -311,8 +310,6 @@ void procon::ExpandedPolygon::resetPolygonForce(polygon_t const& p)
 
 void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, const procon::ExpandedPolygon &jointed_polygon, std::array<Fit, 2> fits)
 {
-    static int cnt=0;
-    std::cout<<++cnt<<std::endl;
     // Update polygon
     this->updatePolygon(true);
 
