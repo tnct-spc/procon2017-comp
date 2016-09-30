@@ -30,6 +30,7 @@ void AnswerDock::addAnswer(procon::Field const& new_field)
 {
     this->fields.push_back(new_field);
     AnswerBoard* answer_board = new AnswerBoard();
+    answer_board->SINGLE_MODE = true;
     answer_board->setField(new_field);
     answer_board->setFixedSize(300,300);
 

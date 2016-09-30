@@ -114,14 +114,14 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         }
     };
 
-    static const QString color_background = SINGLE_MODE? "#E5E6DB":"#d4c91f";
-    static const QString color_piece      = "#0f5ca0";
-    static const QString color_frame      = SINGLE_MODE? "#7ACACB":"#d0b98d";
-    static const QString color_inner      = color_background;
-    static const QString color_id         = "#ff33cc";
-    static const QString color_arrow_left = "#ff0000";
-    static const QString color_arrow_right= "#00ff00";
-    static const QString color_corner_begin_id = "#00ffff";
+    const QString color_background = SINGLE_MODE? "#E5E6DB":"#d4c91f";
+    const QString color_piece      = "#0f5ca0";
+    const QString color_frame      = SINGLE_MODE? "#7ACACB":"#d0b98d";
+    const QString color_inner      = color_background;
+    const QString color_id         = "#ff33cc";
+    const QString color_arrow_left = "#ff0000";
+    const QString color_arrow_right= "#00ff00";
+    const QString color_corner_begin_id = "#00ffff";
 
 
 
