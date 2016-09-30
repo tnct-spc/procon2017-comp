@@ -58,6 +58,7 @@ polygon_t PolygonConnector::pushRingToPolygonT(Ring& ring, procon::ExpandedPolyg
 //ポリゴンを合体する関数本体 !!!!!!polygon2 mast piece
 bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, procon::ExpandedPolygon piece, procon::ExpandedPolygon& new_polygon, std::array<Fit,2> join_data)
 {
+#ifdef DEBUG_RING
     auto debugRing = [](Ring ring, int line){
         std::cout<<std::to_string(line)<<" : ";
         for (int i=0; i < static_cast<int>(ring.size()); i++) {
@@ -67,6 +68,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         }
         std::cout<<std::endl;
     };
+#endif
 
     //結合情報
     Fit fit1 = join_data[0];
