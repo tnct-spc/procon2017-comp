@@ -27,6 +27,7 @@ private:
     cv::Mat capture(int deviceNumber);
     std::shared_ptr<AnswerBoard> board;
 
+
     //Calibration
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
     int selectWebCamera();
@@ -34,8 +35,6 @@ private:
     //webcamera deviceNumber
     int device_number = 0;
 
-    void makeInIFile();
-    void loadInIFile();
 
     //Network
     RequestMapper request_mapper;
@@ -43,9 +42,25 @@ private:
     bool first_answer_flag = true;
     procon::Field best_answer;
 
+    //threshold gui
+    void thresholdGUIinit();
+    void disableThresholdUI();
+    void enableThresholdUI();
+
 private slots:
     void clickedRunButton();
+    void thresholdValueChanged();
     void acceptAnswer(QString file_path);
+
+
+    void clickedApply_1_Button();
+    void clickedApply_2_Button();
+    void clickedApply_3_Button();
+    void clickedApply_4_Button();
+
+    void makeInIFile();
+    void loadInIFile();
+
 };
 
 #endif // HAZAMA_H
