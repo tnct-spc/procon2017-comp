@@ -17,6 +17,7 @@ public:
     Parallel();
     template <typename Lambda,typename Split,typename Range>
     void generateThreads(Lambda lambda,Split split,Range start,Range end) {
+        threads.clear();
         Split split_num = (end - start) / split;
         Range i = 0;
         if (split_num > 0) {

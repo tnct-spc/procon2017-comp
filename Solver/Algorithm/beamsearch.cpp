@@ -5,6 +5,7 @@
 #include <mutex>
 #include <thread>
 #include "parallel.h"
+#include <random>
 
 BeamSearch::BeamSearch()
 {
@@ -14,6 +15,8 @@ BeamSearch::BeamSearch()
 void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
+    beam_width = 800;
+    variety_width = 200;
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -99,12 +102,38 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         }
     };
 
-    int const width = beam_width < static_cast<int>(evaluations.size()) ? beam_width : static_cast<int>(evaluations.size());
+    int const width = (beam_width) < static_cast<int>(evaluations.size()) ? (beam_width) : static_cast<int>(evaluations.size());
     /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
     parallel.generateThreads(makeField,cpu_num,0,width);
-
     /**スレッド終わるの待ち**/
     parallel.joinThreads();
+
+    if (static_cast<int>(evaluations.size()) - beam_width > variety_width) {
+        auto makeRandomVector = [&](int num)->std::vector<int>{
+            std::vector<int> random_vec;
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_int_distribution<int> variety(beam_width,static_cast<int>(evaluations.size()));
+            random_vec.reserve(num * 2);
+            while (random_vec.size() < num) {
+                for (int roop = 0;roop < num * 2;roop++) {
+                    random_vec.push_back(variety(mt));
+                }
+                std::sort(random_vec.begin(),random_vec.end());
+                random_vec.erase(std::unique(random_vec.begin(),random_vec.end()),random_vec.end());
+            }
+            return random_vec;
+        };
+        std::vector<int> random_vec = std::move(makeRandomVector(variety_width));
+        std::vector<std::thread> threads;
+        for (int i = 0;i < variety_width;i++) {
+            std::thread thread(makeField,random_vec.at(i),random_vec.at(i) + 1);
+            threads.emplace_back(std::move(thread));
+        }
+        for (int i = 0;i < variety_width;i++) {
+            threads.at(i).join();
+        }
+    }
     return next_field_vec;
 
 }
@@ -139,15 +168,18 @@ procon::Field BeamSearch::run(procon::Field field)
     //このiは添字として使ってるわけではない（ただの回数ルーブ）
     for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++){
         evaluations.clear();
+
+        //最小角計算
         for (int j = 0;j < static_cast<int>(field_vec.size());j++){
             field_vec.at(j).calcMinAngleSide();
         }
+
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
         //それより先がなければその1手前の最高評価値のフィールドを返す
         if (evaluations.empty()) return buckup_field;
 
-        sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
+        std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
 
         //結合できるものがなければその１手前の最高評価地のフィールドを返す

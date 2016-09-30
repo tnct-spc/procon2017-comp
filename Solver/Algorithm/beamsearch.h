@@ -9,8 +9,9 @@ class BeamSearch : public AlgorithmWrapper
 private:
 protected:
     //ビーム幅
-    const double beam_width = 1000;
+    int beam_width;
     int cpu_num;
+    int variety_width;
     void initialization();
     virtual void evaluateNextMove
     (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec);
