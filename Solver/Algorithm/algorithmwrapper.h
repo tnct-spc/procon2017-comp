@@ -15,6 +15,8 @@ public:
     static constexpr double ideal_min = 0.1;
     static constexpr double ideal_max = 1.5;
 
+    static constexpr int resolution = 5;
+
     std::vector<double> angle_frequency;
 
     AlgorithmWrapper();

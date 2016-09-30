@@ -13,7 +13,7 @@ procon::Field AlgorithmWrapper::run(procon::Field field)
 
 void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
 {
-    angle_frequency.resize(72);
+    angle_frequency.resize(360 / resolution);
     constexpr double to_deg = 180 / 3.1415926535;
     int count = 0;
     auto pieces = field.getElementaryPieces();
@@ -71,7 +71,7 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::Exp
                     Evaluation eva;
                     eva.frame_id = k;
                     eva.fits = fits;
-                    eva.evaluation = bg::area(piece.getPolygon()) * angle_frequency.at((int)piece_first / 5);
+                    eva.evaluation = bg::area(piece.getPolygon()) * angle_frequency.at((int)piece_first / resolution);
                     evaluations.push_back(eva);
                 }
             }
