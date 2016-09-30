@@ -14,6 +14,7 @@ class AnswerBoard : public QWidget
 public:
     explicit AnswerBoard(QWidget *parent = 0);
     ~AnswerBoard();
+    bool SINGLE_MODE = true;
     void setField(const procon::Field& field);
     void setRawPicture(const cv::Mat& raw_pieces_pic,const std::vector<cv::Point>& pieces_pos);
     void setRandomColors(const std::vector<cv::Vec3b>& random_colors);
