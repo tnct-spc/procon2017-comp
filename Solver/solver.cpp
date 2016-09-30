@@ -11,7 +11,7 @@ Solver::Solver()
 {
 }
 
-procon::Field Solver::run(procon::Field field, int algorithm_number)
+void Solver::run(procon::Field field, int algorithm_number)
 {
     std::vector<AlgorithmWrapper*> Algorithms;
     Algorithms.push_back(new PoorAlgorithm());
@@ -20,11 +20,16 @@ procon::Field Solver::run(procon::Field field, int algorithm_number)
     Algorithms.push_back(new BeamSearch());
     Algorithms.push_back(new BeamSearchByLength());
 
-    procon::Field result = Algorithms.at(algorithm_number)->run(field);
+    connect(Algorithms.at(algorithm_number),&PoorAlgorithm::throwAnswer,this,&Solver::emitAnswer);
+    Algorithms.at(algorithm_number)->run(field);
 
     for(auto algo : Algorithms) delete(algo);
     Algorithms.clear();
 
-    return result;
+    return;
 }
 
+void Solver::emitAnswer(procon::Field field)
+{
+    emit throwAnswer(field);
+}

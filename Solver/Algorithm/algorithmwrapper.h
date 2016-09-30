@@ -6,8 +6,10 @@
 #include "Utils/evaluation.h"
 #include "fit.h"
 
-class AlgorithmWrapper
+class AlgorithmWrapper : public QObject
 {
+    Q_OBJECT
+
 public:
     static constexpr double length_error = 0.05; // 単位CM
     static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
@@ -32,8 +34,8 @@ public:
         }
 
     } PieceAssesment;
-
-
+signals:
+    void throwAnswer(procon::Field field);
 };
 
 #endif // ALGORITHMWRAPPER_H

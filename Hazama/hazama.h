@@ -2,6 +2,7 @@
 #define HAZAMA_H
 
 #include "answerboard.h"
+#include "answerdock.h"
 #include "http/request_mapper.h"
 #include "field.h"
 #include "imagerecognition.h"
@@ -26,7 +27,8 @@ private:
     Ui::Hazama *ui;
     cv::Mat capture(int deviceNumber);
     std::shared_ptr<AnswerBoard> board;
-
+    std::shared_ptr<AnswerDock> DOCK;
+    Solver* solver;
 
     //Calibration
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
@@ -60,6 +62,8 @@ private slots:
 
     void makeInIFile();
     void loadInIFile();
+
+    void emitAnswer(procon::Field field);
 
 };
 

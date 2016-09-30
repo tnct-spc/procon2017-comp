@@ -197,5 +197,6 @@ procon::Field BeamSearch::run(procon::Field field)
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
         if(field_vec.empty()) return buckup_field;
     }
+    emit throwAnswer(field_vec.at(0));
     return field_vec.at(0);
 }

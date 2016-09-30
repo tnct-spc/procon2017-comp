@@ -69,9 +69,10 @@ bool MainWindow::get()
         throw "poa";
         //poa
     }
-    procon::Field field = solver.run(PDATA, algorithm_number);
+    solver.run(PDATA, algorithm_number);
 
     //Display answer
+    procon::Field field;
     board->setField(field);
 
     //io

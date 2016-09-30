@@ -33,6 +33,8 @@ Hazama::~Hazama()
 void Hazama::init()
 {
 
+    DOCK = std::make_shared<AnswerDock>();
+    DOCK->showMaximized();
 
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();
@@ -183,24 +185,6 @@ void Hazama::run()
         /*Image Recognition*/
         ImageRecognition imrec;
         PDATA = imrec.run(raw_frame, raw_pieces);
-        procon::ExpandedPolygon frame = PDATA.getElementaryFrame();
-        polygon_t rframe = frame.getPolygon();
-        polygon_t nframe;
-        for(auto ring:rframe.outer()){
-            nframe.outer().push_back(ring);
-        }
-
-        nframe.inners().push_back(polygon_t::ring_type());
-        nframe.inners().at(0).push_back(point_t{0.12434,0.12533});
-        nframe.inners().at(0).push_back(point_t{1.13242,1.134342});
-        nframe.inners().at(0).push_back(point_t{0.234431,1.3231});
-
-        nframe.inners().push_back(polygon_t::ring_type());
-        for(auto ring:rframe.inners().at(0)){
-            nframe.inners().at(1).push_back(ring);
-        }
-        frame.resetPolygonForce(nframe);
-        PDATA.setElementaryFrame(frame);
 
         //display recognized image
         board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
@@ -220,7 +204,8 @@ void Hazama::run()
         procon::PolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
     }else{
         //Solve puzzle
-        Solver solver;
+        solver = new Solver();
+        connect(solver,&Solver::throwAnswer,this,&Hazama::emitAnswer);
         int algorithm_number = -1;
         if(ui->algo0->isChecked()){
             algorithm_number = 0;
@@ -236,18 +221,24 @@ void Hazama::run()
             throw "poa";
             //poa
         }
-        procon::Field field = solver.run(PDATA, algorithm_number);
-
-        //Display answer
-        board->setField(field);
-        PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
-        //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
+        solver->run(PDATA, algorithm_number);
     }
 
     //enable thresholdUI
     enableThresholdUI();
 
     std::cout<<"finish"<<std::endl;
+}
+
+void Hazama::emitAnswer(procon::Field field)
+{
+    //Display answer
+    for(int i=0;i<50;++i){
+        DOCK->addAnswer(field);
+    }
+    board->setField(field);
+    PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
+    //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }
 
 cv::Mat Hazama::capture(int deviceNumber)
