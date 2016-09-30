@@ -381,9 +381,9 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
         frame_join_line_idss.at(inner_id).push_back(old_frame_join_line_ids.at(this_polygon_end_next_line_id));
     }
 
-    if(frame_join_line_idss.at(inner_id).size() != new_frame.inners().at(inner_id).size()-1){
-        throw "TURAMI ERROR";
-    }
+    //if(frame_join_line_idss.at(inner_id).size() != new_frame.inners().at(inner_id).size()-1){
+    //    throw "TURAMI ERROR";
+    //}
 
     // Replace raw polygon
     polygon = new_frame;
