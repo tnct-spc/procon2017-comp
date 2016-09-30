@@ -1,6 +1,8 @@
 #include "beamsearchbylength.h"
 #include "parallel.h"
 
+//#define NO_PARALLEL
+
 BeamSearchByLength::BeamSearchByLength()
 {
 
@@ -47,9 +49,13 @@ void BeamSearchByLength::evaluateNextMove (std::vector<Evaluation> & evaluations
         }
     };
 
+#ifndef NO_PARALLEL
     /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
     parallel.generateThreads(evaluateRange,cpu_num,0,field_vec_size);
     /**スレッド終わるの待ち**/
     parallel.joinThreads();
+#else
+    evaluateRange(0,field_vec_size);
+#endif
 
 }

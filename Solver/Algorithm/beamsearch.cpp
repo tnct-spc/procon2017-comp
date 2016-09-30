@@ -6,6 +6,8 @@
 #include <thread>
 #include "parallel.h"
 
+//#define NO_PARALLEL
+
 BeamSearch::BeamSearch()
 {
     this->initialization();
@@ -57,10 +59,14 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         }
     };
 
+#ifndef NO_PARALLEL
     /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
     parallel.generateThreads(evaluateRange,cpu_num,0,field_vec_size);
     /**スレッド終わるの待ち**/
     parallel.joinThreads();
+#else
+    evaluateRange(0,field_vec_size);
+#endif
 
 }
 
@@ -100,11 +106,15 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
     };
 
     int const width = beam_width < static_cast<int>(evaluations.size()) ? beam_width : static_cast<int>(evaluations.size());
+#ifndef NO_PARALLEL
     /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
     parallel.generateThreads(makeField,cpu_num,0,width);
 
     /**スレッド終わるの待ち**/
     parallel.joinThreads();
+#else
+    makeField(0,width);
+#endif
     return next_field_vec;
 
 }
