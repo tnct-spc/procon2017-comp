@@ -220,7 +220,7 @@ void Hazama::run()
         solver->run(PDATA, algorithm_number);
     }
 
-    board->update();
+
 
     //enable thresholdUI
     enableThresholdUI();

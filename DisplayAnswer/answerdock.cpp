@@ -33,7 +33,6 @@ void AnswerDock::addAnswer(procon::Field const& field)
     answer_board->SINGLE_MODE = true;
     answer_board->setFixedSize(300,300);
 
-    static int view_count = 0;
     this->ui->testd->addWidget(answer_board,view_count/4,view_count%4);
     view_count++;
 }

@@ -21,6 +21,7 @@ public:
 
 private:
     Ui::AnswerDock *ui;
+    int view_count = 0;
 };
 
 #endif // ANSWERDOCK_H
