@@ -106,7 +106,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 
                 {
                     MUTEX_LOCK(parallel);
-                    next_field_vec.push_back(new_field);
+                    next_field_vec.push_back(std::move(new_field));
                 }
             }
         }

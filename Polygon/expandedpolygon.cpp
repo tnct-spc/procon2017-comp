@@ -279,9 +279,6 @@ void procon::ExpandedPolygon::resetPolygonForce(polygon_t const& p)
 
 void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, const procon::ExpandedPolygon &jointed_polygon, std::array<Fit, 2> fits)
 {
-    // Update polygon
-    this->updatePolygon(true);
-
     // Add piece to jointed_pieces
     jointed_pieces.push_back(jointed_polygon);
 
