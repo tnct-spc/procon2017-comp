@@ -7,12 +7,18 @@
 
 #include "field.h"
 
+class AlgorithmWrapper;
+class AnswerDock;
+
 class SOLVERSHARED_EXPORT Solver : public QObject
 {
     Q_OBJECT
 
+private:
+    std::vector<AlgorithmWrapper*> Algorithms;
 public:
     Solver();
+    ~Solver();
     void run(procon::Field field, int algorithm_number = 0);
 signals:
     void throwAnswer(procon::Field field);

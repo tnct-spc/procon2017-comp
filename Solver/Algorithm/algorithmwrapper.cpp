@@ -6,6 +6,12 @@
 #include "utilities.h"
 #include "Evaluation/searchsamelength.h"
 
+void AlgorithmWrapper::init()
+{
+    DOCK = std::make_shared<AnswerDock>();
+    DOCK->showMaximized();
+}
+
 procon::Field AlgorithmWrapper::run(procon::Field field)
 {
     return field;

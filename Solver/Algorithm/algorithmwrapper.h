@@ -4,6 +4,7 @@
 #include "field.h"
 #include "expandedpolygon.h"
 #include "Utils/evaluation.h"
+#include "answerdock.h"
 #include "fit.h"
 
 class AlgorithmWrapper : public QObject
@@ -17,6 +18,9 @@ public:
     AlgorithmWrapper();
     virtual ~AlgorithmWrapper() = default;
 
+    std::shared_ptr<AnswerDock> DOCK;
+
+    void init();
     virtual procon::Field run(procon::Field field);
 
     Fit fit1,fit2;

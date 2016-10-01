@@ -33,9 +33,6 @@ Hazama::~Hazama()
 void Hazama::init()
 {
 
-    DOCK = std::make_shared<AnswerDock>();
-    DOCK->showMaximized();
-
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();
 
@@ -235,9 +232,6 @@ void Hazama::run()
 void Hazama::emitAnswer(procon::Field field)
 {
     //Display answer
-    for(int i=0;i<50;++i){
-        DOCK->addAnswer(field);
-    }
     board->setField(field);
     PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
     //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));

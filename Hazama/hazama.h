@@ -27,7 +27,6 @@ private:
     Ui::Hazama *ui;
     cv::Mat capture(int deviceNumber);
     std::shared_ptr<AnswerBoard> board;
-    std::shared_ptr<AnswerDock> DOCK;
     Solver* solver;
     ImageRecognition imrec;
 

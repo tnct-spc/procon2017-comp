@@ -4,7 +4,6 @@
 #include <QWidget>
 
 #include "field.h"
-#include "imagerecognition.h"
 #include "answerboard.h"
 
 namespace Ui {
