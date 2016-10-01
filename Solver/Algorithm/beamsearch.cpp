@@ -107,8 +107,8 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             }
         }
     };
-
-    int const width = beam_width < static_cast<int>(evaluations.size()) ? beam_width : static_cast<int>(evaluations.size());
+    constexpr int coefficient = 1;
+    int const width = beam_width * coefficient < static_cast<int>(evaluations.size()) ? beam_width * coefficient : static_cast<int>(evaluations.size());
 
 #ifndef NO_PARALLEL
     /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
@@ -119,12 +119,12 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
     makeField(0,width);
 #endif
 
-    if (static_cast<int>(evaluations.size()) - beam_width > variety_width) {
+    if (static_cast<int>(evaluations.size()) - beam_width * coefficient > variety_width) {
         auto makeRandomVector = [&](int num)->std::vector<int>{
             std::vector<int> random_vec;
             std::random_device rd;
             std::mt19937 mt(rd());
-            std::uniform_int_distribution<int> variety(beam_width,static_cast<int>(evaluations.size()));
+            std::uniform_int_distribution<int> variety(beam_width * coefficient,static_cast<int>(evaluations.size()));
             random_vec.reserve(num * 2);
             while (random_vec.size() < num) {
                 for (int roop = 0;roop < num * 2;roop++) {
@@ -161,6 +161,28 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
     return  can_prune;
 }
 
+bool BeamSearch::removeDuplicateField(std::vector<procon::Field> & field_vec)
+{
+    auto poor_unique_move = [&](std::vector<procon::Field>::iterator begin,std::vector<procon::Field>::iterator end)
+    {
+        //*おおっと*線形*つらい*
+        std::vector<procon::Field> ret_vector;
+        ret_vector.reserve(static_cast<int>(end - begin));
+        for(auto it_i = begin;it_i < end - 1;it_i++) {
+            bool check_overlap = false;
+            for (auto it_j = it_i + 1;it_j < end - 1;it_j++) {
+                if (*it_i || *it_j) {
+                    check_overlap = true;
+                }
+            }
+            if (!check_overlap) ret_vector.emplace_back(*(it_i));
+        }
+        return std::move(ret_vector);
+    };
+    std::for_each(field_vec.begin(),field_vec.end(),[](procon::Field & field){field.calcFieldID();});
+    field_vec = std::move(poor_unique_move(field_vec.begin(),field_vec.end()));
+}
+
 procon::Field BeamSearch::run(procon::Field field)
 {
     auto sortEvaLambda = [&](Evaluation const& a,Evaluation const& b)->bool
@@ -192,31 +214,10 @@ procon::Field BeamSearch::run(procon::Field field)
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
-
-        auto removeDuplicateField = [&](){
-            auto poor_unique_move = [&](std::vector<procon::Field>::iterator begin,std::vector<procon::Field>::iterator end)
-            {
-                //*おおっと*線形*つらい*
-                std::vector<procon::Field> ret_vector;
-                ret_vector.reserve(static_cast<int>(end - begin));
-                for(auto it_i = begin;it_i < end - 1;it_i++) {
-                    bool check_overlap = false;
-                    for (auto it_j = it_i + 1;it_j < end - 1;it_j++) {
-                        if (*it_i || *it_j) {
-                            check_overlap = true;
-                        }
-                    }
-                    if (!check_overlap) ret_vector.emplace_back(*(it_i));
-                }
-                return std::move(ret_vector);
-            };
-            std::for_each(field_vec.begin(),field_vec.end(),[](procon::Field & field){field.calcFieldID();});
-            field_vec = std::move(poor_unique_move(field_vec.begin(),field_vec.end()));
-        };
-
         if(field_vec.empty()) return buckup_field;
 
-        removeDuplicateField();
+        removeDuplicateField(field_vec);
+
         //return field_vec[0];
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
         if(field_vec.empty()) return buckup_field;

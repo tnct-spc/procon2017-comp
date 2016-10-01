@@ -8,9 +8,6 @@ class Field
 {
 private:
     std::bitset<50> piece_id;
-    std::vector<double> slope_id;
-    std::vector<point_t> coord_id;
-
 private:
     //フィールド上のピース&フレーム
     procon::ExpandedPolygon field_frame;
