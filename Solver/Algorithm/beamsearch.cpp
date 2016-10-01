@@ -7,7 +7,7 @@
 #include "parallel.h"
 #include <random>
 
-#define NO_PARALLEL
+//#define NO_PARALLEL
 
 BeamSearch::BeamSearch()
 {
@@ -17,7 +17,7 @@ BeamSearch::BeamSearch()
 void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
-    beam_width = 10;
+    beam_width = 1000;
     variety_width = 200;
 }
 
@@ -119,6 +119,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
     makeField(0,width);
 #endif
 
+#ifndef NO_PARALLEL
     if (static_cast<int>(evaluations.size()) - beam_width > variety_width) {
         auto makeRandomVector = [&](int num)->std::vector<int>{
             std::vector<int> random_vec;
@@ -145,6 +146,8 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             threads.at(i).join();
         }
     }
+#endif
+
     return next_field_vec;
 
 }
