@@ -14,6 +14,8 @@ AnswerBoard::AnswerBoard(QWidget *parent) :
     ui(new Ui::AnswerBoard)
 {
     ui->setupUi(this);
+
+    connect(this,&AnswerBoard::clicked,this,&AnswerBoard::printBigWindow);
 }
 
 AnswerBoard::~AnswerBoard()
@@ -26,6 +28,8 @@ void AnswerBoard::setField(const procon::Field &field)
     is_set_field = true;
     this->field = procon::make_unique<procon::Field>(field);
     this->update();
+
+    print_field = field;
 
     //add putid_list
     std::vector<procon::ExpandedPolygon> pieces = this->field->getFrame().getJointedPieces();
@@ -253,4 +257,24 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
             std::cout<<"Press Key : "<<event->key()<<std::endl;
             break;
     }
+}
+
+void AnswerBoard::mousePressEvent(QMouseEvent *)
+{
+    emit clicked();
+}
+
+void AnswerBoard::printBigWindow()
+{
+    std::cout << "clicked" << std::endl;
+
+    //AnswerBoard ans;
+
+    ans_board = new AnswerBoard();
+    ans_board->setField(print_field);
+    ans_board->showMaximized();
+
+
+
+    //sleep(2000);
 }

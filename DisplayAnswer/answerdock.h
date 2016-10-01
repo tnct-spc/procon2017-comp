@@ -18,6 +18,7 @@ public:
     ~AnswerDock();
     void addAnswer(procon::Field const& new_field);
 
+
 private:
     Ui::AnswerDock *ui;
     std::vector<procon::Field> fields;
