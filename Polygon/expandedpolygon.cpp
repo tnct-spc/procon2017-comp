@@ -579,3 +579,13 @@ void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
 
     polygon = translatedPolygon;
 }
+
+void procon::ExpandedPolygon::sortJointedPieces()
+{
+    auto lambda = [](procon::ExpandedPolygon & a,procon::ExpandedPolygon & b)
+    {
+        return a.getId() > b.getId();
+    };
+
+    std::sort(jointed_pieces.begin(),jointed_pieces.end(),lambda);
+}

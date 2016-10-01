@@ -192,8 +192,32 @@ procon::Field BeamSearch::run(procon::Field field)
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
-        //return field_vec[0];
 
+        auto removeDuplicateField = [&](){
+            auto poor_unique_move = [&](std::vector<procon::Field>::iterator begin,std::vector<procon::Field>::iterator end)
+            {
+                //*おおっと*線形*つらい*
+                std::vector<procon::Field> ret_vector;
+                ret_vector.reserve(static_cast<int>(end - begin));
+                for(auto it_i = begin;it_i < end - 1;it_i++) {
+                    bool check_overlap = false;
+                    for (auto it_j = it_i + 1;it_j < end - 1;it_j++) {
+                        if (*it_i || *it_j) {
+                            check_overlap = true;
+                        }
+                    }
+                    if (!check_overlap) ret_vector.emplace_back(*(it_i));
+                }
+                return std::move(ret_vector);
+            };
+            std::for_each(field_vec.begin(),field_vec.end(),[](procon::Field & field){field.calcFieldID();});
+            field_vec = std::move(poor_unique_move(field_vec.begin(),field_vec.end()));
+        };
+
+        if(field_vec.empty()) return buckup_field;
+
+        removeDuplicateField();
+        //return field_vec[0];
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
         if(field_vec.empty()) return buckup_field;
     }

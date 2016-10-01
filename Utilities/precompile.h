@@ -25,6 +25,7 @@
 /*std*/
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <cmath>
 #include <exception>
 #include <fstream>

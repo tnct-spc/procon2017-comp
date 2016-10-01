@@ -7,6 +7,11 @@ namespace procon {
 class Field
 {
 private:
+    std::bitset<50> piece_id;
+    std::vector<double> slope_id;
+    std::vector<point_t> coord_id;
+
+private:
     //フィールド上のピース&フレーム
     procon::ExpandedPolygon field_frame;
     std::vector<procon::ExpandedPolygon> field_pieces;
@@ -23,6 +28,8 @@ private:
     double min_angle;
     double min_side;
 
+public:
+    bool operator || (Field & field_id);
 public:
     //constructor
     Field();
@@ -50,6 +57,9 @@ public:
     int getPiecesSize() const;
     double getMinAngle() const;
     double getMinSide() const;
+    std::bitset<50> const& getPieceID() const;
+    std::vector<double> const& getSlopeID() const;
+    std::vector<point_t> const& getCoordID() const;
 
     //任意の位置のピースを消去
     void removePiece(int n);
@@ -66,6 +76,9 @@ public:
 
     //最小辺最小角を計算する
     void calcMinAngleSide();
+
+    //フィールドのIDを計算する
+    void calcFieldID();
 };
 }
 #endif // FIELD_H

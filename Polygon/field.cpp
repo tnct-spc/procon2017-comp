@@ -1,4 +1,5 @@
 #include "field.h"
+#include "utilities.h"
 
 /*--------------------constructor---------------------*/
 procon::Field::Field()
@@ -115,6 +116,12 @@ double procon::Field::getMinSide() const
     return min_side;
 }
 
+
+std::bitset<50> const& procon::Field::getPieceID() const
+{
+    return piece_id;
+}
+
 //remove
 void procon::Field::removePiece(int n)
 {
@@ -181,4 +188,39 @@ void procon::Field::calcMinAngleSide()
     //set
     min_angle = min_anglee;
     min_side = min_sidee;
+}
+
+bool procon::Field::operator || (Field & field) {
+    if (this->piece_id != field.piece_id) return false;
+
+    //ソート（これによって比較が可能に)
+    this->field_frame.sortJointedPieces();
+    field.field_frame.sortJointedPieces();
+
+    for (int i = 0;i < this->getFrame().getJointedPieces().size();i++) {
+
+        //slope check
+        {
+            double const& slope_a = this->getFrame().getJointedPieces().at(i).getSideSlope().at(0);
+            double const& slope_b = field.getFrame().getJointedPieces().at(i).getSideSlope().at(0);
+            constexpr double threshold = 3.141592653589 / 180;
+            if (!Utilities::nearlyEqual(slope_a,slope_b,threshold)) return false;
+        }
+        //coord test
+        {
+            point_t const& coord_a = this->getFrame().getJointedPieces().at(i).getPolygon().outer().at(0);
+            point_t const& coord_b = field.getFrame().getJointedPieces().at(i).getPolygon().outer().at(0);
+            constexpr double threshold = 0.5;
+            if (!Utilities::nearlyEqual(coord_a.x(),coord_b.x(),threshold)) return false;
+            if (!Utilities::nearlyEqual(coord_a.y(),coord_b.y(),threshold)) return false;
+        }
+    }
+    return true;
+}
+
+void procon::Field::calcFieldID()
+{
+    for (auto & piece : field_frame.getJointedPieces()) {
+         piece_id.set(piece.getId());
+    }
 }
