@@ -201,6 +201,9 @@ void Hazama::run()
         return;
     }
 
+    // Hide HAZAMA
+    this->showMinimized();
+
     if(ui->server_mode_radio->isChecked()){
         /*Save Puzzle*/
         std::string PROBLEM_SAVE_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";

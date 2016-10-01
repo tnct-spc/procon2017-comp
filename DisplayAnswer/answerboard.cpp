@@ -274,9 +274,11 @@ void AnswerBoard::printBigWindow()
 
     //AnswerBoard ans;
 
-    ans_board = new AnswerBoard();
-    ans_board->setField(print_field);
-    ans_board->showMaximized();
+    if(SINGLE_MODE){
+        ans_board = new AnswerBoard();
+        ans_board->setField(print_field);
+        ans_board->showMaximized();
+    }
 
 
 
