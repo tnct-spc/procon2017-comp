@@ -7,7 +7,7 @@ SimpleAlgorithm::SimpleAlgorithm()
 
 }
 
-procon::Field SimpleAlgorithm::run(procon::Field field)
+void SimpleAlgorithm::run(procon::Field field)
 {
     field.setFrame(field.getElementaryFrame());
     for(auto elementary_piece : field.getElementaryPieces()){

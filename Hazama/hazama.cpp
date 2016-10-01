@@ -48,17 +48,25 @@ void Hazama::acceptAnswer(QString file_path)
     //get POST puzzle answer data
     procon::Field field = procon::PolygonIO::importAnswer(file_path.toStdString(),PDATA);
 
+    //Display answer
+    emitAnswer(field);
+}
+
+void Hazama::emitAnswer(procon::Field field)
+{
     if(first_answer_flag){
         first_answer_flag = false;
         best_answer = field;
     }else{
-        if(field.getPiecesSize() > best_answer.getPiecesSize()){
+        if(field.getFrame().getJointedPieces().size() > best_answer.getFrame().getJointedPieces().size()){
             best_answer = field;
         }
     }
 
     //Display answer
     board->setField(best_answer);
+    //PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
+    //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }
 
 void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
@@ -226,15 +234,6 @@ void Hazama::run()
     enableThresholdUI();
 
     std::cout<<"finish"<<std::endl;
-}
-
-void Hazama::emitAnswer(procon::Field field)
-{
-    //Display answer
-    board->setField(field);
-    board->update();
-    PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
-    //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }
 
 cv::Mat Hazama::capture(int deviceNumber)

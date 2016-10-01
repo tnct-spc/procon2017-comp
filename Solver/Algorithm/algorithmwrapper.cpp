@@ -10,7 +10,7 @@
 void AlgorithmWrapper::init()
 {
     DOCK = std::make_shared<AnswerDock>();
-    DOCK->showMaximized();
+    DOCK->showMinimized();
 }
 
 void AlgorithmWrapper::submitAnswer(procon::Field field)

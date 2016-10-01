@@ -419,6 +419,11 @@ void procon::ExpandedPolygon::pushNewJointedPolygon(const polygon_t &new_frame, 
     //std::vector<polygon_line_id_type> frame_join_line_idss;
 }
 
+void procon::ExpandedPolygon::replaceJointedPieces(std::vector<procon::ExpandedPolygon> pieces)
+{
+    jointed_pieces = std::move(pieces);
+}
+
 // operator
 procon::ExpandedPolygon procon::ExpandedPolygon::operator =
 (procon::ExpandedPolygon const& p)

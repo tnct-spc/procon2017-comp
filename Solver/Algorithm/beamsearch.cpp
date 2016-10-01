@@ -168,7 +168,7 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
     return  can_prune;
 }
 
-procon::Field BeamSearch::run(procon::Field field)
+void BeamSearch::run(procon::Field field)
 {
     auto sortEvaLambda = [&](Evaluation const& a,Evaluation const& b)->bool
     {
