@@ -202,6 +202,11 @@ procon::Field BeamSearch::run(procon::Field field)
             emit throwAnswer(buckup_field);
             return buckup_field;
         }
+
+        int size = field_vec.size();
+        for(int i=0;i<size;++i){
+            DOCK->addAnswer(field_vec[i]);
+        }
     }
     emit throwAnswer(field_vec.at(0));
     return field_vec.at(0);

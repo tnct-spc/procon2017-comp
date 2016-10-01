@@ -9,6 +9,11 @@ namespace procon{
     }
 }
 
+std::unique_ptr<QImage> AnswerBoard::pieces_pic;
+std::unique_ptr<std::vector<cv::Point>> AnswerBoard::pieces_pos;
+std::unique_ptr<std::vector<cv::Vec3b>> AnswerBoard::random_colors;
+bool AnswerBoard::is_set_rawpic = false;
+
 AnswerBoard::AnswerBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AnswerBoard)
@@ -52,19 +57,18 @@ void AnswerBoard::setField(const procon::Field &field)
     }
 }
 
-void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos)
+void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos_)
 {
     is_set_rawpic = true;
     cv::cvtColor(raw_pieces_pic, raw_pieces_pic, CV_RGB2BGR);
-    this->pieces_pic = procon::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
-    *(this->pieces_pic) = QImage(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888).copy();
-    this->pieces_pos = procon::make_unique<std::vector<cv::Point>>(pieces_pos);
-    this->update();
+    pieces_pic = procon::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
+    *(pieces_pic) = QImage(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888).copy();
+    pieces_pos = procon::make_unique<std::vector<cv::Point>>(pieces_pos_);
 }
 
-void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors)
+void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors_)
 {
-    this->random_colors = procon::make_unique<std::vector<cv::Vec3b>>(random_colors);
+    random_colors = procon::make_unique<std::vector<cv::Vec3b>>(random_colors_);
 }
 
 QPointF AnswerBoard::getPosition(QPointF point_percent, Space space){
