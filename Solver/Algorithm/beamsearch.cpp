@@ -7,7 +7,7 @@
 #include "parallel.h"
 #include <random>
 
-//#define NO_PARALLEL
+#define NO_PARALLEL
 
 BeamSearch::BeamSearch()
 {
@@ -17,7 +17,11 @@ BeamSearch::BeamSearch()
 void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
+#ifndef NO_PARALLEL
     beam_width = 1000;
+#else
+    beam_width = 100;
+#endif
     variety_width = 200;
 }
 
