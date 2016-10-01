@@ -27,19 +27,7 @@ class ExpandedPolygon
 
     polygon_t polygon;
 
-    //jointed pieces data
-    typedef struct POLYGON_LINE_ID_TYPE{
-        int polygon_id;
-        int line_id;
-    } polygon_line_id_type;
-    typedef std::array<polygon_line_id_type,2> join_id_type;
-    friend bool operator<(const polygon_line_id_type &lhs, const polygon_line_id_type &rhs){return lhs.polygon_id == rhs.polygon_id ? lhs.line_id < rhs.line_id : lhs.polygon_id < rhs.polygon_id;}
-    friend bool operator==(const polygon_line_id_type &lhs, const polygon_line_id_type &rhs){return lhs.polygon_id == rhs.polygon_id && lhs.line_id == rhs.line_id;}
-    friend bool operator<(const join_id_type &lhs, const join_id_type &rhs){return lhs[0] == rhs[0] ? lhs[1] < rhs[1] : lhs[0] < rhs[0];}
-
     std::vector<procon::ExpandedPolygon> jointed_pieces;
-    std::vector<std::set<join_id_type>> jointed_pieces_id_sets;
-    std::vector<std::vector<polygon_line_id_type>> frame_join_line_idss;
 
     //flag
     bool calcSize_flag = false;
@@ -74,7 +62,6 @@ public:
     std::vector<int> getMultiIds() const;
     std::string makeMultiIdString() const;
     std::vector<procon::ExpandedPolygon> const& getJointedPieces() const;
-    std::vector<std::vector<procon::ExpandedPolygon::polygon_line_id_type>> const& getFrameJoinLineIdss() const;
 
     //setter
     void setMultiIds(std::vector<int> multi_ids_);
