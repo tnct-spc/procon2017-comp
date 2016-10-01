@@ -9,11 +9,18 @@ namespace procon{
     }
 }
 
+std::unique_ptr<QImage> AnswerBoard::pieces_pic;
+std::unique_ptr<std::vector<cv::Point>> AnswerBoard::pieces_pos;
+std::unique_ptr<std::vector<cv::Vec3b>> AnswerBoard::random_colors;
+bool AnswerBoard::is_set_rawpic = false;
+
 AnswerBoard::AnswerBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AnswerBoard)
 {
     ui->setupUi(this);
+
+    connect(this,&AnswerBoard::clicked,this,&AnswerBoard::printBigWindow);
 }
 
 AnswerBoard::~AnswerBoard()
@@ -26,6 +33,8 @@ void AnswerBoard::setField(const procon::Field &field)
     is_set_field = true;
     this->field = procon::make_unique<procon::Field>(field);
     this->update();
+
+    print_field = field;
 
     //add putid_list
     std::vector<procon::ExpandedPolygon> pieces = this->field->getFrame().getJointedPieces();
@@ -48,31 +57,30 @@ void AnswerBoard::setField(const procon::Field &field)
     }
 }
 
-void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos)
+void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector<cv::Point>& pieces_pos_)
 {
     is_set_rawpic = true;
     cv::cvtColor(raw_pieces_pic, raw_pieces_pic, CV_RGB2BGR);
-    this->pieces_pic = procon::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
-    *(this->pieces_pic) = QImage(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888).copy();
-    this->pieces_pos = procon::make_unique<std::vector<cv::Point>>(pieces_pos);
-    this->update();
+    pieces_pic = procon::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
+    *(pieces_pic) = QImage(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888).copy();
+    pieces_pos = procon::make_unique<std::vector<cv::Point>>(pieces_pos_);
 }
 
-void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors)
+void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors_)
 {
-    this->random_colors = procon::make_unique<std::vector<cv::Vec3b>>(random_colors);
+    random_colors = procon::make_unique<std::vector<cv::Vec3b>>(random_colors_);
 }
 
 QPointF AnswerBoard::getPosition(QPointF point_percent, Space space){
     int height = this->height();
     int width  = this->width();
-    int height_size = height - (top_margin + bottom_margin);
-    int width_size  = ( width - (left_margin + right_margin) )/2;
+    int height_size = height - (SINGLE_MODE?0:(top_margin + bottom_margin));
+    int width_size  = ( width - (SINGLE_MODE?0:(left_margin + right_margin)) ) / (SINGLE_MODE? 1:2);
     int image_size = height_size < width_size ? height_size : width_size;
     int y_padding  = height_size < width_size ? 0 : (height_size-image_size)/2;
     int x_padding  = height_size < width_size ? (width_size-image_size)/2 : 0;
-    return QPointF((point_percent.x()*image_size) + x_padding + left_margin + (space == LEFT || space == OVERALL ? 0 : width_size),
-                   (point_percent.y()*image_size) + y_padding +  top_margin);
+    return QPointF((point_percent.x()*image_size) + x_padding + (SINGLE_MODE?0:left_margin) + (SINGLE_MODE? 0 : space == LEFT ? 0:space == OVERALL ? (width_size/2) : width_size),
+                   (point_percent.y()*image_size) + y_padding +  (SINGLE_MODE?0:top_margin));
 }
 
 double AnswerBoard::getScale(){
@@ -114,14 +122,17 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         }
     };
 
-    static const QString color_background = "#d4c91f";
-    static const QString color_piece      = "#0f5ca0";
-    static const QString color_frame      = "#d0b98d";
-    static const QString color_inner      = "#d4c91f";
-    static const QString color_id         = "#ff33cc";
-    static const QString color_arrow_left = "#ff0000";
-    static const QString color_arrow_right= "#00ff00";
-    static const QString color_corner_begin_id = "#00ffff";
+    const QString color_background = SINGLE_MODE? "#E5E6DB":"#d4c91f";
+    const QString color_piece      = "#0f5ca0";
+    const QString color_frame      = SINGLE_MODE? "#7ACACB":"#d0b98d";
+    const QString color_inner      = color_background;
+    const QString color_id         = "#ff33cc";
+    const QString color_arrow_left = "#ff0000";
+    const QString color_arrow_right= "#00ff00";
+    const QString color_corner_begin_id = "#00ffff";
+
+
+
 
     std::array<QPointF,50> field_pieces_pos;
     std::array<QPointF,50> rawpic_pieces_pos;
@@ -142,7 +153,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             if(has_connector) field_pieces_pos.at(piece_id) = display_pos;
 
             //draw piece
-            painter.setPen(QPen(Qt::black, 3));
+            painter.setPen(QPen(Qt::black, 0));
             if(has_connector) painter.setBrush(QBrush(QColor(random_colors->at(piece_id)[2],random_colors->at(piece_id)[1],random_colors->at(piece_id)[0])));
             else painter.setBrush(QBrush(QColor(color_piece)));
             drawPolygon(piece.getPolygon(),Space::LEFT);
@@ -172,7 +183,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         //    count++;
         //}
         //draw frame
-        painter.setPen(QPen(Qt::black, 3));
+        painter.setPen(QPen(Qt::black, 0));
         painter.setBrush(QBrush(QColor(color_frame)));
         drawPolygon(field->getFrame().getPolygon(),Space::LEFT);
 
@@ -189,10 +200,11 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         for(auto piece : field->getFrame().getJointedPieces()){
             drawPiece(piece);
         }
+
     }
 
     //draw rawpic
-    if(is_set_rawpic){
+    if(!SINGLE_MODE && is_set_rawpic){
         //draw pic
         double rawpic_height_margin = (1-((double)pieces_pic->height()/(double)pieces_pic->width()))/2;
         painter.drawImage(QRectF(getPosition(QPointF(0,rawpic_height_margin),RIGHT),getPosition(QPointF(1,1-rawpic_height_margin),RIGHT)), *pieces_pic);
@@ -212,7 +224,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     }
 
     //draw arrow
-    if(is_set_field && is_set_rawpic){
+    if(!SINGLE_MODE && is_set_field && is_set_rawpic){
         if(putid_left != -1){
             painter.setPen(QPen(QColor(color_arrow_left), 5));
             painter.drawLine(field_pieces_pos.at(putid_left),rawpic_pieces_pos.at(putid_left));
@@ -249,4 +261,24 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
             std::cout<<"Press Key : "<<event->key()<<std::endl;
             break;
     }
+}
+
+void AnswerBoard::mousePressEvent(QMouseEvent *)
+{
+    emit clicked();
+}
+
+void AnswerBoard::printBigWindow()
+{
+    std::cout << "clicked" << std::endl;
+
+    //AnswerBoard ans;
+
+    ans_board = new AnswerBoard();
+    ans_board->setField(print_field);
+    ans_board->showMaximized();
+
+
+
+    //sleep(2000);
 }

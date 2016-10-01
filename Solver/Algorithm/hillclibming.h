@@ -7,7 +7,7 @@ class HillClibming : public AlgorithmWrapper
 {
 public:
     HillClibming();
-    procon::Field run(procon::Field field);
+    void run(procon::Field field);
 };
 
 #endif // HILLCLIBMING_H

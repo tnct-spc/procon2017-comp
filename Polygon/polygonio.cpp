@@ -110,14 +110,9 @@ void procon::PolygonIO::exportPolygon(procon::Field field, std::string file_path
 
 void procon::PolygonIO::exportAnswer(procon::Field field, std::string file_path)
 {
-    //frame jointed piece to normal piece
-    for(auto piece : field.getFrame().getJointedPieces()){
-        field.setPiece(piece);
-    }
-
     std::ofstream outputfile(file_path);
 
-    for(procon::ExpandedPolygon piece : field.getPieces()){
+    for(auto& piece : field.getFrame().getJointedPieces()){
         outputfile << piece.getId() << ","
                    << piece.centerx << ","
                    << piece.centery << ","
@@ -129,7 +124,7 @@ void procon::PolygonIO::exportAnswer(procon::Field field, std::string file_path)
 
 procon::Field procon::PolygonIO::importAnswer(std::string file_path, procon::Field field)
 {
-    field.setFrame(field.getElementaryFrame());
+    std::vector<procon::ExpandedPolygon> pieces;
 
     std::ifstream inputfile(file_path);
 
@@ -149,8 +144,13 @@ procon::Field procon::PolygonIO::importAnswer(std::string file_path, procon::Fie
             tmpPolygon.setPolygonPosition(std::stod(tmpX),std::stod(tmpY));
             if(std::stoi(tmpI) == true) tmpPolygon.inversePolygon();
             tmpPolygon.setPolygonAngle(std::stod(tmpR));
-            field.setPiece(tmpPolygon);
+            pieces.emplace_back(tmpPolygon);
         }
     }
+
+    procon::ExpandedPolygon frame = field.getElementaryFrame();
+    frame.replaceJointedPieces(pieces);
+    field.setFrame(frame);
+
     return field;
 }

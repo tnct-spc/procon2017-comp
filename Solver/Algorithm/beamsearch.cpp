@@ -17,7 +17,11 @@ BeamSearch::BeamSearch()
 void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
-    beam_width = 800;
+#ifndef NO_PARALLEL
+    beam_width = 1000;
+#else
+    beam_width = 100;
+#endif
     variety_width = 200;
 }
 
@@ -119,6 +123,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
     makeField(0,width);
 #endif
 
+#ifndef NO_PARALLEL
     if (static_cast<int>(evaluations.size()) - beam_width > variety_width) {
         auto makeRandomVector = [&](int num)->std::vector<int>{
             std::vector<int> random_vec;
@@ -145,6 +150,8 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             threads.at(i).join();
         }
     }
+#endif
+
     return next_field_vec;
 
 }
@@ -161,7 +168,7 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
     return  can_prune;
 }
 
-procon::Field BeamSearch::run(procon::Field field)
+void BeamSearch::run(procon::Field field)
 {
     auto sortEvaLambda = [&](Evaluation const& a,Evaluation const& b)->bool
     {
@@ -188,14 +195,24 @@ procon::Field BeamSearch::run(procon::Field field)
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
         //それより先がなければその1手前の最高評価値のフィールドを返す
-        if (evaluations.empty()) return buckup_field;
+        if (evaluations.empty()){
+            submitAnswer(buckup_field);
+            return;
+        }
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
         //return field_vec[0];
 
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
-        if(field_vec.empty()) return buckup_field;
+        if(field_vec.empty()){
+            submitAnswer(buckup_field);
+            return;
+        }
+
+        // Output Answer
+        for(auto field: field_vec) DOCK->addAnswer(field);
+        submitAnswer(field_vec.at(0));
     }
-    return field_vec.at(0);
+    return;
 }

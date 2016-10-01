@@ -19,10 +19,12 @@ PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 DEFINES += DISPLAYANSWER_LIBRARY
 
 SOURCES += \
-    answerboard.cpp
+    answerboard.cpp \
+    answerdock.cpp
 
 HEADERS +=\
-    answerboard.h
+    answerboard.h \
+    answerdock.h
 
 LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
@@ -32,7 +34,8 @@ unix {
 }
 
 FORMS += \
-    answerboard.ui
+    answerboard.ui \
+    answerdock.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon

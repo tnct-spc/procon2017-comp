@@ -4,10 +4,13 @@
 #include "field.h"
 #include "expandedpolygon.h"
 #include "Utils/evaluation.h"
+#include "answerdock.h"
 #include "fit.h"
 
-class AlgorithmWrapper
+class AlgorithmWrapper : public QObject
 {
+    Q_OBJECT
+
 public:
     static constexpr double length_error = 0.05; // 単位CM
     static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
@@ -22,8 +25,12 @@ public:
     AlgorithmWrapper();
     virtual ~AlgorithmWrapper() = default;
 
-    virtual procon::Field run(procon::Field field);
+    std::shared_ptr<AnswerDock> DOCK;
+
+    void init();
+    virtual void run(procon::Field field);
     void calcAngleFrequency(procon::Field field);
+    void submitAnswer(procon::Field field);
 
     Fit fit1,fit2;
     std::vector<Evaluation> evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
@@ -40,8 +47,8 @@ public:
         }
 
     } PieceAssesment;
-
-
+signals:
+    void throwAnswer(procon::Field field);
 };
 
 #endif // ALGORITHMWRAPPER_H

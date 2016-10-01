@@ -21,7 +21,7 @@ protected:
     bool canPrune(procon::ExpandedPolygon const& next_frame ,double const& min_angle);
 public:
     BeamSearch();
-    procon::Field run(procon::Field field);
+    void run(procon::Field field);
 };
 
 

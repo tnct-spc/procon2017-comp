@@ -33,7 +33,6 @@ Hazama::~Hazama()
 void Hazama::init()
 {
 
-
     board = std::make_shared<AnswerBoard>();
     board->showMaximized();
 
@@ -49,17 +48,25 @@ void Hazama::acceptAnswer(QString file_path)
     //get POST puzzle answer data
     procon::Field field = procon::PolygonIO::importAnswer(file_path.toStdString(),PDATA);
 
+    //Display answer
+    emitAnswer(field);
+}
+
+void Hazama::emitAnswer(procon::Field field)
+{
     if(first_answer_flag){
         first_answer_flag = false;
         best_answer = field;
     }else{
-        if(field.getPiecesSize() > best_answer.getPiecesSize()){
+        if(field.getFrame().getJointedPieces().size() > best_answer.getFrame().getJointedPieces().size()){
             best_answer = field;
         }
     }
 
     //Display answer
     board->setField(best_answer);
+    //PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
+    //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }
 
 void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
@@ -181,30 +188,11 @@ void Hazama::run()
         }
 
         /*Image Recognition*/
-        ImageRecognition imrec;
         PDATA = imrec.run(raw_frame, raw_pieces);
-        procon::ExpandedPolygon frame = PDATA.getElementaryFrame();
-        polygon_t rframe = frame.getPolygon();
-        polygon_t nframe;
-        for(auto ring:rframe.outer()){
-            nframe.outer().push_back(ring);
-        }
-
-        nframe.inners().push_back(polygon_t::ring_type());
-        nframe.inners().at(0).push_back(point_t{0.12434,0.12533});
-        nframe.inners().at(0).push_back(point_t{1.13242,1.134342});
-        nframe.inners().at(0).push_back(point_t{0.234431,1.3231});
-
-        nframe.inners().push_back(polygon_t::ring_type());
-        for(auto ring:rframe.inners().at(0)){
-            nframe.inners().at(1).push_back(ring);
-        }
-        frame.resetPolygonForce(nframe);
-        PDATA.setElementaryFrame(frame);
 
         //display recognized image
-        board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
-        board->setRandomColors(imrec.getRawRandomColors());
+        AnswerBoard::setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
+        AnswerBoard::setRandomColors(imrec.getRawRandomColors());
     } else if (ui->useFileData->isChecked()) {
         //環境によっては動かない
         //std::string path = QFileDialog::getOpenFileName(this).toStdString();
@@ -220,7 +208,8 @@ void Hazama::run()
         procon::PolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
     }else{
         //Solve puzzle
-        Solver solver;
+        solver = new Solver();
+        connect(solver,&Solver::throwAnswer,this,&Hazama::emitAnswer);
         int algorithm_number = -1;
         if(ui->algo0->isChecked()){
             algorithm_number = 0;
@@ -236,13 +225,10 @@ void Hazama::run()
             throw "poa";
             //poa
         }
-        procon::Field field = solver.run(PDATA, algorithm_number);
-
-        //Display answer
-        board->setField(field);
-        PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
-        //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
+        solver->run(PDATA, algorithm_number);
     }
+
+
 
     //enable thresholdUI
     enableThresholdUI();

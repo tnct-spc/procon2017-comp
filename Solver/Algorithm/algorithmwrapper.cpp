@@ -5,10 +5,26 @@
 #include "polygonviewer.h"
 #include "utilities.h"
 #include "Evaluation/searchsamelength.h"
+#include <QTimer>
 
-procon::Field AlgorithmWrapper::run(procon::Field field)
+void AlgorithmWrapper::init()
 {
-    return field;
+    DOCK = std::make_shared<AnswerDock>();
+    DOCK->showMinimized();
+}
+
+void AlgorithmWrapper::submitAnswer(procon::Field field)
+{
+    emit throwAnswer(field);
+    // Wait 1msec
+    QEventLoop loop;
+    QTimer::singleShot(1, &loop, SLOT(quit()));
+    loop.exec();
+}
+
+void AlgorithmWrapper::run(procon::Field field)
+{
+    return;
 }
 
 void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
