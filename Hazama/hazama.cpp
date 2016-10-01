@@ -232,6 +232,7 @@ void Hazama::emitAnswer(procon::Field field)
 {
     //Display answer
     board->setField(field);
+    board->update();
     PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
     //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }

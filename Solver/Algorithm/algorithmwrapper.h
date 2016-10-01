@@ -22,6 +22,7 @@ public:
 
     void init();
     virtual procon::Field run(procon::Field field);
+    void submitAnswer(procon::Field field);
 
     Fit fit1,fit2;
     std::vector<Evaluation> evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);

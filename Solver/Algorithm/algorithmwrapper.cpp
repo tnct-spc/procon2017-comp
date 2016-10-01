@@ -5,11 +5,21 @@
 #include "polygonviewer.h"
 #include "utilities.h"
 #include "Evaluation/searchsamelength.h"
+#include <QTimer>
 
 void AlgorithmWrapper::init()
 {
     DOCK = std::make_shared<AnswerDock>();
     DOCK->showMaximized();
+}
+
+void AlgorithmWrapper::submitAnswer(procon::Field field)
+{
+    emit throwAnswer(field);
+    // Wait 1msec
+    QEventLoop loop;
+    QTimer::singleShot(1, &loop, SLOT(quit()));
+    loop.exec();
 }
 
 procon::Field AlgorithmWrapper::run(procon::Field field)

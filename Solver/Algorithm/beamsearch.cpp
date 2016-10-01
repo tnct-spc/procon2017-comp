@@ -196,7 +196,7 @@ procon::Field BeamSearch::run(procon::Field field)
         this->evaluateNextMove(evaluations,field_vec);
         //それより先がなければその1手前の最高評価値のフィールドを返す
         if (evaluations.empty()){
-            emit throwAnswer(buckup_field);
+            submitAnswer(buckup_field);
             return buckup_field;
         }
 
@@ -206,15 +206,13 @@ procon::Field BeamSearch::run(procon::Field field)
 
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
         if(field_vec.empty()){
-            emit throwAnswer(buckup_field);
+            submitAnswer(buckup_field);
             return buckup_field;
         }
 
-        int size = field_vec.size();
-        for(int i=0;i<size;++i){
-            DOCK->addAnswer(field_vec[i]);
-        }
+        // Output Answer
+        for(auto field: field_vec) DOCK->addAnswer(field);
+        submitAnswer(field_vec.at(0));
     }
-    emit throwAnswer(field_vec.at(0));
     return field_vec.at(0);
 }
