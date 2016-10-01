@@ -82,6 +82,8 @@ public:
     void setPolygonAngle(double degree);
     void setPolygonPosition(double x,double y);
 
+    void sortJointedPieces();
+
     double difference_of_default_degree = 0;
 
     double centerx = 0;
