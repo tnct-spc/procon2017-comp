@@ -7,7 +7,7 @@
 #include "parallel.h"
 #include <random>
 
-//#define NO_PARALLEL
+#define NO_PARALLEL
 
 BeamSearch::BeamSearch()
 {
@@ -17,7 +17,7 @@ BeamSearch::BeamSearch()
 void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
-    beam_width = 800;
+    beam_width = 10;
     variety_width = 200;
 }
 
@@ -188,14 +188,20 @@ procon::Field BeamSearch::run(procon::Field field)
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
         //それより先がなければその1手前の最高評価値のフィールドを返す
-        if (evaluations.empty()) return buckup_field;
+        if (evaluations.empty()){
+            emit throwAnswer(buckup_field);
+            return buckup_field;
+        }
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
         //return field_vec[0];
 
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
-        if(field_vec.empty()) return buckup_field;
+        if(field_vec.empty()){
+            emit throwAnswer(buckup_field);
+            return buckup_field;
+        }
     }
     emit throwAnswer(field_vec.at(0));
     return field_vec.at(0);

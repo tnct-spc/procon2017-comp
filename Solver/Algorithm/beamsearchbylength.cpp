@@ -1,7 +1,7 @@
 #include "beamsearchbylength.h"
 #include "parallel.h"
 
-//#define NO_PARALLEL
+#define NO_PARALLEL
 
 BeamSearchByLength::BeamSearchByLength()
 {

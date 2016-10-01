@@ -12,16 +12,16 @@ class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 public:
     procon::Field run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
 
-    inline cv::Mat getRawPiecesPic(){
-        return std::move(raw_colored_pic);
+    const cv::Mat& getRawPiecesPic(){
+        return raw_colored_pic;
     }
 
-    inline std::vector<cv::Point> getRawPiecesPos(){
-        return std::move(raw_pieces_pos);
+    const std::vector<cv::Point>& getRawPiecesPos(){
+        return raw_pieces_pos;
     }
 
-    inline std::vector<cv::Vec3b> getRawRandomColors(){
-        return std::move(raw_random_colors);
+    const std::vector<cv::Vec3b>& getRawRandomColors(){
+        return raw_random_colors;
     }
 
 private:

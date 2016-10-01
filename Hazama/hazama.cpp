@@ -183,12 +183,12 @@ void Hazama::run()
         }
 
         /*Image Recognition*/
-        ImageRecognition imrec;
         PDATA = imrec.run(raw_frame, raw_pieces);
 
         //display recognized image
         board->setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
         board->setRandomColors(imrec.getRawRandomColors());
+        AnswerDock::setupDefaultRawPicData(imrec.getRawPiecesPic(), imrec.getRawPiecesPos(),imrec.getRawRandomColors());
     } else if (ui->useFileData->isChecked()) {
         //環境によっては動かない
         //std::string path = QFileDialog::getOpenFileName(this).toStdString();

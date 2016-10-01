@@ -29,6 +29,7 @@ private:
     std::shared_ptr<AnswerBoard> board;
     std::shared_ptr<AnswerDock> DOCK;
     Solver* solver;
+    ImageRecognition imrec;
 
     //Calibration
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
