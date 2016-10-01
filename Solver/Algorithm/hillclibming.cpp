@@ -36,7 +36,7 @@ std::vector<AlgorithmWrapper::PieceAssesment> assesment_function(procon::Field f
 }
 
 procon::Field HillClibming::run(procon::Field field)
-{   
+{
     //評価関数の戻り値の格納
     std::vector<PieceAssesment> piece_assesment;
     std::array<bool,50> isPlaced;
@@ -62,5 +62,6 @@ procon::Field HillClibming::run(procon::Field field)
         field.setIsPlaced(isPlaced);
 
     }
-    return field;
+    submitAnswer(field);
+    return;
 }

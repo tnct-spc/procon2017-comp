@@ -26,5 +26,6 @@ procon::Field SimpleAlgorithm::run(procon::Field field)
         }
         next_roop:;
     }
-    return field;
+    submitAnswer(field);
+    return;
 }

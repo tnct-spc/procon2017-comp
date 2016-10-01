@@ -22,9 +22,9 @@ void AlgorithmWrapper::submitAnswer(procon::Field field)
     loop.exec();
 }
 
-procon::Field AlgorithmWrapper::run(procon::Field field)
+void AlgorithmWrapper::run(procon::Field field)
 {
-    return field;
+    return;
 }
 std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece)
 {

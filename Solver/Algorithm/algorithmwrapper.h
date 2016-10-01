@@ -21,7 +21,7 @@ public:
     std::shared_ptr<AnswerDock> DOCK;
 
     void init();
-    virtual procon::Field run(procon::Field field);
+    virtual void run(procon::Field field);
     void submitAnswer(procon::Field field);
 
     Fit fit1,fit2;

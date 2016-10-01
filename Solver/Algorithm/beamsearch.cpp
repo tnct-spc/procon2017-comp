@@ -197,7 +197,7 @@ procon::Field BeamSearch::run(procon::Field field)
         //それより先がなければその1手前の最高評価値のフィールドを返す
         if (evaluations.empty()){
             submitAnswer(buckup_field);
-            return buckup_field;
+            return;
         }
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
@@ -207,12 +207,12 @@ procon::Field BeamSearch::run(procon::Field field)
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
         if(field_vec.empty()){
             submitAnswer(buckup_field);
-            return buckup_field;
+            return;
         }
 
         // Output Answer
         for(auto field: field_vec) DOCK->addAnswer(field);
         submitAnswer(field_vec.at(0));
     }
-    return field_vec.at(0);
+    return;
 }
