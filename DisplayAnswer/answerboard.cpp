@@ -201,6 +201,21 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             drawPiece(piece);
         }
 
+        //draw Eva
+        QPointF display_pos = getPosition(QPointF(0/frame_size,3/frame_size), Space::LEFT);
+        painter.setPen(QPen(QColor(color_id)));
+        QFont font = painter.font();
+        font.setPointSize(std::abs(getScale()/(SINGLE_MODE?5:15)));
+        painter.setFont(font);
+        painter.drawText(display_pos, QString::number(field->evaluation));
+        //draw frame-jointed pieces number
+        int cnt = 1;
+        for(auto piece : field->getFrame().getJointedPieces()){
+            QPointF display_pos = getPosition(QPointF(27/frame_size,(3*cnt)/frame_size), Space::LEFT);
+            painter.drawText(display_pos, QString::number(piece.getId()));
+            cnt++;
+        }
+
     }
 
     //draw rawpic

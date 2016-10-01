@@ -211,7 +211,12 @@ void BeamSearch::run(procon::Field field)
         }
 
         // Output Answer
-        for(auto field: field_vec) DOCK->addAnswer(field);
+        int cnt = 0;
+        for(auto& field: field_vec){
+            field.evaluation = evaluations.at(cnt).evaluation;
+            DOCK->addAnswer(field);
+            cnt++;
+        }
         submitAnswer(field_vec.at(0));
     }
     return;

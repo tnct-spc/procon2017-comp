@@ -24,6 +24,9 @@ private:
     double min_side;
 
 public:
+    // Public Member
+    double evaluation;
+
     //constructor
     Field();
 
