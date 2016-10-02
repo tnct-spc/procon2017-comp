@@ -5,6 +5,7 @@
 #include "field.h"
 #include "Evaluation/searchsamelength.h"
 #include "Utils/evaluation.h"
+#include <QEventLoop>
 
 class StepSearch : public AlgorithmWrapper
 {
@@ -21,6 +22,8 @@ public:
     void run(procon::Field field);
     std::vector<procon::Field> field_vec;
     QEventLoop loop;
+private slots:
+    void restartWithField(procon::Field field);
 };
 
 #endif // STEPSEARCH_H

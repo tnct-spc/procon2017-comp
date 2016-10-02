@@ -15,6 +15,7 @@ void PoorAlgorithm::run(procon::Field field)
     procon::ExpandedPolygon p = field.getElementaryPieces().at(0);
     p.rotatePolygon(45);
     field.setPiece(p,20.0,20.0);
+    DOCK->addAnswer(field);
     submitAnswer(field);
     return;
 

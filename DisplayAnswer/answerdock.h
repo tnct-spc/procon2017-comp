@@ -21,7 +21,12 @@ public:
 
 private:
     Ui::AnswerDock *ui;
-    int answers_size = 0;
+    std::vector<procon::Field> fields;
+private slots:
+    void clickedAnswer(int id);
+signals:
+    void selectField(procon::Field field);
+
 };
 
 #endif // ANSWERDOCK_H

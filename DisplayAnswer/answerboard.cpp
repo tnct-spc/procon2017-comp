@@ -271,21 +271,34 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void AnswerBoard::mousePressEvent(QMouseEvent *)
+void AnswerBoard::mousePressEvent(QMouseEvent *event)
 {
-    emit clicked();
+    emit clicked(event);
 }
-
-void AnswerBoard::printBigWindow()
+#include <QMouseEvent>
+void AnswerBoard::printBigWindow(QMouseEvent *event)
 {
     std::cout << "clicked" << std::endl;
 
+    //emit clicked_with_id(id);
+
     //AnswerBoard ans;
 
+    int mousebutton = event->buttons();
+
+    std::cout << mousebutton << std::endl;
+
     if(SINGLE_MODE){
-        ans_board = new AnswerBoard();
-        ans_board->setField(print_field);
-        ans_board->showMaximized();
+
+        if(mousebutton == Qt::RightButton){
+                ans_board = new AnswerBoard();
+                ans_board->setField(print_field);
+                ans_board->showMaximized();
+        }else if(mousebutton == Qt::LeftButton){
+
+            emit clicked_with_id(id);
+
+        }
     }
 
 

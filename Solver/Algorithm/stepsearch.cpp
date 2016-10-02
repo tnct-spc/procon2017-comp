@@ -104,6 +104,8 @@ std::vector<procon::Field> StepSearch::makeNextField (std::vector<Evaluation> co
 
 void StepSearch::run(procon::Field field)
 {
+    connect(&*DOCK,&AnswerDock::selectField,this,&StepSearch::restartWithField);
+
     auto sortEvaLambda = [&](Evaluation const& a,Evaluation const& b)->bool
     {
         return a.evaluation > b.evaluation;
@@ -151,8 +153,14 @@ void StepSearch::run(procon::Field field)
             cnt++;
         }
         submitAnswer(field_vec.at(0));
-        QTimer::singleShot(500, &loop, SLOT(quit()));
         loop.exec();
     }
     return;
+}
+
+void StepSearch::restartWithField(procon::Field field)
+{
+    field_vec.clear();
+    field_vec.push_back(field);
+    loop.quit();
 }
