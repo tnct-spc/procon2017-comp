@@ -119,6 +119,8 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
     parallel.generateThreads(makeField,cpu_num,0,width);
     /**スレッド終わるの待ち**/
     parallel.joinThreads();
+    //重複しているfieldの除去
+    removeDuplicateField(next_field_vec);
 #else
     makeField(0,width);
 #endif
@@ -170,6 +172,7 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
 
 bool BeamSearch::removeDuplicateField(std::vector<procon::Field> & field_vec)
 {
+    if (field_vec.size() == 0) return false;
     auto poor_unique_move = [&](std::vector<procon::Field>::iterator begin,std::vector<procon::Field>::iterator end)
     {
         //*おおっと*線形*つらい*
@@ -216,6 +219,7 @@ void BeamSearch::run(procon::Field field)
 
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
+
         //それより先がなければその1手前の最高評価値のフィールドを返す
         if (evaluations.empty()){
             submitAnswer(buckup_field);
@@ -224,12 +228,6 @@ void BeamSearch::run(procon::Field field)
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
-        if(field_vec.empty()){
-            submitAnswer(buckup_field);
-            return;
-        }
-
-        removeDuplicateField(field_vec);
 
         //return field_vec[0];
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
