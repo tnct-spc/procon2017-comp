@@ -18,11 +18,11 @@ void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
 #ifndef NO_PARALLEL
-    beam_width = 1000;
+    beam_width = 100;
 #else
     beam_width = 100;
 #endif
-    variety_width = 200;
+    variety_width = 50;
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -111,27 +111,41 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             }
         }
     };
-    constexpr int coefficient = 1;
-    int const width = beam_width * coefficient < static_cast<int>(evaluations.size()) ? beam_width * coefficient : static_cast<int>(evaluations.size());
+    //過剰生産倍率
+    //constexpr double size_weight = 1.2;
+    //限界サイズ
+    const int limit = static_cast<int>(evaluations.size());
 
 #ifndef NO_PARALLEL
-    /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
-    parallel.generateThreads(makeField,cpu_num,0,width);
-    /**スレッド終わるの待ち**/
-    parallel.joinThreads();
-    //重複しているfieldの除去
-    removeDuplicateField(next_field_vec);
+    //マルチスレッド
+    int i;
+    for (i = 1;next_field_vec.size() < beam_width;i++) {
+        if (i * beam_width > limit) {
+            parallel.generateThreads(makeField,cpu_num,(i - 1) * beam_width,limit);
+            parallel.joinThreads();
+            return next_field_vec;
+        } else {
+            parallel.generateThreads(makeField,cpu_num,(i - 1) * beam_width,i * beam_width);
+            parallel.joinThreads();
+        }
+
+        //重複しているfieldの除去
+        removeDuplicateField(next_field_vec);
+    }
 #else
-    makeField(0,width);
+    makeField(0,limit);
 #endif
 
 #ifndef NO_PARALLEL
-    if (static_cast<int>(evaluations.size()) - beam_width * coefficient > variety_width) {
+
+    if (next_field_vec.size() > beam_width) next_field_vec.resize(beam_width);
+
+    if (limit - (i - 1) *  beam_width > variety_width) {
         auto makeRandomVector = [&](int num)->std::vector<int>{
             std::vector<int> random_vec;
             std::random_device rd;
             std::mt19937 mt(rd());
-            std::uniform_int_distribution<int> variety(beam_width * coefficient,static_cast<int>(evaluations.size()));
+            std::uniform_int_distribution<int> variety((i - 1) * beam_width,limit);
             random_vec.reserve(num * 2);
             while (random_vec.size() < num) {
                 for (int roop = 0;roop < num * 2;roop++) {
@@ -154,6 +168,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
     }
 #endif
 
+    //std::cout << "piecesize" << next_field_vec.size() << std::endl;
     return next_field_vec;
 
 }
