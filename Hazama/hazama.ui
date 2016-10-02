@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>878</width>
+    <width>1230</width>
     <height>598</height>
    </rect>
   </property>
@@ -50,13 +50,13 @@
      <string>ServerMode</string>
     </property>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="QGroupBox" name="algorithmSelector">
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>20</y>
       <width>311</width>
-      <height>131</height>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
@@ -128,6 +128,19 @@
      </property>
      <property name="checked">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="algo5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>101</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>StepSearch</string>
      </property>
     </widget>
    </widget>
@@ -244,7 +257,7 @@
      <rect>
       <x>390</x>
       <y>40</y>
-      <width>155</width>
+      <width>160</width>
       <height>101</height>
      </rect>
     </property>
@@ -331,8 +344,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>878</width>
-     <height>17</height>
+     <width>1230</width>
+     <height>27</height>
     </rect>
    </property>
   </widget>

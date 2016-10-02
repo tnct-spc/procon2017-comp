@@ -224,6 +224,8 @@ void Hazama::run()
             algorithm_number = 3;
         }else if(ui->algo4->isChecked()){
             algorithm_number = 4;
+        }else if(ui->algo5->isChecked()){
+            algorithm_number = 5;
         }else{
             throw "poa";
             //poa

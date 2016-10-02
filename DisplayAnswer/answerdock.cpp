@@ -1,6 +1,7 @@
 #include "answerdock.h"
 #include "ui_answerdock.h"
 
+#include "utilities.h"
 #include "answerboard.h"
 #include "field.h"
 #include <QScrollArea>
@@ -33,6 +34,6 @@ void AnswerDock::addAnswer(procon::Field const& field)
     answer_board->SINGLE_MODE = true;
     answer_board->setFixedSize(300,300);
 
-    this->ui->testd->addWidget(answer_board,view_count/4,view_count%4);
-    view_count++;
+    this->ui->testd->addWidget(answer_board,answers_size/4,answers_size%4);
+    answers_size++;
 }
