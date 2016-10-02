@@ -559,6 +559,15 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
                 ring.push_back(piece_lines.at(i));
             }
             rings.push_back(ring);
+
+            auto tmp_rings =std::move(rings);
+            rings.clear();
+            for (auto& r : tmp_rings) {
+                if (r.size() > 2) {
+                    rings.emplace_back(std::move(r));
+                }
+            }
+
             rings.at(0) = repairLines(rings.at(0));
             frame_polygon = convertLineToPolygon(rings.at(0));
 
