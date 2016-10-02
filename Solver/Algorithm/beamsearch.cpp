@@ -132,7 +132,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             std::uniform_int_distribution<int> variety(beam_width * coefficient,static_cast<int>(evaluations.size()));
             random_vec.reserve(num * 2);
             while (random_vec.size() < num) {
-                for (int roop = 0;roop < num * 2;roop++) {
+                for (unsigned int roop = 0;roop < num * 2;roop++) {
                     random_vec.push_back(variety(mt));
                 }
                 std::sort(random_vec.begin(),random_vec.end());
