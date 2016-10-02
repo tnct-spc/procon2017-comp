@@ -306,7 +306,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         pieces_lines.push_back(std::vector<cv::Vec4f>());
 
         //LSD直線検出 引数の"scale"が重要！！！
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.50);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.40);
         lsd->detect(image, pieces_lines[count]);
 
         //描画
