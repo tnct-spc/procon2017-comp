@@ -141,12 +141,12 @@ void Hazama::run()
 
     std::cout << "Run" << std::endl;
 
-    std::string frame_path = "./../../procon2016-comp/sample/1_frame.png";
+    std::string frame_path = "./../../procon2016-comp/sample/mirrorless_nframe.JPG";
 
     //disable threshold UI
     disableThresholdUI();
 
-    std::string pieces_path = "./../../procon2016-comp/sample/1_pieces.png";
+    std::string pieces_path = "./../../procon2016-comp/sample/mirrorless_npieces.JPG";
     std::string path = "./../../procon2016-comp/sample/data.csv";
 
     /*Get puzzle data*/

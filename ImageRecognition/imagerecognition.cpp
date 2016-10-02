@@ -2,7 +2,8 @@
 
 procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
-    raw_pieces_pic = cv::Mat(raw_pieces_image,cv::Rect(250,0,1450,1080));
+    //raw_pieces_pic = cv::Mat(raw_pieces_image,cv::Rect(250,0,1450,1080));
+    raw_pieces_pic = raw_pieces_image;
 
     //前処理
     cv::Mat frame_image = preprocessingFrame(raw_frame_image);
@@ -24,16 +25,93 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
 void ImageRecognition::threshold(cv::Mat& image)
 {
     //resize
-    image = cv::Mat(image,cv::Rect(75,0,1455,1080));
+    image = cv::Mat(image,cv::Rect(0,500,2664,3300));
+
+    /*
+    cv::namedWindow("capture",cv::WINDOW_NORMAL);
+    cv::imshow("capture",image);
+    */
+
+
+    /* kido
+    // get d
+    std::vector<cv::Mat> white_channels(3);
+    cv::Mat hsv_white;
+    cv::cvtColor(white, hsv_white, CV_BGR2HSV);
+    cv::split(hsv_white, white_channels);
+    cv::Mat whiteD = white_channels[2];
+    int rows = white.rows;
+    int cols = white.cols;
+
+    std::vector<cv::Mat> image_channels(3);
+    cv::Mat hsv_image;
+    cv::cvtColor(image, hsv_image, CV_BGR2HSV);
+    cv::split(hsv_image, image_channels);
+    cv::Mat imageD = image_channels[2];
+
+    // smooth
+    int smooth_threshold = 0;
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
+        int av=0;
+        int av_cnt=0;
+        for (int dy = -smooth_threshold; dy < smooth_threshold; dy++) for (int dx = -smooth_threshold; dx <= smooth_threshold; dx++){
+            int ny = y + dy;
+            int nx = x + dx;
+            if(0 <= ny && ny < rows && 0 <= nx && nx < cols){
+                av_cnt++;
+                av += whiteD.at<unsigned char>(ny,nx);
+            }
+        }
+        whiteD.at<unsigned char>(y,x) = av/av_cnt;
+    }
+
+    // ave
+    unsigned long int Dsum=0;
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
+        Dsum += whiteD.at<unsigned char>(y,x);
+    }
+    int ave = Dsum/(rows*cols);
+    std::cout<<"ave="<<ave<<std::endl;
+
+    // fit
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++){
+        imageD.at<unsigned char>(y,x) += ave - whiteD.at<unsigned char>(y,x);
+    }
+
+
+    // merge d
+    image_channels[2] = imageD;
+    cv::merge(image_channels, hsv_image);
+    cv::cvtColor(hsv_image, image, CV_HSV2BGR);
+
+    */
+
+    cv::Mat normal_area,koge_area;
 
     //色抽出 H:0-180/180, S:76-255/255, B:76-153/255
-    colorExtraction(&image, &image, CV_BGR2HSV, 0, 180, 37, 255, 120, 217);
+    colorExtraction(&image, &normal_area, CV_BGR2HSV, 0, 180, 89, 255, 76, 148);
+    //colorExtraction(&image, &normal_area, CV_BGR2HSV, 0, 180, 89, 255, 76, 140);
+    colorExtraction(&image, &koge_area, CV_BGR2HSV, 5, 20, 153, 255, 43, 90);
 
     //グレースケールに変換
-    cvtColor(image,image,CV_RGB2GRAY);
+    cvtColor(normal_area,normal_area,CV_RGB2GRAY);
+    cvtColor(koge_area,koge_area,CV_RGB2GRAY);
 
     //二値化
-    cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
+    cv::threshold(normal_area,normal_area, 0, 255, cv::THRESH_BINARY_INV);
+    cv::threshold(koge_area,koge_area, 0, 255, cv::THRESH_BINARY_INV);
+
+    //syn
+    cv::bitwise_and(normal_area,koge_area,image);
+
+    /*
+    cv::namedWindow("capturerer",cv::WINDOW_NORMAL);
+    cv::imshow("capturerer",image);
+    cv::namedWindow("capturer",cv::WINDOW_NORMAL);
+    cv::imshow("capturer",normal_area);
+    cv::namedWindow("capturern",cv::WINDOW_NORMAL);
+    cv::imshow("capturern",koge_area);
+    */
 }
 
 cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
@@ -234,10 +312,10 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         //描画
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
-        //if (count + 1 == 14) {
-        //    cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
-        //    cv::imshow(std::to_string(count+1), pic);
-        //}
+        if (1==1 || count + 1 == 14) {
+            cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
+            cv::imshow(std::to_string(count+1), pic);
+        }
         count++;
     }
 
