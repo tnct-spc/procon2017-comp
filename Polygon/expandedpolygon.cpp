@@ -454,7 +454,7 @@ void procon::ExpandedPolygon::setPolygonPosition(double x, double y)
 
 void procon::ExpandedPolygon::sortJointedPieces()
 {
-    auto lambda = [](procon::ExpandedPolygon & a,procon::ExpandedPolygon & b)
+    auto lambda = [](procon::ExpandedPolygon const& a,procon::ExpandedPolygon const& b)
     {
         return a.getId() > b.getId();
     };
