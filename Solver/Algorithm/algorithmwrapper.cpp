@@ -18,7 +18,7 @@ void AlgorithmWrapper::submitAnswer(procon::Field field)
     emit throwAnswer(field);
     // Wait 1msec
     QEventLoop loop;
-    QTimer::singleShot(1, &loop, SLOT(quit()));
+    QTimer::singleShot(500, &loop, SLOT(quit()));
     loop.exec();
 }
 

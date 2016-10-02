@@ -16,16 +16,18 @@ class AnswerBoard : public QWidget
 public:
     explicit AnswerBoard(QWidget *parent = 0);
     ~AnswerBoard();
+    int id = -1;
     bool SINGLE_MODE = false;
     void setField(const procon::Field& field);
     static void setRawPicture(const cv::Mat& raw_pieces_pic,const std::vector<cv::Point>& pieces_pos);
     static void setRandomColors(const std::vector<cv::Vec3b>& random_colors);
 
 signals:
-    void clicked();
+    void clicked(QMouseEvent*event);
+    void clicked_with_id(int id);
 
 private slots:
-    void printBigWindow();
+    void printBigWindow(QMouseEvent*event);
 
 private:
     Ui::AnswerBoard *ui;
@@ -62,7 +64,7 @@ private:
 protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *event);
-    void mousePressEvent(QMouseEvent*);
+    void mousePressEvent(QMouseEvent*event);
 };
 
 #endif // ANSWERBOARD_H

@@ -1,13 +1,6 @@
 #include "answerboard.h"
 #include "ui_answerboard.h"
-
-namespace procon{
-    template<typename T, typename ...Args>
-    std::unique_ptr<T> make_unique( Args&& ...args )
-    {
-        return std::unique_ptr<T>( new T( std::forward<Args>(args)... ) );
-    }
-}
+#include "utilities.h"
 
 std::unique_ptr<QImage> AnswerBoard::pieces_pic;
 std::unique_ptr<std::vector<cv::Point>> AnswerBoard::pieces_pos;
@@ -31,7 +24,7 @@ AnswerBoard::~AnswerBoard()
 void AnswerBoard::setField(const procon::Field &field)
 {
     is_set_field = true;
-    this->field = procon::make_unique<procon::Field>(field);
+    this->field = Utilities::make_unique<procon::Field>(field);
     this->update();
 
     print_field = field;
@@ -61,14 +54,14 @@ void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector
 {
     is_set_rawpic = true;
     cv::cvtColor(raw_pieces_pic, raw_pieces_pic, CV_RGB2BGR);
-    pieces_pic = procon::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
+    pieces_pic = Utilities::make_unique<QImage>(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888);
     *(pieces_pic) = QImage(raw_pieces_pic.data, raw_pieces_pic.cols, raw_pieces_pic.rows, raw_pieces_pic.step, QImage::Format_RGB888).copy();
-    pieces_pos = procon::make_unique<std::vector<cv::Point>>(pieces_pos_);
+    pieces_pos = Utilities::make_unique<std::vector<cv::Point>>(pieces_pos_);
 }
 
 void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors_)
 {
-    random_colors = procon::make_unique<std::vector<cv::Vec3b>>(random_colors_);
+    random_colors = Utilities::make_unique<std::vector<cv::Vec3b>>(random_colors_);
 }
 
 QPointF AnswerBoard::getPosition(QPointF point_percent, Space space){
@@ -278,21 +271,34 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void AnswerBoard::mousePressEvent(QMouseEvent *)
+void AnswerBoard::mousePressEvent(QMouseEvent *event)
 {
-    emit clicked();
+    emit clicked(event);
 }
-
-void AnswerBoard::printBigWindow()
+#include <QMouseEvent>
+void AnswerBoard::printBigWindow(QMouseEvent *event)
 {
     std::cout << "clicked" << std::endl;
 
+    //emit clicked_with_id(id);
+
     //AnswerBoard ans;
 
+    int mousebutton = event->buttons();
+
+    std::cout << mousebutton << std::endl;
+
     if(SINGLE_MODE){
-        ans_board = new AnswerBoard();
-        ans_board->setField(print_field);
-        ans_board->showMaximized();
+
+        if(mousebutton == Qt::RightButton){
+                ans_board = new AnswerBoard();
+                ans_board->setField(print_field);
+                ans_board->showMaximized();
+        }else if(mousebutton == Qt::LeftButton){
+
+            emit clicked_with_id(id);
+
+        }
     }
 
 
