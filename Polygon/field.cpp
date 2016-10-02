@@ -197,7 +197,7 @@ bool procon::Field::operator || (Field & field) {
     this->field_frame.sortJointedPieces();
     field.field_frame.sortJointedPieces();
 
-    for (int i = 0;i < this->getFrame().getJointedPieces().size();i++) {
+    for (unsigned int i = 0;i < this->getFrame().getJointedPieces().size();i++) {
 
         //slope check
         {

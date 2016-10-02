@@ -177,7 +177,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         polygon_t new_raw_polygon = pushRingToPolygonT(new_ring, jointed_polygon, fit1.frame_inner_pos);
         jointed_polygon.setMultiIds(std::vector<int>{jointed_polygon.getId(), piece.getId()});
         new_polygon = std::move(jointed_polygon);
-        new_polygon.pushNewJointedPolygon(new_raw_polygon, piece, join_data);
+        new_polygon.pushNewJointedPolygon(new_raw_polygon, piece);
     }else{ //piece-piece
         throw "Not supported!";
         new_polygon.setMultiIds(std::vector<int>{jointed_polygon.getId(), piece.getId()});

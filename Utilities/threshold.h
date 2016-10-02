@@ -7,7 +7,7 @@ class threshold
 private:
     static bool read_default_config_flag;
 public:
-    threshold(QString config_file_path = "dynamic.yml");
+    threshold(/*QString config_file_path = "dynamic.yml"*/);
     int test_threshold_san = 3.1415926535;
 };
 

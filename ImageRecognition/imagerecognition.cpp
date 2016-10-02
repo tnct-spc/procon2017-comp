@@ -312,10 +312,10 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         //描画
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
-        if (1==1 || count + 1 == 14) {
-            cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
-            cv::imshow(std::to_string(count+1), pic);
-        }
+        //if (count + 1 == 14) {
+        //    cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
+        //    cv::imshow(std::to_string(count+1), pic);
+        //}
         count++;
     }
 

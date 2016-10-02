@@ -125,7 +125,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 
 #ifndef NO_PARALLEL
     if (static_cast<int>(evaluations.size()) - beam_width * coefficient > variety_width) {
-        auto makeRandomVector = [&](int num)->std::vector<int>{
+        auto makeRandomVector = [&](unsigned int num)->std::vector<int>{
             std::vector<int> random_vec;
             std::random_device rd;
             std::mt19937 mt(rd());
@@ -188,6 +188,7 @@ bool BeamSearch::removeDuplicateField(std::vector<procon::Field> & field_vec)
     };
     std::for_each(field_vec.begin(),field_vec.end(),[](procon::Field & field){field.calcFieldID();});
     field_vec = std::move(poor_unique_move(field_vec.begin(),field_vec.end()));
+    return true;
 }
 
 void BeamSearch::run(procon::Field field)

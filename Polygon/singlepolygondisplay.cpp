@@ -30,7 +30,7 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 3));
 
-    auto drawPolygon = [&](procon::ExpandedPolygon const& polygon, std::vector<QPointF> points, bool set_base, int inner_id = -1){
+    auto drawPolygon = [&](std::vector<QPointF> points, bool set_base){
         static const double margin = 10;
         const int size = points.size();
         static double x_max,y_max,x_min,y_min;
@@ -74,7 +74,7 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
         points.push_back(QPointF(polygon.getPolygon().outer()[i].x(),polygon.getPolygon().outer()[i].y()));
     }
     painter.setBrush(QBrush(QColor("#0f5ca0")));
-    drawPolygon(polygon, points, 1);
+    drawPolygon(points, 1);
     int inner_size = polygon.getInnerSize();
     for(int i=0;i<inner_size;i++){
         auto inner = polygon.getPolygon().inners().at(i);
@@ -84,6 +84,6 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
             points.push_back(QPointF(inner[i].x(),inner[i].y()));
         }
         painter.setBrush(QBrush(QColor("#f4c342")));
-        drawPolygon(polygon,points,0,i);
+        drawPolygon(points,0);
     }
 }

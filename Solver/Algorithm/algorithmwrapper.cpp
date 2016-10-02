@@ -24,6 +24,8 @@ void AlgorithmWrapper::submitAnswer(procon::Field field)
 
 void AlgorithmWrapper::run(procon::Field field)
 {
+    field.setFrame(field.getElementaryFrame());
+    submitAnswer(field);
     return;
 }
 
