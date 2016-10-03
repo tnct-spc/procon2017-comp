@@ -22,7 +22,7 @@ void BeamSearch::initialization()
 #else
     beam_width = 100;
 #endif
-    variety_width = 50;
+    variety_width = 20;
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -119,7 +119,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 #ifndef NO_PARALLEL
     //マルチスレッド
     int i;
-    for (i = 1;next_field_vec.size() < beam_width;i++) {
+    for (i = 1;static_cast<int>(next_field_vec.size()) < beam_width;i++) {
         if (i * beam_width > limit) {
             parallel.generateThreads(makeField,cpu_num,(i - 1) * beam_width,limit);
             parallel.joinThreads();
@@ -138,16 +138,18 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 
 #ifndef NO_PARALLEL
 
-    if (next_field_vec.size() > beam_width) next_field_vec.resize(beam_width);
+
+    if (static_cast<int>(next_field_vec.size()) > beam_width) next_field_vec.resize(beam_width);
 
     if (limit - (i - 1) *  beam_width > variety_width) {
+        /*
         auto makeRandomVector = [&](int num)->std::vector<int>{
             std::vector<int> random_vec;
             std::random_device rd;
             std::mt19937 mt(rd());
             std::uniform_int_distribution<int> variety((i - 1) * beam_width,limit);
             random_vec.reserve(num * 2);
-            while (random_vec.size() < num) {
+            while (static_cast<int>(random_vec.size()) < num) {
                 for (int roop = 0;roop < num * 2;roop++) {
                     random_vec.push_back(variety(mt));
                 }
@@ -155,20 +157,41 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
                 random_vec.erase(std::unique(random_vec.begin(),random_vec.end()),random_vec.end());
             }
             return random_vec;
+        }; */
+
+        auto makeRandomVector = [&](int start,int end){
+            std::vector<int> random_vec;
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            int last = end - 1;
+            for (int i = start;i < end;i++){
+                random_vec.emplace_back(i);
+            }
+            for (int i = end;i < start;i++){
+                std::uniform_int_distribution<int> variety(start,end);
+                std::swap(random_vec.at(variety(mt)),random_vec.at(end - 1));
+            }
+            return random_vec;
         };
-        std::vector<int> random_vec = std::move(makeRandomVector(variety_width));
-        std::vector<std::thread> threads;
-        for (int i = 0;i < variety_width;i++) {
-            std::thread thread(makeField,random_vec.at(i),random_vec.at(i) + 1);
-            threads.emplace_back(std::move(thread));
-        }
-        for (int i = 0;i < variety_width;i++) {
-            threads.at(i).join();
+
+        std::vector<int> random_vec = std::move(makeRandomVector((i - 1) * beam_width,limit));
+        int falut = 0;
+        while (static_cast<int>(next_field_vec.size()) < beam_width + variety_width) {
+            std::vector<std::thread> threads;
+            for (int i = 0;i < variety_width;i++) {
+                std::thread thread(makeField,random_vec.at(i + falut),random_vec.at(i + falut) + 1);
+                threads.emplace_back(std::move(thread));
+            }
+            for (int i = 0;i < variety_width;i++) {
+                threads.at(i).join();
+            }
+            falut += variety_width;
         }
     }
 #endif
 
-    //std::cout << "piecesize" << next_field_vec.size() << std::endl;
+    if (static_cast<int>(next_field_vec.size()) > beam_width + variety_width) next_field_vec.resize(beam_width + variety_width);
+
     return next_field_vec;
 
 }
