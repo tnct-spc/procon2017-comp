@@ -131,7 +131,7 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
 void Hazama::run()
 {
     //When you want to calibrate webcamera,please comment out this line!!!
-    //makeCalibrationData("./../../procon2016-comp/picture/cal/calibration.yml",5);
+    //makeCalibrationData("./../../procon2016-comp/picture/cal/calibration.yml",8);
 
     const std::string calibration_data_file_path = "./../../procon2016-comp/picture/cal/calibration.yml";
     static bool init_calibration_flag = false;
@@ -156,21 +156,20 @@ void Hazama::run()
     cv::Mat calibration_src;
     cv::undistort(src, calibration_src, mtx, dist);
 
-    //cv::namedWindow("pic",cv::WINDOW_NORMAL);
-    //cv::imshow("pic",calibration_src);
-    //cv::namedWindow("rpic",cv::WINDOW_NORMAL);
-    //cv::imshow("rpic",src);
+    cv::namedWindow("pic",cv::WINDOW_NORMAL);
+    cv::imshow("pic",calibration_src);
+    cv::namedWindow("rpic",cv::WINDOW_NORMAL);
+    cv::imshow("rpic",src);
     //cv::waitKey(0);
-
 
     std::cout << "Run" << std::endl;
 
-    std::string frame_path = "./../../procon2016-comp/sample/mirrorless_nframe_2.JPG";
+    std::string frame_path = "./../../procon2016-comp/sample/mirrorless_frame_ver2.JPG";
 
     //disable threshold UI
     disableThresholdUI();
 
-    std::string pieces_path = "./../../procon2016-comp/sample/mirrorless_npieces.JPG";
+    std::string pieces_path = "./../../procon2016-comp/sample/mirrorless_pieces_ver2.JPG";
     std::string path = "./../../procon2016-comp/sample/data.csv";
 
     /*Get puzzle data*/
@@ -207,8 +206,10 @@ void Hazama::run()
             //std::string frame_path = QFileDialog::getOpenFileName(this,"input frame picture","./../../procon2016-comp/picture/").toStdString();
             //std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
 
-            raw_frame = cv::imread(frame_path, 1);
-            raw_pieces = cv::imread(pieces_path, 1);
+            cv::Mat nocframe = cv::imread(frame_path, 1);
+            cv::Mat nocpieces = cv::imread(pieces_path, 1);
+            cv::undistort(nocframe, raw_frame, mtx, dist);
+            cv::undistort(nocpieces, raw_pieces, mtx, dist);
         }
 
         /*Image Recognition*/
