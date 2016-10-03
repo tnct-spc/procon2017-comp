@@ -1,4 +1,6 @@
 #include "imagerecognition.h"
+#include "polygonviewer.h"
+#include "utilities.h"
 
 procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
@@ -305,7 +307,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         pieces_lines.push_back(std::vector<cv::Vec4f>());
 
         //LSD直線検出 引数の"scale"が重要！！！
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.45);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.30);
         lsd->detect(image, pieces_lines[count]);
 
         //描画
@@ -339,7 +341,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             const double end_x = lines.at(i)[2];
             const double end_y = lines.at(i)[3];
 
-            double min = 4000;
+            double min = 114514;
             double min_subscript = i + 1;
 
             for (int j = i + 1; j < static_cast<int>(lines.size()); j++){
@@ -401,7 +403,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
             //許容角度
             //(3.141592 / 180)でdeg -> radに
-            constexpr double allowable_angle = 1 * (3.141592 / 180);
+            constexpr double allowable_angle = 3 * (3.141592 / 180);
 
             //二つの線分の角度の差が許容角度以下ならば次の線分を更新する
             if (std::abs(angle1-angle2) < allowable_angle) {
@@ -429,7 +431,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     };
     /***ここまで***/
 
-    auto convertLineToPolygon = [](std::vector<cv::Vec4f> const& lines)->polygon_t {
+    auto convertLineToPolygon = [&](std::vector<cv::Vec4f> const& lines)->polygon_t {
 
         /****2線分の交点をだす関数****/
         auto calcIntersection = [](std::vector<double> a,std::vector<double> b)->double {
@@ -476,7 +478,19 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             const double x = calcIntersection(vec_x,vec_y);
             const double y = calcIntersection(vec_y,vec_x);
 
-            polygon.outer().push_back(point_t(x,y));
+            //平均のx,y
+            const double mean_x = ((x2 + x3) / 2);
+            const double mean_y = ((y2 + y3) / 2);
+            //平均点と算術点の許容誤差
+            //ありえん誤差
+            constexpr double length_error = 3;
+            if (!Utilities::nearlyEqual(mean_x,x,length_error / scale) || !Utilities::nearlyEqual(mean_y,y,length_error / scale)) {
+                auto hoge = length_error / scale;
+                std::cerr << "gosaaaaaaaaaaaaaaaaaaa" << std::endl;
+                polygon.outer().push_back(point_t(mean_x,mean_y));
+            } else {
+                polygon.outer().push_back(point_t(x,y));
+            }
         }
         polygon.outer().push_back(polygon.outer().at(0));
         return polygon;
@@ -514,29 +528,32 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
         }
 
-        piece_lines = sortLines(piece_lines);
+        auto tmp = std::move(sortLines(piece_lines));
+        piece_lines.clear();
+        piece_lines = std::move(tmp);
 
         if (frame_flag == true){
+            {
+                //謎の長さtoセンチメートル
+                //scaleを頑張って測る
+                //コードが最高にキモい
+                const cv::Vec4f start_line = piece_lines.at(0);
+                auto func = [&](cv::Vec4f line1,cv::Vec4f line2)->double {
+                    const double line1_distance = calcDistance(start_line[0],start_line[1],line1[2],line1[3]);
+                    const double line2_distance = calcDistance(start_line[0],start_line[1],line2[2],line2[3]);
+                    return line1_distance < line2_distance;
+                };
+                auto end_line = *(std::min_element(piece_lines.begin(),piece_lines.end(),func));
+                double sum = 0;
+                for (auto line : piece_lines) {
+                    sum += calcDistance(line[0],line[1],line[2],line[3]);
+                    if (line == end_line) break;    //キモい
+                }
+                scale = 30 * 4 / sum;
+            }
 
             std::vector<std::vector<cv::Vec4f>> rings;
             std::vector<cv::Vec4f> ring;
-
-            //謎の長さtoセンチメートル
-            //scaleを頑張って測る
-            //コードが最高にキモい
-            const cv::Vec4f start_line = piece_lines.at(0);
-            auto func = [&](cv::Vec4f line1,cv::Vec4f line2)->double {
-                const double line1_distance = calcDistance(start_line[0],start_line[1],line1[2],line1[3]);
-                const double line2_distance = calcDistance(start_line[0],start_line[1],line2[2],line2[3]);
-                return line1_distance < line2_distance;
-            };
-            auto end_line = *(std::min_element(piece_lines.begin(),piece_lines.end(),func));
-            double sum = 0;
-            for (auto line : piece_lines) {
-                sum += calcDistance(line[0],line[1],line[2],line[3]);
-                if (line == end_line) break;    //キモい
-            }
-            scale =  30 * 4 / sum;
 
             polygon_t outer_polygon,inner_polygon,frame_polygon;
 
@@ -600,6 +617,9 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         std::cout << "piece" << bg::dsv(po) << std::endl;
     }*/
     //std::cout << "frame" << bg::dsv(polygons.at(0)) << std::endl;
+    procon::ExpandedPolygon po;
+    po.resetPolygonForce(polygons.at(0));
+    PolygonViewer::getInstance().pushPolygon(po,"hoge",-1);
     return std::move(polygons);
 }
 

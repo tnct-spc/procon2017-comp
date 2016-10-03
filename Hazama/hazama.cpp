@@ -65,7 +65,7 @@ void Hazama::emitAnswer(procon::Field field)
 
     //Display answer
     board->setField(best_answer);
-    //PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
+    PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
     //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }
 
@@ -140,6 +140,8 @@ void Hazama::run()
 
     std::string frame_path = "./../../procon2016-comp/sample/sample_frame_1.JPG";
     std::string pieces_path = "./../../procon2016-comp/sample/sample_pieces_1.JPG";
+    //std::string frame_path = "./../../procon2016-comp/sample/mirrorless_frame_ver2.JPG";
+    //std::string pieces_path = "./../../procon2016-comp/sample/mirrorless_pieces_ver2.JPG";
     std::string path = "./../../procon2016-comp/sample/data.csv";
 
     /*Get puzzle data*/
