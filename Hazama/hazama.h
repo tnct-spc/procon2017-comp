@@ -8,6 +8,7 @@
 #include "imagerecognition.h"
 #include "polygonio.h"
 #include "solver.h"
+#include "threshold.h"
 
 namespace Ui {
 class Hazama;

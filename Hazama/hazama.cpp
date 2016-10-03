@@ -361,13 +361,13 @@ void Hazama::loadInIFile()
 void Hazama::thresholdGUIinit()
 {
     //set label
-    ui->label_1->setText("kido");
+    ui->label_1->setText("LSD Threhosld");
     ui->label_2->setText("kaiaiai");
     ui->label_3->setText("iikannzi");
     ui->label_4->setText("yabai");
 
     //set 上限,下限
-    ui->horizontalSlider_1->setRange(0,500);
+    ui->horizontalSlider_1->setRange(0,100);
     ui->horizontalSlider_2->setRange(0,500);
     ui->horizontalSlider_3->setRange(0,500);
     ui->horizontalSlider_4->setRange(0,500);
@@ -402,7 +402,7 @@ void Hazama::thresholdValueChanged()
 {
 
     //get value
-    int lcdNumber_1_value = ui->horizontalSlider_1->value();
+    double lcdNumber_1_value = static_cast<double>(ui->horizontalSlider_1->value()) / 100;
     int lcdNumber_2_value = ui->horizontalSlider_2->value();
     int lcdNumber_3_value = ui->horizontalSlider_3->value();
     int lcdNumber_4_value = ui->horizontalSlider_4->value();
@@ -421,6 +421,9 @@ void Hazama::clickedApply_1_Button()
 
     //threshold::test_threshold_san = 99999;
     std::cout << "clicked_1_button" << std::endl;
+    threshold::LSDthrehold = static_cast<double>(ui->horizontalSlider_1->value()) /100;
+    //
+    std::cout << "LSDthrehold set to " << threshold::LSDthrehold << std::endl;
 
 }
 
