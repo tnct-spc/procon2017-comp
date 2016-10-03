@@ -201,10 +201,12 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         font.setPointSize(std::abs(getScale()/(SINGLE_MODE?5:15)));
         painter.setFont(font);
         painter.drawText(display_pos, QString::number(field->evaluation));
+
         //draw frame-jointed pieces number
-        int cnt = 1;
+        const int max_len = 10;
+        int cnt = 0;
         for(auto piece : field->getFrame().getJointedPieces()){
-            QPointF display_pos = getPosition(QPointF(27/frame_size,(3*cnt)/frame_size), Space::LEFT);
+            QPointF display_pos = getPosition(QPointF((27+3*(cnt/max_len))/frame_size,(3*(cnt%max_len))/frame_size), Space::LEFT);
             painter.drawText(display_pos, QString::number(piece.getId()));
             cnt++;
         }
