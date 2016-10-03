@@ -18,11 +18,11 @@ void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
 #ifndef NO_PARALLEL
-    beam_width = 1000;
+    beam_width = 100;
 #else
     beam_width = 100;
 #endif
-    variety_width = 200;
+    variety_width = 20;
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -111,46 +111,68 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             }
         }
     };
-    constexpr int coefficient = 1;
-    int const width = beam_width * coefficient < static_cast<int>(evaluations.size()) ? beam_width * coefficient : static_cast<int>(evaluations.size());
+    //過剰生産倍率
+    //constexpr double size_weight = 1.2;
+    //限界サイズ
+    const int limit = static_cast<int>(evaluations.size());
 
 #ifndef NO_PARALLEL
-    /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
-    parallel.generateThreads(makeField,cpu_num,0,width);
-    /**スレッド終わるの待ち**/
-    parallel.joinThreads();
+    //マルチスレッド
+    int i;
+    for (i = 1;static_cast<int>(next_field_vec.size()) < beam_width;i++) {
+        if (i * beam_width > limit) {
+            parallel.generateThreads(makeField,cpu_num,(i - 1) * beam_width,limit);
+            parallel.joinThreads();
+            return next_field_vec;
+        } else {
+            parallel.generateThreads(makeField,cpu_num,(i - 1) * beam_width,i * beam_width);
+            parallel.joinThreads();
+        }
+
+        //重複しているfieldの除去
+        removeDuplicateField(next_field_vec);
+    }
 #else
-    makeField(0,width);
+    makeField(0,limit);
 #endif
 
 #ifndef NO_PARALLEL
-    if (static_cast<int>(evaluations.size()) - beam_width * coefficient > variety_width) {
-        auto makeRandomVector = [&](unsigned int num)->std::vector<int>{
+
+    if (static_cast<int>(next_field_vec.size()) > beam_width) next_field_vec.resize(beam_width);
+
+    if (limit - (i - 1) *  beam_width > variety_width) {
+        auto makeRandomVector = [&](int start,int end){
             std::vector<int> random_vec;
             std::random_device rd;
             std::mt19937 mt(rd());
-            std::uniform_int_distribution<int> variety(beam_width * coefficient,static_cast<int>(evaluations.size()));
-            random_vec.reserve(num * 2);
-            while (random_vec.size() < num) {
-                for (unsigned int roop = 0;roop < num * 2;roop++) {
-                    random_vec.push_back(variety(mt));
-                }
-                std::sort(random_vec.begin(),random_vec.end());
-                random_vec.erase(std::unique(random_vec.begin(),random_vec.end()),random_vec.end());
+            int last = end - 1;
+            for (int i = start;i < end;i++){
+                random_vec.emplace_back(i);
+            }
+            for (int i = end;i < start;i++){
+                std::uniform_int_distribution<int> variety(start,end);
+                std::swap(random_vec.at(variety(mt)),random_vec.at(end - 1));
             }
             return random_vec;
         };
-        std::vector<int> random_vec = std::move(makeRandomVector(variety_width));
-        std::vector<std::thread> threads;
-        for (int i = 0;i < variety_width;i++) {
-            std::thread thread(makeField,random_vec.at(i),random_vec.at(i) + 1);
-            threads.emplace_back(std::move(thread));
-        }
-        for (int i = 0;i < variety_width;i++) {
-            threads.at(i).join();
+
+        std::vector<int> random_vec = std::move(makeRandomVector((i - 1) * beam_width,limit));
+        int falut = 0;
+        while (static_cast<int>(next_field_vec.size()) < beam_width + variety_width) {
+            std::vector<std::thread> threads;
+            for (int i = 0;i < variety_width;i++) {
+                std::thread thread(makeField,random_vec.at(i + falut),random_vec.at(i + falut) + 1);
+                threads.emplace_back(std::move(thread));
+            }
+            for (int i = 0;i < variety_width;i++) {
+                threads.at(i).join();
+            }
+            falut += variety_width;
         }
     }
 #endif
+
+    if (static_cast<int>(next_field_vec.size()) > beam_width + variety_width) next_field_vec.resize(beam_width + variety_width);
 
     return next_field_vec;
 
@@ -170,6 +192,7 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
 
 bool BeamSearch::removeDuplicateField(std::vector<procon::Field> & field_vec)
 {
+    if (field_vec.size() == 0) return false;
     auto poor_unique_move = [&](std::vector<procon::Field>::iterator begin,std::vector<procon::Field>::iterator end)
     {
         //*おおっと*線形*つらい*
@@ -217,6 +240,7 @@ void BeamSearch::run(procon::Field field)
 
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
+
         //それより先がなければその1手前の最高評価値のフィールドを返す
         if (evaluations.empty()){
             submitAnswer(buckup_field);
@@ -225,12 +249,6 @@ void BeamSearch::run(procon::Field field)
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
-        if(field_vec.empty()){
-            submitAnswer(buckup_field);
-            return;
-        }
-
-        removeDuplicateField(field_vec);
 
         //return field_vec[0];
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
