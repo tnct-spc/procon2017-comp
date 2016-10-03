@@ -65,7 +65,7 @@ void Hazama::emitAnswer(procon::Field field)
 
     //Display answer
     board->setField(best_answer);
-    //PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
+    PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
     //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }
 
