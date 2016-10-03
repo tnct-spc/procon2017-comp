@@ -37,8 +37,7 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
 
             // 一致する場所の開始を探して、終了まで探索する
 
-            auto calcSameShape = [&](int p1_pos, int p2_pos, Fit::DotORLine dot_or_line){
-                int Eva = 1;
+            auto calcSameShape = [&](int p1_pos, int p2_pos, Fit::DotORLine dot_or_line, int Eva){
                 std::array<Fit, 2> fits;
 
                 fits.at(0).frame_inner_pos = polygon1.getInnerSize() != 0 ? p1_inner_cnt : -1;
@@ -149,10 +148,14 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
                     if(p1_pos == polygon1_size) p1_pos = 0;
                     p2_pos = j;
                     if(isMatchAngle(polygon1_angles[p1_pos], polygon2_angles[p2_pos], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0)){
-                        calcSameShape(p1_pos, p2_pos, Fit::Dot);
+                        int Eva;
+                        Eva++;
+                        calcSameShape(p1_pos, p2_pos, Fit::Dot, Eva);
                     }
                     if(isMatchLength(polygon1_lengths[p1_pos], polygon2_lengths[p2_pos == 0 ? polygon2_size-1 : p2_pos-1])){
-                        calcSameShape(p1_pos, p2_pos == 0 ? polygon2_size-1 : p2_pos-1, Fit::Line);
+                        int Eva;
+                        Eva++;
+                        calcSameShape(p1_pos, p2_pos == 0 ? polygon2_size-1 : p2_pos-1, Fit::Line, Eva);
                     }
                 }
             }

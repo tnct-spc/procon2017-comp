@@ -1,5 +1,6 @@
 #include "beamsearch.h"
 #include "field.h"
+#include "fit.h"
 #include "Utils/evaluation.h"
 #include "Utils/polygonconnector.h"
 #include <mutex>
@@ -217,6 +218,31 @@ void BeamSearch::run(procon::Field field)
 
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
+
+
+        //hyouka ti wo keisan surude-!!!
+        for(unsigned int l = 0; l <  evaluations.size(); l++){
+            //gizi fit
+            double sum = 0.000;
+            int counter = 0;
+            Evaluation eva;
+
+
+            for(unsigned int k = evaluations.at(l).fits.at(1).start_id + 1; k < evaluations.at(l).fits.at(1).end_id; k++){
+
+                const double angle = field_vec.at(evaluations.at(l).vector_id).getElementaryPieces().at(evaluations.at(l).piece_id).getSideAngle().at(k);
+                sum += this->angle_frequency.at(static_cast<int>( ( angle / resolution) * ( 180 / 3.141592)));
+
+                ++counter;
+            }
+            if(!(counter == 0)){
+
+                evaluations.at(l).evaluation += ((sum / counter));
+
+                double t = (0.00005*(sum / counter));
+            }
+        }
+
         //それより先がなければその1手前の最高評価値のフィールドを返す
         if (evaluations.empty()){
             submitAnswer(buckup_field);
