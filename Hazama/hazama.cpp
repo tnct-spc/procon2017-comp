@@ -90,16 +90,15 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
         obj.push_back(Point3f(j/horizonalCrossCount, j%horizonalCrossCount, 0.0f));
     }
 
-    for(unsigned int i=1; i<numberOfImages; i++) {
+    for(unsigned int i=0; i<numberOfImages; i++) {
 
         std::cout << "now:" << i << std::endl;
 
         char filename[128];
-        sprintf(filename, "../../procon2016-comp/calibration/%d.jpg", i);
+        sprintf(filename, "../../procon2016-comp/picture/cal/pic%d.JPG", i);
         Mat frame = imread(filename);
         Mat gray;
 
-        flip(frame, frame, -1);
         cvtColor(frame, gray, CV_BGR2GRAY);
 
         // 10-7 チェスを探す
@@ -111,10 +110,6 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
             cornerSubPix(gray, centers, Size(11,11), Size(-1,-1), TermCriteria (TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1));
             object_points.push_back(obj);
             image_points.push_back(centers);
-
-            // draw
-            drawChessboardCorners(gray, chessboardPatterns, Mat(centers), true);
-            imshow("debugWindow", gray);
 
         } else {
             cout << "not found" << endl;
@@ -136,12 +131,41 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
 void Hazama::run()
 {
     //When you want to calibrate webcamera,please comment out this line!!!
-    //makeCalibrationData("./../../procon2016-comp/calibration/calibration.yml",24);
+    //makeCalibrationData("./../../procon2016-comp/picture/cal/calibration.yml",5);
+
+    const std::string calibration_data_file_path = "./../../procon2016-comp/picture/cal/calibration.yml";
+    static bool init_calibration_flag = false;
+
+    static cv::Mat mtx,dist;
+
+    //init
+    if(!init_calibration_flag){
+        init_calibration_flag = true;
+
+        cv::FileStorage fs(calibration_data_file_path, cv::FileStorage::READ);
+        fs["mtx"] >> mtx;
+        fs["dist"] >> dist;
+        fs.release();
+    }
+
+    cv::Mat src;
+    src = cv::imread("./../../procon2016-comp/sample/mirrorless_npieces.JPG", 1);
+
+
+    //calibrate
+    cv::Mat calibration_src;
+    cv::undistort(src, calibration_src, mtx, dist);
+
+    //cv::namedWindow("pic",cv::WINDOW_NORMAL);
+    //cv::imshow("pic",calibration_src);
+    //cv::namedWindow("rpic",cv::WINDOW_NORMAL);
+    //cv::imshow("rpic",src);
+    //cv::waitKey(0);
 
 
     std::cout << "Run" << std::endl;
 
-    std::string frame_path = "./../../procon2016-comp/sample/mirrorless_nframe.JPG";
+    std::string frame_path = "./../../procon2016-comp/sample/mirrorless_nframe_2.JPG";
 
     //disable threshold UI
     disableThresholdUI();
@@ -201,6 +225,12 @@ void Hazama::run()
         return;
     }
 
+    int cnt=0;
+    for(procon::ExpandedPolygon a:PDATA.getElementaryPieces()){
+        std::cout<<cnt<<a.getSize()<<std::endl;
+        cnt++;
+    }
+
     // Hide HAZAMA
     this->showMinimized();
 
@@ -243,7 +273,7 @@ void Hazama::run()
 
 cv::Mat Hazama::capture(int deviceNumber)
 {
-    const std::string calibration_data_file_path = "./../../procon2016-comp/calibration/calibration.yml";
+    const std::string calibration_data_file_path = "./../../procon2016-comp/picture/cal/calibration.yml";
     static bool init_calibration_flag = false;
 
     static cv::Mat mtx,dist;

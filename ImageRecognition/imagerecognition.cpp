@@ -27,10 +27,10 @@ void ImageRecognition::threshold(cv::Mat& image)
     //resize
     image = cv::Mat(image,cv::Rect(0,500,2664,3300));
 
-    /*
+
     cv::namedWindow("capture",cv::WINDOW_NORMAL);
     cv::imshow("capture",image);
-    */
+
 
 
     /* kido
@@ -104,14 +104,13 @@ void ImageRecognition::threshold(cv::Mat& image)
     //syn
     cv::bitwise_and(normal_area,koge_area,image);
 
-    /*
     cv::namedWindow("capturerer",cv::WINDOW_NORMAL);
     cv::imshow("capturerer",image);
-    cv::namedWindow("capturer",cv::WINDOW_NORMAL);
-    cv::imshow("capturer",normal_area);
-    cv::namedWindow("capturern",cv::WINDOW_NORMAL);
-    cv::imshow("capturern",koge_area);
-    */
+    //cv::namedWindow("capturer",cv::WINDOW_NORMAL);
+    //cv::imshow("capturer",normal_area);
+    //cv::namedWindow("capturern",cv::WINDOW_NORMAL);
+    //cv::imshow("capturern",koge_area);
+
 }
 
 cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
@@ -306,16 +305,16 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         pieces_lines.push_back(std::vector<cv::Vec4f>());
 
         //LSD直線検出 引数の"scale"が重要！！！
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.40);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.45);
         lsd->detect(image, pieces_lines[count]);
 
         //描画
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
-        //if (count + 1 == 14) {
-        //    cv::namedWindow(std::to_string(count+1),CV_WINDOW_NORMAL);
-        //    cv::imshow(std::to_string(count+1), pic);
-        //}
+        if (1==1 || count + 1 == 14) {
+            cv::namedWindow(std::to_string(count+1));
+            cv::imshow(std::to_string(count+1), pic);
+        }
         count++;
     }
 
