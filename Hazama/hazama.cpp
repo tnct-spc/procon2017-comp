@@ -54,7 +54,7 @@ void Hazama::acceptAnswer(QString file_path)
 
 void Hazama::emitAnswer(procon::Field field)
 {
-    if(first_answer_flag){
+    if(!ui->isKeepBestAnswerMode->isChecked() || first_answer_flag){
         first_answer_flag = false;
         best_answer = field;
     }else{

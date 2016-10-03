@@ -268,7 +268,7 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
             this->update();
             break;
         default:
-            std::cout<<"Press Key : "<<event->key()<<std::endl;
+            //std::cout<<"Press Key : "<<event->key()<<std::endl;
             break;
     }
 }
@@ -280,15 +280,11 @@ void AnswerBoard::mousePressEvent(QMouseEvent *event)
 #include <QMouseEvent>
 void AnswerBoard::printBigWindow(QMouseEvent *event)
 {
-    std::cout << "clicked" << std::endl;
-
     //emit clicked_with_id(id);
 
     //AnswerBoard ans;
 
     int mousebutton = event->buttons();
-
-    std::cout << mousebutton << std::endl;
 
     if(SINGLE_MODE){
 

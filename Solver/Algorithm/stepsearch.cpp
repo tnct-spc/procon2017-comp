@@ -115,35 +115,20 @@ void StepSearch::run(procon::Field field)
 
     field.setFrame(field.getElementaryFrame());
     field_vec.push_back(field);
-    procon::Field buckup_field;
 
     //ピースが全部置かれたら終了
     //このiは添字として使ってるわけではない（ただの回数ルーブ）
-    for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++){
+    while(1){
         evaluations.clear();
 
         //最小角計算
-        for (int j = 0;j < static_cast<int>(field_vec.size());j++){
-            field_vec.at(j).calcMinAngleSide();
-        }
+        for (auto& field : field_vec) field.calcMinAngleSide();
 
-        buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
-        //それより先がなければその1手前の最高評価値のフィールドを返す
-        if (evaluations.empty()){
-            submitAnswer(buckup_field);
-            return;
-        }
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
-        field_vec = std::move(this->makeNextField(evaluations,field_vec));
-        //return field_vec[0];
 
-        //結合できるものがなければその１手前の最高評価地のフィールドを返す
-        if(field_vec.empty()){
-            submitAnswer(buckup_field);
-            return;
-        }
+        field_vec = std::move(this->makeNextField(evaluations,field_vec));
 
         // Output Answer
         int cnt = 0;
@@ -152,7 +137,7 @@ void StepSearch::run(procon::Field field)
             DOCK->addAnswer(field);
             cnt++;
         }
-        submitAnswer(field_vec.at(0));
+        if(!field_vec.empty()) submitAnswer(field_vec.at(0));
         loop.exec();
     }
     return;
