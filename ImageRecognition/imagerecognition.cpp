@@ -28,8 +28,8 @@ void ImageRecognition::threshold(cv::Mat& image)
     image = cv::Mat(image,cv::Rect(500,0,3300,2664));
 
 
-    cv::namedWindow("capture",cv::WINDOW_NORMAL);
-    cv::imshow("capture",image);
+    //cv::namedWindow("capture",cv::WINDOW_NORMAL);
+    //cv::imshow("capture",image);
 
 
 
@@ -104,8 +104,8 @@ void ImageRecognition::threshold(cv::Mat& image)
     //syn
     cv::bitwise_and(normal_area,koge_area,image);
 
-    cv::namedWindow("capturerer",cv::WINDOW_NORMAL);
-    cv::imshow("capturerer",image);
+    //cv::namedWindow("capturerer",cv::WINDOW_NORMAL);
+    //cv::imshow("capturerer",image);
     //cv::namedWindow("capturer",cv::WINDOW_NORMAL);
     //cv::imshow("capturer",normal_area);
     //cv::namedWindow("capturern",cv::WINDOW_NORMAL);
@@ -311,10 +311,10 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         //描画
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
-        if (1==1 || count + 1 == 14) {
-            cv::namedWindow(std::to_string(count+1));
-            cv::imshow(std::to_string(count+1), pic);
-        }
+        //if (1==1 || count + 1 == 14) {
+        //    cv::namedWindow(std::to_string(count+1));
+        //    cv::imshow(std::to_string(count+1), pic);
+        //}
         count++;
     }
 
