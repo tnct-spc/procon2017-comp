@@ -40,6 +40,9 @@ void Hazama::init()
 
     QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
 
+    // Threshold
+    this->ui->horizontalSlider_1->setValue(threshold::LSDthrehold);
+
 }
 
 void Hazama::acceptAnswer(QString file_path)
