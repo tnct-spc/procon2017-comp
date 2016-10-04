@@ -31,13 +31,13 @@ void AlgorithmWrapper::run(procon::Field field)
 
 void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
 {
-    angle_frequency.resize(360 / resolution);
+    angle_frequency.resize(360 / angle_resolution);
     constexpr double to_deg = 180 / 3.1415926535;
     auto pieces = field.getElementaryPieces();
     for (auto piece : pieces) {
         auto angles = piece.getSideAngle();
         for (auto angle : angles) {
-            int num = static_cast<int>(angle * to_deg / resolution);
+            int num = static_cast<int>(angle * to_deg / angle_resolution);
             angle_frequency.at(num) += 1;
         }
     }
@@ -53,17 +53,18 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
     for (auto& angle : angle_frequency) {
         auto linerFunction = [&](double x)->double
         {
-            return ((ideal_max - ideal_min) / (real_min - real_max)) * (x - real_max) + ideal_min;
+            return ((angle_ideal_max - angle_ideal_min) / (real_min - real_max)) * (x - real_max) + angle_ideal_min;
         };
         auto exponentialFunction = [&](double x)->double
         {
-            return std::pow(base,-alpha * x) + beta;
+            return std::pow(angle_base,-angle_alpha * x) + angle_beta;
         };
 
         //angle = linerFunction(angle);
         angle = exponentialFunction(angle);
     }
 }
+
 
 std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece)
 {
@@ -92,7 +93,7 @@ std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::Exp
                     Evaluation eva;
                     eva.frame_id = k;
                     eva.fits = fits;
-                    eva.evaluation = bg::area(piece.getPolygon()) * angle_frequency.at((int)piece_first / resolution);
+                    eva.evaluation = bg::area(piece.getPolygon()) * angle_frequency.at((int)piece_first / angle_resolution);
                     evaluations.push_back(eva);
                 }
             }
