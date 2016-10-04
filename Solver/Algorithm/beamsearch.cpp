@@ -137,7 +137,6 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 #endif
 
 #ifndef NO_PARALLEL
-
     if (static_cast<int>(next_field_vec.size()) > beam_width) next_field_vec.resize(beam_width);
 
     if (limit - (i - 1) *  beam_width > variety_width) {
@@ -156,7 +155,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             return random_vec;
         };
 
-        std::vector<int> random_vec = std::move(makeRandomVector((i - 1) * beam_width,limit));
+        std::vector<int> random_vec = std::move(makeRandomVector((i - 1) * beam_width,limit + 1));
         int falut = 0;
         while (static_cast<int>(next_field_vec.size()) < beam_width + variety_width) {
             std::vector<std::thread> threads;
@@ -170,8 +169,8 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             falut += variety_width;
         }
     }
-#endif
 
+#endif
     if (static_cast<int>(next_field_vec.size()) > beam_width + variety_width) next_field_vec.resize(beam_width + variety_width);
 
     return next_field_vec;
