@@ -220,8 +220,12 @@ void BeamSearch::run(procon::Field field)
         this->evaluateNextMove(evaluations,field_vec);
 
 
-        //hyouka ti wo keisan surude-!!!
+        //hyouka ti wo keisan surude-!!! angle frequency
         for(unsigned int l = 0; l <  evaluations.size(); l++){
+
+
+
+
             //gizi fit
             double sum = 0.000;
             int counter = 0;
@@ -237,11 +241,17 @@ void BeamSearch::run(procon::Field field)
             }
             if(!(counter == 0)){
 
-                evaluations.at(l).evaluation += ((sum / counter));
+                std::cout << evaluations.at(l).evaluation << std::endl;
 
-                double t = (0.00005*(sum / counter));
+                evaluations.at(l).evaluation += (sum / counter);
+
+                double t = sum / counter;
+
+                std::cout << evaluations.at(l).evaluation << std::endl;
+                std::cout << t << std::endl;
             }
         }
+
 
         //それより先がなければその1手前の最高評価値のフィールドを返す
         if (evaluations.empty()){
