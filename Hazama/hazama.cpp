@@ -40,6 +40,9 @@ void Hazama::init()
 
     QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
 
+    // Threshold
+    this->ui->horizontalSlider_1->setValue(threshold::LSDthrehold);
+
 }
 
 void Hazama::acceptAnswer(QString file_path)
@@ -65,7 +68,7 @@ void Hazama::emitAnswer(procon::Field field)
 
     //Display answer
     board->setField(best_answer);
-    //PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
+    PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
     //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }
 
@@ -90,16 +93,15 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
         obj.push_back(Point3f(j/horizonalCrossCount, j%horizonalCrossCount, 0.0f));
     }
 
-    for(unsigned int i=1; i<numberOfImages; i++) {
+    for(unsigned int i=0; i<numberOfImages; i++) {
 
         std::cout << "now:" << i << std::endl;
 
         char filename[128];
-        sprintf(filename, "../../procon2016-comp/calibration/%d.jpg", i);
+        sprintf(filename, "../../procon2016-comp/picture/cal/pic%d.JPG", i);
         Mat frame = imread(filename);
         Mat gray;
 
-        flip(frame, frame, -1);
         cvtColor(frame, gray, CV_BGR2GRAY);
 
         // 10-7 チェスを探す
@@ -111,10 +113,6 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
             cornerSubPix(gray, centers, Size(11,11), Size(-1,-1), TermCriteria (TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1));
             object_points.push_back(obj);
             image_points.push_back(centers);
-
-            // draw
-            drawChessboardCorners(gray, chessboardPatterns, Mat(centers), true);
-            imshow("debugWindow", gray);
 
         } else {
             cout << "not found" << endl;
@@ -136,17 +134,17 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
 void Hazama::run()
 {
     //When you want to calibrate webcamera,please comment out this line!!!
-    //makeCalibrationData("./../../procon2016-comp/calibration/calibration.yml",24);
-
+    //makeCalibrationData("./../../procon2016-comp/picture/cal/calibration.yml",8);
 
     std::cout << "Run" << std::endl;
-
-    std::string frame_path = "./../../procon2016-comp/sample/mirrorless_nframe.JPG";
 
     //disable threshold UI
     disableThresholdUI();
 
-    std::string pieces_path = "./../../procon2016-comp/sample/mirrorless_npieces.JPG";
+    std::string frame_path = "./../../procon2016-comp/sample/sample_frame_1.JPG";
+    std::string pieces_path = "./../../procon2016-comp/sample/sample_pieces_1.JPG";
+    //std::string frame_path = "./../../procon2016-comp/sample/mirrorless_frame_ver2.JPG";
+    //std::string pieces_path = "./../../procon2016-comp/sample/mirrorless_pieces_ver2.JPG";
     std::string path = "./../../procon2016-comp/sample/data.csv";
 
     /*Get puzzle data*/
@@ -179,12 +177,18 @@ void Hazama::run()
 
         } else {
 
-            //環境によっては動かない
-            //std::string frame_path = QFileDialog::getOpenFileName(this,"input frame picture","./../../procon2016-comp/picture/").toStdString();
-            //std::string pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","./../../procon2016-comp/picture/").toStdString();
+            //read
+            cv::Mat nocframe = cv::imread(frame_path, 1);
+            cv::Mat nocpieces = cv::imread(pieces_path, 1);
 
-            raw_frame = cv::imread(frame_path, 1);
-            raw_pieces = cv::imread(pieces_path, 1);
+            //calibration
+            cv::Mat mtx,dist;
+            cv::FileStorage fs(calibration_data_file_path, cv::FileStorage::READ);
+            fs["mtx"] >> mtx;
+            fs["dist"] >> dist;
+            fs.release();
+            cv::undistort(nocframe, raw_frame, mtx, dist);
+            cv::undistort(nocpieces, raw_pieces, mtx, dist);
         }
 
         /*Image Recognition*/
@@ -199,6 +203,12 @@ void Hazama::run()
         PDATA = procon::PolygonIO::importPolygon(path);
     } else {
         return;
+    }
+
+    int cnt=0;
+    for(procon::ExpandedPolygon a:PDATA.getElementaryPieces()){
+        std::cout<<cnt<<a.getSize()<<std::endl;
+        cnt++;
     }
 
     // Hide HAZAMA
@@ -243,7 +253,6 @@ void Hazama::run()
 
 cv::Mat Hazama::capture(int deviceNumber)
 {
-    const std::string calibration_data_file_path = "./../../procon2016-comp/calibration/calibration.yml";
     static bool init_calibration_flag = false;
 
     static cv::Mat mtx,dist;
