@@ -20,6 +20,9 @@ public:
 
     static constexpr int resolution = 5;
 
+    static constexpr double alpha = 3;
+    static constexpr double base = 2.71;
+
     std::vector<double> angle_frequency;
 
     AlgorithmWrapper();

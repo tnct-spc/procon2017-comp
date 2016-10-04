@@ -55,8 +55,13 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
         {
             return ((ideal_max - ideal_min) / (real_min - real_max)) * (x - real_max) + ideal_min;
         };
+        auto exponentialFunction = [&](double x)->double
+        {
+            return alpha * std::pow(base,-alpha * x);
+        };
 
-        angle = linerFunction(angle);
+        //angle = linerFunction(angle);
+        angle = exponentialFunction(angle);
     }
 }
 
