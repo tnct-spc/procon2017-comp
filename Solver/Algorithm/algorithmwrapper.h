@@ -20,9 +20,9 @@ public:
     static constexpr double ideal_min = 0.1;
     static constexpr double ideal_max = 1.5;
     //exponential
-    static constexpr double alpha = 3;
-    static constexpr double beta = 0.2;
-    static constexpr double base = 2.71;
+    static constexpr double alpha = 1;
+    static constexpr double beta = 1;
+    static constexpr double base = 2;
 
     std::vector<double> angle_frequency;
 

@@ -239,31 +239,18 @@ void BeamSearch::run(procon::Field field)
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
 
-        //HEAD
-        //ユニークな角度の評価値を高める
-        for(unsigned int l = 0; l <  evaluations.size(); l++){
-
-            //擬似fit
-            double sum = 0.000;
-            int counter = 0;
-            Evaluation eva;
-
-            for(unsigned int k = evaluations.at(l).fits.at(1).start_id + 1; k < evaluations.at(l).fits.at(1).end_id; k++){
-
-                const double angle = field_vec.at(evaluations.at(l).vector_id).getElementaryPieces().at(evaluations.at(l).piece_id).getSideAngle().at(k);
-                constexpr double to_deg = 180 / 3.141592;
-                sum += this->angle_frequency.at(static_cast<int>( ( angle / resolution) * to_deg));
-                ++counter;
+        for(Evaluation & evaluation: evaluations) {
+            double max = this->beta;
+            //at(1)なのはピース側のため
+            for(int k = evaluation.fits.at(1).start_id; k < evaluation.fits.at(1).end_id + 1; k++){
+                const double angle = field_vec.at(evaluation.vector_id).getElementaryPieces().at(evaluation.piece_id).getSideAngle().at(k);
+                constexpr double to_deg = 180 / 3.141592653589;
+                double tmp = this->angle_frequency.at(static_cast<int>((angle / resolution) * to_deg));
+                if (tmp > max) max = tmp;
             }
-            if(counter != 0){
-                //平均
-                evaluations.at(l).evaluation += (sum / counter);
-            }
-        }
+            evaluation.evaluation *= max;
+        }        //それより先がなければその1手前の最高評価値のフィールドを返す
 
-
-        //feature/BeamAlgoWithAngleFrequency
-        //それより先がなければその1手前の最高評価値のフィールドを返す
         if (evaluations.empty()){
             submitAnswer(buckup_field);
             return;
