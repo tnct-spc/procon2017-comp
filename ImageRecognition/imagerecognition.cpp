@@ -626,7 +626,7 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
             }
             translateX = minX;
             translateY = minY;
-        }else{
+        } else {
             //中心が(0,0)になるように移動
             /*
             double sumX=0.0,sumY=0.0;
@@ -649,6 +649,31 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
         bg::strategy::transform::scale_transformer<double, 2, 2> reduction(scale);
         bg::transform(translated_polygon,polygon,reduction);
         bg::reverse(polygon);
+
+        auto repairCutting = [&](polygon_t & polygon){
+            constexpr double cutting_allowance = 0.1;
+            auto enlargePoint = [&](point_t & point){
+                const double delta_x = (cutting_allowance * point.x()) / (std::sqrt(std::pow(point.x(),2) + std::pow(point.y(),2)));
+                double delta_y = 0;
+                if (delta_x != 0) {
+                    delta_y = (point.y() / point.x()) * delta_x;
+                } else {
+                    delta_y = cutting_allowance;
+                }
+                point.set<0>(point.x() + delta_x);
+                point.set<1>(point.y() + delta_y);
+
+            };
+            for (auto& inner : polygon.inners()) {
+                for (auto& point : inner) {
+                    enlargePoint(point);
+                }
+            }
+            for (auto &point : polygon.outer()) {
+                enlargePoint(point);
+            }
+        };repairCutting(polygon);
+
         if (frame_flag){
             ex_frame.resetPolygonForce(polygon);
         } else {
