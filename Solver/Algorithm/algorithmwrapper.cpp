@@ -33,14 +33,12 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
 {
     angle_frequency.resize(360 / resolution);
     constexpr double to_deg = 180 / 3.1415926535;
-    int count = 0;
     auto pieces = field.getElementaryPieces();
     for (auto piece : pieces) {
         auto angles = piece.getSideAngle();
         for (auto angle : angles) {
-            int num = static_cast<int>(angle * to_deg / 5);
+            int num = static_cast<int>(angle * to_deg / resolution);
             angle_frequency.at(num) += 1;
-            count++;
         }
     }
     for (auto& angle : angle_frequency) {
