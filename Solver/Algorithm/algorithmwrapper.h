@@ -15,10 +15,14 @@ public:
     static constexpr double length_error = 0.05; // 単位CM
     static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
 
+    static constexpr int resolution = 5;
+    //liner
     static constexpr double ideal_min = 0.1;
     static constexpr double ideal_max = 1.5;
-
-    static constexpr int resolution = 5;
+    //exponential
+    static constexpr double alpha = 3;
+    static constexpr double beta = 0.2;
+    static constexpr double base = 2.71;
 
     std::vector<double> angle_frequency;
 

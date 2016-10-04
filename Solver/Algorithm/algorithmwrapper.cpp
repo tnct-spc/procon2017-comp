@@ -33,14 +33,12 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
 {
     angle_frequency.resize(360 / resolution);
     constexpr double to_deg = 180 / 3.1415926535;
-    int count = 0;
     auto pieces = field.getElementaryPieces();
     for (auto piece : pieces) {
         auto angles = piece.getSideAngle();
         for (auto angle : angles) {
-            int num = static_cast<int>(angle * to_deg / 5);
+            int num = static_cast<int>(angle * to_deg / resolution);
             angle_frequency.at(num) += 1;
-            count++;
         }
     }
     for (auto& angle : angle_frequency) {
@@ -57,8 +55,13 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
         {
             return ((ideal_max - ideal_min) / (real_min - real_max)) * (x - real_max) + ideal_min;
         };
+        auto exponentialFunction = [&](double x)->double
+        {
+            return std::pow(base,-alpha * x) + beta;
+        };
 
-        angle = linerFunction(angle);
+        //angle = linerFunction(angle);
+        angle = exponentialFunction(angle);
     }
 }
 
