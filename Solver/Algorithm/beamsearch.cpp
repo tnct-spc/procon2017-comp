@@ -240,10 +240,10 @@ void BeamSearch::run(procon::Field field)
         this->evaluateNextMove(evaluations,field_vec);
 
         //HEAD
-        //hyouka ti wo keisan surude-!!! angle frequency
+        //ユニークな角度の評価値を高める
         for(unsigned int l = 0; l <  evaluations.size(); l++){
 
-            //gizi fit
+            //擬似fit
             double sum = 0.000;
             int counter = 0;
             Evaluation eva;
@@ -251,20 +251,13 @@ void BeamSearch::run(procon::Field field)
             for(unsigned int k = evaluations.at(l).fits.at(1).start_id + 1; k < evaluations.at(l).fits.at(1).end_id; k++){
 
                 const double angle = field_vec.at(evaluations.at(l).vector_id).getElementaryPieces().at(evaluations.at(l).piece_id).getSideAngle().at(k);
-                sum += this->angle_frequency.at(static_cast<int>( ( angle / resolution) * ( 180 / 3.141592)));
-
+                constexpr double to_deg = 180 / 3.141592;
+                sum += this->angle_frequency.at(static_cast<int>( ( angle / resolution) * to_deg));
                 ++counter;
             }
-            if(!(counter == 0)){
-
-                std::cout << evaluations.at(l).evaluation << std::endl;
-
+            if(counter != 0){
+                //平均
                 evaluations.at(l).evaluation += (sum / counter);
-
-                double t = sum / counter;
-
-                std::cout << evaluations.at(l).evaluation << std::endl;
-                std::cout << t << std::endl;
             }
         }
 
