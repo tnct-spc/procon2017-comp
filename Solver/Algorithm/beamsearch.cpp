@@ -144,7 +144,6 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             std::vector<int> random_vec;
             std::random_device rd;
             std::mt19937 mt(rd());
-            int last = end - 1;
             for (int i = start;i < end;i++){
                 random_vec.emplace_back(i);
             }
