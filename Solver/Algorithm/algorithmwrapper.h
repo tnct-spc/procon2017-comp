@@ -18,6 +18,7 @@ public:
     std::vector<double> angle_frequency;
     std::vector<double> length_frequency;
 
+    //angle-Frequency
     static constexpr int angle_resolution = 5;
     //liner
     static constexpr double angle_ideal_min = 0.1;
@@ -27,10 +28,12 @@ public:
     static constexpr double angle_beta = 1;
     static constexpr double angle_base = 2;
 
-    static constexpr double length_resolution = 0.5;
+    //length-Frequency
+    static constexpr double length_resolution = 1;
     static constexpr double length_alpha = 1;
     static constexpr double length_beta = 1;
     static constexpr double length_base = 2;
+
     AlgorithmWrapper();
     virtual ~AlgorithmWrapper() = default;
 
@@ -46,6 +49,8 @@ public:
     std::vector<Evaluation> evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
     std::vector<Evaluation> evaluateCombinationByLength(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
 
+    double evaluateUniqueAngle(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
+    double evaluateUniqueLength(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     typedef struct PieceAssesment{
         //評価値
         int EvaluationValue;
