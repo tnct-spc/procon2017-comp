@@ -66,7 +66,7 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
 
 void AlgorithmWrapper::calcLengthFrequency(procon::Field field)
 {
-    length_frequency.resize(360 / length_resolution);
+    length_frequency.resize(30 / length_resolution);
     auto & pieces = field.getElementaryPieces();
     for (auto& piece : pieces) {
         auto lengths = piece.getSideLength();
@@ -164,7 +164,20 @@ double AlgorithmWrapper::evaluateUniqueAngle(Evaluation const& evaluation,std::v
 
 double AlgorithmWrapper::evaluateUniqueLength(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec)
 {
-
+    double max = this->length_beta;
+    //at(1)なのはピース側のため
+    double const& start_id =
+        evaluation.fits.at(1).start_dot_or_line == Fit::Dot
+        ? evaluation.fits.at(1).start_id + 1
+        : evaluation.fits.at(1).start_id;
+    double const& end_id = evaluation.fits.at(1).end_id;
+    procon::ExpandedPolygon const& piece = field_vec.at(evaluation.vector_id).getElementaryPieces().at(evaluation.piece_id);
+    for(int i = start_id; i < end_id + 1; i++){
+        const double length = piece.getSideLength().at(i);
+        double tmp = this->length_frequency.at(static_cast<int>((length / length_resolution)));
+        if (tmp > max) max = tmp;
+    }
+    return max;
 }
 
 AlgorithmWrapper::AlgorithmWrapper()

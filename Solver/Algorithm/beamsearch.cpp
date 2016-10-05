@@ -242,6 +242,7 @@ void BeamSearch::run(procon::Field field)
 
         for(Evaluation & evaluation: evaluations) {
             evaluation.evaluation += this->evaluateUniqueAngle(evaluation,field_vec);
+            evaluation.evaluation += this->evaluateUniqueLength(evaluation,field_vec);
         }
 
         if (evaluations.empty()){
