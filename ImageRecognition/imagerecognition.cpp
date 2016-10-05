@@ -669,19 +669,18 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
         bg::transform(translated_polygon,polygon,reduction);
         bg::reverse(polygon);
 
-        auto repairCutting = [&](polygon_t & polygon){
+        auto repairCutting = [&](polygon_t & polygon)
+        {
             constexpr double cutting_allowance = 0.1;
             auto enlargePoint = [&](point_t & point){
-                const double delta_x = (cutting_allowance * point.x()) / (std::sqrt(std::pow(point.x(),2) + std::pow(point.y(),2)));
-                double delta_y = 0;
-                if (delta_x != 0) {
-                    delta_y = (point.y() / point.x()) * delta_x;
-                } else {
-                    delta_y = cutting_allowance;
-                }
-                point.set<0>(point.x() + delta_x);
-                point.set<1>(point.y() + delta_y);
-
+                auto isMinus= [&](double const& a)->double
+                {
+                    return a < 0 ? -1 : 1;
+                };
+                const double x = isMinus(point.x()) * cutting_allowance + point.x();
+                const double y = isMinus(point.y()) * cutting_allowance + point.y();
+                point.set<0>(x);
+                point.set<1>(y);
             };
             for (auto& inner : polygon.inners()) {
                 for (auto& point : inner) {
