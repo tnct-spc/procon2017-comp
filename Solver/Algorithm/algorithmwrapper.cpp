@@ -147,9 +147,12 @@ double AlgorithmWrapper::evaluateUniqueAngle(Evaluation const& evaluation,std::v
 {
     double max = this->angle_beta;
     //at(1)なのはピース側のため
-    for(int k = evaluation.fits.at(1).start_id; k < evaluation.fits.at(1).end_id + 1; k++){
-        const double angle = field_vec.at(evaluation.vector_id).getElementaryPieces().at(evaluation.piece_id).getSideAngle().at(k);
-        constexpr double to_deg = 180 / 3.141592653589;
+    double const& start_id = evaluation.fits.at(1).start_id;
+    double const& end_id = evaluation.fits.at(1).end_id;
+    procon::ExpandedPolygon const& piece = field_vec.at(evaluation.vector_id).getElementaryPieces().at(evaluation.piece_id);
+    constexpr double to_deg = 180 / 3.141592653589;
+    for(int i = start_id; i < end_id + 1; i++){
+        const double angle = piece.getSideAngle().at(1);
         double tmp = this->angle_frequency.at(static_cast<int>((angle / angle_resolution) * to_deg));
         if (tmp > max) max = tmp;
     }
