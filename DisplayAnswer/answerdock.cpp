@@ -15,11 +15,11 @@ AnswerDock::AnswerDock(QWidget *parent) :
     ui(new Ui::AnswerDock)
 {
     ui->setupUi(this);
-    QImage image("../../procon2016-comp/yurikamome.jpg");
-    QGraphicsScene* scene = new QGraphicsScene();
-    QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-    scene->addItem(pic);
-    ui->Picture->setScene(scene);
+    //QImage image("../../procon2016-comp/yurikamome.jpg");
+    //QGraphicsScene* scene = new QGraphicsScene();
+    //QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+    //scene->addItem(pic);
+    //ui->Picture->setScene(scene);
 }
 
 AnswerDock::~AnswerDock()

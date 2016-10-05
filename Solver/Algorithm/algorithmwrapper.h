@@ -12,7 +12,7 @@ class AlgorithmWrapper : public QObject
     Q_OBJECT
 
 public:
-    static constexpr double length_error = 0.10; // 単位CM
+    static constexpr double length_error = 0.20; // 単位CM
     static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
 
     std::vector<double> angle_frequency;
