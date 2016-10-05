@@ -29,7 +29,8 @@ void AnswerBoard::setField(const procon::Field &field)
 
     print_field = field;
 
-    //add putid_list
+    //set putid_list
+    putid_list.clear();
     std::vector<procon::ExpandedPolygon> pieces = this->field->getFrame().getJointedPieces();
     std::sort(pieces.begin(),pieces.end(),[](procon::ExpandedPolygon const& rhs, procon::ExpandedPolygon const& lhs)->bool{
         const point_t r_center = bg::return_centroid<point_t>(rhs.getPolygon());
