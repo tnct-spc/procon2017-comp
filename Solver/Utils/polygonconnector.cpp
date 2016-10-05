@@ -129,43 +129,50 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     Ring new_ring;
     int count = complete_matching_end_pos_1 + 1;
     int Type = 1;
-
     double x,y;
-    do{
-        if (Type == 1) {
-            x = ring1[count%size1].x();
-            y = ring1[count%size1].y();
-            if (count % size1 == complete_matching_start_pos_1){
-                Type = 2;
-                if (fit1.start_dot_or_line == Fit::Dot) { //dot_or_lineはどちらのポリゴンでも同じですね…仕様が変だ
-                    count = complete_matching_start_pos_2 + 1;
-                } else {
-                    count = complete_matching_start_pos_2;
-                }
-                if(fit1.start_dot_or_line == Fit::Line && fit1.is_start_straight == true){
-                    // Line is straight. Skip.
-                    count++;
-                }
-            }else{
-                count++;
-            }
+
+    // Frame Area
+    while(1){
+        x = ring1[count%size1].x();
+        y = ring1[count%size1].y();
+
+        if (count % size1 == complete_matching_start_pos_1){
+            break;
         }
-        if (Type == 2) {
-            x = ring2[count%size2].x();
-            y = ring2[count%size2].y();
-            if (count % size2 == (fit2.end_dot_or_line == Fit::Dot ? (((complete_matching_end_pos_2 - 1) % size2 + size2) % size2) : complete_matching_end_pos_2)) {
-                if(fit1.end_dot_or_line == Fit::Line && fit1.is_end_straight == true){
-                    // Line is straight. Skip.
-                    break;
-                }else{
-                    Type=-1;
-                }
-            }else{
-                count++;
-            }
-        }
+
         new_ring.push_back(point_t(x,y));
-    } while (Type != -1);
+        count++;
+    }
+
+    // Switch Area
+    if (fit1.start_dot_or_line == Fit::Dot) { //dot_or_lineはどちらのポリゴンでも同じですね…仕様が変だ
+        count = complete_matching_start_pos_2 + 1;
+    } else {
+        count = complete_matching_start_pos_2;
+    }
+    // Straight Check
+    if(fit1.start_dot_or_line == Fit::Line && fit1.is_start_straight == true){
+        // Line is straight. Skip.
+        count++;
+    }
+
+    // Frame & Piece Area
+    while(1){
+        x = ring2[count%size2].x();
+        y = ring2[count%size2].y();
+
+        if (count % size2 == (fit2.end_dot_or_line == Fit::Dot ? (((complete_matching_end_pos_2 - 1) % size2 + size2) % size2) : complete_matching_end_pos_2)) {
+            break;
+        }
+
+        new_ring.push_back(point_t(x,y));
+        count++;
+    }
+    if(fit1.end_dot_or_line == Fit::Line && fit1.is_end_straight == true){
+        // Line is straight. Skip.
+    }else{
+        new_ring.push_back(point_t(x,y));
+    }
 
 #ifdef DEBUG_RING
     debugRing(new_ring,__LINE__);
