@@ -2,6 +2,8 @@
 #include "ui_answerboard.h"
 #include "utilities.h"
 
+//#define GOSA_CHECK_MODE
+
 std::unique_ptr<QImage> AnswerBoard::pieces_pic;
 std::unique_ptr<std::vector<cv::Point>> AnswerBoard::pieces_pos;
 std::unique_ptr<std::vector<cv::Vec3b>> AnswerBoard::random_colors;
@@ -191,7 +193,10 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         }
 
         //draw frame-jointed pieces
-        for(auto piece : field->getFrame().getJointedPieces()){
+        for(procon::ExpandedPolygon piece : field->getFrame().getJointedPieces()){
+#ifdef GOSA_CHECK_MODE
+            piece.translatePolygon(30,0);
+#endif
             drawPiece(piece);
         }
 
@@ -215,7 +220,11 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     }
 
     //draw rawpic
+#ifdef GOSA_CHECK_MODE
+    if(0==0){
+#else
     if(!SINGLE_MODE && is_set_rawpic){
+#endif
         //draw pic
         double rawpic_height_margin = (1-((double)pieces_pic->height()/(double)pieces_pic->width()))/2;
         painter.drawImage(QRectF(getPosition(QPointF(0,rawpic_height_margin),RIGHT),getPosition(QPointF(1,1-rawpic_height_margin),RIGHT)), *pieces_pic);
