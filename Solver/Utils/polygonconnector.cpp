@@ -291,10 +291,10 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
 
     int ring1_pos = cmend1; //orange end zone
     if((ring1_pos+2)%size1 == cmstart1 && fit1.start_dot_or_line == Fit::Dot){
-        ring1_orange_end_zone = false;
+        //ring1_orange_end_zone = false;
         ring1_yello_start_zone = true;
     }else if((ring1_pos+1)%size1 == cmstart1 && fit1.start_dot_or_line == Fit::Line){
-        ring1_orange_end_zone = false;
+        //ring1_orange_end_zone = false;
         ring1_orange_start_zone = true;
     }
 
@@ -314,10 +314,10 @@ bool PolygonConnector::hasConflict(Ring ring1, Ring ring2, Fit fit1, Fit fit2)
 
         int ring2_pos = cmend2; //orange end zone
         if(((ring2_pos-2)%size2+size2)%size2 == cmstart2 && fit2.start_dot_or_line == Fit::Dot){
-            ring2_orange_end_zone = false;
+            //ring2_orange_end_zone = false;
             ring2_yello_start_zone = true;
         }else if(((ring2_pos-1)%size2+size2)%size2 == cmstart2 && fit2.start_dot_or_line == Fit::Line){
-            ring2_orange_end_zone = false;
+            //ring2_orange_end_zone = false;
             ring2_orange_start_zone = true;
         }
 
