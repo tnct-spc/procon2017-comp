@@ -23,9 +23,9 @@ public:
     BeamSearch();
     void run(procon::Field field);
 
-    double alpha = 5;
-    double beta = 3;
-    double gamma = 3;
+    double alpha = 3;
+    double beta = 0.5;
+    double gamma = 2;
 };
 
 
