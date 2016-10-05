@@ -2,7 +2,7 @@
 
 bool threshold::read_default_config_flag = false;
 
-double threshold::LSDthrehold = 0.5;
+double threshold::LSDthrehold = 0.30;
 
 threshold::threshold(/*QString config_file_path*/)
 {
