@@ -15,16 +15,24 @@ public:
     static constexpr double length_error = 0.10; // 単位CM
     static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
 
-    static constexpr int resolution = 5;
-    //liner
-    static constexpr double ideal_min = 0.1;
-    static constexpr double ideal_max = 1.5;
-    //exponential
-    static constexpr double alpha = 1;
-    static constexpr double beta = 1;
-    static constexpr double base = 2;
-
     std::vector<double> angle_frequency;
+    std::vector<double> length_frequency;
+
+    //angle-Frequency
+    static constexpr int angle_resolution = 5;
+    //liner
+    static constexpr double angle_ideal_min = 0.1;
+    static constexpr double angle_ideal_max = 1.5;
+    //exponential
+    static constexpr double angle_alpha = 1;
+    static constexpr double angle_beta = 1;
+    static constexpr double angle_base = 2;
+
+    //length-Frequency
+    static constexpr double length_resolution = 1;
+    static constexpr double length_alpha = 1;
+    static constexpr double length_beta = 1;
+    static constexpr double length_base = 2;
 
     AlgorithmWrapper();
     virtual ~AlgorithmWrapper() = default;
@@ -34,12 +42,15 @@ public:
     void init();
     virtual void run(procon::Field field);
     void calcAngleFrequency(procon::Field field);
+    void calcLengthFrequency(procon::Field field);
     void submitAnswer(procon::Field field);
 
     Fit fit1,fit2;
     std::vector<Evaluation> evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
     std::vector<Evaluation> evaluateCombinationByLength(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
 
+    double evaluateUniqueAngle(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
+    double evaluateUniqueLength(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     typedef struct PieceAssesment{
         //評価値
         int EvaluationValue;
