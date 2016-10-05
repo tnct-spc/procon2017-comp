@@ -141,8 +141,8 @@ void Hazama::run()
     //disable threshold UI
     disableThresholdUI();
 
-    std::string frame_path = "./../../procon2016-comp/sample/sample_frame_1.JPG";
-    std::string pieces_path = "./../../procon2016-comp/sample/sample_pieces_1.JPG";
+    std::string frame_path = ui->franeURL->text().toStdString();
+    std::string pieces_path = ui->pieceURL->text().toStdString();
     //std::string frame_path = "./../../procon2016-comp/sample/mirrorless_frame_ver2.JPG";
     //std::string pieces_path = "./../../procon2016-comp/sample/mirrorless_pieces_ver2.JPG";
     std::string path = "./../../procon2016-comp/sample/data.csv";
@@ -181,8 +181,8 @@ void Hazama::run()
 
             if(ui->selectImageData->isChecked()){
                 //環境によっては動かない
-                pieces_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
-                path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
+                frame_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
+                pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
             }
             cv::Mat nocframe = cv::imread(frame_path, 1);
             cv::Mat nocpieces = cv::imread(pieces_path, 1);

@@ -257,8 +257,8 @@
      <rect>
       <x>390</x>
       <y>40</y>
-      <width>162</width>
-      <height>121</height>
+      <width>167</width>
+      <height>132</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -333,7 +333,7 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>610</x>
       <y>170</y>
       <width>160</width>
       <height>80</height>
@@ -359,10 +359,10 @@
    <widget class="QWidget" name="verticalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>870</x>
-      <y>10</y>
+      <x>850</x>
+      <y>20</y>
       <width>351</width>
-      <height>521</height>
+      <height>71</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -378,6 +378,58 @@
      </item>
     </layout>
    </widget>
+   <widget class="QLineEdit" name="pieceURL">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>110</y>
+      <width>281</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>./../../procon2016-comp/sample/sample_pieces_1.JPG</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="franeURL">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>150</y>
+      <width>281</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>./../../procon2016-comp/sample/sample_frame_1.JPG</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>120</y>
+      <width>61</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Piece_URL</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>150</y>
+      <width>71</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frame_URL</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -385,7 +437,7 @@
      <x>0</x>
      <y>0</y>
      <width>1230</width>
-     <height>17</height>
+     <height>27</height>
     </rect>
    </property>
   </widget>
