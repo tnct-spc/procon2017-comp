@@ -91,15 +91,69 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     const int complete_matching_start_pos_2 = fit2.start_dot_or_line == Fit::Dot ? fit2.start_id : increment(fit2.start_id, size2);
     const int complete_matching_end_pos_2   = fit2.end_dot_or_line   == Fit::Dot ? fit2.end_id   : fit2.end_id                    ;
 
-    // 回転　Ring2を回転させる。このとき誤差が生じる。
-    const double x1 = ring1[complete_matching_start_pos_1].x() - ring1[increment(complete_matching_start_pos_1, size1)].x();
-    const double y1 = ring1[complete_matching_start_pos_1].y() - ring1[increment(complete_matching_start_pos_1, size1)].y();
-    const double x2 = ring2[complete_matching_start_pos_2].x() - ring2[decrement(complete_matching_start_pos_2, size2)].x();
-    const double y2 = ring2[complete_matching_start_pos_2].y() - ring2[decrement(complete_matching_start_pos_2, size2)].y();
-    const double degree2 = atan2(y2, x2);
-    const double degree1 = atan2(y1, x1);
-    const double rotate_radian = (degree1 - degree2);
-    piece.rotatePolygon(-rotate_radian*(360/(M_PI*2))); //rotate piece
+    // 回転　Ring2を回転させる。
+    bool first_radian = true;
+    double criteria_radian;
+    double result_radian;
+
+    double rotate_radian_average = 0.0;
+    int rotate_radian_count = 0;
+    if(fit1.start_dot_or_line == Fit::Dot){
+        const double x1 = ring1[Utilities::dec(complete_matching_start_pos_1,size1)].x() - ring1[complete_matching_start_pos_1].x();
+        const double y1 = ring1[Utilities::dec(complete_matching_start_pos_1,size1)].y() - ring1[complete_matching_start_pos_1].y();
+        const double x2 = ring2[Utilities::inc(complete_matching_start_pos_2,size2)].x() - ring2[complete_matching_start_pos_2].x();
+        const double y2 = ring2[Utilities::inc(complete_matching_start_pos_2,size2)].y() - ring2[complete_matching_start_pos_2].y();
+        const double degree2 = atan2(y2, x2);
+        const double degree1 = atan2(y1, x1);
+        double rotate_radian = (degree1 - degree2);
+        //std::cout<<"aaa"<<rotate_radian<<std::endl;
+        if(first_radian){
+            first_radian = false;
+            criteria_radian = rotate_radian;
+            //rotate_radian_average += rotate_radian;
+        }
+
+        //rotate_radian_count++;
+        //std::cout<<"ccc"<<rotate_radian<<std::endl;
+    }
+    do{
+        const double x1 = ring1[Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count)].x() - ring1[Utilities::inc(complete_matching_start_pos_1,size1,1 + rotate_radian_count)].x();
+        const double y1 = ring1[Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count)].y() - ring1[Utilities::inc(complete_matching_start_pos_1,size1,1 + rotate_radian_count)].y();
+        const double x2 = ring2[Utilities::dec(complete_matching_start_pos_2,size2,rotate_radian_count)].x() - ring2[Utilities::dec(complete_matching_start_pos_2,size2,1 + rotate_radian_count)].x();
+        const double y2 = ring2[Utilities::dec(complete_matching_start_pos_2,size2,rotate_radian_count)].y() - ring2[Utilities::dec(complete_matching_start_pos_2,size2,1 + rotate_radian_count)].y();
+        const double degree2 = atan2(y2, x2);
+        const double degree1 = atan2(y1, x1);
+        double rotate_radian = (degree1 - degree2);
+
+        //std::cout<<"v"<<rotate_radian<<std::endl;
+        double distance_radian = 0;
+        if(first_radian){
+            first_radian = false;
+            criteria_radian = rotate_radian;
+            //rotate_radian_average += rotate_radian;
+        }else{
+            if(rotate_radian < criteria_radian){
+                rotate_radian += M_PI * 2;
+            }
+            distance_radian = rotate_radian - criteria_radian;
+            if(distance_radian >= M_PI){
+                distance_radian -= M_PI * 2;
+            }
+            rotate_radian_average += distance_radian;
+        }
+
+        rotate_radian_count++;
+        //std::cout<<"d"<<rotate_radian_count<<","<<rotate_radian<<","<<distance_radian<<std::endl;
+    }while((Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count-1) != complete_matching_end_pos_1) &&
+           (Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count) != complete_matching_end_pos_1));
+    //rotate_radian_average /= (double)(fit1.start_dot_or_line == Fit::Dot? 1 + rotate_radian_count : rotate_radian_count);
+    if(rotate_radian_count != 1){
+        result_radian = rotate_radian_average / (double)(fit1.start_dot_or_line == Fit::Dot? rotate_radian_count : rotate_radian_count - 1);
+    }
+    result_radian = criteria_radian + result_radian;
+    //std::cout<<"result:"<<result_radian<<std::endl;
+
+    piece.rotatePolygon(-result_radian*(360/(M_PI*2))); //rotate piece
     ring2 = popRingByPolygon(piece,-1); //update ring2
 
     //debugRing(ring1,__LINE__);
@@ -129,43 +183,71 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     Ring new_ring;
     int count = complete_matching_end_pos_1 + 1;
     int Type = 1;
-
     double x,y;
-    do{
-        if (Type == 1) {
-            x = ring1[count%size1].x();
-            y = ring1[count%size1].y();
-            if (count % size1 == complete_matching_start_pos_1){
-                Type = 2;
-                if (fit1.start_dot_or_line == Fit::Dot) { //dot_or_lineはどちらのポリゴンでも同じですね…仕様が変だ
-                    count = complete_matching_start_pos_2 + 1;
-                } else {
-                    count = complete_matching_start_pos_2;
-                }
-                if(fit1.start_dot_or_line == Fit::Line && fit1.is_start_straight == true){
-                    // Line is straight. Skip.
-                    count++;
-                }
-            }else{
-                count++;
-            }
+
+    // Frame Area
+    while(1){
+        x = ring1[count%size1].x();
+        y = ring1[count%size1].y();
+
+        if (count % size1 == complete_matching_start_pos_1){
+            break;
         }
-        if (Type == 2) {
+
+        new_ring.push_back(point_t(x,y));
+        count++;
+    }
+
+    // Frame & Piece Area
+    bool start_pos_flag = true;
+    while(1){
+        if(start_pos_flag){
+            start_pos_flag = false;
+            // Switch Area
+            if (fit1.start_dot_or_line == Fit::Dot) { //dot_or_lineはどちらのポリゴンでも同じですね…仕様が変だ
+                count = complete_matching_start_pos_2 + 1;
+            } else {
+                count = complete_matching_start_pos_2;
+            }
+            // Straight Check
+            if(fit1.start_dot_or_line == Fit::Line && fit1.is_start_straight == true){
+                // Line is straight. Skip.
+                count++;
+                x = ring2[count%size2].x();
+                y = ring2[count%size2].y();
+            }else{
+                if (fit1.start_dot_or_line == Fit::Dot) {
+                    x = ring2[count%size2].x();
+                    y = ring2[count%size2].y();
+                }else{
+                    // calc average
+                    x = (ring2[count%size2].x() + ring1[complete_matching_start_pos_1].x()) / 2.0;
+                    y = (ring2[count%size2].y() + ring1[complete_matching_start_pos_1].y()) / 2.0;
+                }
+            }
+        }else{
             x = ring2[count%size2].x();
             y = ring2[count%size2].y();
-            if (count % size2 == (fit2.end_dot_or_line == Fit::Dot ? (((complete_matching_end_pos_2 - 1) % size2 + size2) % size2) : complete_matching_end_pos_2)) {
-                if(fit1.end_dot_or_line == Fit::Line && fit1.is_end_straight == true){
-                    // Line is straight. Skip.
-                    break;
-                }else{
-                    Type=-1;
-                }
-            }else{
-                count++;
-            }
+        }
+
+        if (count % size2 == (fit2.end_dot_or_line == Fit::Dot ? (((complete_matching_end_pos_2 - 1) % size2 + size2) % size2) : complete_matching_end_pos_2)) {
+            break;
+        }
+
+        new_ring.push_back(point_t(x,y));
+        count++;
+    }
+    if(fit1.end_dot_or_line == Fit::Line && fit1.is_end_straight == true){
+        // Line is straight. Skip.
+    }else{
+        if (fit1.end_dot_or_line == Fit::Dot) {
+        }else{
+            // calc average
+            x = (ring2[complete_matching_end_pos_2].x() + ring1[complete_matching_end_pos_1].x()) / 2.0;
+            y = (ring2[complete_matching_end_pos_2].y() + ring1[complete_matching_end_pos_1].y()) / 2.0;
         }
         new_ring.push_back(point_t(x,y));
-    } while (Type != -1);
+    }
 
 #ifdef DEBUG_RING
     debugRing(new_ring,__LINE__);

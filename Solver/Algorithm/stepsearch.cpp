@@ -137,8 +137,8 @@ void StepSearch::run(procon::Field field)
             DOCK->addAnswer(field);
             cnt++;
         }
-        if(!field_vec.empty()) submitAnswer(field_vec.at(0));
         loop.exec();
+        submitAnswer(field_vec.at(0));
     }
     return;
 }
