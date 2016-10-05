@@ -144,22 +144,37 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         count++;
     }
 
-    // Switch Area
-    if (fit1.start_dot_or_line == Fit::Dot) { //dot_or_lineはどちらのポリゴンでも同じですね…仕様が変だ
-        count = complete_matching_start_pos_2 + 1;
-    } else {
-        count = complete_matching_start_pos_2;
-    }
-    // Straight Check
-    if(fit1.start_dot_or_line == Fit::Line && fit1.is_start_straight == true){
-        // Line is straight. Skip.
-        count++;
-    }
-
     // Frame & Piece Area
+    bool start_pos_flag = true;
     while(1){
-        x = ring2[count%size2].x();
-        y = ring2[count%size2].y();
+        if(start_pos_flag){
+            start_pos_flag = false;
+            // Switch Area
+            if (fit1.start_dot_or_line == Fit::Dot) { //dot_or_lineはどちらのポリゴンでも同じですね…仕様が変だ
+                count = complete_matching_start_pos_2 + 1;
+            } else {
+                count = complete_matching_start_pos_2;
+            }
+            // Straight Check
+            if(fit1.start_dot_or_line == Fit::Line && fit1.is_start_straight == true){
+                // Line is straight. Skip.
+                count++;
+                x = ring2[count%size2].x();
+                y = ring2[count%size2].y();
+            }else{
+                if (fit1.start_dot_or_line == Fit::Dot) {
+                    x = ring2[count%size2].x();
+                    y = ring2[count%size2].y();
+                }else{
+                    // calc average
+                    x = (ring2[count%size2].x() + ring1[complete_matching_start_pos_1].x()) / 2.0;
+                    y = (ring2[count%size2].y() + ring1[complete_matching_start_pos_1].y()) / 2.0;
+                }
+            }
+        }else{
+            x = ring2[count%size2].x();
+            y = ring2[count%size2].y();
+        }
 
         if (count % size2 == (fit2.end_dot_or_line == Fit::Dot ? (((complete_matching_end_pos_2 - 1) % size2 + size2) % size2) : complete_matching_end_pos_2)) {
             break;
@@ -171,6 +186,12 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     if(fit1.end_dot_or_line == Fit::Line && fit1.is_end_straight == true){
         // Line is straight. Skip.
     }else{
+        if (fit1.end_dot_or_line == Fit::Dot) {
+        }else{
+            // calc average
+            x = (ring2[complete_matching_end_pos_2].x() + ring1[complete_matching_end_pos_1].x()) / 2.0;
+            y = (ring2[complete_matching_end_pos_2].y() + ring1[complete_matching_end_pos_1].y()) / 2.0;
+        }
         new_ring.push_back(point_t(x,y));
     }
 
