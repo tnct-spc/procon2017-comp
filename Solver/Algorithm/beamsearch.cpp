@@ -149,14 +149,14 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
             for (int i = start;i < end;i++){
                 random_vec.emplace_back(i);
             }
-            for (int i = end;i < start;i++){
-                std::uniform_int_distribution<int> variety(start,end);
-                std::swap(random_vec.at(variety(mt)),random_vec.at(end - 1));
+            std::uniform_int_distribution<int> variety(start,end - 1);
+            for (int i = end - start - 1;i >= 0;i--){
+                std::swap(random_vec.at(variety(mt) - start),random_vec.at(i));
             }
             return random_vec;
         };
 
-        std::vector<int> random_vec = std::move(makeRandomVector((i - 1) * beam_width,limit + 1));
+        std::vector<int> random_vec = std::move(makeRandomVector((i - 1) * beam_width,limit));
         int falut = 0;
         while (static_cast<int>(next_field_vec.size()) < beam_width + variety_width && falut + variety_width < limit) {
             std::vector<std::thread> threads;
