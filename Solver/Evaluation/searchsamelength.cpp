@@ -24,7 +24,6 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
     // フレームならそれぞれのポリゴン同士で、比較
 
     for(int p1_inner_cnt = 0; p1_inner_cnt < (polygon1.getInnerSize() != 0 ? polygon1.getInnerSize() : 1); ++p1_inner_cnt){
-
         int polygon1_size = polygon1.getInnerSize() != 0 ? polygon1.getPolygon().inners().at(p1_inner_cnt).size()-1 : polygon1.getSize();
         std::vector<double> polygon1_angles = polygon1.getInnerSize() != 0 ? polygon1.getInnersSideAngle().at(p1_inner_cnt) : polygon1.getSideAngle();
         std::vector<double> polygon1_lengths = polygon1.getInnerSize() != 0 ? polygon1.getInnersSideLength().at(p1_inner_cnt) : polygon1.getSideLength();

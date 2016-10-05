@@ -32,6 +32,7 @@ private:
     ImageRecognition imrec;
 
     //Calibration
+    const std::string calibration_data_file_path = "./../../procon2016-comp/picture/cal/calibration.yml";
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
     int selectWebCamera();
 
