@@ -234,7 +234,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
 
     //draw rawpic
 #ifdef GOSA_CHECK_MODE
-    if(0==0){
+    if(1==0){
 #else
     if(!SINGLE_MODE && is_set_rawpic){
 #endif
