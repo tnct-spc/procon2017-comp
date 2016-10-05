@@ -250,7 +250,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
 
             //inverse color
             bool is_inverse = false;
-            for(auto& piece : field->getFrame().getJointedPieces()){
+            for(auto piece : field->getFrame().getJointedPieces()){
                 if(count == piece.getId() && piece.is_inverse){
                     is_inverse = true;
                     break;

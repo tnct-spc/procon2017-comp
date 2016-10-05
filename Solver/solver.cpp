@@ -27,6 +27,9 @@ void Solver::run(procon::Field field, int algorithm_number)
     Algorithms.push_back(new BeamSearchByLength());
     Algorithms.push_back(new StepSearch());
 
+    field.setFrame(field.getElementaryFrame());
+    emitAnswer(field);
+
     connect(Algorithms.at(algorithm_number),&AlgorithmWrapper::throwAnswer,this,&Solver::emitAnswer);
     Algorithms.at(algorithm_number)->init();
     Algorithms.at(algorithm_number)->run(field);
