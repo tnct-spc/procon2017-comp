@@ -91,15 +91,24 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     const int complete_matching_start_pos_2 = fit2.start_dot_or_line == Fit::Dot ? fit2.start_id : increment(fit2.start_id, size2);
     const int complete_matching_end_pos_2   = fit2.end_dot_or_line   == Fit::Dot ? fit2.end_id   : fit2.end_id                    ;
 
-    // 回転　Ring2を回転させる。このとき誤差が生じる。
-    const double x1 = ring1[complete_matching_start_pos_1].x() - ring1[increment(complete_matching_start_pos_1, size1)].x();
-    const double y1 = ring1[complete_matching_start_pos_1].y() - ring1[increment(complete_matching_start_pos_1, size1)].y();
-    const double x2 = ring2[complete_matching_start_pos_2].x() - ring2[decrement(complete_matching_start_pos_2, size2)].x();
-    const double y2 = ring2[complete_matching_start_pos_2].y() - ring2[decrement(complete_matching_start_pos_2, size2)].y();
-    const double degree2 = atan2(y2, x2);
-    const double degree1 = atan2(y1, x1);
-    const double rotate_radian = (degree1 - degree2);
-    piece.rotatePolygon(-rotate_radian*(360/(M_PI*2))); //rotate piece
+    // 回転　Ring2を回転させる。
+    double rotate_radian_average = 0.0;
+    int rotate_radian_count = 0;
+    do{
+        const double x1 = ring1[Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count)].x() - ring1[Utilities::inc(complete_matching_start_pos_1,size1,1 + rotate_radian_count)].x();
+        const double y1 = ring1[Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count)].y() - ring1[Utilities::inc(complete_matching_start_pos_1,size1,1 + rotate_radian_count)].y();
+        const double x2 = ring2[Utilities::dec(complete_matching_start_pos_2,size2,rotate_radian_count)].x() - ring2[Utilities::dec(complete_matching_start_pos_2,size2,1 + rotate_radian_count)].x();
+        const double y2 = ring2[Utilities::dec(complete_matching_start_pos_2,size2,rotate_radian_count)].y() - ring2[Utilities::dec(complete_matching_start_pos_2,size2,1 + rotate_radian_count)].y();
+        const double degree2 = atan2(y2, x2);
+        const double degree1 = atan2(y1, x1);
+        const double rotate_radian = (degree1 - degree2);
+
+        rotate_radian_average += rotate_radian;
+        rotate_radian_count++;
+    }while((Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count-1) != complete_matching_end_pos_1) &&
+           (Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count) != complete_matching_end_pos_1));
+    rotate_radian_average /= (double)rotate_radian_count;
+    piece.rotatePolygon(-rotate_radian_average*(360/(M_PI*2))); //rotate piece
     ring2 = popRingByPolygon(piece,-1); //update ring2
 
     //debugRing(ring1,__LINE__);
