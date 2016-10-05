@@ -149,8 +149,6 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
                     if(p1_pos == polygon1_size) p1_pos = 0;
                     p2_pos = j;
                     if(isMatchAngle(polygon1_angles[p1_pos], polygon2_angles[p2_pos], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0)){
-                        int Eva;
-                        Eva++;
                         calcSameShape(p1_pos, p2_pos, Fit::Dot);
                     }
                     if(isMatchLength(polygon1_lengths[p1_pos], polygon2_lengths[p2_pos == 0 ? polygon2_size-1 : p2_pos-1])){
