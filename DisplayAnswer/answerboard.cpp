@@ -143,6 +143,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             point_t center = {0,0};
             boost::geometry::centroid(piece.getPolygon(), center);
             QPointF display_pos = getPosition(QPointF((center.x()/frame_size)-0.025, (center.y()/frame_size)+0.025), Space::LEFT);
+            QPointF inverse_display_pos = getPosition(QPointF((center.x()/frame_size)-0.035, (center.y()/frame_size)+0.035), Space::LEFT);
             if(has_connector) field_pieces_pos.at(piece_id) = display_pos;
 
             //draw piece
@@ -152,11 +153,23 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             drawPolygon(piece.getPolygon(),Space::LEFT);
             //draw number
             if(is_set_rawpic){
+                //inverse color
+                if(piece.is_inverse){
+                    painter.setPen(QPen(QColor(color_id)));
+                    QFont font = painter.font();
+                    font.setPointSize(std::abs(getScale()/20));
+                    painter.setFont(font);
+                    painter.setPen(QPen(QColor("#ffffff")));
+                    painter.drawText(inverse_display_pos, "●");
+                }
+
+                //draw piece id
                 painter.setPen(QPen(QColor(color_id)));
                 QFont font = painter.font();
                 font.setPointSize(std::abs(getScale()/30));
                 painter.setFont(font);
                 painter.drawText(display_pos, (piece_id != -1) ? QString::number(piece_id) : QString::fromStdString(piece.makeMultiIdString()));
+
                 //draw corner begin ID
                 auto corner = piece.getPolygon().outer()[0];
                 QPointF display_pos = getPosition(QPointF((corner.x()/frame_size)-0.0125, (corner.y()/frame_size)+0.0125), Space::LEFT);
@@ -222,7 +235,25 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         int count = 0;
         for(cv::Point& pos : *pieces_pos){
             QPointF display_pos = getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.025), Space::RIGHT);
+            QPointF inverse_display_pos = getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.035,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.035), Space::RIGHT);
             rawpic_pieces_pos.at(count) = display_pos;
+
+            //inverse color
+            bool is_inverse = false;
+            for(auto& piece : field->getFrame().getJointedPieces()){
+                if(count == piece.getId() && piece.is_inverse){
+                    is_inverse = true;
+                    break;
+                }
+            }
+            if(is_inverse){
+                painter.setPen(QPen(QColor(color_id)));
+                QFont font = painter.font();
+                font.setPointSize(std::abs(getScale()/20));
+                painter.setFont(font);
+                painter.setPen(QPen(QColor("#ffffff")));
+                painter.drawText(inverse_display_pos, "●");
+            }
 
             painter.setPen(QPen(QColor(color_id)));
             QFont font = painter.font();
