@@ -148,7 +148,7 @@ void Hazama::run()
     std::string path = "./../../procon2016-comp/sample/data.csv";
 
     /*Get puzzle data*/
-    if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked()){
+    if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked() || ui->selectImageData->isChecked()){
         cv::Mat raw_frame;
         cv::Mat raw_pieces;
         //get Image
@@ -178,6 +178,12 @@ void Hazama::run()
         } else {
 
             //read
+
+            if(ui->selectImageData->isChecked()){
+                //環境によっては動かない
+                pieces_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
+                path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
+            }
             cv::Mat nocframe = cv::imread(frame_path, 1);
             cv::Mat nocpieces = cv::imread(pieces_path, 1);
 

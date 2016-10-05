@@ -257,15 +257,15 @@
      <rect>
       <x>390</x>
       <y>40</y>
-      <width>160</width>
-      <height>101</height>
+      <width>162</width>
+      <height>121</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QRadioButton" name="useWebCamera">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="font">
         <font>
@@ -275,6 +275,9 @@
        <property name="text">
         <string>UseWebCamera</string>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
        <property name="checked">
         <bool>false</bool>
        </property>
@@ -282,6 +285,9 @@
      </item>
      <item>
       <widget class="QRadioButton" name="useFileData">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="font">
         <font>
          <pointsize>13</pointsize>
@@ -294,9 +300,6 @@
      </item>
      <item>
       <widget class="QRadioButton" name="useImageData">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
        <property name="font">
         <font>
          <pointsize>13</pointsize>
@@ -307,6 +310,21 @@
        </property>
        <property name="checked">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="selectImageData">
+       <property name="font">
+        <font>
+         <pointsize>13</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>SelectImageData</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -367,7 +385,7 @@
      <x>0</x>
      <y>0</y>
      <width>1230</width>
-     <height>27</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>
