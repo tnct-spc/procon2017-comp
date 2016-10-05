@@ -34,6 +34,8 @@ public:
     static constexpr double length_beta = 1;
     static constexpr double length_base = 2;
 
+    //History
+    double norm = 0;
     AlgorithmWrapper();
     virtual ~AlgorithmWrapper() = default;
 
@@ -51,6 +53,8 @@ public:
 
     double evaluateUniqueAngle(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     double evaluateUniqueLength(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
+    void evaluateHistoryInit(std::vector<procon::Field> const& field_vec);
+    double evaluateHistory(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     typedef struct PieceAssesment{
         //評価値
         int EvaluationValue;

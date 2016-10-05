@@ -23,7 +23,7 @@ void BeamSearch::initialization()
 #else
     beam_width = 100;
 #endif
-    variety_width = 20;
+    variety_width = 50;
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -230,20 +230,21 @@ void BeamSearch::run(procon::Field field)
 
     //ピースが全部置かれたら終了
     //このiは添字として使ってるわけではない（ただの回数ルーブ）
-    for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++){
+    for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++) {
         evaluations.clear();
 
         //最小角計算(後のpruningで使用)
-        for (int j = 0;j < static_cast<int>(field_vec.size());j++){
+        for (int j = 0;j < static_cast<int>(field_vec.size());j++) {
             field_vec.at(j).calcMinAngleSide();
         }
 
         buckup_field = field_vec.at(0);
         this->evaluateNextMove(evaluations,field_vec);
-
+        this->evaluateHistoryInit(field_vec);
         for(Evaluation & evaluation: evaluations) {
-            evaluation.evaluation += this->evaluateUniqueAngle(evaluation,field_vec);
-            evaluation.evaluation += this->evaluateUniqueLength(evaluation,field_vec);
+            evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
+            evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
+            evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
         }
 
         if (evaluations.empty()){
