@@ -250,7 +250,7 @@ void BeamSearch::run(procon::Field field)
                 if (tmp > max) max = tmp;
             }
             evaluation.evaluation *= max;
-        }        //それより先がなければその1手前の最高評価値のフィールドを返す
+        }
 
         if (evaluations.empty()){
             submitAnswer(buckup_field);
