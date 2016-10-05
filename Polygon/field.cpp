@@ -53,8 +53,14 @@ void procon::Field::setIsPlaced(const std::array<bool,50> &IsPlaced)
     isPlaced = IsPlaced;
 }
 
-void procon::Field::setIsPlaced(int const& piece_id){
+void procon::Field::setIsPlaced(int const& piece_id)
+{
     isPlaced.at(piece_id) = true;
+}
+
+void procon::Field::sumTotalEvaluation(const double &eva)
+{
+    total_evaluation += eva;
 }
 
 //getter
@@ -122,6 +128,10 @@ std::bitset<50> const& procon::Field::getPieceID() const
     return piece_id;
 }
 
+double procon::Field::getTotalEvaluation() const
+{
+    return total_evaluation;
+}
 //remove
 void procon::Field::removePiece(int n)
 {

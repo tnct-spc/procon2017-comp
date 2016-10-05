@@ -180,6 +180,25 @@ double AlgorithmWrapper::evaluateUniqueLength(Evaluation const& evaluation,std::
     return max;
 }
 
+void AlgorithmWrapper::evaluateHistoryInit(std::vector<procon::Field> const& field_vec)
+{
+    auto maxLambda = [](procon::Field field_a,procon::Field field_b)
+    {
+        return field_a.getTotalEvaluation() < field_b.getTotalEvaluation();
+    };
+    auto const& max_field = *(std::max_element(field_vec.begin(),field_vec.end(),maxLambda));
+    norm = max_field.getTotalEvaluation();
+}
+
+double AlgorithmWrapper::evaluateHistory(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec)
+{
+    if (norm != 0){
+        return field_vec.at(evaluation.vector_id).getTotalEvaluation() / norm;
+    } else {
+        return 0.0;
+    }
+}
+
 AlgorithmWrapper::AlgorithmWrapper()
 {
 }
