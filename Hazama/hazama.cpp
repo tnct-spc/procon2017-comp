@@ -3,6 +3,8 @@
 
 #include "polygonviewer.h"
 
+#include <QTimer>
+
 #include <iostream>
 
 #include <boost/property_tree/ptree.hpp>
@@ -28,6 +30,17 @@ Hazama::Hazama(QWidget *parent) :
 Hazama::~Hazama()
 {
     delete ui;
+}
+
+void Hazama::pauseClicked()
+{
+    is_pause_flag = true;
+}
+
+void Hazama::startClicked()
+{
+    board->setField(best_answer);
+    is_pause_flag = false;
 }
 
 void Hazama::init()
@@ -67,8 +80,14 @@ void Hazama::emitAnswer(procon::Field field)
     }
 
     //Display answer
-    board->setField(best_answer);
-    PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
+    // Wait 1msec
+    QEventLoop loop;
+    QTimer::singleShot(1, &loop, SLOT(quit()));
+    loop.exec();
+    if(!is_pause_flag){
+        board->setField(best_answer);
+    }
+    //PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
     //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
 }
 
@@ -218,7 +237,7 @@ void Hazama::run()
     }
 
     // Hide HAZAMA
-    this->showMinimized();
+    //this->showMinimized();
 
     if(ui->server_mode_radio->isChecked()){
         /*Save Puzzle*/

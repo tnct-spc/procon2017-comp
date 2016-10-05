@@ -51,6 +51,8 @@ private:
     void disableThresholdUI();
     void enableThresholdUI();
 
+    bool is_pause_flag = false;
+
 private slots:
     void clickedRunButton();
     void thresholdValueChanged();
@@ -66,6 +68,9 @@ private slots:
     void loadInIFile();
 
     void emitAnswer(procon::Field field);
+
+    void pauseClicked();
+    void startClicked();
 
 };
 

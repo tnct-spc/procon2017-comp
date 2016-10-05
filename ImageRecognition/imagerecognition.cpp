@@ -122,6 +122,7 @@ cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
     int rows = image.rows;
     int cols = image.cols;
 
+    /*
     //ピース内に混じっている白い穴を削除
     cv::Mat hole_label;
     cv::Mat hole_label_stats;
@@ -140,6 +141,7 @@ cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
         }
     }
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++) image.at<unsigned char>(y,x) = (hole_label.at<int>(y,x) == 1 || hole_label.at<int>(y,x) == max_num) ? 255 : 0;
+    */
 
     //二値化
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
@@ -178,6 +180,7 @@ cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
     //triming, and delete small noise
     const int NOIZE_SIZE = 100;
     std::vector<cv::Mat> result_images;
+    //cv::Mat framing_image(rows,cols,CV_8UC1);
     int count=0;
     for(auto &im: images){
         if(minmaxs[count].maxX-minmaxs[count].minX < NOIZE_SIZE && minmaxs[count].maxY-minmaxs[count].minY < NOIZE_SIZE){
@@ -185,12 +188,31 @@ cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
             continue;
         }
         result_images.push_back(cv::Mat(im,cv::Rect(minmaxs[count].minX - 5 < 0 ? 0 : minmaxs[count].minX - 5,
-                                                    minmaxs[count].minY - 5 < 0 ? 0 : minmaxs[count].minY - 5,
-                                                    minmaxs[count].maxX + 5 > cols ? cols-minmaxs[count].minX : minmaxs[count].maxX-minmaxs[count].minX + 10,
-                                                    minmaxs[count].maxY + 5 > rows ? rows-minmaxs[count].minY : minmaxs[count].maxY-minmaxs[count].minY + 10
-                                                    )));
+                                                            minmaxs[count].minY - 5 < 0 ? 0 : minmaxs[count].minY - 5,
+                                                            minmaxs[count].maxX + 5 > cols ? cols-minmaxs[count].minX : minmaxs[count].maxX-minmaxs[count].minX + 10,
+                                                            minmaxs[count].maxY + 5 > rows ? rows-minmaxs[count].minY : minmaxs[count].maxY-minmaxs[count].minY + 10
+                                                            )));
+
         count++;
     }
+    /*
+    std::cout<<"c="<<result_images.size()<<std::endl;
+    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
+    {
+        bool dot = 0;
+        for(auto& result : result_images){
+            dot &= result.at<unsigned char>(y,x);
+        }
+        framing_image.at<unsigned char>(y,x) = dot? 255 : 0;
+    }
+
+    cv::namedWindow("result",cv::WINDOW_NORMAL);
+    cv::imshow("result",result_images[0]);
+    cv::namedWindow("framing",cv::WINDOW_NORMAL);
+    cv::imshow("framing",framing_image);
+    cv::waitKey(0);
+    */
+
     return std::move(result_images[0]);
 }
 
