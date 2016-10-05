@@ -102,6 +102,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 
             if (hasJoinSuccess  && !canPrune(new_frame,min_angle) ) {
                 procon::Field new_field = field_vec.at(vec_id);
+                new_field.sumTotalEvaluation(evaluations.at(j).evaluation);
                 new_field.setFrame(new_frame);
                 new_field.setIsPlaced(piece_id);
 
