@@ -92,8 +92,30 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     const int complete_matching_end_pos_2   = fit2.end_dot_or_line   == Fit::Dot ? fit2.end_id   : fit2.end_id                    ;
 
     // 回転　Ring2を回転させる。
+    bool first_radian = true;
+    double criteria_radian;
+    double result_radian;
+
     double rotate_radian_average = 0.0;
     int rotate_radian_count = 0;
+    if(fit1.start_dot_or_line == Fit::Dot){
+        const double x1 = ring1[Utilities::dec(complete_matching_start_pos_1,size1)].x() - ring1[complete_matching_start_pos_1].x();
+        const double y1 = ring1[Utilities::dec(complete_matching_start_pos_1,size1)].y() - ring1[complete_matching_start_pos_1].y();
+        const double x2 = ring2[Utilities::inc(complete_matching_start_pos_2,size2)].x() - ring2[complete_matching_start_pos_2].x();
+        const double y2 = ring2[Utilities::inc(complete_matching_start_pos_2,size2)].y() - ring2[complete_matching_start_pos_2].y();
+        const double degree2 = atan2(y2, x2);
+        const double degree1 = atan2(y1, x1);
+        double rotate_radian = (degree1 - degree2);
+        //std::cout<<"aaa"<<rotate_radian<<std::endl;
+        if(first_radian){
+            first_radian = false;
+            criteria_radian = rotate_radian;
+            //rotate_radian_average += rotate_radian;
+        }
+
+        //rotate_radian_count++;
+        //std::cout<<"ccc"<<rotate_radian<<std::endl;
+    }
     do{
         const double x1 = ring1[Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count)].x() - ring1[Utilities::inc(complete_matching_start_pos_1,size1,1 + rotate_radian_count)].x();
         const double y1 = ring1[Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count)].y() - ring1[Utilities::inc(complete_matching_start_pos_1,size1,1 + rotate_radian_count)].y();
@@ -101,14 +123,37 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         const double y2 = ring2[Utilities::dec(complete_matching_start_pos_2,size2,rotate_radian_count)].y() - ring2[Utilities::dec(complete_matching_start_pos_2,size2,1 + rotate_radian_count)].y();
         const double degree2 = atan2(y2, x2);
         const double degree1 = atan2(y1, x1);
-        const double rotate_radian = (degree1 - degree2);
+        double rotate_radian = (degree1 - degree2);
 
-        rotate_radian_average += rotate_radian;
+        //std::cout<<"v"<<rotate_radian<<std::endl;
+        double distance_radian = 0;
+        if(first_radian){
+            first_radian = false;
+            criteria_radian = rotate_radian;
+            //rotate_radian_average += rotate_radian;
+        }else{
+            if(rotate_radian < criteria_radian){
+                rotate_radian += M_PI * 2;
+            }
+            distance_radian = rotate_radian - criteria_radian;
+            if(distance_radian >= M_PI){
+                distance_radian -= M_PI * 2;
+            }
+            rotate_radian_average += distance_radian;
+        }
+
         rotate_radian_count++;
+        //std::cout<<"d"<<rotate_radian_count<<","<<rotate_radian<<","<<distance_radian<<std::endl;
     }while((Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count-1) != complete_matching_end_pos_1) &&
            (Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count) != complete_matching_end_pos_1));
-    rotate_radian_average /= (double)rotate_radian_count;
-    piece.rotatePolygon(-rotate_radian_average*(360/(M_PI*2))); //rotate piece
+    //rotate_radian_average /= (double)(fit1.start_dot_or_line == Fit::Dot? 1 + rotate_radian_count : rotate_radian_count);
+    if(rotate_radian_count != 1){
+        result_radian = rotate_radian_average / (double)(fit1.start_dot_or_line == Fit::Dot? rotate_radian_count : rotate_radian_count - 1);
+    }
+    result_radian = criteria_radian + result_radian;
+    //std::cout<<"result:"<<result_radian<<std::endl;
+
+    piece.rotatePolygon(-result_radian*(360/(M_PI*2))); //rotate piece
     ring2 = popRingByPolygon(piece,-1); //update ring2
 
     //debugRing(ring1,__LINE__);
