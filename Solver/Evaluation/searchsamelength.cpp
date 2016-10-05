@@ -1,5 +1,6 @@
 #include "searchsamelength.h"
 #include "Algorithm/algorithmwrapper.h"
+#include "utilities.h"
 
 std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygon& polygon1, const procon::ExpandedPolygon& polygon2, std::vector<std::array<Fit,2>> &result)
 {
@@ -47,7 +48,9 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
                 fits.at(0).start_id = p1_pos;
                 fits.at(1).start_dot_or_line = dot_or_line;
                 fits.at(1).start_id = p2_pos;
-                fits.at(0).is_start_straight = isStraightAngle(polygon1_angles[p1_pos], polygon2_angles[p2_pos], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0);
+                if(dot_or_line == Fit::Line){
+                    fits.at(0).is_start_straight = isStraightAngle(polygon1_angles[p1_pos], polygon2_angles[Utilities::inc(p2_pos,polygon2_size,1)], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0);
+                }
 
                 auto lengthCheck = [&](){
                     //decrement comp2
@@ -113,7 +116,9 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
                 fits.at(0).end_id=p1_pos;
                 fits.at(1).end_dot_or_line = dot_or_line;
                 fits.at(1).end_id=p2_pos;
-                fits.at(0).is_end_straight = isStraightAngle(polygon1_angles[p1_pos], polygon2_angles[p2_pos], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0);
+                if(dot_or_line){
+                    fits.at(0).is_end_straight = isStraightAngle(polygon1_angles[Utilities::inc(p1_pos,polygon1_size,1)], polygon2_angles[p2_pos], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0);
+                }
 
                 //重複していたらcompare erase
                 bool is_apply = true;
