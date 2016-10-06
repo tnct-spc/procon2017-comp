@@ -239,6 +239,8 @@ double AlgorithmWrapper::evaluateFrame(Evaluation const& evaluation,std::vector<
     }
     for (auto angles : field.getFrame().getInnersSideAngle()) {
         for (auto angle : angles) {
+            //ここでreleaseだと落ちる
+            //犯人は多分いしょた
             ave.emplace_back(angle_frequency.at(static_cast<int>((angle / angle_resolution) * to_deg)));
         }
     }
