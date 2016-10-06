@@ -242,11 +242,17 @@ void BeamSearch::run(procon::Field field)
         this->evaluateNextMove(evaluations,field_vec);
         this->evaluateHistoryInit(field_vec);
         for(Evaluation & evaluation: evaluations) {
+            std::cout << "alpha" << std::endl;
             evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
+            std::cout << "beta" << std::endl;
             evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
+            std::cout << "gamma" << std::endl;
             evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
+            std::cout << "delta" << std::endl;
+            evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
         }
 
+        std::cout << "clear" << std::endl;
         if (evaluations.empty()){
             submitAnswer(buckup_field);
             return;

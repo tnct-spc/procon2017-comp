@@ -16,6 +16,7 @@ public:
     static constexpr double angle_error = 0.017; //単位rad 0.017rad=1°
 
     std::vector<double> angle_frequency;
+    std::vector<std::vector<double>> angle_frequency_kai;
     std::vector<double> length_frequency;
 
     //angle-Frequency
@@ -25,13 +26,13 @@ public:
     static constexpr double angle_ideal_max = 1.5;
     //exponential
     static constexpr double angle_alpha = 1;
-    static constexpr double angle_beta = 1;
+    static constexpr double angle_beta = 0;
     static constexpr double angle_base = 2;
 
     //length-Frequency
     static constexpr double length_resolution = 1;
     static constexpr double length_alpha = 1;
-    static constexpr double length_beta = 1;
+    static constexpr double length_beta = 0;
     static constexpr double length_base = 2;
 
     //History
@@ -53,6 +54,7 @@ public:
 
     double evaluateUniqueAngle(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     double evaluateUniqueLength(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
+    double evaluateFrame(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     void evaluateHistoryInit(std::vector<procon::Field> const& field_vec);
     double evaluateHistory(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     typedef struct PieceAssesment{
