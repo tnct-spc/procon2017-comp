@@ -691,6 +691,7 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
         bg::transform(translated_polygon,polygon,reduction);
         bg::reverse(polygon);
 
+        /* Arien
         auto repairCutting = [&](polygon_t & polygon)
         {
             constexpr double cutting_allowance = 0.1;
@@ -713,6 +714,7 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
                 enlargePoint(point);
             }
         };repairCutting(polygon);
+        */
 
         if (frame_flag){
             ex_frame.resetPolygonForce(polygon);
