@@ -158,7 +158,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
 
         std::vector<int> random_vec = std::move(makeRandomVector((i - 1) * beam_width,limit));
         int falut = 0;
-        while (static_cast<int>(next_field_vec.size()) < beam_width + variety_width && falut + variety_width < limit) {
+        while (static_cast<int>(next_field_vec.size()) < beam_width + variety_width && falut + variety_width < (limit - ( (i - 1) * beam_width) )) {
             std::vector<std::thread> threads;
             for (int i = 0;i < variety_width;i++) {
                 std::thread thread(makeField,random_vec.at(i + falut),random_vec.at(i + falut) + 1);
