@@ -94,7 +94,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     // 回転　Ring2を回転させる。
     bool first_radian = true;
     double criteria_radian;
-    double result_radian;
+    double result_radian = 0;
 
     double rotate_radian_average = 0.0;
     int rotate_radian_count = 0;
