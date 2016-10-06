@@ -36,16 +36,35 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
     auto pieces = field.getElementaryPieces();
     for (auto piece : pieces) {
         auto angles = piece.getSideAngle();
+        std::vector<double> kai;
+        kai.resize(360 / angle_resolution);
         for (auto angle : angles) {
             int num = static_cast<int>(angle * to_deg / angle_resolution);
             angle_frequency.at(num) += 1;
+            kai.at(num) += 1;
         }
+        angle_frequency_kai.push_back(kai);
     }
+
     for (auto& angle : angle_frequency) {
         if (angle == 0) {
             angle = 1;
         }
     }
+
+    for (auto& angles : angle_frequency_kai) {
+        for (auto& angle : angle_frequency) {
+            if (angle == 0) {
+                angle = 1;
+            }
+        }
+    }
+
+
+    auto exponentialFunction = [&](double x)->double
+    {
+        return std::pow(angle_base,-angle_alpha * x) + angle_beta;
+    };
 
     for (auto& angle : angle_frequency) {
         double real_max = *(std::max_element(angle_frequency.begin(),angle_frequency.end()));
@@ -54,13 +73,13 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
         {
             return ((angle_ideal_max - angle_ideal_min) / (real_min - real_max)) * (x - real_max) + angle_ideal_min;
         };
-        auto exponentialFunction = [&](double x)->double
-        {
-            return std::pow(angle_base,-angle_alpha * x) + angle_beta;
-        };
-
         //angle = linerFunction(angle);
         angle = exponentialFunction(angle);
+    }
+    for (auto & angles : angle_frequency_kai) {
+        for (auto & angle : angles) {
+            angle = exponentialFunction(angle);
+        }
     }
 }
 
@@ -197,6 +216,35 @@ double AlgorithmWrapper::evaluateHistory(Evaluation const& evaluation,std::vecto
     } else {
         return 0.0;
     }
+}
+
+double AlgorithmWrapper::evaluateFrame(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec)
+{
+    constexpr double to_deg = 180 / 3.141592653589;
+    std::vector<double> ave;
+    procon::Field const& field = field_vec.at(evaluation.vector_id);
+
+    auto mergeVector = [](std::vector<double> & a,std::vector<double> const& b) {
+        for (int i = 0;i < a.size();i++) {
+            a.at(i) *= b.at(i);
+        }
+    };
+    std::vector<double> angle_frequency;
+    angle_frequency.resize(360 / angle_resolution);
+    for (auto & angle : angle_frequency) angle = 1;
+    for (int i = 0;i < field.getElementaryPieces().size();i++) {
+        if (!field.getIsPlaced().at(i)) {
+            mergeVector(angle_frequency,angle_frequency_kai.at(i));
+        }
+    }
+    for (auto angles : field.getFrame().getInnersSideAngle()) {
+        for (auto angle : angles) {
+            //ここでreleaseだと落ちる
+            //犯人は多分いしょた
+            ave.emplace_back(angle_frequency.at(static_cast<int>((angle / angle_resolution) * to_deg)));
+        }
+    }
+    return 1 - (std::accumulate(ave.begin(),ave.end(),0.0) / ave.size());
 }
 
 AlgorithmWrapper::AlgorithmWrapper()
