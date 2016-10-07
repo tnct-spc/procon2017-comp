@@ -49,6 +49,9 @@
     <property name="text">
      <string>ServerMode</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QGroupBox" name="algorithmSelector">
     <property name="geometry">
@@ -73,6 +76,9 @@
      </property>
      <property name="text">
       <string>BeamAlgorithmWithSearchSameLength</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QRadioButton" name="algo3">
@@ -127,7 +133,7 @@
       <string>PoorAlgorithm</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QRadioButton" name="algo5">
@@ -309,7 +315,7 @@
         <string>UseImageData</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -324,7 +330,7 @@
         <string>SelectImageData</string>
        </property>
        <property name="checked">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
