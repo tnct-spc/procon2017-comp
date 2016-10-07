@@ -19,6 +19,11 @@ MainWindow::~MainWindow()
 
 bool MainWindow::get()
 {
+    if(ui->bossmode->isChecked()){
+        SERVER_URL = "http://localhost:8016/get";
+        SERVER_POST_URL = "http://localhost:8016/answer";
+    }
+
     QEventLoop eventloop;
 
     std::cout<<"challange get"<<std::endl;
