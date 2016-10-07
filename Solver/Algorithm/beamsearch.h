@@ -23,10 +23,14 @@ public:
     BeamSearch();
     void run(procon::Field field);
 
+    bool alpha_is_none = false;
+    bool beta_is_none = false;
+    bool gamma_is_none = false;
+    bool delta_is_none = false;
     double alpha = 0.5;
-    double beta = 0;
+    double beta = 1;
     double gamma = 4;
-    double delta = 0;
+    double delta = 1;
 };
 
 

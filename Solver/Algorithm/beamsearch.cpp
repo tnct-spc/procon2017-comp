@@ -187,6 +187,7 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
             }
         }
     }
+    /*
     for (auto const& angles : next_frame.getInnersSideAngle()) {
         for (auto const& angle : angles) {
             auto isAngleExist = [&](double const& angle)
@@ -199,8 +200,8 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
                 return true;
             }
         }
-
     }
+    */
     return  can_prune;
 }
 
@@ -236,7 +237,7 @@ void BeamSearch::run(procon::Field field)
     };
     calcAngleFrequency(field);
     calcLengthFrequency(field);
-    calcAngleExist(field);
+    //calcAngleExist(field);
     std::vector<procon::Field> field_vec;
     std::vector<Evaluation> evaluations;
 
@@ -266,15 +267,14 @@ void BeamSearch::run(procon::Field field)
             evaluation.evaluation_frame = delta * this->evaluateFrame(evaluation,field_vec);
 #endif
             //std::cout << "alpha" << std::endl;
-            evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
+            if(!alpha_is_none) evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
             //std::cout << "beta" << std::endl;
-            evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
+            if(!beta_is_none) evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
             //std::cout << "gamma" << std::endl;
-            evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
+            if(!gamma_is_none) evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
             //std::cout << "delta" << std::endl;
-            evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
+            if(!delta_is_none) evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
         }
-
         if (evaluations.empty()){
             submitAnswer(buckup_field);
             return;
