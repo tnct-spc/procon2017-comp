@@ -200,6 +200,7 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
 
     // Frame & Piece Area
     bool start_pos_flag = true;
+    bool ultra_finish = false;
     while(1){
         if(start_pos_flag){
             start_pos_flag = false;
@@ -211,6 +212,11 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
             }
             // Straight Check
             if(fit1.start_dot_or_line == Fit::Line && fit1.is_start_straight == true){
+                if (count % size2 == (fit2.end_dot_or_line == Fit::Dot ? (((complete_matching_end_pos_2 - 1) % size2 + size2) % size2) : complete_matching_end_pos_2)) {
+                    //second connection
+                    ultra_finish = true;
+                    break;
+                }
                 // Line is straight. Skip.
                 count++;
                 x = ring2[count%size2].x();
@@ -237,16 +243,18 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         new_ring.push_back(point_t(x,y));
         count++;
     }
-    if(fit1.end_dot_or_line == Fit::Line && fit1.is_end_straight == true){
-        // Line is straight. Skip.
-    }else{
-        if (fit1.end_dot_or_line == Fit::Dot) {
+    if(!ultra_finish){
+        if(fit1.end_dot_or_line == Fit::Line && fit1.is_end_straight == true){
+            // Line is straight. Skip.
         }else{
-            // calc average
-            x = (ring2[complete_matching_end_pos_2].x() + ring1[complete_matching_end_pos_1].x()) / 2.0;
-            y = (ring2[complete_matching_end_pos_2].y() + ring1[complete_matching_end_pos_1].y()) / 2.0;
+            if (fit1.end_dot_or_line == Fit::Dot) {
+            }else{
+                // calc average
+                x = (ring2[complete_matching_end_pos_2].x() + ring1[complete_matching_end_pos_1].x()) / 2.0;
+                y = (ring2[complete_matching_end_pos_2].y() + ring1[complete_matching_end_pos_1].y()) / 2.0;
+            }
+            new_ring.push_back(point_t(x,y));
         }
-        new_ring.push_back(point_t(x,y));
     }
 
 #ifdef DEBUG_RING
