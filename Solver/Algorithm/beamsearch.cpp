@@ -182,9 +182,23 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
     for (auto const& angles : next_frame.getInnersSideAngle()) {
         for (auto const& angle : angles){
             if (angle < min_angle) {
-                can_prune = true;
+                return true;
             }
         }
+    }
+    for (auto const& angles : next_frame.getInnersSideAngle()) {
+        for (auto const& angle : angles) {
+            auto isAngleExist = [&](double const& angle)
+            {
+                int _angle = static_cast<int>(angle) / exist_resolution;
+                return this->angle_exist.at(_angle);
+            };
+            constexpr double to_rad = 180 / 3.1415926535;
+            if (!isAngleExist(angle * to_rad)) {
+                return true;
+            }
+        }
+
     }
     return  can_prune;
 }
@@ -221,6 +235,7 @@ void BeamSearch::run(procon::Field field)
     };
     calcAngleFrequency(field);
     calcLengthFrequency(field);
+    calcAngleExist(field);
     std::vector<procon::Field> field_vec;
     std::vector<Evaluation> evaluations;
 
@@ -242,17 +257,12 @@ void BeamSearch::run(procon::Field field)
         this->evaluateNextMove(evaluations,field_vec);
         this->evaluateHistoryInit(field_vec);
         for(Evaluation & evaluation: evaluations) {
-            std::cout << "alpha" << std::endl;
             evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
-            std::cout << "beta" << std::endl;
             evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
-            std::cout << "gamma" << std::endl;
             evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
-            std::cout << "delta" << std::endl;
             evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
         }
 
-        std::cout << "clear" << std::endl;
         if (evaluations.empty()){
             submitAnswer(buckup_field);
             return;

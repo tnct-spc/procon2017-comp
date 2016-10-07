@@ -4,7 +4,9 @@
 #include "Utils/polygonconnector.h"
 #include "polygonviewer.h"
 #include "utilities.h"
+#include "algorithm.h"
 #include "Evaluation/searchsamelength.h"
+#include <boost/algorithm/algorithm.hpp>
 #include <QTimer>
 
 void AlgorithmWrapper::init()
@@ -80,6 +82,33 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
         for (auto & angle : angles) {
             angle = exponentialFunction(angle);
         }
+    }
+}
+
+void AlgorithmWrapper::calcAngleExist(procon::Field field)
+{
+    for (auto & angle : angle_exist) angle = false;
+    //copy
+    std::vector<double> merge_angles;
+    auto const& pieces = field.getElementaryPieces();
+    for (auto const& piece : pieces) {
+        std::copy(piece.getSideAngle().begin(),piece.getSideAngle().end(),std::back_inserter(merge_angles));
+    }
+    std::sort(merge_angles.begin(),merge_angles.end());
+    constexpr double to_deg = 180 / 3.141592653589793;
+    //nCr
+    for (int r = 1;r < 4;r++) {
+        do {
+            std::for_each(merge_angles.begin(),merge_angles.begin() + r,[](auto angle){std::cout << angle;});
+            std::cout << std::endl;
+            int sum_angle = static_cast<int>((std::accumulate(merge_angles.begin(),merge_angles.begin() + r,0.0) * to_deg) / exist_resolution);
+            //int sum_angle = 1;
+            if (sum_angle < 360 / exist_resolution && sum_angle != 0) {
+                //angle_exist.at(sum_angle - 1) = true;
+                angle_exist.at(sum_angle) = true;
+                //angle_exist.at(sum_angle + 1) = true;
+            }
+        } while (procon::Algorithm::next_combination(merge_angles.begin(),merge_angles.begin() + r,merge_angles.end()));
     }
 }
 
