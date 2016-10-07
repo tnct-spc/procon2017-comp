@@ -190,7 +190,7 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
         for (auto const& angle : angles) {
             auto isAngleExist = [&](double const& angle)
             {
-                int _angle = static_cast<int>(angle);
+                int _angle = static_cast<int>(angle) / exist_resolution;
                 return this->angle_exist.at(_angle);
             };
             constexpr double to_rad = 180 / 3.1415926535;

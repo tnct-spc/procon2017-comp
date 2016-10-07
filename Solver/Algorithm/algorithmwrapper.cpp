@@ -101,12 +101,12 @@ void AlgorithmWrapper::calcAngleExist(procon::Field field)
         do {
             std::for_each(merge_angles.begin(),merge_angles.begin() + r,[](auto angle){std::cout << angle;});
             std::cout << std::endl;
-            int sum_angle = static_cast<int>(std::accumulate(merge_angles.begin(),merge_angles.begin() + r,0.0) * to_deg);
+            int sum_angle = static_cast<int>((std::accumulate(merge_angles.begin(),merge_angles.begin() + r,0.0) * to_deg) / exist_resolution);
             //int sum_angle = 1;
-            if (sum_angle < 360 && sum_angle != 0) {
-                angle_exist.at(sum_angle - 1) = true;
+            if (sum_angle < 360 / exist_resolution && sum_angle != 0) {
+                //angle_exist.at(sum_angle - 1) = true;
                 angle_exist.at(sum_angle) = true;
-                angle_exist.at(sum_angle + 1) = true;
+                //angle_exist.at(sum_angle + 1) = true;
             }
         } while (procon::Algorithm::next_combination(merge_angles.begin(),merge_angles.begin() + r,merge_angles.end()));
     }

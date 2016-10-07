@@ -16,9 +16,12 @@ public:
     static constexpr double angle_error = 0.034; //単位rad 0.017rad=1°
 
     std::vector<double> angle_frequency;
-    std::array<bool,361> angle_exist;
     std::vector<std::vector<double>> angle_frequency_kai;
     std::vector<double> length_frequency;
+
+    //pruning
+    static constexpr double exist_resolution = 1;
+    std::array<bool,(int)(360 / exist_resolution) + 1> angle_exist;
 
     //angle-Frequency
     static constexpr int angle_resolution = 5;
