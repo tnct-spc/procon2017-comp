@@ -1,6 +1,8 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
+//#define HYOKA_MODE
+
 #define TO_STRING(VariableName) # VariableName
 
 #include "utilities_global.h"

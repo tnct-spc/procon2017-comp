@@ -29,7 +29,12 @@ private:
     double total_evaluation = 0;
 public:
     // Public Member
-    double evaluation;
+    double evaluation_sum;
+    double evaluation_normal;
+    double evaluation_angle;
+    double evaluation_length;
+    double evaluation_history;
+    double evaluation_frame;
 
     bool operator || (Field & field_id);
 

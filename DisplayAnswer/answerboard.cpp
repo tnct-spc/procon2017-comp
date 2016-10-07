@@ -219,9 +219,19 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         QFont font = painter.font();
         font.setPointSize(std::abs(getScale()/(SINGLE_MODE?5:15)));
         painter.setFont(font);
-        painter.drawText(display_pos, QString::number(field->evaluation));
+        painter.drawText(display_pos, QString::number(field->evaluation_sum));
+#ifdef HYOKA_MODE
+        //draw kaku Eva
+        display_pos = getPosition(QPointF(0/frame_size,6/frame_size), Space::LEFT);
+        painter.setPen(QPen(QColor(color_id)));
+        font = painter.font();
+        font.setPointSize(std::abs(getScale()/(SINGLE_MODE?10:30)));
+        painter.setFont(font);
+        painter.drawText(display_pos, QString::number(field->evaluation_sum) + "=" + QString::number(field->evaluation_normal) + "+" + QString::number(field->evaluation_angle) + "+" + QString::number(field->evaluation_length) + "+" + QString::number(field->evaluation_history) + "+" + QString::number(field->evaluation_frame));
+#endif
 
         //draw frame-jointed pieces number
+        /*
         const int max_len = 10;
         int cnt = 0;
         for(auto piece : field->getFrame().getJointedPieces()){
@@ -229,6 +239,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             painter.drawText(display_pos, QString::number(piece.getId()));
             cnt++;
         }
+        */
 
     }
 
