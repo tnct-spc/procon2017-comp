@@ -16,7 +16,7 @@ ProbMaker::~ProbMaker()
 void ProbMaker::run()
 {
     //枠を作る
-    pushFlame();
+    pushFrame();
 
     //300回線を引く
     for(int i=0;i<300;i++) addNewLine();
@@ -41,7 +41,7 @@ void ProbMaker::run()
 
 }
 
-void ProbMaker::pushFlame()
+void ProbMaker::pushFrame()
 {
     std::random_device rd;
     std::uniform_real_distribution<double> rand(0.0,1.0);
@@ -170,21 +170,21 @@ bool ProbMaker::isValidLine(const std::shared_ptr<Line> &newL, double startL_ang
 
 procon::Field ProbMaker::PolygonToExPolygon()
 {
-    polygon_t flame;
+    polygon_t frame;
     polygon_t buff;
     std::vector<polygon_t> pieces;
-    procon::ExpandedPolygon ex_flame;
+    procon::ExpandedPolygon ex_frame;
     procon::ExpandedPolygon buff2;
     std::vector<procon::ExpandedPolygon> ex_pieces;
     procon::Field field;
 
-    //flame
+    //frame
     for(int j = 0;j < (static_cast<int>(Polygons.at(0).size()));++j){
-        flame.outer().push_back(point_t(Polygons.at(0).at(j).s_dot->x/30,Polygons.at(0).at(j).s_dot->y/30));
+        frame.outer().push_back(point_t(Polygons.at(0).at(j).s_dot->x/30,Polygons.at(0).at(j).s_dot->y/30));
     }
-    flame.outer().push_back(point_t(Polygons.at(0).at(0).s_dot->x/30,Polygons.at(0).at(0).s_dot->y/30));
-    ex_flame.setPolygon(flame);
-    field.setElementaryFlame(ex_flame);
+    frame.outer().push_back(point_t(Polygons.at(0).at(0).s_dot->x/30,Polygons.at(0).at(0).s_dot->y/30));
+    ex_frame.resetPolygonForce(frame);
+    field.setElementaryFrame(ex_frame);
 
     //polygon
     for(int i = 1;i < (static_cast<int>(Polygons.size()));++i){
@@ -204,7 +204,7 @@ procon::Field ProbMaker::PolygonToExPolygon()
         }
         pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(0).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(0).s_dot->y/30)-reference_point_y));
         ex_pieces.push_back(buff2);
-        ex_pieces.at(i-1).setPolygon(pieces.at(i-1));
+        ex_pieces.at(i-1).resetPolygonForce(pieces.at(i-1));
     }
     field.setElementaryPieces(ex_pieces);
 

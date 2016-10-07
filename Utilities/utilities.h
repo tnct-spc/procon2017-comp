@@ -59,5 +59,18 @@ public:
         }
         return cr1 && cr2;
     }
+
+    static int inc(int num,int size, int len=1){
+        return (num+len) % size;
+    }
+    static int dec(int num,int size, int len=1){
+        return ((num-len)%size + size) % size;
+    }
+
+    template<typename T, typename ...Args>
+    static std::unique_ptr<T> make_unique( Args&& ...args )
+    {
+        return std::unique_ptr<T>( new T( std::forward<Args>(args)... ) );
+    }
 };
 #endif // UTILITIES_H

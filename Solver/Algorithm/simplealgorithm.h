@@ -7,7 +7,7 @@ class SimpleAlgorithm : public AlgorithmWrapper
 {
 public:
     SimpleAlgorithm();
-    procon::Field run(procon::Field field);
+    void run(procon::Field field);
 };
 
 #endif // SIMPLEALGORITHM_H

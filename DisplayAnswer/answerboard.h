@@ -3,6 +3,8 @@
 
 #include "field.h"
 
+class AnswerBoard;
+
 namespace Ui {
 class AnswerBoard;
 }
@@ -14,18 +16,27 @@ class AnswerBoard : public QWidget
 public:
     explicit AnswerBoard(QWidget *parent = 0);
     ~AnswerBoard();
+    int id = -1;
+    bool SINGLE_MODE = false;
     void setField(const procon::Field& field);
-    void setRawPicture(const cv::Mat& raw_pieces_pic,const std::vector<cv::Point>& pieces_pos);
-    void setRandomColors(const std::vector<cv::Vec3b>& random_colors);
+    static void setRawPicture(const cv::Mat& raw_pieces_pic,const std::vector<cv::Point>& pieces_pos);
+    static void setRandomColors(const std::vector<cv::Vec3b>& random_colors);
+
+signals:
+    void clicked(QMouseEvent*event);
+    void clicked_with_id(int id);
+
+private slots:
+    void printBigWindow(QMouseEvent*event);
 
 private:
     Ui::AnswerBoard *ui;
     std::unique_ptr<procon::Field> field;
-    std::unique_ptr<QImage> pieces_pic;
-    std::unique_ptr<std::vector<cv::Point>> pieces_pos;
-    std::unique_ptr<std::vector<cv::Vec3b>> random_colors;
+    static std::unique_ptr<QImage> pieces_pic;
+    static std::unique_ptr<std::vector<cv::Point>> pieces_pos;
+    static std::unique_ptr<std::vector<cv::Vec3b>> random_colors;
     bool is_set_field = false;
-    bool is_set_rawpic = false;
+    static bool is_set_rawpic;
     std::vector<int> putid_list;
     int putid_left = -1;
     int putid_right = -1;
@@ -34,7 +45,10 @@ private:
     const int bottom_margin = 10;
     const int left_margin   = 100;
     const int right_margin  = 10;
-    const double flame_size = 35;
+    const double frame_size = 35;
+
+    procon::Field print_field;
+    AnswerBoard* ans_board;
 
     enum Space
     {
@@ -50,6 +64,7 @@ private:
 protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent*event);
 };
 
 #endif // ANSWERBOARD_H

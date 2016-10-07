@@ -1,8 +1,15 @@
 #include "searchsamelength.h"
 #include "Algorithm/algorithmwrapper.h"
+#include "utilities.h"
 
 std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygon& polygon1, const procon::ExpandedPolygon& polygon2, std::vector<std::array<Fit,2>> &result)
 {
+    auto isStraightAngle = [](double left, double right, bool is_inner_left, bool is_inner_right){
+        if(is_inner_left) left = (M_PI * 2) - left;
+        if(is_inner_right) right = (M_PI * 2) - right;
+        return (M_PI) - AlgorithmWrapper::angle_error * 2 < (left + right) && (left + right) < (M_PI) + AlgorithmWrapper::angle_error * 2;
+    };
+
     auto isMatchAngle = [](double left, double right, bool is_inner_left, bool is_inner_right){
         if(is_inner_left) left = (M_PI * 2) - left;
         if(is_inner_right) right = (M_PI * 2) - right;
@@ -18,7 +25,6 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
     // フレームならそれぞれのポリゴン同士で、比較
 
     for(int p1_inner_cnt = 0; p1_inner_cnt < (polygon1.getInnerSize() != 0 ? polygon1.getInnerSize() : 1); ++p1_inner_cnt){
-
         int polygon1_size = polygon1.getInnerSize() != 0 ? polygon1.getPolygon().inners().at(p1_inner_cnt).size()-1 : polygon1.getSize();
         std::vector<double> polygon1_angles = polygon1.getInnerSize() != 0 ? polygon1.getInnersSideAngle().at(p1_inner_cnt) : polygon1.getSideAngle();
         std::vector<double> polygon1_lengths = polygon1.getInnerSize() != 0 ? polygon1.getInnersSideLength().at(p1_inner_cnt) : polygon1.getSideLength();
@@ -32,15 +38,18 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
             // 一致する場所の開始を探して、終了まで探索する
 
             auto calcSameShape = [&](int p1_pos, int p2_pos, Fit::DotORLine dot_or_line){
-                int Eva = 1;
                 std::array<Fit, 2> fits;
+                int Eva = 1;
 
-                fits.at(0).flame_inner_pos = polygon1.getInnerSize() != 0 ? p1_inner_cnt : -1;
-                fits.at(1).flame_inner_pos = polygon2.getInnerSize() != 0 ? p2_inner_cnt : -1;
+                fits.at(0).frame_inner_pos = polygon1.getInnerSize() != 0 ? p1_inner_cnt : -1;
+                fits.at(1).frame_inner_pos = polygon2.getInnerSize() != 0 ? p2_inner_cnt : -1;
                 fits.at(0).start_dot_or_line = dot_or_line;
                 fits.at(0).start_id = p1_pos;
                 fits.at(1).start_dot_or_line = dot_or_line;
                 fits.at(1).start_id = p2_pos;
+                if(dot_or_line == Fit::Line){
+                    fits.at(0).is_start_straight = isStraightAngle(polygon1_angles[p1_pos], polygon2_angles[Utilities::inc(p2_pos,polygon2_size,1)], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0);
+                }
 
                 auto lengthCheck = [&](){
                     //decrement comp2
@@ -106,12 +115,15 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
                 fits.at(0).end_id=p1_pos;
                 fits.at(1).end_dot_or_line = dot_or_line;
                 fits.at(1).end_id=p2_pos;
+                if(dot_or_line){
+                    fits.at(0).is_end_straight = isStraightAngle(polygon1_angles[Utilities::inc(p1_pos,polygon1_size,1)], polygon2_angles[p2_pos], polygon1.getInnerSize() != 0, polygon2.getInnerSize() != 0);
+                }
 
                 //重複していたらcompare erase
                 bool is_apply = true;
                 for(unsigned int i = 0; i < result.size(); ++i){
-                    if( fits[0].flame_inner_pos == result[i][0].flame_inner_pos &&
-                        fits[1].flame_inner_pos == result[i][1].flame_inner_pos &&
+                    if( fits[0].frame_inner_pos == result[i][0].frame_inner_pos &&
+                        fits[1].frame_inner_pos == result[i][1].frame_inner_pos &&
                         fits[0].end_dot_or_line == result[i][0].end_dot_or_line &&
                         fits[0].end_id == result[i][0].end_id &&
                         fits[1].end_id == result[i][1].end_id &&

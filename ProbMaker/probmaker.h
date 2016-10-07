@@ -91,7 +91,7 @@ private:
     //新しいLineを引く
     void addNewLine();
     //枠線を引く
-    void pushFlame();
+    void pushFrame();
     //すべての線からランダムでdotを作る
     std::shared_ptr<Dot> pickRandomDotAtAll(std::shared_ptr<Line> &line_pos);
     //ポリゴンの中からランダムでdotを作る

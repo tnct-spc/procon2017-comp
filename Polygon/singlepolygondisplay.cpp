@@ -8,7 +8,7 @@ SinglePolygonDisplay::SinglePolygonDisplay(QWidget *parent = 0) :
     ui->setupUi(this);
 }
 
-std::unique_ptr<SinglePolygonDisplay> SinglePolygonDisplay::create(procon::ExpandedPolygon& polygon, std::string wname_, int scale)
+std::unique_ptr<SinglePolygonDisplay> SinglePolygonDisplay::create(procon::ExpandedPolygon const& polygon, std::string wname_, int scale)
 {
     std::unique_ptr<SinglePolygonDisplay> instance(new SinglePolygonDisplay());
     instance->polygon = polygon;
@@ -54,7 +54,16 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
             draw_point[i].setX(((points.at(i).x() + x_offset)*x/max)+x/2+x_margin);
             draw_point[i].setY(((points.at(i).y() + y_offset)*y/max)+y/2+y_margin);
         }
+        //draw polygon
         painter.drawPolygon(draw_point,size);
+        //draw number
+        painter.setPen(QPen(QColor("#00ff00")));
+        QFont font = painter.font();
+        font.setPointSize(std::abs(y/30));
+        painter.setFont(font);
+        for(int count=0; count<size;++count){
+            painter.drawText(draw_point[count], QString::number(count));
+        }
         delete[] draw_point;
     };
 

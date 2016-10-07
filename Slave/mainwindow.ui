@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>875</width>
-    <height>521</height>
+    <width>567</width>
+    <height>395</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -162,13 +162,26 @@
      <string>BeamAlgorithmWithSearchSameLength</string>
     </property>
    </widget>
+   <widget class="QRadioButton" name="algo5">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>250</y>
+      <width>281</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>StepSearch</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>875</width>
+     <width>567</width>
      <height>27</height>
     </rect>
    </property>

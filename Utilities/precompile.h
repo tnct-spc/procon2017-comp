@@ -25,6 +25,7 @@
 /*std*/
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <cmath>
 #include <exception>
 #include <fstream>
@@ -35,6 +36,7 @@
 #include <numeric>
 #include <queue>
 #include <random>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>

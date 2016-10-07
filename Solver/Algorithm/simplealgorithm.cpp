@@ -7,12 +7,12 @@ SimpleAlgorithm::SimpleAlgorithm()
 
 }
 
-procon::Field SimpleAlgorithm::run(procon::Field field)
+void SimpleAlgorithm::run(procon::Field field)
 {
-    field.setFlame(field.getElementaryFlame());
+    field.setFrame(field.getElementaryFrame());
     for(auto elementary_piece : field.getElementaryPieces()){
         for(double x = 0;x < 30;x++){
-            for(double y = 0;y < 30;y++){                   
+            for(double y = 0;y < 30;y++){
                 elementary_piece.setPolygonPosition(x,y);
                 for(int degree = 0; degree < 360; degree = degree + 10){
                     elementary_piece.setPolygonAngle(degree);
@@ -26,5 +26,6 @@ procon::Field SimpleAlgorithm::run(procon::Field field)
         }
         next_roop:;
     }
-    return field;
+    submitAnswer(field);
+    return;
 }

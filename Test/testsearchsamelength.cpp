@@ -31,8 +31,8 @@ bool testSearchSameLength::run(){
         sample12.outer().push_back(point_t(0,0));
         sample12.outer().push_back(point_t(-2.5,-5));
 
-        polygon1.setPolygon(sample11);
-        polygon2.setPolygon(sample12);
+        polygon1.resetPolygonForce(sample11);
+        polygon2.resetPolygonForce(sample12);
         std::vector<std::array<Fit,2>> fits;
         //SearchSameLength::evaluateMatching(polygon1, polygon2, fits);
 
@@ -74,8 +74,8 @@ bool testSearchSameLength::run(){
         sample12.outer().push_back(point_t(0,5));
         sample12.outer().push_back(point_t(5,5));
 
-        polygon1.setPolygon(sample11);
-        polygon2.setPolygon(sample12);
+        polygon1.resetPolygonForce(sample11);
+        polygon2.resetPolygonForce(sample12);
 
         std::vector<std::array<Fit,2>> fits;
         //SearchSameLength::evaluateMatching(polygon1, polygon2, fits);
@@ -150,8 +150,8 @@ bool testSearchSameLength::run(){
         sample12.outer().push_back(point_t(0,-1.5));
         sample12.outer().push_back(point_t(0,-2));
 
-        polygon1.setPolygon(sample11);
-        polygon2.setPolygon(sample12);
+        polygon1.resetPolygonForce(sample11);
+        polygon2.resetPolygonForce(sample12);
 
         std::vector<std::array<Fit,2>> fits;
         SearchSameLength::evaluateMatching(polygon1, polygon2, fits);

@@ -10,22 +10,22 @@ class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
 
 public:
-    procon::Field run(cv::Mat raw_flame_image, cv::Mat raw_pieces_image);
+    procon::Field run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
 
-    inline cv::Mat getRawPiecesPic(){
-        return std::move(raw_colored_pic);
+    const cv::Mat& getRawPiecesPic(){
+        return raw_colored_pic;
     }
 
-    inline std::vector<cv::Point> getRawPiecesPos(){
-        return std::move(raw_pieces_pos);
+    const std::vector<cv::Point>& getRawPiecesPos(){
+        return raw_pieces_pos;
     }
 
-    inline std::vector<cv::Vec3b> getRawRandomColors(){
-        return std::move(raw_random_colors);
+    const std::vector<cv::Vec3b>& getRawRandomColors(){
+        return raw_random_colors;
     }
 
 private:
-    cv::Mat preprocessingFlame(cv::Mat image);
+    cv::Mat preprocessingFrame(cv::Mat image);
     std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
     std::vector<std::vector<cv::Vec4f>> LineDetection(std::vector<cv::Mat> const& images);
     std::vector<polygon_t> Vectored(std::vector<std::vector<cv::Vec4f>> const& lines);
@@ -42,6 +42,7 @@ private:
     std::vector<cv::Point> raw_pieces_pos;
     std::vector<cv::Vec3b> raw_random_colors;
     double scale;
+    static constexpr double cutting_allowance = 0.0;
 };
 
 #endif // IMAGERECOGNITION_H

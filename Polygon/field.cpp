@@ -1,4 +1,5 @@
 #include "field.h"
+#include "utilities.h"
 
 /*--------------------constructor---------------------*/
 procon::Field::Field()
@@ -9,9 +10,9 @@ procon::Field::Field()
 
 /*---------------------public--------------------------*/
 //setter
-void procon::Field::setFlame(ExpandedPolygon const& flame)
+void procon::Field::setFrame(ExpandedPolygon const& frame)
 {
-    field_flame = flame;
+    field_frame = frame;
 }
 
 void procon::Field::setPiece(procon::ExpandedPolygon piece)
@@ -31,9 +32,9 @@ void procon::Field::setPiece(procon::ExpandedPolygon piece, int n, double x, dou
     field_pieces.at(n) = piece;
 }
 
-void procon::Field::setElementaryFlame(procon::ExpandedPolygon const& flame)
+void procon::Field::setElementaryFrame(procon::ExpandedPolygon const& frame)
 {
-    elementary_flame = flame;
+    elementary_frame = frame;
 }
 
 
@@ -52,8 +53,14 @@ void procon::Field::setIsPlaced(const std::array<bool,50> &IsPlaced)
     isPlaced = IsPlaced;
 }
 
-void procon::Field::setIsPlaced(int const& piece_id){
+void procon::Field::setIsPlaced(int const& piece_id)
+{
     isPlaced.at(piece_id) = true;
+}
+
+void procon::Field::sumTotalEvaluation(const double &eva)
+{
+    total_evaluation += eva;
 }
 
 //getter
@@ -67,15 +74,15 @@ procon::ExpandedPolygon const& procon::Field::getPiece(const int &n) const
     return field_pieces.at(n);
 }
 
-procon::ExpandedPolygon const& procon::Field::getFlame() const
+procon::ExpandedPolygon const& procon::Field::getFrame() const
 {
-    return field_flame;
+    return field_frame;
 }
 
 
-procon::ExpandedPolygon const& procon::Field::getElementaryFlame() const
+procon::ExpandedPolygon const& procon::Field::getElementaryFrame() const
 {
-    return elementary_flame;
+    return elementary_frame;
 }
 
 
@@ -115,6 +122,16 @@ double procon::Field::getMinSide() const
     return min_side;
 }
 
+
+std::bitset<50> const& procon::Field::getPieceID() const
+{
+    return piece_id;
+}
+
+double procon::Field::getTotalEvaluation() const
+{
+    return total_evaluation;
+}
 //remove
 void procon::Field::removePiece(int n)
 {
@@ -124,19 +141,19 @@ void procon::Field::removePiece(int n)
 //is_
 bool procon::Field::isPuttable(procon::ExpandedPolygon polygon)
 {
-    for (auto inner_ring : field_flame.getPolygon().inners()){
+    for (auto inner_ring : field_frame.getPolygon().inners()){
         if(!boost::geometry::within(polygon.getPolygon(),inner_ring)) return false;
     }
-    //if(!boost::geometry::within(polygon.getPolygon(), field_flame.getPolygon())) return false;
+    //if(!boost::geometry::within(polygon.getPolygon(), field_frame.getPolygon())) return false;
     for(auto p : field_pieces){
         if(!boost::geometry::disjoint(polygon.getPolygon(), p.getPolygon())) return false;
     }
     return true;
 }
 
-void procon::Field::printFlame()
+void procon::Field::printFrame()
 {
-    std::cout << bg::dsv(elementary_flame.getPolygon()) << std::endl;
+    std::cout << bg::dsv(elementary_frame.getPolygon()) << std::endl;
 }
 
 void procon::Field::printPiece()
@@ -181,4 +198,39 @@ void procon::Field::calcMinAngleSide()
     //set
     min_angle = min_anglee;
     min_side = min_sidee;
+}
+
+bool procon::Field::operator || (Field & field) {
+    if (this->piece_id != field.piece_id) return false;
+
+    //ソート（これによって比較が可能に)
+    this->field_frame.sortJointedPieces();
+    field.field_frame.sortJointedPieces();
+
+    for (unsigned int i = 0;i < this->getFrame().getJointedPieces().size();i++) {
+
+        //slope check
+        {
+            double const& slope_a = this->getFrame().getJointedPieces().at(i).getSideSlope().at(0);
+            double const& slope_b = field.getFrame().getJointedPieces().at(i).getSideSlope().at(0);
+            constexpr double threshold = 3.141592653589 / 180;
+            if (!Utilities::nearlyEqual(slope_a,slope_b,threshold)) return false;
+        }
+        //coord test
+        {
+            point_t const& coord_a = this->getFrame().getJointedPieces().at(i).getPolygon().outer().at(0);
+            point_t const& coord_b = field.getFrame().getJointedPieces().at(i).getPolygon().outer().at(0);
+            constexpr double threshold = 0.5;
+            if (!Utilities::nearlyEqual(coord_a.x(),coord_b.x(),threshold)) return false;
+            if (!Utilities::nearlyEqual(coord_a.y(),coord_b.y(),threshold)) return false;
+        }
+    }
+    return true;
+}
+
+void procon::Field::calcFieldID()
+{
+    for (auto & piece : field_frame.getJointedPieces()) {
+         piece_id.set(piece.getId());
+    }
 }

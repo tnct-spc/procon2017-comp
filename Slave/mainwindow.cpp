@@ -19,10 +19,6 @@ MainWindow::~MainWindow()
 
 bool MainWindow::get()
 {
-    std::string SAVE_PROBLEM_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
-    std::string SAVE_ANSWER_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/answer.csv";
-    QString SERVER_URL = "http://127.0.0.1:8016/get";
-    QString SERVER_POST_URL = "http://127.0.0.1:8016/answer";
     QEventLoop eventloop;
 
     std::cout<<"challange get"<<std::endl;
@@ -53,7 +49,8 @@ bool MainWindow::get()
     procon::Field PDATA = procon::PolygonIO::importPolygon(SAVE_PROBLEM_PATH);
 
     //solve puzzle
-    Solver solver;
+    solver = new Solver();
+    connect(solver,&Solver::throwAnswer,this,&MainWindow::emitAnswer);
     int algorithm_number = -1;
     if(ui->algo0->isChecked()){
         algorithm_number = 0;
@@ -65,11 +62,19 @@ bool MainWindow::get()
         algorithm_number = 3;
     }else if(ui->algo4->isChecked()){
         algorithm_number = 4;
+    }else if(ui->algo5->isChecked()){
+        algorithm_number = 5;
     }else{
         throw "poa";
         //poa
     }
-    procon::Field field = solver.run(PDATA, algorithm_number);
+    solver->run(PDATA, algorithm_number);
+    return true;
+}
+
+bool MainWindow::emitAnswer(procon::Field field)
+{
+    QEventLoop eventloop;
 
     //Display answer
     board->setField(field);
