@@ -250,13 +250,13 @@ void BeamSearch::run(procon::Field field)
             evaluation.evaluation_history = gamma * this->evaluateHistory(evaluation,field_vec);
             evaluation.evaluation_frame = delta * this->evaluateFrame(evaluation,field_vec);
 #endif
-            std::cout << "alpha" << std::endl;
+            //std::cout << "alpha" << std::endl;
             evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
-            std::cout << "beta" << std::endl;
+            //std::cout << "beta" << std::endl;
             evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
-            std::cout << "gamma" << std::endl;
+            //std::cout << "gamma" << std::endl;
             evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
-            std::cout << "delta" << std::endl;
+            //std::cout << "delta" << std::endl;
             evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
         }
 
