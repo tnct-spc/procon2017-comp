@@ -7,6 +7,7 @@
 #include <thread>
 #include "parallel.h"
 #include <random>
+#include "utilities.h"
 
 //#define NO_PARALLEL
 
@@ -257,9 +258,20 @@ void BeamSearch::run(procon::Field field)
         this->evaluateNextMove(evaluations,field_vec);
         this->evaluateHistoryInit(field_vec);
         for(Evaluation & evaluation: evaluations) {
+#ifdef HYOKA_MODE
+            evaluation.evaluation_normal = evaluation.evaluation;
+            evaluation.evaluation_angle = alpha * this->evaluateUniqueAngle(evaluation,field_vec);
+            evaluation.evaluation_length = beta * this->evaluateUniqueLength(evaluation,field_vec);
+            evaluation.evaluation_history = gamma * this->evaluateHistory(evaluation,field_vec);
+            evaluation.evaluation_frame = delta * this->evaluateFrame(evaluation,field_vec);
+#endif
+            //std::cout << "alpha" << std::endl;
             evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
+            //std::cout << "beta" << std::endl;
             evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
+            //std::cout << "gamma" << std::endl;
             evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
+            //std::cout << "delta" << std::endl;
             evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
         }
 
@@ -281,7 +293,14 @@ void BeamSearch::run(procon::Field field)
         // Output Answer
         int cnt = 0;
         for(auto& field: field_vec){
-            field.evaluation = evaluations.at(cnt).evaluation;
+#ifdef HYOKA_MODE
+            field.evaluation_normal = evaluations.at(cnt).evaluation_normal;
+            field.evaluation_angle = evaluations.at(cnt).evaluation_angle;
+            field.evaluation_length = evaluations.at(cnt).evaluation_length;
+            field.evaluation_history = evaluations.at(cnt).evaluation_history;
+            field.evaluation_frame = evaluations.at(cnt).evaluation_frame;
+#endif
+            field.evaluation_sum = evaluations.at(cnt).evaluation;
             DOCK->addAnswer(field);
             cnt++;
         }

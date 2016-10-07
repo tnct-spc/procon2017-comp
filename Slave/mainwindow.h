@@ -30,8 +30,8 @@ private:
 
     std::string SAVE_PROBLEM_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
     std::string SAVE_ANSWER_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/answer.csv";
-    QString SERVER_URL = "http://127.0.0.1:8016/get";
-    QString SERVER_POST_URL = "http://127.0.0.1:8016/answer";
+    QString SERVER_URL = "http://192.168.1.130:8016/get";
+    QString SERVER_POST_URL = "http://192.168.1.130:8016/answer";
 
 private slots:
     void pushGetButton();
