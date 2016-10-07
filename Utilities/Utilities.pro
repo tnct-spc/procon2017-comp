@@ -20,13 +20,15 @@ DEFINES += UTILITIES_LIBRARY
 
 SOURCES += utilities.cpp \
     parallel.cpp \
-    threshold.cpp
+    threshold.cpp \
+    algorithm.cpp
 
 HEADERS += utilities.h\
         utilities_global.h \
     precompile.h \
     parallel.h \
-    threshold.h
+    threshold.h \
+    algorithm.h
 
 unix {
     target.path = /usr/lib
