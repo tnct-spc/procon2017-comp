@@ -24,14 +24,16 @@ public:
     void run(procon::Field field);
 
     bool alpha_is_none = true;
-    bool beta_is_none = true;
+    bool beta_is_none = false;
     bool gamma_is_none = false;
     bool delta_is_none = true;
+    bool epsilon_is_none = true;
 
     double alpha = 0;
     double beta = 0;
     double gamma = 4;
     double delta = 0;
+    double epsilon = 0;
 };
 
 

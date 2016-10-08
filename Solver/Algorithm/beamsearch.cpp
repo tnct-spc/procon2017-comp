@@ -235,9 +235,9 @@ void BeamSearch::run(procon::Field field)
     {
         return a.evaluation > b.evaluation;
     };
-    calcAngleFrequency(field);
-    calcLengthFrequency(field);
-    //calcAngleExist(field);
+    if (!alpha_is_none) calcAngleFrequency(field);
+    if (!beta_is_none) calcLengthFrequency(field);
+
     std::vector<procon::Field> field_vec;
     std::vector<Evaluation> evaluations;
 
@@ -247,6 +247,8 @@ void BeamSearch::run(procon::Field field)
 
     //ピースが全部置かれたら終了
     //このiは添字として使ってるわけではない（ただの回数ルーブ）
+    double gosa = 0.1 / static_cast<int>(field.getElementaryPieces().size());
+    double gosa_angle = 0.017 / static_cast<int>(field.getElementaryPieces().size());
     for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++) {
         evaluations.clear();
 
@@ -266,14 +268,11 @@ void BeamSearch::run(procon::Field field)
             evaluation.evaluation_history = gamma * this->evaluateHistory(evaluation,field_vec);
             evaluation.evaluation_frame = delta * this->evaluateFrame(evaluation,field_vec);
 #endif
-            //std::cout << "alpha" << std::endl;
             if(!alpha_is_none) evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
-            //std::cout << "beta" << std::endl;
             if(!beta_is_none) evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
-            //std::cout << "gamma" << std::endl;
             if(!gamma_is_none) evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
-            //std::cout << "delta" << std::endl;
             if(!delta_is_none) evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
+            if(!epsilon_is_none) evaluation.evaluation += epsilon * this->evaluateArea(evaluation,field_vec);
         }
         if (evaluations.empty()){
             submitAnswer(buckup_field);
@@ -305,6 +304,8 @@ void BeamSearch::run(procon::Field field)
             cnt++;
         }
         submitAnswer(field_vec.at(0));
+        this->length_error += gosa;
+        this->angle_error += gosa_angle;
     }
     return;
 }

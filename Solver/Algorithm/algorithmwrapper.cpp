@@ -9,6 +9,9 @@
 #include <boost/algorithm/algorithm.hpp>
 #include <QTimer>
 
+double AlgorithmWrapper::length_error = 0.1;
+double AlgorithmWrapper::angle_error = 0.034; // 単位CM
+
 void AlgorithmWrapper::init()
 {
     DOCK = std::make_shared<AnswerDock>();
@@ -274,6 +277,17 @@ double AlgorithmWrapper::evaluateFrame(Evaluation const& evaluation,std::vector<
         }
     }
     return 1 - (std::accumulate(ave.begin(),ave.end(),0.0) / ave.size());
+}
+
+double AlgorithmWrapper::evaluateArea(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec)
+{
+    procon::ExpandedPolygon const& piece = field_vec.at(evaluation.vector_id).getElementaryPieces().at(evaluation.piece_id);
+    double const& area = bg::area(piece.getPolygon());
+    auto exponentialFunction = [&](double x)->double
+    {
+        return std::pow(area_base,-area_alpha * x) + area_beta;
+    };
+    return exponentialFunction(area);
 }
 
 AlgorithmWrapper::AlgorithmWrapper()

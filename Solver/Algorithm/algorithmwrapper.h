@@ -12,8 +12,8 @@ class AlgorithmWrapper : public QObject
     Q_OBJECT
 
 public:
-    static constexpr double length_error = 0.10; // 単位CM
-    static constexpr double angle_error = 0.034; //単位rad 0.017rad=1°
+    static double length_error; // 単位CM
+    static double angle_error; //単位rad 0.017rad=1°
 
     std::vector<double> angle_frequency;
     std::vector<std::vector<double>> angle_frequency_kai;
@@ -39,6 +39,10 @@ public:
     static constexpr double length_beta = 0;
     static constexpr double length_base = 2;
 
+    //exponential
+    static constexpr double area_alpha = 1;
+    static constexpr double area_beta = 0;
+    static constexpr double area_base = 2;
     //History
     double norm = 0;
     AlgorithmWrapper();
@@ -63,6 +67,8 @@ public:
     double evaluateFrame(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     void evaluateHistoryInit(std::vector<procon::Field> const& field_vec);
     double evaluateHistory(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
+    double evaluateArea(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
+
     typedef struct PieceAssesment{
         //評価値
         int EvaluationValue;
