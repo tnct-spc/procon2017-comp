@@ -219,7 +219,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         QFont font = painter.font();
         font.setPointSize(std::abs(getScale()/(SINGLE_MODE?5:15)));
         painter.setFont(font);
-        painter.drawText(display_pos, QString::number(field->evaluation_sum));
+        painter.drawText(display_pos, QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
 #ifdef HYOKA_MODE
         //draw kaku Eva
         display_pos = getPosition(QPointF(0/frame_size,6/frame_size), Space::LEFT);
