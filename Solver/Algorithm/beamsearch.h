@@ -29,7 +29,7 @@ public:
     bool delta_is_none = true;
     double alpha = 0;
     double beta = 0;
-    double gamma = 4;
+    double gamma = 100;
     double delta = 0;
 };
 

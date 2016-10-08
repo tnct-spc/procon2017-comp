@@ -254,6 +254,17 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         painter.drawImage(QRectF(getPosition(QPointF(0,rawpic_height_margin),RIGHT),getPosition(QPointF(1,1-rawpic_height_margin),RIGHT)), *pieces_pic);
         //draw number
         int count = 0;
+
+        //oitenaipiece
+        std::vector<bool> is_put;
+        int piece_size = field->getElementaryPieces().size();
+        for(int i=0;i<piece_size;i++){
+            is_put.push_back(false);
+        }
+        for(auto piece : field->getFrame().getJointedPieces()){
+            is_put.at(piece.getId()) = true;
+        }
+
         for(cv::Point& pos : *pieces_pos){
             QPointF display_pos = getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.025), Space::RIGHT);
             QPointF inverse_display_pos = getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.035,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.035), Space::RIGHT);
@@ -281,6 +292,19 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             font.setPointSize(std::abs(getScale()/30));
             painter.setFont(font);
             painter.drawText(display_pos, QString::number(count));
+
+            //non put piece
+            if(is_put.at(count) == false){
+                painter.setPen(QPen(QColor(color_id)));
+                QFont font = painter.font();
+                font.setPointSize(std::abs(getScale()/20));
+                painter.setFont(font);
+                painter.setPen(QPen(QColor("#0000ff")));
+                painter.drawText(inverse_display_pos, "●");
+                painter.setPen(QPen(QColor("#00ff00")));
+                painter.drawText(inverse_display_pos, "@");
+            }
+
             count++;
         }
     }
