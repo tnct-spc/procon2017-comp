@@ -31,6 +31,9 @@ private:
     Solver* solver;
     ImageRecognition imrec;
 
+    int field_stack_pointer=0;
+    std::vector<procon::Field> field_stack;
+
     //Calibration
     const std::string calibration_data_file_path = "./../../procon2016-comp/picture/cal/calibration.yml";
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
@@ -71,6 +74,8 @@ private slots:
 
     void pauseClicked();
     void startClicked();
+    void leftClicked();
+    void rightClicked();
 
 };
 
