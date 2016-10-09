@@ -290,6 +290,28 @@ void BeamSearch::run(procon::Field field)
             DOCK->addAnswer(field);
             cnt++;
         }
+
+        auto lambda = [](procon::Field const& a,procon::Field const& b) {
+            double a_area,b_area;
+            auto calcArea = [](procon::Field const& a)
+            {
+                double sum = 0;
+                auto const& pieces = a.getElementaryPieces();
+                for (int i = 0;i < pieces.size();i++) {
+                    if(!a.getIsPlaced().at(i)) {
+                        sum += bg::area(pieces.at(i).getPolygon());
+                    }
+                }
+                return sum;
+            };
+
+            a_area = calcArea(a);
+            b_area = calcArea(b);
+            return a_area < b_area;
+        };
+
+        std::sort(field_vec.begin(),field_vec.end(),lambda);
+
         submitAnswer(field_vec.at(0));
     }
     return;
