@@ -43,7 +43,7 @@ bool MainWindow::get()
     if(network_error_flag) return false;
     std::string raw_data = getreply->readAll().constData();
 
-    std::cout<<"finish get"<<std::endl;
+    //std::cout<<"finish get"<<std::endl;
 
     //save src
     std::ofstream outputfile(SAVE_PROBLEM_PATH);
@@ -87,7 +87,7 @@ bool MainWindow::emitAnswer(procon::Field field)
     //io
     procon::PolygonIO::exportAnswer(field,SAVE_ANSWER_PATH);
 
-    std::cout<<"challenge send"<<std::endl;
+    //std::cout<<"challenge send"<<std::endl;
 
     //send
     QFile answer_file(QString::fromStdString(SAVE_ANSWER_PATH));
@@ -102,12 +102,12 @@ bool MainWindow::emitAnswer(procon::Field field)
     connect(postreply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
 
-    std::cout<<"sending :"<<postData.toString(QUrl::FullyEncoded).toUtf8().toStdString()<<std::endl;
+    //std::cout<<"sending :"<<postData.toString(QUrl::FullyEncoded).toUtf8().toStdString()<<std::endl;
     answer_file.close();
 
     if(network_error_flag) return false;
 
-    std::cout<<"finish send"<<std::endl;
+    //std::cout<<"finish send"<<std::endl;
 
     ui->state->setText(QString::fromStdString(std::string(postreply->readAll().constData())));
 

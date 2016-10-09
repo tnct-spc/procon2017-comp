@@ -229,8 +229,8 @@ void Hazama::run()
 
             if(ui->selectImageData->isChecked()){
                 //環境によっては動かない
-                frame_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
-                pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
+                frame_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc").toStdString();
+                pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc").toStdString();
             }
             cv::Mat nocframe = cv::imread(frame_path, 1);
             cv::Mat nocpieces = cv::imread(pieces_path, 1);

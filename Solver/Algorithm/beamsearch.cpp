@@ -260,7 +260,6 @@ void BeamSearch::run(procon::Field field)
             if(!delta_is_none) evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
         }
 
-        std::cout << "clear" << std::endl;
         if (evaluations.empty()){
             submitAnswer(buckup_field);
             return;
