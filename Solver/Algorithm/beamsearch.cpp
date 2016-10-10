@@ -266,7 +266,12 @@ void BeamSearch::run(procon::Field field)
         }
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
+
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
+
+        std::sort(field_vec.begin(),field_vec.end(),[](procon::Field const& rhs,procon::Field const& lhs){
+            return rhs.getTotalEvaluation() > lhs.getTotalEvaluation();
+        });
 
         //return field_vec[0];
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
