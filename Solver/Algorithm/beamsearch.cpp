@@ -24,7 +24,7 @@ void BeamSearch::initialization()
 #else
     beam_width = 100;
 #endif
-    variety_width = 20;
+    variety_width = 0;
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -264,7 +264,6 @@ void BeamSearch::run(procon::Field field)
             if(!epsilon_is_none) evaluation.evaluation += epsilon * this->evaluateArea(evaluation,field_vec);
         }
 
-        //std::cout << "clear" << std::endl;
         if (evaluations.empty()){
             submitAnswer(buckup_field);
             return;
@@ -294,6 +293,28 @@ void BeamSearch::run(procon::Field field)
             DOCK->addAnswer(field);
             cnt++;
         }
+
+        auto lambda = [](procon::Field const& a,procon::Field const& b) {
+            double a_area,b_area;
+            auto calcArea = [](procon::Field const& a)
+            {
+                double sum = 0;
+                auto const& pieces = a.getElementaryPieces();
+                for (int i = 0;i < pieces.size();i++) {
+                    if(!a.getIsPlaced().at(i)) {
+                        sum += bg::area(pieces.at(i).getPolygon());
+                    }
+                }
+                return sum;
+            };
+
+            a_area = calcArea(a);
+            b_area = calcArea(b);
+            return a_area < b_area;
+        };
+
+        std::sort(field_vec.begin(),field_vec.end(),lambda);
+
         submitAnswer(field_vec.at(0));
         this->length_error += gosa;
         this->angle_error += gosa_angle;

@@ -30,7 +30,7 @@ public:
     bool epsilon_is_none = true;
     double alpha = 0;
     double beta = 0;
-    double gamma = 4;
+    double gamma = 100;
     double delta = 0;
     double epsilon = 0;
 };

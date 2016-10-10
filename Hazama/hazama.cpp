@@ -79,6 +79,9 @@ void Hazama::emitAnswer(procon::Field field)
         }
     }
 
+    field_stack.push_back(field);
+    field_stack_pointer++;
+
     //Display answer
     // Wait 1msec
     QEventLoop loop;
@@ -89,6 +92,32 @@ void Hazama::emitAnswer(procon::Field field)
     }
     //PolygonViewer::getInstance().pushPolygon(field.getFrame(),std::string("Answer Frame"));
     //PolygonViewer::getInstance().pushPolygon(field.getFrame().getJointedPieces().at(0),std::string("Answer Piece No.0"));
+}
+
+void Hazama::leftClicked()
+{
+    if(field_stack_pointer != 1){
+        field_stack_pointer--;
+    }
+    board->setField(field_stack.at(field_stack_pointer-1));
+    //Display answer
+    // Wait 1msec
+    QEventLoop loop;
+    QTimer::singleShot(1, &loop, SLOT(quit()));
+    loop.exec();
+}
+
+void Hazama::rightClicked()
+{
+    if(field_stack_pointer != field_stack.size()){
+        field_stack_pointer++;
+    }
+    board->setField(field_stack.at(field_stack_pointer-1));
+    //Display answer
+    // Wait 1msec
+    QEventLoop loop;
+    QTimer::singleShot(1, &loop, SLOT(quit()));
+    loop.exec();
 }
 
 void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOfImages)
@@ -200,8 +229,8 @@ void Hazama::run()
 
             if(ui->selectImageData->isChecked()){
                 //環境によっては動かない
-                frame_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
-                pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc/9016-4EF8/DCIM/103_0103/").toStdString();
+                frame_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc").toStdString();
+                pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc").toStdString();
             }
             cv::Mat nocframe = cv::imread(frame_path, 1);
             cv::Mat nocpieces = cv::imread(pieces_path, 1);
