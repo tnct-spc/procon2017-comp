@@ -278,14 +278,6 @@ void BeamSearch::run(procon::Field field)
         // Output Answer
         int cnt = 0;
         for(auto& field: field_vec){
-#ifdef HYOKA_MODE
-            field.evaluation_normal = evaluations.at(cnt).evaluation_normal;
-            field.evaluation_angle = evaluations.at(cnt).evaluation_angle;
-            field.evaluation_length = evaluations.at(cnt).evaluation_length;
-            field.evaluation_history = evaluations.at(cnt).evaluation_history;
-            field.evaluation_frame = evaluations.at(cnt).evaluation_frame;
-#endif
-            field.evaluation_sum = evaluations.at(cnt).evaluation;
             DOCK->addAnswer(field);
             cnt++;
         }
