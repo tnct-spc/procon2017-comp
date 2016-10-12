@@ -3,19 +3,22 @@
 #include "utilities.h"
 
 //#define GOSA_CHECK_MODE
+//#define HYOKA_MODE
 
 std::unique_ptr<QImage> AnswerBoard::pieces_pic;
 std::unique_ptr<std::vector<cv::Point>> AnswerBoard::pieces_pos;
 std::unique_ptr<std::vector<cv::Vec3b>> AnswerBoard::random_colors;
 bool AnswerBoard::is_set_rawpic = false;
 
-AnswerBoard::AnswerBoard(QWidget *parent) :
+AnswerBoard::AnswerBoard(int id, bool is_single_mode, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::AnswerBoard)
+    ui(new Ui::AnswerBoard),
+    id(id),
+    SINGLE_MODE(is_single_mode)
 {
     ui->setupUi(this);
 
-    connect(this,&AnswerBoard::clicked,this,&AnswerBoard::printBigWindow);
+    connect(this,&AnswerBoard::clicked,this,&AnswerBoard::handleClickAction);
 }
 
 AnswerBoard::~AnswerBoard()
@@ -28,8 +31,6 @@ void AnswerBoard::setField(const procon::Field &field)
     is_set_field = true;
     this->field = Utilities::make_unique<procon::Field>(field);
     this->update();
-
-    print_field = field;
 
     //set putid_list
     putid_list.clear();
@@ -45,7 +46,7 @@ void AnswerBoard::setField(const procon::Field &field)
     int jointed_pieces_size = pieces.size();
     if(jointed_pieces_size >= 1){
         putid_list.erase(putid_list.begin());
-        putid_left = pieces.at(0).getId();
+        putid_left = pieces.front().getId();
     }
     if(jointed_pieces_size >= 2){
         putid_list.pop_back();
@@ -127,17 +128,15 @@ void AnswerBoard::paintEvent(QPaintEvent *)
     const QString color_arrow_right= "#00ff00";
     const QString color_corner_begin_id = "#00ffff";
 
-
-
-
+    //サポート矢印のためのピース位置保管変数
     std::array<QPointF,50> field_pieces_pos;
     std::array<QPointF,50> rawpic_pieces_pos;
 
-    //draw background
+    // Draw background
     painter.setBrush(QBrush(QColor(color_background)));
     painter.drawRect(0,0,this->width(),this->height());
 
-    //draw field
+    // Draw field
     if(is_set_field){
         auto drawPiece = [&](procon::ExpandedPolygon piece){
             int piece_id = piece.getId();
@@ -183,29 +182,21 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             }
         };
 
-        //
-        //int count = 0;
-        //for(auto piece : field->getElementaryPieces()){
-        //    displays.push_back(new SinglePolygonDisplay());
-        //    displays[count]->resetPolygonForce(piece,30,std::to_string(count));
-        //    displays[count]->show();
-        //    count++;
-        //}
-        //draw frame
+        // Draw frame outer
         painter.setPen(QPen(Qt::black, 0));
         painter.setBrush(QBrush(QColor(color_frame)));
         drawPolygon(field->getFrame().getPolygon(),Space::LEFT);
 
-        //draw frame inners
+        // Draw frame inners
         painter.setBrush(QBrush(QColor(color_inner)));
         drawPolygonInners(field->getFrame().getPolygon(),Space::LEFT);
 
-        //draw pieces
+        // Draw pieces(使わなかった)
         for(auto piece : field->getPieces()){
             drawPiece(piece);
         }
 
-        //draw frame-jointed pieces
+        // Draw pieces jointed frame
         for(procon::ExpandedPolygon piece : field->getFrame().getJointedPieces()){
 #ifdef GOSA_CHECK_MODE
             piece.translatePolygon(30,0);
@@ -213,7 +204,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             drawPiece(piece);
         }
 
-        //draw Eva
+        // Draw Evaluation
         QPointF display_pos = getPosition(QPointF(0/frame_size,3/frame_size), Space::LEFT);
         painter.setPen(QPen(QColor(color_id)));
         QFont font = painter.font();
@@ -221,7 +212,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         painter.setFont(font);
         painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"     :     "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
 #ifdef HYOKA_MODE
-        //draw kaku Eva
+        // Draw each Evaluation
         display_pos = getPosition(QPointF(0/frame_size,6/frame_size), Space::LEFT);
         painter.setPen(QPen(QColor(color_id)));
         font = painter.font();
@@ -229,33 +220,19 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         painter.setFont(font);
         painter.drawText(display_pos, QString::number(field->evaluation_sum) + "=" + QString::number(field->evaluation_normal) + "+" + QString::number(field->evaluation_angle) + "+" + QString::number(field->evaluation_length) + "+" + QString::number(field->evaluation_history) + "+" + QString::number(field->evaluation_frame));
 #endif
-
-        //draw frame-jointed pieces number
-        /*
-        const int max_len = 10;
-        int cnt = 0;
-        for(auto piece : field->getFrame().getJointedPieces()){
-            QPointF display_pos = getPosition(QPointF((27+3*(cnt/max_len))/frame_size,(3*(cnt%max_len))/frame_size), Space::LEFT);
-            painter.drawText(display_pos, QString::number(piece.getId()));
-            cnt++;
-        }
-        */
-
     }
 
-    //draw rawpic
+    // Draw rawpic
 #ifdef GOSA_CHECK_MODE
-    if(1==0){
+    if(false){
 #else
     if(!SINGLE_MODE && is_set_rawpic){
 #endif
-        //draw pic
+        // Draw pic
         double rawpic_height_margin = (1-((double)pieces_pic->height()/(double)pieces_pic->width()))/2;
         painter.drawImage(QRectF(getPosition(QPointF(0,rawpic_height_margin),RIGHT),getPosition(QPointF(1,1-rawpic_height_margin),RIGHT)), *pieces_pic);
-        //draw number
-        int count = 0;
 
-        //oitenaipiece
+        // Draw pieces numbers
         std::vector<bool> is_put;
         int piece_size = field->getElementaryPieces().size();
         for(int i=0;i<piece_size;i++){
@@ -264,16 +241,15 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         for(auto piece : field->getFrame().getJointedPieces()){
             is_put.at(piece.getId()) = true;
         }
+        for(int piece_count = 0; piece_count < pieces_pos->size(); ++piece_count){
+            QPointF display_pos = getPosition(QPointF(((double)pieces_pos->at(piece_count).x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pieces_pos->at(piece_count).y/(double)pieces_pic->height()))+0.025), Space::RIGHT);
+            QPointF inverse_display_pos = getPosition(QPointF(((double)pieces_pos->at(piece_count).x/(double)pieces_pic->width())-0.035,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pieces_pos->at(piece_count).y/(double)pieces_pic->height()))+0.035), Space::RIGHT);
+            rawpic_pieces_pos.at(piece_count) = display_pos;
 
-        for(cv::Point& pos : *pieces_pos){
-            QPointF display_pos = getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.025), Space::RIGHT);
-            QPointF inverse_display_pos = getPosition(QPointF(((double)pos.x/(double)pieces_pic->width())-0.035,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pos.y/(double)pieces_pic->height()))+0.035), Space::RIGHT);
-            rawpic_pieces_pos.at(count) = display_pos;
-
-            //inverse color
+            // Draw circle if polygon inversed
             bool is_inverse = false;
             for(auto piece : field->getFrame().getJointedPieces()){
-                if(count == piece.getId() && piece.is_inverse){
+                if(piece_count == piece.getId() && piece.is_inverse){
                     is_inverse = true;
                     break;
                 }
@@ -287,14 +263,15 @@ void AnswerBoard::paintEvent(QPaintEvent *)
                 painter.drawText(inverse_display_pos, "●");
             }
 
+            // Draw number
             painter.setPen(QPen(QColor(color_id)));
             QFont font = painter.font();
             font.setPointSize(std::abs(getScale()/30));
             painter.setFont(font);
-            painter.drawText(display_pos, QString::number(count));
+            painter.drawText(display_pos, QString::number(piece_count));
 
-            //non put piece
-            if(is_put.at(count) == false){
+            // Draw "@" if piece hadn't put
+            if(is_put.at(piece_count) == false){
                 painter.setPen(QPen(QColor(color_id)));
                 QFont font = painter.font();
                 font.setPointSize(std::abs(getScale()/20));
@@ -304,8 +281,6 @@ void AnswerBoard::paintEvent(QPaintEvent *)
                 painter.setPen(QPen(QColor("#00ff00")));
                 painter.drawText(inverse_display_pos, "@");
             }
-
-            count++;
         }
     }
 
@@ -325,7 +300,8 @@ void AnswerBoard::paintEvent(QPaintEvent *)
 void AnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     switch(event->key()){
-        case 16781616:
+        case 16781616:// caps lock
+            //左プレイヤーが置くピースを切り替える
             if(putid_list.size() == 0){
                 putid_left = -1;
             }else{
@@ -334,7 +310,8 @@ void AnswerBoard::keyPressEvent(QKeyEvent *event)
             }
             this->update();
             break;
-        case 16777220:
+        case 16777220:// enter
+            //右プレイヤーが置くピースを切り替える
             if(putid_list.size() == 0){
                 putid_right = -1;
             }else{
@@ -353,29 +330,20 @@ void AnswerBoard::mousePressEvent(QMouseEvent *event)
 {
     emit clicked(event);
 }
-#include <QMouseEvent>
-void AnswerBoard::printBigWindow(QMouseEvent *event)
+
+void AnswerBoard::handleClickAction(QMouseEvent *event)
 {
-    //emit clicked_with_id(id);
-
-    //AnswerBoard ans;
-
     int mousebutton = event->buttons();
 
-    if(SINGLE_MODE){
-
-        if(mousebutton == Qt::RightButton){
-                ans_board = new AnswerBoard();
-                ans_board->setField(print_field);
-                ans_board->showMaximized();
-        }else if(mousebutton == Qt::LeftButton){
-
-            emit clicked_with_id(id);
-
+    if(mousebutton == Qt::RightButton){
+        if(SINGLE_MODE){
+            ans_board = new AnswerBoard();
+            ans_board->setField(*field);
+            ans_board->showMaximized();
+        }
+    }else if(mousebutton == Qt::LeftButton){
+        if(SINGLE_MODE){
+            emit clicked_with_id(this->id);
         }
     }
-
-
-
-    //sleep(2000);
 }

@@ -36,7 +36,7 @@
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="0" column="0">
-      <layout class="QGridLayout" name="testd">
+      <layout class="QGridLayout" name="board_container">
        <property name="rightMargin">
         <number>0</number>
        </property>

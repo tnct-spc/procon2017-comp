@@ -11,6 +11,7 @@
 #include <QKeyEvent>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QObject>
 #include <QPainter>
 #include <QPen>
