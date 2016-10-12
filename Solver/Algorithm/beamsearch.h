@@ -27,9 +27,9 @@ public:
     bool beta_is_none = true;
     bool gamma_is_none = false;
     bool delta_is_none = true;
-    double alpha = 0;
+    double alpha = 1;
     double beta = 0;
-    double gamma = 100;
+    double gamma = 3;
     double delta = 0;
 };
 
