@@ -10,7 +10,7 @@ class OutputProblemPage : public QObject
     Q_OBJECT
 public:
     explicit OutputProblemPage(QObject *parent = 0);
-    void Service(QHttpRequest* request, QHttpResponse* response);
+    void Service(QHttpResponse* response);
 
 private:
     //pass

@@ -1,6 +1,7 @@
 #include "request_mapper.h"
 
-RequestMapper::RequestMapper(QObject *parent) : QObject(parent){
+RequestMapper::RequestMapper(QObject *parent) : QObject(parent)
+{
 
     QDir().mkdir("docroot");
     QDir().mkdir("docroot/answer");
@@ -13,20 +14,24 @@ RequestMapper::RequestMapper(QObject *parent) : QObject(parent){
     server->listen(8016);
 }
 
-void RequestMapper::service(QHttpRequest* request, QHttpResponse* response) {
-    std::cout << "getservice"<<std::endl;
+void RequestMapper::service(QHttpRequest* request, QHttpResponse* response)
+{
     QString path=request->path();
 
     if (path=="/" || path=="/help") {
+        std::cout << "requested help page"<<std::endl;
         P_help_page.Service(response);
     }
     else if (path=="/answer") {
+        std::cout << "requested answer page"<<std::endl;
         P_answer_page.Service(request, response);
     }
     else if (path.startsWith("/get")) {
-        P_output_problem_page.Service(request, response);
+        std::cout << "requested get page"<<std::endl;
+        P_output_problem_page.Service(response);
     }
     else {
+        std::cout << "request invalid"<<std::endl;
         response->writeHead(404);
         response->write("404 Not Found.");
         response->end();

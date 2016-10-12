@@ -8,7 +8,6 @@ int main(int argc, char *argv[])
     PolygonViewer::getInstance();
 
     Hazama w;
-    w.init();
     w.show();
 
     return a.exec();

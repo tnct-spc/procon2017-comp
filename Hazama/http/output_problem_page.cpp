@@ -2,23 +2,11 @@
 
 OutputProblemPage::OutputProblemPage(QObject *parent) : QObject(parent)
 {
-    //empty
 }
 
-void OutputProblemPage::Service(QHttpRequest *request, QHttpResponse *response){
-    //std::cout<<"getRequest get with body="<<request->body().data()<<std::endl;
-    /*
-    //get addless
-    QString addless =request->url().toString();
-
-    //saerch filename
-    int filelen=addless.length();
-    int seek=filelen-1;
-    while(addless.mid(seek,1)!="/") seek--;
-    */
-
-    //open problem file
-    //QString filename_problem=ProblemFolderName+addless.mid(seek);
+void OutputProblemPage::Service(QHttpResponse *response)
+{
+    // Open problem file
     QString filename_problem = ProblemFileName;
     QFile problem(filename_problem);
     if(problem.open(QIODevice::ReadOnly)){
@@ -28,10 +16,8 @@ void OutputProblemPage::Service(QHttpRequest *request, QHttpResponse *response){
         problem.close();
     }else{
         response->writeHead(404);
-        //response->write("404 Not Found.");
         response->write("Not yet been generated file.");
         response->end();
     }
-    std::cout<<"getRequest end"<<std::endl;
 }
 

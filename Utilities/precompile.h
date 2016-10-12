@@ -18,6 +18,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QSharedPointer>
+#include <QtCore>
 #include <QtCore/qglobal.h>
 #include <QUrl>
 #include <QUrlQuery>
@@ -53,6 +54,9 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/ring.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/optional.hpp>
 
 /*openCV*/
 #include <opencv2/core/core.hpp>
