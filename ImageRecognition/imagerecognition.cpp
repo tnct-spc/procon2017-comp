@@ -5,24 +5,27 @@
 
 procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
-    //raw_pieces_pic = cv::Mat(raw_pieces_image,cv::Rect(250,0,1450,1080));
     raw_pieces_pic = raw_pieces_image;
 
-    //前処理
+    // 二値化,前処理.
     cv::Mat frame_image = preprocessingFrame(raw_frame_image);
     std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
 
+    // ピースはひとつひとつの画像に分ける
     std::vector<cv::Mat> images;
     images.push_back(frame_image);
     for(cv::Mat& piece : pieces_images) images.push_back(piece);
 
-    //線分検出
+    // 線分検出
     std::vector<std::vector<cv::Vec4f>> pieces_lines = LineDetection(images);
 
-    //ベクター化
+    // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
-    return makeField(polygons);
+    // fieldクラスのデータに変換
+    procon::Field field = makeField(polygons);
+
+    return std::move(field);
 }
 
 void ImageRecognition::threshold(cv::Mat& image)
@@ -30,13 +33,10 @@ void ImageRecognition::threshold(cv::Mat& image)
     //resize
     image = cv::Mat(image,cv::Rect(500,0,3300,2664));
 
-
     //cv::namedWindow("capture",cv::WINDOW_NORMAL);
     //cv::imshow("capture",image);
 
-
-
-    /* kido
+    /* ヒストグラム均一化の残骸
     // get d
     std::vector<cv::Mat> white_channels(3);
     cv::Mat hsv_white;
@@ -81,7 +81,6 @@ void ImageRecognition::threshold(cv::Mat& image)
         imageD.at<unsigned char>(y,x) += ave - whiteD.at<unsigned char>(y,x);
     }
 
-
     // merge d
     image_channels[2] = imageD;
     cv::merge(image_channels, hsv_image);
@@ -91,20 +90,11 @@ void ImageRecognition::threshold(cv::Mat& image)
 
     cv::Mat normal_area,koge_area;
 
-    //色抽出 H:0-180/180, S:76-255/255, B:76-153/255
+    // 色抽出 H:180, S:255, B:255
     colorExtraction(&image, &normal_area, CV_BGR2HSV, 0, 180, 89, 255, 76, 148);
-    //colorExtraction(&image, &normal_area, CV_BGR2HSV, 0, 180, 89, 255, 76, 140);
     colorExtraction(&image, &koge_area, CV_BGR2HSV, 5, 20, 153, 255, 43, 90);
 
-    //グレースケールに変換
-    cvtColor(normal_area,normal_area,CV_RGB2GRAY);
-    cvtColor(koge_area,koge_area,CV_RGB2GRAY);
-
-    //二値化
-    cv::threshold(normal_area,normal_area, 0, 255, cv::THRESH_BINARY_INV);
-    cv::threshold(koge_area,koge_area, 0, 255, cv::THRESH_BINARY_INV);
-
-    //syn
+    // 通常部分とこげ部分をマージ
     cv::bitwise_and(normal_area,koge_area,image);
 
     //cv::namedWindow("capturerer",cv::WINDOW_NORMAL);
@@ -113,40 +103,20 @@ void ImageRecognition::threshold(cv::Mat& image)
     //cv::imshow("capturer",normal_area);
     //cv::namedWindow("capturern",cv::WINDOW_NORMAL);
     //cv::imshow("capturern",koge_area);
-
 }
 
 cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
 {
+    // 二値化
     threshold(image);
+
+    // 白黒を反転？
+    cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
+
     int rows = image.rows;
     int cols = image.cols;
 
-    /*
-    //ピース内に混じっている白い穴を削除
-    cv::Mat hole_label;
-    cv::Mat hole_label_stats;
-    cv::Mat buf;
-    int hole_num = cv::connectedComponentsWithStats(image, hole_label, hole_label_stats, buf, 4);
-    std::vector<int> labels_area;
-    for(int i=2;i<hole_num;++i){
-        labels_area.push_back(hole_label_stats.ptr<int>(i)[cv::ConnectedComponentsTypes::CC_STAT_AREA]);
-    }
-    int max_val=0;
-    int max_num=0;
-    for(int i=0;i<(int)labels_area.size();++i){
-        if(labels_area[i] > max_val){
-            max_val = labels_area[i];
-            max_num = i + 2;
-        }
-    }
-    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++) image.at<unsigned char>(y,x) = (hole_label.at<int>(y,x) == 1 || hole_label.at<int>(y,x) == max_num) ? 255 : 0;
-    */
-
-    //二値化
-    cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
-
-    //ピースを一つ一つに分ける
+    // ピースを一つ一つに分ける
     struct minmax2D{
         int minX = 10000;
         int maxX = 0;
@@ -177,10 +147,9 @@ cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
     }
     delete piece_label;
 
-    //triming, and delete small noise
+    // ピースのサイズに画像をカット、小さいものはノイズとみなして除去
     const int NOIZE_SIZE = 100;
     std::vector<cv::Mat> result_images;
-    //cv::Mat framing_image(rows,cols,CV_8UC1);
     int count=0;
     for(auto &im: images){
         if(minmaxs[count].maxX-minmaxs[count].minX < NOIZE_SIZE && minmaxs[count].maxY-minmaxs[count].minY < NOIZE_SIZE){
@@ -195,50 +164,35 @@ cv::Mat ImageRecognition::preprocessingFrame(cv::Mat image)
 
         count++;
     }
-    /*
-    std::cout<<"c="<<result_images.size()<<std::endl;
-    for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++)
-    {
-        bool dot = 0;
-        for(auto& result : result_images){
-            dot &= result.at<unsigned char>(y,x);
-        }
-        framing_image.at<unsigned char>(y,x) = dot? 255 : 0;
-    }
-
-    cv::namedWindow("result",cv::WINDOW_NORMAL);
-    cv::imshow("result",result_images[0]);
-    cv::namedWindow("framing",cv::WINDOW_NORMAL);
-    cv::imshow("framing",framing_image);
-    cv::waitKey(0);
-    */
 
     return std::move(result_images[0]);
 }
 
 std::vector<cv::Mat> ImageRecognition::preprocessingPieces(cv::Mat image)
 {
+    // 二値化
     threshold(image);
+
     int rows = image.rows;
     int cols = image.cols;
 
-    //ピース内に混じっている白い穴を削除
+    // Labeling ピース内に混じっている白い穴を削除
     cv::Mat hole_label;
     cv::connectedComponents(image, hole_label,4);
     for (int y = 0; y < rows; y++) for (int x = 0; x < cols; x++) image.at<unsigned char>(y,x) = hole_label.at<int>(y,x) == 1  ? 255 : 0;
 
-    //二値化
+    // 白黒を反転？
     cv::threshold(image, image, 0, 255, cv::THRESH_BINARY_INV);
 
-    //ピースを一つ一つに分ける
 
-    //get blackzone label
+    /*このあたりはつらいが綺麗にする気力がない*/
+
+
+    // Delete small noise from image
     cv::Mat blackzone_label;
     cv::Mat blackzone_stats;
     cv::Mat blackzone_centroids;
     int blackzone_num = cv::connectedComponentsWithStats(image, blackzone_label, blackzone_stats, blackzone_centroids, 4);
-
-    //delete small noise from image
     const int NOIZE_SIZE = 100;
     std::vector<bool> isErase;
     for(int i=0;i<blackzone_num;++i){
@@ -256,21 +210,21 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(cv::Mat image)
         }
     }
 
-    //get pieces label
+    // Labeling
     cv::Mat pieces_label;
     cv::Mat pieces_stats;
     cv::Mat pieces_centroids;
     int piece_num = cv::connectedComponentsWithStats(image, pieces_label, pieces_stats, pieces_centroids, 4);
     piece_num--; //white zone
 
-    //make random color
+    // Make random color
     std::random_device rd;
     std::uniform_real_distribution<double> rand(0,255);
     for(int i=0;i<piece_num;++i){
         raw_random_colors.push_back(cv::Vec3b(rand(rd),rand(rd),rand(rd)));
     }
 
-    //reset images
+    // Reset images?
     std::vector<cv::Mat> images;
     for(int i=0;i<piece_num;++i) images.push_back(cv::Mat(rows,cols,CV_8UC1));
     for(int i=0;i<piece_num;++i){
@@ -279,7 +233,7 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(cv::Mat image)
         }
     }
 
-    //sepalate image, and calc minmax, and make color image
+    // Sepalate image and make color image
     struct minmax2D{
         int minX = 10000;
         int maxX = 0;
@@ -305,7 +259,7 @@ std::vector<cv::Mat> ImageRecognition::preprocessingPieces(cv::Mat image)
     }
     raw_colored_pic = color_image;
 
-    //triming, and get piece raw pos
+    // Triming, and get piece raw pos
     std::vector<cv::Mat> result_images;
     int count=0;
     for(auto &im: images){
@@ -336,6 +290,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         //描画
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
+        // Debug
         //if (1==1 || count + 1 == 14) {
         //    cv::namedWindow(std::to_string(count+1));
         //    cv::imshow(std::to_string(count+1), pic);
@@ -630,19 +585,6 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         }
     }
 
-    //表示
-    /*
-    int count = 0;
-    for (auto po:polygons){
-        procon::ExpandedPolygon ishowta;
-        ishowta.resetPolygonForce(po);
-        count++;
-        std::cout << "piece" << bg::dsv(po) << std::endl;
-    }*/
-    //std::cout << "frame" << bg::dsv(polygons.at(0)) << std::endl;
-    procon::ExpandedPolygon po;
-    po.resetPolygonForce(polygons.at(0));
-    PolygonViewer::getInstance().pushPolygon(po,"hoge",-1);
     return std::move(polygons);
 }
 
@@ -733,61 +675,34 @@ procon::Field ImageRecognition::makeField(std::vector<polygon_t> polygons){
     return field;
 }
 
-void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst,
-    int code,
-    int ch1Lower, int ch1Upper,
-    int ch2Lower, int ch2Upper,
-    int ch3Lower, int ch3Upper
-    )
+void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst, int code, int ch1Lower, int ch1Upper, int ch2Lower, int ch2Upper, int ch3Lower, int ch3Upper)
 {
     cv::Mat colorImage;
-    int lower[3];
-    int upper[3];
-
-    cv::Mat lut = cv::Mat(256, 1, CV_8UC3);
+    std::vector<int> lower = {ch1Lower,ch2Lower,ch3Lower};
+    std::vector<int> upper = {ch1Upper,ch2Upper,ch3Upper};
 
     cv::cvtColor(*src, colorImage, code);
 
-    lower[0] = ch1Lower;
-    lower[1] = ch2Lower;
-    lower[2] = ch3Lower;
-
-    upper[0] = ch1Upper;
-    upper[1] = ch2Upper;
-    upper[2] = ch3Upper;
-
-    for (int i = 0; i < 256; i++){
-        for (int k = 0; k < 3; k++){
-            if (lower[k] <= upper[k]){
-                if ((lower[k] <= i) && (i <= upper[k])){
-                    lut.data[i*lut.step+k] = 255;
-                }else{
-                    lut.data[i*lut.step+k] = 0;
-                }
-            }else{
-                if ((i <= upper[k]) || (lower[k] <= i)){
-                    lut.data[i*lut.step+k] = 255;
-                }else{
-                    lut.data[i*lut.step+k] = 0;
-                }
+    colorImage.forEach<cv::Vec3b>([&lower, &upper](cv::Vec3b &p, const int* position) -> void {
+        bool is_extract = [&]()->bool{
+            for(int i=0;i<3;++i){
+                if(!((lower[i] <= p[i]) && (p[i] <= upper[i]))) return false;
             }
+            return true;
+        }();
+
+        if(is_extract){
+            for(int i=0;i<3;++i) p[i] = 255;
+        }else{
+            for(int i=0;i<3;++i) p[i] = 0;
         }
-    }
+    });
 
-    //LUTを使用して二値化
-    cv::LUT(colorImage, lut, colorImage);
+    // グレースケールに変換
+    cvtColor(colorImage,colorImage,CV_RGB2GRAY);
 
-    //Channel毎に分解
-    std::vector<cv::Mat> planes;
-    cv::split(colorImage, planes);
+    // 二値化
+    cv::threshold(colorImage,colorImage, 0, 255, cv::THRESH_BINARY_INV);
 
-    //マスクを作成
-    cv::Mat maskImage;
-    cv::bitwise_and(planes[0], planes[1], maskImage);
-    cv::bitwise_and(maskImage, planes[2], maskImage);
-
-    //出力
-    cv::Mat maskedImage;
-    src->copyTo(maskedImage, maskImage);
-    *dst = maskedImage;
+    *dst = colorImage;
 }

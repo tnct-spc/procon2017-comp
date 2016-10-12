@@ -37,6 +37,7 @@ private:
         int ch2Lower, int ch2Upper,
         int ch3Lower, int ch3Upper
         );
+
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;
     std::vector<cv::Point> raw_pieces_pos;
