@@ -24,7 +24,7 @@ void BeamSearch::initialization()
 #else
     beam_width = 100;
 #endif
-    variety_width = 0;
+    variety_width = 20;
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -240,8 +240,8 @@ void BeamSearch::run(procon::Field field)
         }
 
         buckup_field = field_vec.at(0);
-        this->evaluateNextMove(evaluations,field_vec);
         this->evaluateHistoryInit(field_vec);
+        this->evaluateNextMove(evaluations,field_vec);
         for(Evaluation & evaluation: evaluations) {
 #ifdef HYOKA_MODE
             evaluation.evaluation_normal = evaluation.evaluation;

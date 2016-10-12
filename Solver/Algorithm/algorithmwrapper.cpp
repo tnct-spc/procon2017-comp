@@ -201,18 +201,22 @@ double AlgorithmWrapper::evaluateUniqueLength(Evaluation const& evaluation,std::
 
 void AlgorithmWrapper::evaluateHistoryInit(std::vector<procon::Field> const& field_vec)
 {
-    auto maxLambda = [](procon::Field field_a,procon::Field field_b)
+    auto compLambda = [](procon::Field field_a,procon::Field field_b)
     {
         return field_a.getTotalEvaluation() < field_b.getTotalEvaluation();
     };
-    auto const& max_field = *(std::max_element(field_vec.begin(),field_vec.end(),maxLambda));
-    norm = max_field.getTotalEvaluation();
+    auto const& max_field = *(std::max_element(field_vec.begin(),field_vec.end(),compLambda));
+    auto const& min_field = *(std::min_element(field_vec.begin(),field_vec.end(),compLambda));
+    history_max = max_field.getTotalEvaluation();
+    history_min = min_field.getTotalEvaluation();
 }
 
 double AlgorithmWrapper::evaluateHistory(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec)
 {
-    if (norm != 0){
-        return field_vec.at(evaluation.vector_id).getTotalEvaluation() / norm;
+    if (history_max - history_min != 0){
+        double const& eva = field_vec.at(evaluation.vector_id).getTotalEvaluation();
+        double ret = ((1.0 / (history_max - history_min)) * (eva - history_min));
+        return ret;
     } else {
         return 0.0;
     }

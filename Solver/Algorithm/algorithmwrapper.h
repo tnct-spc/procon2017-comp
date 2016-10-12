@@ -36,7 +36,9 @@ public:
     static constexpr double length_base = 2;
 
     //History
-    double norm = 0;
+    double history_max;
+    double history_min;
+
     AlgorithmWrapper();
     virtual ~AlgorithmWrapper() = default;
 
