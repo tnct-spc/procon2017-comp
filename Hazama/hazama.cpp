@@ -60,7 +60,7 @@ void Hazama::init()
 
 void Hazama::acceptAnswer(QString file_path)
 {
-    std::cout<<"accept!!!!!!!!!!!!!!!!!"<<std::endl;
+    std::cout<<"accept new answer"<<std::endl;
     //get POST puzzle answer data
     procon::Field field = procon::PolygonIO::importAnswer(file_path.toStdString(),PDATA);
 
@@ -163,7 +163,7 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
             image_points.push_back(centers);
 
         } else {
-            cout << "not found" << endl;
+            cout << "error! chess board not found" << endl;
         }
     }
 
@@ -259,19 +259,13 @@ void Hazama::run()
         return;
     }
 
-    int cnt=0;
-    for(procon::ExpandedPolygon a:PDATA.getElementaryPieces()){
-        std::cout<<cnt<<a.getSize()<<std::endl;
-        cnt++;
-    }
-
     // Hide HAZAMA
     //this->showMinimized();
 
     if(ui->server_mode_radio->isChecked()){
         /*Save Puzzle*/
         std::string PROBLEM_SAVE_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
-        std::cout<<PROBLEM_SAVE_PATH<<std::endl;
+        std::cout<<"Save problem in : "<<PROBLEM_SAVE_PATH<<std::endl;
         procon::PolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
     }else{
         //Solve puzzle
@@ -368,12 +362,10 @@ int Hazama::selectWebCamera()
 
     if (MsgBox.clickedButton() == button0) {
 
-        std::cout << "0" << std::endl;
         return 0;
 
     } else if(MsgBox.clickedButton() == button1) {
 
-        std::cout << "1" << std::endl;
         return 1;
 
     }
@@ -483,7 +475,7 @@ void Hazama::clickedApply_1_Button()
 {
 
     //threshold::test_threshold_san = 99999;
-    std::cout << "clicked_1_button" << std::endl;
+    std::cout << "clicked_apply_1_button" << std::endl;
     threshold::LSDthrehold = static_cast<double>(ui->horizontalSlider_1->value()) /100;
     //
     std::cout << "LSDthrehold set to " << threshold::LSDthrehold << std::endl;
@@ -493,21 +485,21 @@ void Hazama::clickedApply_1_Button()
 void Hazama::clickedApply_2_Button()
 {
 
-    std::cout << "clicked_2_button" << std::endl;
+    std::cout << "clicked_apply_2_button" << std::endl;
 
 }
 
 void Hazama::clickedApply_3_Button()
 {
 
-    std::cout << "clicked_3_button" << std::endl;
+    std::cout << "clicked_apply_3_button" << std::endl;
 
 }
 
 void Hazama::clickedApply_4_Button()
 {
 
-    std::cout << "clicked_4_button" << std::endl;
+    std::cout << "clicked_apply_4_button" << std::endl;
 
 }
 

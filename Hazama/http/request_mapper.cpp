@@ -9,7 +9,7 @@ RequestMapper::RequestMapper(QObject *parent) : QObject(parent){
     QObject::connect(server, SIGNAL(newRequest(QHttpRequest*,QHttpResponse*)), this, SLOT(service(QHttpRequest*,QHttpResponse*)));
 
     QObject::connect(&P_answer_page, SIGNAL(getAnswer(QString)), this, SLOT(acceptAnswer(QString)));
-    std::cout<<"con"<<std::endl;
+
     server->listen(8016);
 }
 

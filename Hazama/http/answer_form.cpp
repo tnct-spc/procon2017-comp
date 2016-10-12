@@ -4,7 +4,7 @@ AnswerForm::AnswerForm(QObject *parent) : QObject(parent) {
     // empty
 }
 void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
-    std::cout<<"get answer"<<std::endl;
+    std::cout<<"get new answer"<<std::endl;
     new_response_=response;
 
     if(request->body().isEmpty()){
@@ -20,7 +20,7 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
     QUrlQuery url_query(lowdata);
     QString raw_user_id = url_query.queryItemValue("id");
     QString pre_answer_data = url_query.queryItemValue("answer");
-    std::cout<<"predata="<<pre_answer_data.toStdString()<<std::endl;
+    //std::cout<<"predata="<<pre_answer_data.toStdString()<<std::endl;
 
     //Decode
     raw_user_id.replace("+"," ");
