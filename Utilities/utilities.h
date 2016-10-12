@@ -69,6 +69,7 @@ public:
         return ((num-len)%size + size) % size;
     }
 
+    // Not supported on c++11
     template<typename T, typename ...Args>
     static std::unique_ptr<T> make_unique( Args&& ...args )
     {
