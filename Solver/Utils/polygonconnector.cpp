@@ -172,7 +172,6 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     // ここで回転の誤差により角が一致しない場合がある。
     Ring new_ring;
     int count = complete_matching_end_pos_1 + 1;
-    int Type = 1;
     double x,y;
 
     // Frame Area

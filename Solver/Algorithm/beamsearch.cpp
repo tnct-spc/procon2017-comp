@@ -268,7 +268,7 @@ void BeamSearch::run(procon::Field field)
             {
                 double sum = 0;
                 auto const& pieces = a.getElementaryPieces();
-                for (int i = 0;i < pieces.size();i++) {
+                for (unsigned int i = 0;i < pieces.size();i++) {
                     if(!a.getIsPlaced().at(i)) {
                         sum += bg::area(pieces.at(i).getPolygon());
                     }

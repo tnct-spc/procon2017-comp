@@ -67,12 +67,12 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
     };
 
     for (auto& angle : angle_frequency) {
-        double real_max = *(std::max_element(angle_frequency.begin(),angle_frequency.end()));
-        double real_min = *(std::min_element(angle_frequency.begin(),angle_frequency.end()));
-        auto linerFunction = [&](double x)->double
-        {
-            return ((angle_ideal_max - angle_ideal_min) / (real_min - real_max)) * (x - real_max) + angle_ideal_min;
-        };
+        //double real_max = *(std::max_element(angle_frequency.begin(),angle_frequency.end()));
+        //double real_min = *(std::min_element(angle_frequency.begin(),angle_frequency.end()));
+        //auto linerFunction = [&](double x)->double
+        //{
+        //    return ((angle_ideal_max - angle_ideal_min) / (real_min - real_max)) * (x - real_max) + angle_ideal_min;
+        //};
         //angle = linerFunction(angle);
         angle = exponentialFunction(angle);
     }
@@ -228,14 +228,14 @@ double AlgorithmWrapper::evaluateFrame(Evaluation const& evaluation,std::vector<
     procon::Field const& field = field_vec.at(evaluation.vector_id);
 
     auto mergeVector = [](std::vector<double> & a,std::vector<double> const& b) {
-        for (int i = 0;i < a.size();i++) {
+        for (unsigned int i = 0;i < a.size();i++) {
             a.at(i) *= b.at(i);
         }
     };
     std::vector<double> angle_frequency;
     angle_frequency.resize(360 / angle_resolution);
     for (auto & angle : angle_frequency) angle = 1;
-    for (int i = 0;i < field.getElementaryPieces().size();i++) {
+    for (unsigned int i = 0;i < field.getElementaryPieces().size();i++) {
         if (!field.getIsPlaced().at(i)) {
             mergeVector(angle_frequency,angle_frequency_kai.at(i));
         }

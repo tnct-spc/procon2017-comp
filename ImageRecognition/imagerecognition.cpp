@@ -463,7 +463,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             //ありえん誤差
             constexpr double length_error = 3;
             if (!Utilities::nearlyEqual(mean_x,x,length_error / scale) || !Utilities::nearlyEqual(mean_y,y,length_error / scale)) {
-                auto hoge = length_error / scale;
+                //auto hoge = length_error / scale;
                 std::cerr << "gosaaaaaaaaaaaaaaaaaaa" << std::endl;
                 polygon.outer().push_back(point_t(mean_x,mean_y));
             } else {
@@ -683,7 +683,7 @@ void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst, int code, int
 
     cv::cvtColor(*src, colorImage, code);
 
-    colorImage.forEach<cv::Vec3b>([&lower, &upper](cv::Vec3b &p, const int* position) -> void {
+    colorImage.forEach<cv::Vec3b>([&lower, &upper](cv::Vec3b &p, const int*) -> void {
         bool is_extract = [&]()->bool{
             for(int i=0;i<3;++i){
                 if(!((lower[i] <= p[i]) && (p[i] <= upper[i]))) return false;

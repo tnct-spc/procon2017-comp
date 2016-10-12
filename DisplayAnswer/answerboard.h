@@ -53,7 +53,7 @@ private:
     std::vector<int> putid_list;
     int putid_left = -1;
     int putid_right = -1;
-    const int id;
+    const int id = -1;
 
     // Big board
     AnswerBoard* ans_board;

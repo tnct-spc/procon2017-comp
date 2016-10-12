@@ -241,7 +241,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
         for(auto piece : field->getFrame().getJointedPieces()){
             is_put.at(piece.getId()) = true;
         }
-        for(int piece_count = 0; piece_count < pieces_pos->size(); ++piece_count){
+        for(unsigned int piece_count = 0; piece_count < pieces_pos->size(); ++piece_count){
             QPointF display_pos = getPosition(QPointF(((double)pieces_pos->at(piece_count).x/(double)pieces_pic->width())-0.025,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pieces_pos->at(piece_count).y/(double)pieces_pic->height()))+0.025), Space::RIGHT);
             QPointF inverse_display_pos = getPosition(QPointF(((double)pieces_pos->at(piece_count).x/(double)pieces_pic->width())-0.035,(rawpic_height_margin + ((double)pieces_pic->height()/(double)pieces_pic->width()) * ((double)pieces_pos->at(piece_count).y/(double)pieces_pic->height()))+0.035), Space::RIGHT);
             rawpic_pieces_pos.at(piece_count) = display_pos;
@@ -249,7 +249,7 @@ void AnswerBoard::paintEvent(QPaintEvent *)
             // Draw circle if polygon inversed
             bool is_inverse = false;
             for(auto piece : field->getFrame().getJointedPieces()){
-                if(piece_count == piece.getId() && piece.is_inverse){
+                if(static_cast<int>(piece_count) == piece.getId() && piece.is_inverse){
                     is_inverse = true;
                     break;
                 }
