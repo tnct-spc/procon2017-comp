@@ -9,8 +9,6 @@
 #include <random>
 #include "utilities.h"
 
-//#define NO_PARALLEL
-
 BeamSearch::BeamSearch()
 {
     this->initialization();
@@ -19,11 +17,7 @@ BeamSearch::BeamSearch()
 void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
-#ifndef NO_PARALLEL
     beam_width = 100;
-#else
-    beam_width = 100;
-#endif
     variety_width = 20;
 }
 
@@ -68,15 +62,10 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         }
     };
 
-#ifndef NO_PARALLEL
     /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
     parallel.generateThreads(evaluateRange,cpu_num,0,field_vec_size);
     /**スレッド終わるの待ち**/
     parallel.joinThreads();
-#else
-    evaluateRange(0,field_vec_size);
-#endif
-
 }
 
 std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> const& evaluations,std::vector<procon::Field> const& field_vec)
@@ -119,7 +108,6 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
     //限界サイズ
     const int limit = static_cast<int>(evaluations.size());
 
-#ifndef NO_PARALLEL
     //マルチスレッド
     int i;
     for (i = 1;static_cast<int>(next_field_vec.size()) < beam_width;i++) {
@@ -135,11 +123,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         //重複しているfieldの除去
         removeDuplicateField(next_field_vec);
     }
-#else
-    makeField(0,limit);
-#endif
 
-#ifndef NO_PARALLEL
     if (static_cast<int>(next_field_vec.size()) > beam_width) next_field_vec.resize(beam_width);
 
     if (limit - (i - 1) *  beam_width > variety_width) {
@@ -172,7 +156,6 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         }
     }
 
-#endif
     if (static_cast<int>(next_field_vec.size()) > beam_width + variety_width) next_field_vec.resize(beam_width + variety_width);
     return next_field_vec;
 
@@ -201,6 +184,7 @@ bool BeamSearch::removeDuplicateField(std::vector<procon::Field> & field_vec)
         for(auto it_i = begin;it_i < end - 1;it_i++) {
             bool check_overlap = false;
             for (auto it_j = it_i + 1;it_j < end - 1;it_j++) {
+                //||は==と同じようなもの
                 if (*it_i || *it_j) {
                     check_overlap = true;
                 }
@@ -240,23 +224,14 @@ void BeamSearch::run(procon::Field field)
         }
 
         buckup_field = field_vec.at(0);
+
         this->evaluateHistoryInit(field_vec);
         this->evaluateNextMove(evaluations,field_vec);
+
         for(Evaluation & evaluation: evaluations) {
-#ifdef HYOKA_MODE
-            evaluation.evaluation_normal = evaluation.evaluation;
-            evaluation.evaluation_angle = alpha * this->evaluateUniqueAngle(evaluation,field_vec);
-            evaluation.evaluation_length = beta * this->evaluateUniqueLength(evaluation,field_vec);
-            evaluation.evaluation_history = gamma * this->evaluateHistory(evaluation,field_vec);
-            evaluation.evaluation_frame = delta * this->evaluateFrame(evaluation,field_vec);
-#endif
-            //std::cout << "alpha" << std::endl;
             if(!alpha_is_none) evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
-            //std::cout << "beta" << std::endl;
             if(!beta_is_none) evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
-            //std::cout << "gamma" << std::endl;
             if(!gamma_is_none) evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
-            //std::cout << "delta" << std::endl;
             if(!delta_is_none) evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
         }
 

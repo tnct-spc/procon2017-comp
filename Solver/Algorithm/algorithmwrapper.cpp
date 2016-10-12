@@ -53,7 +53,7 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
     }
 
     for (auto& angles : angle_frequency_kai) {
-        for (auto& angle : angle_frequency) {
+        for (auto& angle : angles) {
             if (angle == 0) {
                 angle = 1;
             }
@@ -102,7 +102,6 @@ void AlgorithmWrapper::calcLengthFrequency(procon::Field field)
         };
         length = exponentialFunction(length);
     }
-    true;
 }
 
 std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece)
@@ -243,8 +242,6 @@ double AlgorithmWrapper::evaluateFrame(Evaluation const& evaluation,std::vector<
     }
     for (auto angles : field.getFrame().getInnersSideAngle()) {
         for (auto angle : angles) {
-            //ここでreleaseだと落ちる
-            //犯人は多分いしょた
             ave.emplace_back(angle_frequency.at(static_cast<int>((angle / angle_resolution) * to_deg)));
         }
     }
