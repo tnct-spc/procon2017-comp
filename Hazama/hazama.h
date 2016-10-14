@@ -21,35 +21,36 @@ class Hazama : public QMainWindow
 public:
     explicit Hazama(QWidget *parent = 0);
     ~Hazama();
-    void init();
     void run();
 
 private:
     Ui::Hazama *ui;
+
     cv::Mat capture(int deviceNumber);
+
     std::shared_ptr<AnswerBoard> board;
     Solver* solver;
     ImageRecognition imrec;
 
-    int field_stack_pointer=0;
+    unsigned int field_stack_pointer=0;
     std::vector<procon::Field> field_stack;
 
-    //Calibration
+    // Calibration
     const std::string calibration_data_file_path = "./../../procon2016-comp/picture/cal/calibration.yml";
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
     int selectWebCamera();
 
-    //webcamera deviceNumber
+    // Webcamera deviceNumber
     int device_number = 0;
 
 
-    //Network
+    // Network
     RequestMapper request_mapper;
     procon::Field PDATA;
     bool first_answer_flag = true;
     procon::Field best_answer;
 
-    //threshold gui
+    // Threshold gui
     void thresholdGUIinit();
     void disableThresholdUI();
     void enableThresholdUI();

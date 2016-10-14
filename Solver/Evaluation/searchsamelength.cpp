@@ -146,6 +146,7 @@ std::vector<int> SearchSameLength::evaluateMatching(const procon::ExpandedPolygo
                 return true;
             };
 
+            //すべての始点から探索
             for (int i = 0; i < polygon1_size; ++i) {
                 int p1_pos = i;
                 int p2_pos;

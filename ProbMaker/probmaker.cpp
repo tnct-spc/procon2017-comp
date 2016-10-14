@@ -231,7 +231,9 @@ void ProbMaker::addNewLine()
             std::shared_ptr<Line> buff_line = std::make_shared<Line>(start_dot, end_dot);
             double a1 = start_line->angle;
             double a2 = end_line->angle;
-            if(isValidLine(buff_line , a1,a2)) goto finishSelectLine;
+            if(isValidLine(buff_line , a1,a2)){
+                goto finishSelectLine;
+            }
         }
     }
     finishSelectLine:
@@ -294,72 +296,80 @@ void ProbMaker::eraseMinPolygon()
         for(auto polygons_it = Polygons.begin(),end = Polygons.end(); polygons_it < end; ++polygons_it){
             std::vector<struct polygon>& Polygon = *polygons_it;
 
-            //[内包判定]
-            auto includeCheck = [&](std::shared_ptr<Dot> dot){
-                int cross_cnt = 0;
-                //点からrandomDotに線を生成(ランダムでないと角っこにぶつかってしまいご判定？)
-                std::random_device rd;
-                std::uniform_real_distribution<double> rand(0.0,1.0);
-                std::shared_ptr<Dot> zero_dot = std::make_shared<Dot>(-5+rand(rd),-5+rand(rd));
-                std::shared_ptr<Line> line = std::make_shared<Line>(zero_dot,dot);
-                //線と多角形との交差判定をカウント
-                for(int i=0;i<(int)Polygon.size();++i){
-                    if(isCross(line, Polygon.at(i).line)) cross_cnt++;
+            bool is_min_polygon = [&]()->bool{
+                //[内包判定]
+                auto includeCheck = [&](std::shared_ptr<Dot> dot){
+                    int cross_cnt = 0;
+                    //点からrandomDotに線を生成(ランダムでないと角っこにぶつかってしまいご判定？)
+                    std::random_device rd;
+                    std::uniform_real_distribution<double> rand(0.0,1.0);
+                    std::shared_ptr<Dot> zero_dot = std::make_shared<Dot>(-5+rand(rd),-5+rand(rd));
+                    std::shared_ptr<Line> line = std::make_shared<Line>(zero_dot,dot);
+                    //線と多角形との交差判定をカウント
+                    for(int i=0;i<(int)Polygon.size();++i){
+                        if(isCross(line, Polygon.at(i).line)) cross_cnt++;
+                    }
+                    //奇数なら内包-true
+                    return cross_cnt%2 == 1 ? true : false;
+                };
+
+                //座標の最大最小xyを取得
+                double minX=900,minY=900,maxX=0,maxY=0;
+                for(auto dot_it = Polygon.begin(), end = Polygon.end(); dot_it < end; ++dot_it){
+                    if((*dot_it).s_dot->x < minX) minX = (*dot_it).s_dot->x;
+                    if((*dot_it).s_dot->x > maxX) maxX = (*dot_it).s_dot->x;
+                    if((*dot_it).s_dot->y < minY) minY = (*dot_it).s_dot->y;
+                    if((*dot_it).s_dot->y > maxY) maxY = (*dot_it).s_dot->y;
                 }
-                //奇数なら内包-true
-                return cross_cnt%2 == 1 ? true : false;
-            };
 
-            //座標の最大最小xyを取得
-            double minX=900,minY=900,maxX=0,maxY=0;
-            for(auto dot_it = Polygon.begin(), end = Polygon.end(); dot_it < end; ++dot_it){
-                if((*dot_it).s_dot->x < minX) minX = (*dot_it).s_dot->x;
-                if((*dot_it).s_dot->x > maxX) maxX = (*dot_it).s_dot->x;
-                if((*dot_it).s_dot->y < minY) minY = (*dot_it).s_dot->y;
-                if((*dot_it).s_dot->y > maxY) maxY = (*dot_it).s_dot->y;
-            }
+                //正方形の始点を1/6cmずつずらす
+                for(double x = minX; (x+30) < maxX; x += 5){
+                    for(double y = minY; (y+30) < maxY; y += 5){
+                        //正方形の点を生成
+                        std::array<std::shared_ptr<Dot>, 4> square_dot;
+                        square_dot[0] = std::make_shared<Dot>(x   ,y   );
+                        square_dot[1] = std::make_shared<Dot>(x   ,y+30);
+                        square_dot[2] = std::make_shared<Dot>(x+30,y+30);
+                        square_dot[3] = std::make_shared<Dot>(x+30,y   );
+                        //正方形の点と多角形の[内包判定]
+                        if(
+                        includeCheck(square_dot[0]) &&
+                        includeCheck(square_dot[1]) &&
+                        includeCheck(square_dot[2]) &&
+                        includeCheck(square_dot[3])
+                        ){
+                            //正方形の線を生成
+                            std::array<std::shared_ptr<Line>, 4> square_line;
+                            square_line[0] = std::make_shared<Line>(square_dot[0],square_dot[1]);
+                            square_line[1] = std::make_shared<Line>(square_dot[1],square_dot[2]);
+                            square_line[2] = std::make_shared<Line>(square_dot[2],square_dot[3]);
+                            square_line[3] = std::make_shared<Line>(square_dot[3],square_dot[0]);
+                            //正方形の線と多角形の[交差判定]
+                            bool is_duplicate = [&]()->bool{
+                                for(int i=0;i<4;++i){
+                                    for(int j=0;j<(int)Polygon.size();++j){
+                                        if(isCross(square_line[i], Polygon[j].line)) return true;
+                                    }
+                                }
+                                return false;
+                            }();
 
-            //正方形の始点を1/6cmずつずらす
-            for(double x = minX; (x+30) < maxX; x += 5){
-                for(double y = minY; (y+30) < maxY; y += 5){
-                    //正方形の点を生成
-                    std::array<std::shared_ptr<Dot>, 4> square_dot;
-                    square_dot[0] = std::make_shared<Dot>(x   ,y   );
-                    square_dot[1] = std::make_shared<Dot>(x   ,y+30);
-                    square_dot[2] = std::make_shared<Dot>(x+30,y+30);
-                    square_dot[3] = std::make_shared<Dot>(x+30,y   );
-                    //正方形の点と多角形の[内包判定]
-                    if(
-                    includeCheck(square_dot[0]) &&
-                    includeCheck(square_dot[1]) &&
-                    includeCheck(square_dot[2]) &&
-                    includeCheck(square_dot[3])
-                    ){
-                        //正方形の線を生成
-                        std::array<std::shared_ptr<Line>, 4> square_line;
-                        square_line[0] = std::make_shared<Line>(square_dot[0],square_dot[1]);
-                        square_line[1] = std::make_shared<Line>(square_dot[1],square_dot[2]);
-                        square_line[2] = std::make_shared<Line>(square_dot[2],square_dot[3]);
-                        square_line[3] = std::make_shared<Line>(square_dot[3],square_dot[0]);
-                        //正方形の線と多角形の[交差判定]
-                        for(int i=0;i<4;++i){
-                            for(int j=0;j<(int)Polygon.size();++j){
-                                if(isCross(square_line[i], Polygon[j].line)) goto NextSquare;
+                            if(is_duplicate){
+                                continue;
                             }
+                            return false;
                         }
-                        //true
-                        goto NextPolygon;
-                        //false
-                        NextSquare:;
                     }
                 }
+                return true;
+            }();
+
+            if(is_min_polygon){
+                //正方形を含むことができなかったので、線をひとつ消す
+                eraseFlag = true;
+                eraseRandomLineOnPolygon(Polygon);
             }
-
-            //正方形を含むことができなかったので、線をひとつ消す
-            eraseFlag = true;
-            eraseRandomLineOnPolygon(Polygon);
-
-            NextPolygon:;
+            continue;
         }
         //作りなおす
         makePolygon();

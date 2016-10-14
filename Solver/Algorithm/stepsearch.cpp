@@ -133,7 +133,6 @@ void StepSearch::run(procon::Field field)
         // Output Answer
         int cnt = 0;
         for(auto& field: field_vec){
-            field.evaluation_sum = evaluations.at(cnt).evaluation;
             DOCK->addAnswer(field);
             cnt++;
         }

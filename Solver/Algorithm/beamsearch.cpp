@@ -9,8 +9,6 @@
 #include <random>
 #include "utilities.h"
 
-//#define NO_PARALLEL
-
 BeamSearch::BeamSearch()
 {
     this->initialization();
@@ -19,12 +17,8 @@ BeamSearch::BeamSearch()
 void BeamSearch::initialization()
 {
     cpu_num = std::thread::hardware_concurrency();
-#ifndef NO_PARALLEL
     beam_width = 100;
-#else
-    beam_width = 100;
-#endif
-    variety_width = 0;
+    variety_width = 20;
 }
 
 void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::vector<procon::Field> const& field_vec)
@@ -68,15 +62,10 @@ void BeamSearch::evaluateNextMove (std::vector<Evaluation> & evaluations,std::ve
         }
     };
 
-#ifndef NO_PARALLEL
     /**cpuのスレッド数に合わせてvectorを分割し，それぞれスレッドに投げ込む**/
     parallel.generateThreads(evaluateRange,cpu_num,0,field_vec_size);
     /**スレッド終わるの待ち**/
     parallel.joinThreads();
-#else
-    evaluateRange(0,field_vec_size);
-#endif
-
 }
 
 std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> const& evaluations,std::vector<procon::Field> const& field_vec)
@@ -119,7 +108,6 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
     //限界サイズ
     const int limit = static_cast<int>(evaluations.size());
 
-#ifndef NO_PARALLEL
     //マルチスレッド
     int i;
     for (i = 1;static_cast<int>(next_field_vec.size()) < beam_width;i++) {
@@ -135,11 +123,7 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         //重複しているfieldの除去
         removeDuplicateField(next_field_vec);
     }
-#else
-    makeField(0,limit);
-#endif
 
-#ifndef NO_PARALLEL
     if (static_cast<int>(next_field_vec.size()) > beam_width) next_field_vec.resize(beam_width);
 
     if (limit - (i - 1) *  beam_width > variety_width) {
@@ -172,7 +156,6 @@ std::vector<procon::Field> BeamSearch::makeNextField (std::vector<Evaluation> co
         }
     }
 
-#endif
     if (static_cast<int>(next_field_vec.size()) > beam_width + variety_width) next_field_vec.resize(beam_width + variety_width);
     return next_field_vec;
 
@@ -201,6 +184,7 @@ bool BeamSearch::removeDuplicateField(std::vector<procon::Field> & field_vec)
         for(auto it_i = begin;it_i < end - 1;it_i++) {
             bool check_overlap = false;
             for (auto it_j = it_i + 1;it_j < end - 1;it_j++) {
+                //||は==と同じようなもの
                 if (*it_i || *it_j) {
                     check_overlap = true;
                 }
@@ -220,8 +204,8 @@ void BeamSearch::run(procon::Field field)
     {
         return a.evaluation > b.evaluation;
     };
-    if (!alpha_is_none) calcAngleFrequency(field);
-    if (!beta_is_none) calcLengthFrequency(field);
+    calcAngleFrequency(field);
+    calcLengthFrequency(field);
     std::vector<procon::Field> field_vec;
     std::vector<Evaluation> evaluations;
 
@@ -231,8 +215,6 @@ void BeamSearch::run(procon::Field field)
 
     //ピースが全部置かれたら終了
     //このiは添字として使ってるわけではない（ただの回数ルーブ）
-    double gosa = 0.1 / static_cast<int>(field.getElementaryPieces().size());
-    double gosa_angle = 0.017 / static_cast<int>(field.getElementaryPieces().size());
     for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++) {
         evaluations.clear();
 
@@ -242,26 +224,15 @@ void BeamSearch::run(procon::Field field)
         }
 
         buckup_field = field_vec.at(0);
-        this->evaluateNextMove(evaluations,field_vec);
+
         this->evaluateHistoryInit(field_vec);
+        this->evaluateNextMove(evaluations,field_vec);
+
         for(Evaluation & evaluation: evaluations) {
-#ifdef HYOKA_MODE
-            evaluation.evaluation_normal = evaluation.evaluation;
-            evaluation.evaluation_angle = alpha * this->evaluateUniqueAngle(evaluation,field_vec);
-            evaluation.evaluation_length = beta * this->evaluateUniqueLength(evaluation,field_vec);
-            evaluation.evaluation_history = gamma * this->evaluateHistory(evaluation,field_vec);
-            evaluation.evaluation_frame = delta * this->evaluateFrame(evaluation,field_vec);
-#endif
-            //std::cout << "alpha" << std::endl;
             if(!alpha_is_none) evaluation.evaluation += alpha * this->evaluateUniqueAngle(evaluation,field_vec);
-            //std::cout << "beta" << std::endl;
             if(!beta_is_none) evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
-            //std::cout << "gamma" << std::endl;
             if(!gamma_is_none) evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
-            //std::cout << "delta" << std::endl;
             if(!delta_is_none) evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
-             //std::cout << "delta" << std::endl;
-            if(!epsilon_is_none) evaluation.evaluation += epsilon * this->evaluateArea(evaluation,field_vec);
         }
 
         if (evaluations.empty()){
@@ -270,7 +241,12 @@ void BeamSearch::run(procon::Field field)
         }
 
         std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
+
         field_vec = std::move(this->makeNextField(evaluations,field_vec));
+
+        std::sort(field_vec.begin(),field_vec.end(),[](procon::Field const& rhs,procon::Field const& lhs){
+            return rhs.getTotalEvaluation() > lhs.getTotalEvaluation();
+        });
 
         //return field_vec[0];
         //結合できるものがなければその１手前の最高評価地のフィールドを返す
@@ -282,14 +258,6 @@ void BeamSearch::run(procon::Field field)
         // Output Answer
         int cnt = 0;
         for(auto& field: field_vec){
-#ifdef HYOKA_MODE
-            field.evaluation_normal = evaluations.at(cnt).evaluation_normal;
-            field.evaluation_angle = evaluations.at(cnt).evaluation_angle;
-            field.evaluation_length = evaluations.at(cnt).evaluation_length;
-            field.evaluation_history = evaluations.at(cnt).evaluation_history;
-            field.evaluation_frame = evaluations.at(cnt).evaluation_frame;
-#endif
-            field.evaluation_sum = evaluations.at(cnt).evaluation;
             DOCK->addAnswer(field);
             cnt++;
         }
@@ -300,7 +268,7 @@ void BeamSearch::run(procon::Field field)
             {
                 double sum = 0;
                 auto const& pieces = a.getElementaryPieces();
-                for (int i = 0;i < pieces.size();i++) {
+                for (unsigned int i = 0;i < pieces.size();i++) {
                     if(!a.getIsPlaced().at(i)) {
                         sum += bg::area(pieces.at(i).getPolygon());
                     }
@@ -316,8 +284,6 @@ void BeamSearch::run(procon::Field field)
         std::sort(field_vec.begin(),field_vec.end(),lambda);
 
         submitAnswer(field_vec.at(0));
-        this->length_error += gosa;
-        this->angle_error += gosa_angle;
     }
     return;
 }

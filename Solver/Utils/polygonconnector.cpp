@@ -55,7 +55,7 @@ polygon_t PolygonConnector::pushRingToPolygonT(Ring& ring, procon::ExpandedPolyg
     return new_raw_polygon;
 }
 
-//ポリゴンを合体する関数本体 !!!!!!polygon2 mast piece
+//ポリゴンを合体する関数本体
 bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, procon::ExpandedPolygon piece, procon::ExpandedPolygon& new_polygon, std::array<Fit,2> join_data)
 {
 #ifdef DEBUG_RING
@@ -106,15 +106,10 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         const double degree2 = atan2(y2, x2);
         const double degree1 = atan2(y1, x1);
         double rotate_radian = (degree1 - degree2);
-        //std::cout<<"aaa"<<rotate_radian<<std::endl;
         if(first_radian){
             first_radian = false;
             criteria_radian = rotate_radian;
-            //rotate_radian_average += rotate_radian;
         }
-
-        //rotate_radian_count++;
-        //std::cout<<"ccc"<<rotate_radian<<std::endl;
     }
     do{
         const double x1 = ring1[Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count)].x() - ring1[Utilities::inc(complete_matching_start_pos_1,size1,1 + rotate_radian_count)].x();
@@ -125,12 +120,10 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         const double degree1 = atan2(y1, x1);
         double rotate_radian = (degree1 - degree2);
 
-        //std::cout<<"v"<<rotate_radian<<std::endl;
         double distance_radian = 0;
         if(first_radian){
             first_radian = false;
             criteria_radian = rotate_radian;
-            //rotate_radian_average += rotate_radian;
         }else{
             if(rotate_radian < criteria_radian){
                 rotate_radian += M_PI * 2;
@@ -143,15 +136,12 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
         }
 
         rotate_radian_count++;
-        //std::cout<<"d"<<rotate_radian_count<<","<<rotate_radian<<","<<distance_radian<<std::endl;
     }while((Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count-1) != complete_matching_end_pos_1) &&
            (Utilities::inc(complete_matching_start_pos_1,size1,rotate_radian_count) != complete_matching_end_pos_1));
-    //rotate_radian_average /= (double)(fit1.start_dot_or_line == Fit::Dot? 1 + rotate_radian_count : rotate_radian_count);
     if(rotate_radian_count != 1){
         result_radian = rotate_radian_average / (double)(fit1.start_dot_or_line == Fit::Dot? rotate_radian_count : rotate_radian_count - 1);
     }
     result_radian = criteria_radian + result_radian;
-    //std::cout<<"result:"<<result_radian<<std::endl;
 
     piece.rotatePolygon(-result_radian*(360/(M_PI*2))); //rotate piece
     ring2 = popRingByPolygon(piece,-1); //update ring2
@@ -182,7 +172,6 @@ bool PolygonConnector::joinPolygon(procon::ExpandedPolygon jointed_polygon, proc
     // ここで回転の誤差により角が一致しない場合がある。
     Ring new_ring;
     int count = complete_matching_end_pos_1 + 1;
-    int Type = 1;
     double x,y;
 
     // Frame Area
