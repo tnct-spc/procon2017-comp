@@ -204,8 +204,8 @@ void BeamSearch::run(procon::Field field)
     {
         return a.evaluation > b.evaluation;
     };
-    if (!alpha_is_none) calcAngleFrequency(field);
-    if (!beta_is_none) calcLengthFrequency(field);
+    calcAngleFrequency(field);
+    calcLengthFrequency(field);
     std::vector<procon::Field> field_vec;
     std::vector<Evaluation> evaluations;
 
@@ -215,8 +215,6 @@ void BeamSearch::run(procon::Field field)
 
     //ピースが全部置かれたら終了
     //このiは添字として使ってるわけではない（ただの回数ルーブ）
-    double gosa = 0.1 / static_cast<int>(field.getElementaryPieces().size());
-    double gosa_angle = 0.017 / static_cast<int>(field.getElementaryPieces().size());
     for (int i = 0;i < static_cast<int>(field.getElementaryPieces().size());i++) {
         evaluations.clear();
 
@@ -235,9 +233,8 @@ void BeamSearch::run(procon::Field field)
             if(!beta_is_none) evaluation.evaluation += beta * this->evaluateUniqueLength(evaluation,field_vec);
             if(!gamma_is_none) evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
             if(!delta_is_none) evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
-             //std::cout << "delta" << std::endl;
-            if(!epsilon_is_none) evaluation.evaluation += epsilon * this->evaluateArea(evaluation,field_vec);
         }
+
         if (evaluations.empty()){
             submitAnswer(buckup_field);
             return;
@@ -287,8 +284,6 @@ void BeamSearch::run(procon::Field field)
         std::sort(field_vec.begin(),field_vec.end(),lambda);
 
         submitAnswer(field_vec.at(0));
-        this->length_error += gosa;
-        this->angle_error += gosa_angle;
     }
     return;
 }
