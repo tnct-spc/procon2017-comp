@@ -19,6 +19,10 @@ public:
     std::vector<std::vector<double>> angle_frequency_kai;
     std::vector<double> length_frequency;
 
+    //pruning
+    static constexpr double exist_resolution = 1;
+    std::array<bool,(int)(360 / exist_resolution) + 1> angle_exist;
+
     //angle-Frequency
     static constexpr int angle_resolution = 5;
     //liner
@@ -47,6 +51,7 @@ public:
     void init();
     virtual void run(procon::Field field);
     void calcAngleFrequency(procon::Field field);
+    void calcAngleExist(procon::Field field);
     void calcLengthFrequency(procon::Field field);
     void submitAnswer(procon::Field field);
 
@@ -54,6 +59,7 @@ public:
     std::vector<Evaluation> evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
     std::vector<Evaluation> evaluateCombinationByLength(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece);
 
+    bool isAngleExist(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     double evaluateUniqueAngle(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     double evaluateUniqueLength(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);
     double evaluateFrame(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec);

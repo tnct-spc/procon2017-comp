@@ -166,10 +166,25 @@ bool BeamSearch::canPrune(procon::ExpandedPolygon const& next_frame ,double cons
     for (auto const& angles : next_frame.getInnersSideAngle()) {
         for (auto const& angle : angles){
             if (angle < min_angle) {
-                can_prune = true;
+                return true;
             }
         }
     }
+    /*
+    for (auto const& angles : next_frame.getInnersSideAngle()) {
+        for (auto const& angle : angles) {
+            auto isAngleExist = [&](double const& angle)
+            {
+                int _angle = static_cast<int>(angle) / exist_resolution;
+                return this->angle_exist.at(_angle);
+            };
+            constexpr double to_rad = 180 / 3.1415926535;
+            if (!isAngleExist(angle * to_rad)) {
+                return true;
+            }
+        }
+    }
+    */
     return  can_prune;
 }
 
@@ -206,6 +221,7 @@ void BeamSearch::run(procon::Field field)
     };
     calcAngleFrequency(field);
     calcLengthFrequency(field);
+
     std::vector<procon::Field> field_vec;
     std::vector<Evaluation> evaluations;
 
@@ -234,56 +250,55 @@ void BeamSearch::run(procon::Field field)
             if(!gamma_is_none) evaluation.evaluation += gamma * this->evaluateHistory(evaluation,field_vec);
             if(!delta_is_none) evaluation.evaluation += delta * this->evaluateFrame(evaluation,field_vec);
         }
+    }
 
-        if (evaluations.empty()){
-            submitAnswer(buckup_field);
-            return;
-        }
+    if (evaluations.empty()){
+        submitAnswer(buckup_field);
+        return;
+    }
 
-        std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
+    std::sort(evaluations.begin(),evaluations.end(),sortEvaLambda);
 
-        field_vec = std::move(this->makeNextField(evaluations,field_vec));
+    field_vec = std::move(this->makeNextField(evaluations,field_vec));
 
-        std::sort(field_vec.begin(),field_vec.end(),[](procon::Field const& rhs,procon::Field const& lhs){
-            return rhs.getTotalEvaluation() > lhs.getTotalEvaluation();
-        });
+    std::sort(field_vec.begin(),field_vec.end(),[](procon::Field const& rhs,procon::Field const& lhs){
+        return rhs.getTotalEvaluation() > lhs.getTotalEvaluation();
+    });
 
-        //return field_vec[0];
-        //結合できるものがなければその１手前の最高評価地のフィールドを返す
-        if(field_vec.empty()){
-            submitAnswer(buckup_field);
-            return;
-        }
+    //return field_vec[0];
+    //結合できるものがなければその１手前の最高評価地のフィールドを返す
+    if(field_vec.empty()){
+        submitAnswer(buckup_field);
+        return;
+    }
 
-        // Output Answer
-        int cnt = 0;
-        for(auto& field: field_vec){
-            DOCK->addAnswer(field);
-            cnt++;
-        }
+    // Output Answer
+    int cnt = 0;
+    for(auto& field: field_vec){
+        DOCK->addAnswer(field);
+        cnt++;
+    }
 
-        auto lambda = [](procon::Field const& a,procon::Field const& b) {
-            double a_area,b_area;
-            auto calcArea = [](procon::Field const& a)
-            {
-                double sum = 0;
-                auto const& pieces = a.getElementaryPieces();
-                for (unsigned int i = 0;i < pieces.size();i++) {
-                    if(!a.getIsPlaced().at(i)) {
-                        sum += bg::area(pieces.at(i).getPolygon());
-                    }
+    auto lambda = [](procon::Field const& a,procon::Field const& b) {
+        double a_area,b_area;
+        auto calcArea = [](procon::Field const& a)
+        {
+            double sum = 0;
+            auto const& pieces = a.getElementaryPieces();
+            for (unsigned int i = 0;i < pieces.size();i++) {
+                if(!a.getIsPlaced().at(i)) {
+                    sum += bg::area(pieces.at(i).getPolygon());
                 }
-                return sum;
-            };
-
-            a_area = calcArea(a);
-            b_area = calcArea(b);
-            return a_area < b_area;
+            }
+            return sum;
         };
 
-        std::sort(field_vec.begin(),field_vec.end(),lambda);
+        a_area = calcArea(a);
+        b_area = calcArea(b);
+        return a_area < b_area;
+    };
 
-        submitAnswer(field_vec.at(0));
-    }
-    return;
+    std::sort(field_vec.begin(),field_vec.end(),lambda);
+
+    submitAnswer(field_vec.at(0));
 }
