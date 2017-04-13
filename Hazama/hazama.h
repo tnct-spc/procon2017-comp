@@ -36,7 +36,7 @@ private:
     std::vector<procon::Field> field_stack;
 
     // Calibration
-    const std::string calibration_data_file_path = "./../../procon2016-comp/picture/cal/calibration.yml";
+    const std::string calibration_data_file_path = "./../../procon2017-comp/picture/cal/calibration.yml";
     void makeCalibrationData(std::string savefile_path,unsigned int numberOfImages);
     int selectWebCamera();
 

@@ -17,7 +17,7 @@ AnswerDock::AnswerDock(QWidget *parent) :
     ui->setupUi(this);
 
     // Background image
-    QImage image("../../procon2016-comp/background.png");
+    QImage image("../../procon2017-comp/background.png");
     QGraphicsScene* scene = new QGraphicsScene();
     QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
     scene->addItem(pic);

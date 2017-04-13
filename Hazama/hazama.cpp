@@ -127,7 +127,7 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
         std::cout << "now:" << i << std::endl;
 
         char filename[128];
-        sprintf(filename, "../../procon2016-comp/picture/cal/pic%d.JPG", i);
+        sprintf(filename, "../../procon2017-comp/picture/cal/pic%d.JPG", i);
         cv::Mat frame = cv::imread(filename);
         cv::Mat gray;
 
@@ -163,7 +163,7 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
 void Hazama::run()
 {
     // When you want to calibrate webcamera,please comment out this line!!!
-    //makeCalibrationData("./../../procon2016-comp/picture/cal/calibration.yml",NUM);
+    //makeCalibrationData("./../../procon2017-comp/picture/cal/calibration.yml",NUM);
 
     std::cout << "Run" << std::endl;
 
@@ -172,7 +172,7 @@ void Hazama::run()
 
     std::string frame_path = ui->franeURL->text().toStdString();
     std::string pieces_path = ui->pieceURL->text().toStdString();
-    std::string path = "./../../procon2016-comp/sample/data.csv";
+    std::string path = "./../../procon2017-comp/sample/data.csv";
 
     // Get puzzle data
     if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked() || ui->selectImageData->isChecked()){
@@ -358,7 +358,7 @@ void Hazama::makeInIFile()
     config.put("test.test",13);
 
     // Write
-    boost::property_tree::write_ini("./../../procon2016-comp/config/threshold.ini",config);
+    boost::property_tree::write_ini("./../../procon2017-comp/config/threshold.ini",config);
 
     /* threhsold.ini write example
      *
@@ -372,7 +372,7 @@ void Hazama::loadInIFile()
     boost::property_tree::ptree config;
 
     // Read
-    boost::property_tree::read_ini("./../../procon2016-comp/config/threshold.ini",config);
+    boost::property_tree::read_ini("./../../procon2017-comp/config/threshold.ini",config);
 
     if(boost::optional<int> value_test = config.get_optional<int>("test.test")){
 
