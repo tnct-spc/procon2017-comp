@@ -35,15 +35,13 @@ bool MainWindow::get()
     QNetworkReply *getreply = manager->get(QNetworkRequest(requrl));
     getreply->ignoreSslErrors();
 
-    std::cout<<"endd"<<std::endl;
     connect(getreply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
 
-    std::cout<<"end"<<std::endl;
     if(network_error_flag) return false;
     std::string raw_data = getreply->readAll().constData();
 
-    std::cout<<"finish get"<<std::endl;
+    std::cout<<"get ok"<<std::endl;
 
     //save src
     std::ofstream outputfile(SAVE_PROBLEM_PATH);
@@ -102,12 +100,12 @@ bool MainWindow::emitAnswer(procon::Field field)
     connect(postreply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
 
-    std::cout<<"sending :"<<postData.toString(QUrl::FullyEncoded).toUtf8().toStdString()<<std::endl;
+    //std::cout<<"sending :"<<postData.toString(QUrl::FullyEncoded).toUtf8().toStdString()<<std::endl;
     answer_file.close();
 
     if(network_error_flag) return false;
 
-    std::cout<<"finish send"<<std::endl;
+    std::cout<<"send ok"<<std::endl;
 
     ui->state->setText(QString::fromStdString(std::string(postreply->readAll().constData())));
 
@@ -132,7 +130,7 @@ void MainWindow::networkerror(QNetworkReply::NetworkError e)
      * に乗ってます
      */
     int code = e;
-    std::cout << "network error code " << code  << std::endl;
+    std::cout << "network error! error code  : " << code  << std::endl;
     network_error_flag = true;
     //net_error_num = e;
 }

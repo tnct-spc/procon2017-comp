@@ -1,10 +1,11 @@
 #include "help_page.h"
 
-HelpPage::HelpPage(QObject *parent) : QObject(parent) {
-    // empty
+HelpPage::HelpPage(QObject *parent) : QObject(parent)
+{
 }
 
-void HelpPage::Service(/*QHttpRequest *request,*/ QHttpResponse *response) {
+void HelpPage::Service(/*QHttpRequest *request,*/ QHttpResponse *response)
+{
     response->setHeader("Content-Type", "text/html; charset=UTF-8");
     response->writeHead(200);
     response->write(

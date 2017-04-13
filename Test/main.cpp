@@ -18,7 +18,7 @@ int Test()
 
     for(auto tester : TESTER){
         if(!tester->run()){
-            std::cout<<"エラーや"<<std::endl;
+            std::cout<<"エラー!"<<std::endl;
             ERROR_CNT++;
         }
     }

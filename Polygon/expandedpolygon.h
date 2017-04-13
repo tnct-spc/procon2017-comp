@@ -41,8 +41,6 @@ protected:
 
 
 public:
-    // Public Member
-
     //constructor
     ExpandedPolygon(int id_ = -1);
     ExpandedPolygon(std::vector<int> multi_ids_);

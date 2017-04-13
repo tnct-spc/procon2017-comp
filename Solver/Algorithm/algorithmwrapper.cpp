@@ -9,9 +9,6 @@
 #include <boost/algorithm/algorithm.hpp>
 #include <QTimer>
 
-double AlgorithmWrapper::length_error = 0.1;
-double AlgorithmWrapper::angle_error = 0.034; // 単位CM
-
 void AlgorithmWrapper::init()
 {
     DOCK = std::make_shared<AnswerDock>();
@@ -58,7 +55,7 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
     }
 
     for (auto& angles : angle_frequency_kai) {
-        for (auto& angle : angle_frequency) {
+        for (auto& angle : angles) {
             if (angle == 0) {
                 angle = 1;
             }
@@ -72,12 +69,12 @@ void AlgorithmWrapper::calcAngleFrequency(procon::Field field)
     };
 
     for (auto& angle : angle_frequency) {
-        double real_max = *(std::max_element(angle_frequency.begin(),angle_frequency.end()));
-        double real_min = *(std::min_element(angle_frequency.begin(),angle_frequency.end()));
-        auto linerFunction = [&](double x)->double
-        {
-            return ((angle_ideal_max - angle_ideal_min) / (real_min - real_max)) * (x - real_max) + angle_ideal_min;
-        };
+        //double real_max = *(std::max_element(angle_frequency.begin(),angle_frequency.end()));
+        //double real_min = *(std::min_element(angle_frequency.begin(),angle_frequency.end()));
+        //auto linerFunction = [&](double x)->double
+        //{
+        //    return ((angle_ideal_max - angle_ideal_min) / (real_min - real_max)) * (x - real_max) + angle_ideal_min;
+        //};
         //angle = linerFunction(angle);
         angle = exponentialFunction(angle);
     }
@@ -134,7 +131,6 @@ void AlgorithmWrapper::calcLengthFrequency(procon::Field field)
         };
         length = exponentialFunction(length);
     }
-    true;
 }
 
 std::vector<Evaluation> AlgorithmWrapper::evaluateCombinationByAngle(procon::ExpandedPolygon const& frame, procon::ExpandedPolygon const& piece)
@@ -233,18 +229,22 @@ double AlgorithmWrapper::evaluateUniqueLength(Evaluation const& evaluation,std::
 
 void AlgorithmWrapper::evaluateHistoryInit(std::vector<procon::Field> const& field_vec)
 {
-    auto maxLambda = [](procon::Field field_a,procon::Field field_b)
+    auto compLambda = [](procon::Field field_a,procon::Field field_b)
     {
         return field_a.getTotalEvaluation() < field_b.getTotalEvaluation();
     };
-    auto const& max_field = *(std::max_element(field_vec.begin(),field_vec.end(),maxLambda));
-    norm = max_field.getTotalEvaluation();
+    auto const& max_field = *(std::max_element(field_vec.begin(),field_vec.end(),compLambda));
+    auto const& min_field = *(std::min_element(field_vec.begin(),field_vec.end(),compLambda));
+    history_max = max_field.getTotalEvaluation();
+    history_min = min_field.getTotalEvaluation();
 }
 
 double AlgorithmWrapper::evaluateHistory(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec)
 {
-    if (norm != 0){
-        return field_vec.at(evaluation.vector_id).getTotalEvaluation() / norm;
+    if (history_max - history_min != 0){
+        double const& eva = field_vec.at(evaluation.vector_id).getTotalEvaluation();
+        double ret = ((1.0 / (history_max - history_min)) * (eva - history_min));
+        return ret;
     } else {
         return 0.0;
     }
@@ -257,37 +257,24 @@ double AlgorithmWrapper::evaluateFrame(Evaluation const& evaluation,std::vector<
     procon::Field const& field = field_vec.at(evaluation.vector_id);
 
     auto mergeVector = [](std::vector<double> & a,std::vector<double> const& b) {
-        for (int i = 0;i < a.size();i++) {
+        for (unsigned int i = 0;i < a.size();i++) {
             a.at(i) *= b.at(i);
         }
     };
     std::vector<double> angle_frequency;
     angle_frequency.resize(360 / angle_resolution);
     for (auto & angle : angle_frequency) angle = 1;
-    for (int i = 0;i < field.getElementaryPieces().size();i++) {
+    for (unsigned int i = 0;i < field.getElementaryPieces().size();i++) {
         if (!field.getIsPlaced().at(i)) {
             mergeVector(angle_frequency,angle_frequency_kai.at(i));
         }
     }
     for (auto angles : field.getFrame().getInnersSideAngle()) {
         for (auto angle : angles) {
-            //ここでreleaseだと落ちる
-            //犯人は多分いしょた
             ave.emplace_back(angle_frequency.at(static_cast<int>((angle / angle_resolution) * to_deg)));
         }
     }
     return 1 - (std::accumulate(ave.begin(),ave.end(),0.0) / ave.size());
-}
-
-double AlgorithmWrapper::evaluateArea(Evaluation const& evaluation,std::vector<procon::Field> const& field_vec)
-{
-    procon::ExpandedPolygon const& piece = field_vec.at(evaluation.vector_id).getElementaryPieces().at(evaluation.piece_id);
-    double const& area = bg::area(piece.getPolygon());
-    auto exponentialFunction = [&](double x)->double
-    {
-        return std::pow(area_base,-area_alpha * x) + area_beta;
-    };
-    return exponentialFunction(area);
 }
 
 AlgorithmWrapper::AlgorithmWrapper()

@@ -50,7 +50,7 @@
      <string>ServerMode</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QGroupBox" name="algorithmSelector">
@@ -82,6 +82,9 @@
      </property>
     </widget>
     <widget class="QRadioButton" name="algo3">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -95,6 +98,9 @@
      </property>
     </widget>
     <widget class="QRadioButton" name="algo1">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -108,6 +114,9 @@
      </property>
     </widget>
     <widget class="QRadioButton" name="algo2">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -160,83 +169,21 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="4">
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QSlider" name="horizontalSlider_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="4">
       <widget class="QPushButton" name="pushButton_4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>PushButton</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>TextLabel</string>
+     <item row="2" column="1">
+      <widget class="QSlider" name="horizontalSlider_3">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QSlider" name="horizontalSlider_1">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QLCDNumber" name="lcdNumber_2"/>
-     </item>
-     <item row="2" column="3">
-      <widget class="QLCDNumber" name="lcdNumber_3"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="3">
-      <widget class="QLCDNumber" name="lcdNumber_4"/>
-     </item>
-     <item row="1" column="4">
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLCDNumber" name="lcdNumber_1"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_1">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QSlider" name="horizontalSlider_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -249,8 +196,88 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QSlider" name="horizontalSlider_3">
+     <item row="2" column="4">
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>PushButton</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QLCDNumber" name="lcdNumber_3"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLCDNumber" name="lcdNumber_2"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>PushButton</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLCDNumber" name="lcdNumber_1"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_1">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="QLCDNumber" name="lcdNumber_4"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QSlider" name="horizontalSlider_2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSlider" name="horizontalSlider_4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSlider" name="horizontalSlider_1">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -315,7 +342,7 @@
         <string>UseImageData</string>
        </property>
        <property name="checked">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -330,7 +357,7 @@
         <string>SelectImageData</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -394,7 +421,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>./../../procon2016-comp/sample/sample_pieces_1.JPG</string>
+     <string>./../../procon2016-comp/sample/sample_pieces_3.JPG</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="franeURL">
@@ -407,7 +434,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>./../../procon2016-comp/sample/sample_frame_1.JPG</string>
+     <string>./../../procon2016-comp/sample/sample_frame_3.JPG</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -440,9 +467,9 @@
     <property name="geometry">
      <rect>
       <x>850</x>
-      <y>190</y>
+      <y>320</y>
       <width>371</width>
-      <height>171</height>
+      <height>101</height>
      </rect>
     </property>
     <property name="font">
@@ -460,9 +487,9 @@
     <property name="geometry">
      <rect>
       <x>850</x>
-      <y>370</y>
+      <y>430</y>
       <width>371</width>
-      <height>171</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="font">
@@ -474,6 +501,46 @@
     </property>
     <property name="text">
      <string>START</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="left">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>200</y>
+      <width>171</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>URW Chancery L</family>
+      <pointsize>64</pointsize>
+      <italic>true</italic>
+     </font>
+    </property>
+    <property name="text">
+     <string>←</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="right">
+    <property name="geometry">
+     <rect>
+      <x>1040</x>
+      <y>200</y>
+      <width>171</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>URW Chancery L</family>
+      <pointsize>64</pointsize>
+      <italic>true</italic>
+     </font>
+    </property>
+    <property name="text">
+     <string>→</string>
     </property>
    </widget>
   </widget>
@@ -527,7 +594,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>1002</x>
-     <y>317</y>
+     <y>454</y>
     </hint>
     <hint type="destinationlabel">
      <x>808</x>
@@ -551,9 +618,43 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>left</sender>
+   <signal>clicked()</signal>
+   <receiver>Hazama</receiver>
+   <slot>leftClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>932</x>
+     <y>251</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>826</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>right</sender>
+   <signal>clicked()</signal>
+   <receiver>Hazama</receiver>
+   <slot>rightClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1084</x>
+     <y>255</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1037</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>pauseClicked()</slot>
   <slot>startClicked()</slot>
+  <slot>leftClicked()</slot>
+  <slot>rightClicked()</slot>
  </slots>
 </ui>
