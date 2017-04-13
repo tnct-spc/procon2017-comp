@@ -36,6 +36,7 @@ HEADERS += \
     fit.h
 
 LIBS += -lboost_system -lboost_thread
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
 INSTALLS += target
 
