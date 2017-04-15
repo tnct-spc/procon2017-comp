@@ -13,10 +13,14 @@ class Kunugida : public QMainWindow
 
 public:
     explicit Kunugida(QWidget *parent = 0);
+    void run();
     ~Kunugida();
 
 private:
     Ui::Kunugida *ui;
+    bool is_running = false;
+    void finishedProcess();
+    void startProcess();
 
 private slots:
     void clickedRunButton();

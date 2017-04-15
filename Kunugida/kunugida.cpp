@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include <QDebug>
 #include <QPushButton>
 
 Kunugida::Kunugida(QWidget *parent) :
@@ -19,7 +20,29 @@ Kunugida::~Kunugida()
     delete ui;
 }
 
+void Kunugida::run()
+{
+    std::cout << "Run" << std::endl;
+    this->finishedProcess();
+}
+
 void Kunugida::clickedRunButton()
 {
-    std::cout << "Clicked Run Button" << std::endl;
+    if(!this->is_running){
+        std::cout << "Start Process" << std::endl;
+        this->startProcess();
+        this->run();
+    }else{
+        std::cout << "Main Process is Already Running" << std::endl;
+    }
+}
+
+void Kunugida::finishedProcess()
+{
+    this->is_running = false;
+}
+
+void Kunugida::startProcess()
+{
+    this->is_running = true;
 }
