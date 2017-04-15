@@ -17,6 +17,9 @@ public:
 
 private:
     Ui::Kunugida *ui;
+
+private slots:
+    void clickedRunButton();
 };
 
 #endif // KUNUGIDA_H
