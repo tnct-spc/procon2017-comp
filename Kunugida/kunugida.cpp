@@ -5,6 +5,7 @@
 
 #include <QDebug>
 #include <QPushButton>
+#include <QCheckBox>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
@@ -28,12 +29,16 @@ void Kunugida::run()
 
 void Kunugida::clickedRunButton()
 {
-    if(!this->is_running){
-        std::cout << "Start Process" << std::endl;
-        this->startProcess();
-        this->run();
+    if(ui->ImageRecognitonTestCheckBox->isChecked()){
+        this->imageRecognitonTest();
     }else{
-        std::cout << "Main Process is Already Running" << std::endl;
+        if(!this->is_running){
+            std::cout << "Start Process" << std::endl;
+            this->startProcess();
+            this->run();
+        }else{
+            std::cout << "Main Process is Already Running" << std::endl;
+        }
     }
 }
 
@@ -45,4 +50,9 @@ void Kunugida::finishedProcess()
 void Kunugida::startProcess()
 {
     this->is_running = true;
+}
+
+void Kunugida::imageRecognitonTest()
+{
+    std::cout << "Hello ImageRecogniton Test" << std::endl;
 }

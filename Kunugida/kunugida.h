@@ -14,6 +14,7 @@ class Kunugida : public QMainWindow
 public:
     explicit Kunugida(QWidget *parent = 0);
     void run();
+    void imageRecognitonTest();
     ~Kunugida();
 
 private:
