@@ -9,4 +9,5 @@ SUBDIRS += \
     ProbMaker \
     Hazama \
     Test \
-    Slave
+    Slave \
+    Kunugida
