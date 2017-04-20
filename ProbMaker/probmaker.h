@@ -1,11 +1,22 @@
 #ifndef PROBMAKER_H
 #define PROBMAKER_H
 
+#include <QMainWindow>
 
-class probmaker
+namespace Ui {
+class ProbMaker;
+}
+
+class ProbMaker : public QMainWindow
 {
+    Q_OBJECT
+
 public:
-    probmaker();
+    explicit ProbMaker(QWidget *parent = 0);
+    ~ProbMaker();
+
+private:
+    Ui::ProbMaker *ui;
 };
 
 #endif // PROBMAKER_H

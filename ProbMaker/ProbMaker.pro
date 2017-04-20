@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-04-19T19:24:29
+# Project created by QtCreator 2017-04-19T19:53:41
 #
 #-------------------------------------------------
 
@@ -24,8 +24,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        probmaker.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += probmaker.h
 
-FORMS    += mainwindow.ui
+FORMS    += probmaker.ui
