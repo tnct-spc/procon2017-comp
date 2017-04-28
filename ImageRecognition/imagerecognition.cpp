@@ -7,9 +7,18 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
 {
     raw_pieces_pic = raw_pieces_image;
 
+    cv::namedWindow("piece",cv::WINDOW_NORMAL);
+    cv::imshow("piece",raw_pieces_image);
+
     // 二値化,前処理.
     cv::Mat frame_image = preprocessingFrame(raw_frame_image);
     std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
+
+    //int count = 0;
+    /*for (int i=0; i<pieces_images.size(); i++) {
+        cv::namedWindow(std::to_string(i+1));
+        cv::imshow(std::to_string(i+1), pieces_images[i]);
+    }*/
 
     // ピースはひとつひとつの画像に分ける
     std::vector<cv::Mat> images;
@@ -91,8 +100,11 @@ void ImageRecognition::threshold(cv::Mat& image)
     cv::Mat normal_area,koge_area;
 
     // 色抽出 H:180, S:255, B:255
-    colorExtraction(&image, &normal_area, CV_BGR2HSV, 0, 180, 89, 255, 76, 148);
+    colorExtraction(&image, &normal_area, CV_BGR2HSV, 0, 180, 89, 255, 76, 200);
     colorExtraction(&image, &koge_area, CV_BGR2HSV, 5, 20, 153, 255, 43, 90);
+
+    cv::namedWindow("image",  CV_WINDOW_NORMAL);
+    cv::imshow("image", normal_area);
 
     // 通常部分とこげ部分をマージ
     cv::bitwise_and(normal_area,koge_area,image);
@@ -682,6 +694,9 @@ void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst, int code, int
     std::vector<int> upper = {ch1Upper,ch2Upper,ch3Upper};
 
     cv::cvtColor(*src, colorImage, code);
+    cv::namedWindow("image",  CV_WINDOW_NORMAL);
+    cv::imshow("image", colorImage);
+
 
     colorImage.forEach<cv::Vec3b>([&lower, &upper](cv::Vec3b &p, const int*) -> void {
         bool is_extract = [&]()->bool{
