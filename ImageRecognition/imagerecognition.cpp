@@ -40,10 +40,13 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
 void ImageRecognition::threshold(cv::Mat& image)
 {
     //resize
-    image = cv::Mat(image,cv::Rect(500,0,3300,2664));
+    //int cols = image.cols;
+    //int rows = image.rows;
+    //500,0,3300,2664
+    image = cv::Mat(image,cv::Rect(0,0,3300,2664));
 
-    //cv::namedWindow("capture",cv::WINDOW_NORMAL);
-    //cv::imshow("capture",image);
+    cv::namedWindow("capture",cv::WINDOW_NORMAL);
+    cv::imshow("capture",image);
 
     /* ヒストグラム均一化の残骸
     // get d

@@ -167,6 +167,9 @@ void Hazama::run()
 
     std::cout << "Run" << std::endl;
 
+    // ピースの画像
+    cv::Mat nocpieces;
+
     // Disable threshold UI
     disableThresholdUI();
 
@@ -212,7 +215,7 @@ void Hazama::run()
                 pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc").toStdString();
             }
             cv::Mat nocframe = cv::imread(frame_path, 1);
-            cv::Mat nocpieces = cv::imread(pieces_path, 1);
+            nocpieces = cv::imread(pieces_path, 1);
 
             //calibration
             cv::Mat mtx,dist;
@@ -225,7 +228,7 @@ void Hazama::run()
         }
 
         // Image detect
-        PDATA = imrec.run(raw_frame, raw_pieces);
+        PDATA = imrec.run(raw_frame, nocpieces);
 
         // Set raw image data
         AnswerBoard::setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
