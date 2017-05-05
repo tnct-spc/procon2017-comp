@@ -24,6 +24,7 @@ private:
 
 private slots:
     void clickedRunButton();
+    void clickedDebugRunButton();
 };
 
 #endif // KUNUGIDA_H
