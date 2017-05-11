@@ -30,11 +30,12 @@ void Kunugida::run()
 void Kunugida::clickedRunButton()
 {
     if(!this->is_running){
-        std::cout << "Start Process" << std::endl;
+        logger->info("start solving process");
         this->startProcess();
         this->run();
     }else{
-        std::cout << "Main Process is Already Running" << std::endl;
+        //warning
+        logger->warn("solving process is already running");
     }
 }
 
