@@ -5,13 +5,15 @@
 
 #include <QDebug>
 #include <QPushButton>
+#include <QCheckBox>
+#include <QRadioButton>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Kunugida)
 {
     ui->setupUi(this);
-
+    logger = spdlog::get("Kunugida");
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 }
 
@@ -23,6 +25,7 @@ Kunugida::~Kunugida()
 void Kunugida::run()
 {
     std::cout << "Run" << std::endl;
+    logger->info("Run Button Clicked");
     this->finishedProcess();
 }
 
