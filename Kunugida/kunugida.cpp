@@ -5,8 +5,6 @@
 
 #include <QDebug>
 #include <QPushButton>
-#include <QCheckBox>
-#include <QRadioButton>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
