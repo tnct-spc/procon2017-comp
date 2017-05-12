@@ -36,3 +36,7 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include
