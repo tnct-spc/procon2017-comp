@@ -12,7 +12,16 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
 
     // 二値化,前処理.
     cv::Mat frame_image = preprocessingFrame(raw_frame_image);
-    std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
+    //std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
+
+    // ピースに分割
+    std::vector<cv::Mat> pieces_images = dividePiece(raw_pieces_image);
+
+    // 線分検出
+    std::vector<std::vector<cv::Vec4f>> lines;
+    for (int i = 0; i < pieces_images.size(); i++) {
+        lines.push_back(houghLine(pieces_images[i]));
+    }
 
     //int count = 0;
     /*for (int i=0; i<pieces_images.size(); i++) {
@@ -20,13 +29,16 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
         cv::imshow(std::to_string(i+1), pieces_images[i]);
     }*/
 
+
     // ピースはひとつひとつの画像に分ける
     std::vector<cv::Mat> images;
     images.push_back(frame_image);
-    for(cv::Mat& piece : pieces_images) images.push_back(piece);
+    //for(cv::Mat& piece : pieces_images) images.push_back(piece);
+
 
     // 線分検出
     std::vector<std::vector<cv::Vec4f>> pieces_lines = LineDetection(images);
+    std::copy(lines.begin(), lines.end(), std::back_inserter(pieces_lines));
 
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
@@ -724,3 +736,100 @@ void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst, int code, int
 
     *dst = colorImage;
 }
+
+// RGBからエッジ検出
+std::vector<cv::Vec4f> ImageRecognition::houghLine(cv::Mat src_image)
+{
+    // エッジ画像を検出
+    cv::Mat canny_image;
+    cv::Canny(src_image, canny_image, 60.0, 180.0, 3);
+
+    // Hough変換
+    std::vector<cv::Vec4f> lines;
+    cv::HoughLinesP(canny_image, lines, 1, CV_PI / 180, 80, 50, 50);
+
+    // 画像上に見つけた直線を設置
+    cv::Vec4i pt;
+    cv::Mat line_image = src_image.clone();
+    for (auto it = lines.begin(); it != lines.end(); ++it) {
+        pt = *it;
+        cv::line(line_image, cv::Point(pt[0], pt[1]), cv::Point(pt[2], pt[3]),100, 5, CV_AA);
+    }
+
+    return lines;
+}
+
+// HSVから2値化
+cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
+{
+    // RGB画像をHSVに変換
+    cv::Mat hsv_image;
+    cv::cvtColor(src_image, hsv_image, CV_BGR2HSV);
+
+    // HSVに画像を分解
+    cv::Mat channels[3];
+    cv::split(hsv_image, channels);
+
+    // 色相と彩度から色抽出
+    int width = hsv_image.cols;
+    int height = hsv_image.rows;
+    cv::Mat piece_image = cv::Mat(cv::Size(width, height), CV_8UC1);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int h = channels[0].at<uchar>(y, x);
+            int s = channels[1].at<uchar>(y, x);
+            if ((h > 0 && h < 70) && s > 90) {
+                piece_image.at<uchar>(y, x) = 255;
+            }
+            else {
+                piece_image.at<uchar>(y, x) = 0;
+            }
+        }
+    }
+
+    return piece_image;
+}
+
+// 画像を分ける
+std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
+{
+    int width = src_image.cols;
+    int height = src_image.rows;
+
+    // 2値化
+    cv::Mat bainary_image = HSVDetection(src_image);
+
+    // ラベリング
+    cv::Mat label_Image(cv::Size(width, height), CV_32S);
+    cv::Mat stats;
+    cv::Mat center;
+    int pieces_num = cv::connectedComponentsWithStats(bainary_image, label_Image, stats, center, 4, CV_32S);
+
+    // ノイズの除去＆分割
+    std::vector<cv::Mat> pieces_images;
+    for (int i = 1; i < pieces_num; i++) {
+
+        int *param = stats.ptr<int>(i);
+
+        // 面積の小さいものは省く
+        if (param[cv::ConnectedComponentsTypes::CC_STAT_AREA] > 10000) {
+
+            // 各ピースごとに移し替える
+            cv::Mat piece_image(cv::Size(width, height), CV_8UC1);
+            piece_image = cv::Scalar(255);
+            for (int y = 0; y < height; y++) {
+                int *lb = label_Image.ptr<int>(y);
+                for (int x = 0; x < width; x++) {
+                    unsigned char *pix = piece_image.ptr<unsigned char>(y);
+                    if (lb[x] == i) {
+                        pix[x] = 0;
+                    }
+                }
+            }
+            pieces_images.push_back(piece_image);
+        }
+    }
+
+    return pieces_images;
+}
+
