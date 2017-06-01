@@ -16,19 +16,21 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
 
     // ピースに分割
     std::vector<cv::Mat> pieces_images = dividePiece(raw_pieces_image);
+    //std::vector<cv::Mat> frame_image = dividePiece(raw_frame_image);
 
     // 線分検出
     std::vector<std::vector<cv::Vec4f>> lines;
+    //lines.push_back(houghLine(frame_image[0]));
     for (int i = 0; i < pieces_images.size(); i++) {
         lines.push_back(houghLine(pieces_images[i]));
     }
 
-    //int count = 0;
-    /*for (int i=0; i<pieces_images.size(); i++) {
+    /*
+    for (int i=0; i<10; i++) {
         cv::namedWindow(std::to_string(i+1));
         cv::imshow(std::to_string(i+1), pieces_images[i]);
-    }*/
-
+    }
+    */
 
     // ピースはひとつひとつの画像に分ける
     std::vector<cv::Mat> images;
@@ -41,7 +43,11 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
     std::copy(lines.begin(), lines.end(), std::back_inserter(pieces_lines));
 
     // ベクター化
-    std::vector<polygon_t> polygons = Vectored(pieces_lines);
+    std::vector<polygon_t> polygons = Vectored(lines);
+
+    for (int i=1; i<polygons.size(); i++) {
+        placeGrid(polygons[i]);
+    }
 
     // fieldクラスのデータに変換
     procon::Field field = makeField(polygons);
@@ -746,7 +752,7 @@ std::vector<cv::Vec4f> ImageRecognition::houghLine(cv::Mat src_image)
 
     // Hough変換
     std::vector<cv::Vec4f> lines;
-    cv::HoughLinesP(canny_image, lines, 1, CV_PI / 180, 80, 50, 50);
+    cv::HoughLinesP(canny_image, lines, 1, CV_PI / 180, 80, 50, 70);
 
     // 画像上に見つけた直線を設置
     cv::Vec4i pt;
@@ -778,7 +784,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
         for (int x = 0; x < width; x++) {
             int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
-            if ((h > 0 && h < 70) && s > 90) {
+            if ((h > 10 && h < 50) && s > 70) {
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -795,6 +801,8 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 {
     int width = src_image.cols;
     int height = src_image.rows;
+
+    cv::GaussianBlur(src_image, src_image, cv::Size(5,5), 0);
 
     // 2値化
     cv::Mat bainary_image = HSVDetection(src_image);
@@ -833,3 +841,88 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
     return pieces_images;
 }
 
+void ImageRecognition::placeGrid(polygon_t vertex)
+{
+    // グリッドの点番号で保存
+    std::vector<std::vector<int>> grid_piece;
+    std::vector<int> point;
+    point.push_back(0);
+    point.push_back(0);
+    grid_piece.push_back(point);
+    point.clear();
+
+    // 最初の辺の長さをグリッド基準で計算
+    double r = 216.0 / 3400.0;
+    double first_y = vertex.outer()[1].y() - vertex.outer()[0].y();
+    double first_x = vertex.outer()[1].x() - vertex.outer()[0].x();
+    double y_dif = first_y * r / 2.5;
+    double x_dif = first_x * r / 2.5;
+    double len = sqrt(pow(x_dif, 2.0) + pow(y_dif, 2.0));
+
+    double dif_min = 1.0;
+    double dy;
+    int p[2];
+
+    // 45度の範囲から辺の長さの誤差がもっとも小さいものをピックアップ
+    for (int x = ceil(len); x >= floor(len * sqrt(0.5)); x--) {
+
+        if (len < x) {
+            dy = 0;
+        } else {
+            dy = sqrt(pow(len, 2.0) - pow(x, 2.0));
+        }
+
+        // 計算上の点から上下の点で誤差を比べる
+        double short_error = fabs(sqrt(pow(floor(dy), 2.0) + pow(x, 2.0)) - len);
+        double long_error = fabs(sqrt(pow(ceil(dy), 2.0) + pow(x, 2.0)) - len);
+        if (dif_min > short_error) {
+            p[0] = x;
+            p[1] = (int)floor(dy);
+            dif_min = short_error;
+        } else if (dif_min > long_error) {
+            p[0] = x;
+            p[1] = (int)ceil(dy);
+            dif_min = long_error;
+        }
+    }
+
+    point.push_back(p[0]);
+    point.push_back(p[1]);
+    grid_piece.push_back(point);
+    point.clear();
+
+    // 回転角を算出
+    double theta_1;
+    if (first_x < 0 && first_y > 0) {
+        theta_1 = atan(first_y / first_x) + M_PI;
+    } else if (first_x < 0 && first_y <0) {
+        theta_1 = atan(first_y / first_x) - M_PI;
+    } else {
+        theta_1 = atan(first_y / first_x);
+    }
+    double theta_2 = atan(grid_piece[1][1] / grid_piece[1][0]);
+    double theta = theta_2 - theta_1;
+
+    // 全ての点を回転後のいちに移動
+    polygon_t polygon;
+    polygon.outer().push_back(point_t(0,0));
+    for (int i=1; i<vertex.outer().size(); i++) {
+        double x = vertex.outer()[i].x() - vertex.outer()[0].x();
+        double y = vertex.outer()[i].y() - vertex.outer()[0].y();
+        double move_x = x * cos(theta) - y * sin(theta);
+        double move_y = x * sin(theta) + y * cos(theta);
+        polygon.outer().push_back(point_t(move_x,move_y));
+    }
+
+    // 全ての点の座標をグリッドに変換
+    for (int i=2; i<polygon.outer().size(); i++) {
+        double x = (polygon.outer()[i].x() - polygon.outer()[0].x()) * r / 2.5;
+        double y = (polygon.outer()[i].y() - polygon.outer()[0].y()) * r / 2.5;
+        point.push_back(round(x));
+        point.push_back(round(y));
+        grid_piece.push_back(point);
+        point.clear();
+    }
+
+    return;
+}

@@ -169,6 +169,7 @@ void Hazama::run()
 
     // ピースの画像
     cv::Mat nocpieces;
+    cv::Mat nocframe;
 
     // Disable threshold UI
     disableThresholdUI();
@@ -214,7 +215,7 @@ void Hazama::run()
                 frame_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc").toStdString();
                 pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc").toStdString();
             }
-            cv::Mat nocframe = cv::imread(frame_path, 1);
+            nocframe = cv::imread(frame_path, 1);
             nocpieces = cv::imread(pieces_path, 1);
 
             //calibration
