@@ -24,7 +24,8 @@ SOURCES += \
     expandedpolygon.cpp \
     singlepolygondisplay.cpp \
     polygonviewer.cpp \
-    fit.cpp
+    fit.cpp \
+    neoexpandedpolygon.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -33,7 +34,8 @@ HEADERS += \
     expandedpolygon.h \
     singlepolygondisplay.h \
     polygonviewer.h \
-    fit.h
+    fit.h \
+    neoexpandedpolygon.h
 
 LIBS += -lboost_system -lboost_thread
 LIBS += -L/usr/local/lib `pkg-config --libs opencv`
@@ -55,3 +57,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include
