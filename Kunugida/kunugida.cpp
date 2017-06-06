@@ -12,7 +12,7 @@ Kunugida::Kunugida(QWidget *parent) :
     ui(new Ui::Kunugida)
 {
     ui->setupUi(this);
-
+    logger = spdlog::get("Kunugida");
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 }
 
@@ -24,21 +24,19 @@ Kunugida::~Kunugida()
 void Kunugida::run()
 {
     std::cout << "Run" << std::endl;
+    logger->info("Run Button Clicked");
     this->finishedProcess();
 }
 
 void Kunugida::clickedRunButton()
 {
-    if(ui->ImageRecognitonTestCheckBox->isChecked()){
-        this->imageRecognitonTest();
+    if(!this->is_running){
+        logger->info("start solving process");
+        this->startProcess();
+        this->run();
     }else{
-        if(!this->is_running){
-            std::cout << "Start Process" << std::endl;
-            this->startProcess();
-            this->run();
-        }else{
-            std::cout << "Main Process is Already Running" << std::endl;
-        }
+        //warning
+        logger->warn("solving process is already running");
     }
 }
 

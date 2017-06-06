@@ -2,6 +2,7 @@
 #define KUNUGIDA_H
 
 #include <QMainWindow>
+#include "spdlog/spdlog.h"
 
 namespace Ui {
 class Kunugida;
@@ -19,6 +20,7 @@ public:
 
 private:
     Ui::Kunugida *ui;
+    std::shared_ptr<spdlog::logger> logger;
     bool is_running = false;
     void finishedProcess();
     void startProcess();

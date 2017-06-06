@@ -41,3 +41,7 @@ else:unix: LIBS += -L$$OUT_PWD/../DisplayAnswer/ -lDisplayAnswer
 
 INCLUDEPATH += $$PWD/../DisplayAnswer
 DEPENDPATH += $$PWD/../DisplayAnswer
+
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include
