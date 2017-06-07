@@ -13,9 +13,11 @@ namespace bg = boost::geometry;
 typedef bg::model::d2::point_xy<int> point_i;
 typedef bg::model::polygon<point_i> polygon_i;
 
+namespace procon {
 
 class NeoExpandedPolygon
 {
+public:
     //constractor
     NeoExpandedPolygon();
 
@@ -30,5 +32,7 @@ public:
     void setPolygon(polygon_i polygon);
 
 };
+
+}
 
 #endif // NEOEXPANDEDPOLYGON_H

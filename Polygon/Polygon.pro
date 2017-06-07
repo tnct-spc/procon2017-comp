@@ -25,7 +25,8 @@ SOURCES += \
     singlepolygondisplay.cpp \
     polygonviewer.cpp \
     fit.cpp \
-    neoexpandedpolygon.cpp
+    neoexpandedpolygon.cpp \
+    neosinglepolygondisplay.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -35,7 +36,8 @@ HEADERS += \
     singlepolygondisplay.h \
     polygonviewer.h \
     fit.h \
-    neoexpandedpolygon.h
+    neoexpandedpolygon.h \
+    neosinglepolygondisplay.h
 
 LIBS += -lboost_system -lboost_thread
 LIBS += -L/usr/local/lib `pkg-config --libs opencv`
@@ -49,7 +51,8 @@ unix {
 
 FORMS += \
     singlepolygondisplay.ui \
-    form.ui
+    form.ui \
+    neosinglepolygondisplay.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
