@@ -50,3 +50,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include

@@ -54,7 +54,7 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
             draw_point[i].setX(((points.at(i).x() + x_offset)*x/max)+x/2+x_margin);
             draw_point[i].setY(((points.at(i).y() + y_offset)*y/max)+y/2+y_margin);
         }
-        //draw polygon
+        //draw polygo
         painter.drawPolygon(draw_point,size);
         //draw number
         painter.setPen(QPen(QColor("#00ff00")));

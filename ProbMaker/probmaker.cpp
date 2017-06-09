@@ -12,3 +12,5 @@ ProbMaker::~ProbMaker()
 {
     delete ui;
 }
+
+
