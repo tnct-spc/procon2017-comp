@@ -12,4 +12,5 @@ SUBDIRS += \
     Slave \
     Kunugida \
     ProbMaker \
+    ProbMaker \
     ProbMaker

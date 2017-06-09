@@ -1,12 +1,10 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-04-19T19:53:41
+# Project created by QtCreator 2017-06-10T00:04:12
 #
 #-------------------------------------------------
 
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       += core gui widgets
 
 TARGET = ProbMaker
 TEMPLATE = app
@@ -30,9 +28,42 @@ HEADERS  += probmaker.h
 
 FORMS    += probmaker.ui
 
-# win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
-# else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
-# else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+CONFIG += c++14
 
-# INCLUDEPATH += $$PWD/../Polygon
-# DEPENDPATH += $$PWD/../Polygon
+TARGET = ProbMaker
+TEMPLATE = app
+
+CONFIG   += precompile_header
+
+# Use Precompiled headers (PCH)
+PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
+
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
+else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+
+INCLUDEPATH += $$PWD/../Polygon
+DEPENDPATH += $$PWD/../Polygon
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/release/ -lDisplayAnswer
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/debug/ -lDisplayAnswer
+else:unix: LIBS += -L$$OUT_PWD/../DisplayAnswer/ -lDisplayAnswer
+
+INCLUDEPATH += $$PWD/../DisplayAnswer
+DEPENDPATH += $$PWD/../DisplayAnswer
+
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
+else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
+
+INCLUDEPATH += $$PWD/../Utilities
+DEPENDPATH += $$PWD/../Utilities
+
+
