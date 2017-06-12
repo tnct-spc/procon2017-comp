@@ -17,6 +17,7 @@ namespace procon {
 
 class NeoExpandedPolygon
 {
+public:
     //constractor
     NeoExpandedPolygon();
 
