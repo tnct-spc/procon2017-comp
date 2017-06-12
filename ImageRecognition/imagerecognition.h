@@ -5,6 +5,7 @@
 
 #include "field.h"
 #include "expandedpolygon.h"
+#include "neoexpandedpolygon.h"
 
 class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
