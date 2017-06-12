@@ -2,6 +2,7 @@
 #define PROBMAKER_H
 
 #include <QWidget>
+#include "neoexpandedpolygon.h"
 
 namespace Ui {
 class ProbMaker;
@@ -17,6 +18,11 @@ public:
 
 private:
     Ui::ProbMaker *ui;
+    void run();
+    std::vector<std::pair<point_i,point_i>> lines;
+
+protected:
+    void paintEvent(QPaintEvent *);
 };
 
 #endif // PROBMAKER_H
