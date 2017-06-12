@@ -2,17 +2,17 @@
 
 #include <cmath>
 
-NeoExpandedPolygon::NeoExpandedPolygon()
+procon::NeoExpandedPolygon::NeoExpandedPolygon()
 {
 
 }
 
-void NeoExpandedPolygon::setPolygon(polygon_i polygon)
+void procon::NeoExpandedPolygon::setPolygon(polygon_i polygon)
 {
     this->polygon = polygon;
 }
 
-polygon_i NeoExpandedPolygon::getPolygon()
+polygon_i procon::NeoExpandedPolygon::getPolygon()
 {
     return polygon;
 }
