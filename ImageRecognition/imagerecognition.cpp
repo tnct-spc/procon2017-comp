@@ -2,15 +2,32 @@
 #include "threshold.h"
 #include "polygonviewer.h"
 #include "utilities.h"
+#include "neosinglepolygondisplay.h"
 
 procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
     raw_pieces_pic = raw_pieces_image;
 
+    /*
+    // 表示法サンプル
+    polygon_i polygon;
+    polygon.outer().push_back(point_i(3,3));
+    polygon.outer().push_back(point_i(5,3));
+    polygon.outer().push_back(point_i(4,4));
+    polygon.outer().push_back(point_i(3,3));
+
+    procon::NeoExpandedPolygon hoge;
+    hoge.setPolygon(polygon);
+
+    auto inst = NeoSinglePolygonDisplay::createInstance(hoge, "hoge");
+    inst->show();
+    */
+
     //cv::namedWindow("piece",cv::WINDOW_NORMAL);
     //cv::imshow("piece",raw_pieces_image);
 
     // 二値化,前処理.
+
     cv::Mat frame_image = preprocessingFrame(raw_frame_image);
     //std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
 
@@ -29,25 +46,38 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
     std::vector<std::vector<cv::Vec4f>> lines;
     //lines.push_back(houghLine(frame_image[0]));
     for (unsigned int i = 1; i < pieces_images.size(); i++) {
-        lines.push_back(houghLine(pieces_images[i]));
+        //lines.push_back(houghLine(pieces_images[i]));
     }
 
     // ピースはひとつひとつの画像に分ける
     std::vector<cv::Mat> images;
     images.push_back(frame_image);
-    //for(cv::Mat& piece : pieces_images) images.push_back(piece);
+    for(cv::Mat& piece : pieces_images) images.push_back(piece);
 
     // 線分検出
     std::vector<std::vector<cv::Vec4f>> pieces_lines = LineDetection(images);
-    std::copy(lines.begin(), lines.end(), std::back_inserter(pieces_lines));
+    //std::copy(lines.begin(), lines.end(), std::back_inserter(pieces_lines));
+
+    /*
+    cv::Vec4i pt;
+    cv::Mat line_image = raw_pieces_pic.clone();
+    int color = 100;
+    for (auto it = pieces_lines[20].begin(); it != pieces_lines[20].end(); ++it) {
+        pt = *it;
+        cv::line(line_image, cv::Point(pt[0], pt[1]), cv::Point(pt[2], pt[3]),color, 5, CV_AA);
+        color += 10;
+    }
+    */
+
+    //cv::namedWindow("Line",cv::WINDOW_NORMAL);
+    //cv::imshow("Line",line_image);
+
+    //cv::waitKey(100000);
 
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
     for (unsigned int i=0; i<polygons.size(); i++) {
-        cv::namedWindow("piece", cv::WINDOW_NORMAL);
-        cv::imshow("piece",pieces_images[i+1]);
-
         placeGrid(polygons[i]);
     }
 
@@ -326,12 +356,14 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         cv::Mat pic(image);
         lsd->drawSegments(pic, pieces_lines[count]);
         // Debug
-        //if (1==1 || count + 1 == 14) {
+        //if (count < 10) {
         //    cv::namedWindow(std::to_string(count+1));
         //    cv::imshow(std::to_string(count+1), pic);
         //}
         count++;
     }
+
+    //cv::waitKey(0);
 
     return std::move(pieces_lines);
 }
@@ -784,10 +816,10 @@ std::vector<cv::Vec4f> ImageRecognition::houghLine(cv::Mat src_image)
         color += 10;
     }
 
-    cv::namedWindow("Line");
-    cv::imshow("Line",line_image);
+    //cv::namedWindow("Line");
+    //cv::imshow("Line",line_image);
 
-    cv::waitKey(100000);
+    //cv::waitKey(100000);
 
     return lines;
 }
@@ -877,21 +909,45 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 
 void ImageRecognition::placeGrid(polygon_t vertex)
 {
+    unsigned int size = vertex.outer().size();
+
     // 図形を生成できなければ排除
-    if (vertex.outer().size() < 4) return;
+    if (size < 4) return;
+
+    /*
+    // 最も長い辺から始める（誤差を減らす）
+    // つけない方がいいかも…　大きいピースで誤差が出る
+    double long_len = 0;
+    unsigned int longgest;
+    for (unsigned int i = 0; i < size-1; i++) {
+        double x = vertex.outer().at(i+1).x() - vertex.outer().at(i).x();
+        double y = vertex.outer().at(i+1).y() - vertex.outer().at(i).y();
+        double it_len = pow(x, 2.0) + pow(y, 2.0);
+        if (long_len < it_len) {
+            long_len = it_len;
+            longgest = i;
+        }
+    }
+
+    // 配列を循環
+    vertex.outer().pop_back();
+    polygon_t polygon;
+    for (unsigned int i = 0; i < size-1; i++) {
+        polygon.outer().push_back(vertex.outer().at((i+longgest)%(size-1)));
+    }
+    polygon.outer().push_back(polygon.outer().at(0));
+    */
+
+    polygon_t polygon = vertex;
 
     // グリッドの点番号で保存
-    std::vector<std::vector<int>> grid_piece;
-    std::vector<int> point;
-    point.push_back(0);
-    point.push_back(0);
-    grid_piece.push_back(point);
-    point.clear();
+    polygon_i grid_piece;
+    grid_piece.outer().push_back(point_i(0,0));
 
     // 最初の辺の長さをグリッド基準で計算
     double r = 216.0 / 3400.0;
-    double first_x = vertex.outer().at(1).x() - vertex.outer().at(0).x();
-    double first_y = vertex.outer().at(1).y() - vertex.outer().at(0).y();
+    double first_x = polygon.outer().at(1).x() - polygon.outer().at(0).x();
+    double first_y = polygon.outer().at(1).y() - polygon.outer().at(0).y();
     double x_dif = first_x * r / 2.5;
     double y_dif = first_y * r / 2.5;
     double len = sqrt(pow(x_dif, 2.0) + pow(y_dif, 2.0));
@@ -910,23 +966,20 @@ void ImageRecognition::placeGrid(polygon_t vertex)
         }
 
         // 計算上の点から上下の点で誤差を比べる
-        double pre_error = fabs(sqrt(pow(floor(dy), 2.0) + pow(x, 2.0)) - len);
-        double post_error = fabs(sqrt(pow(ceil(dy), 2.0) + pow(x, 2.0)) - len);
-        if (dif_min > pre_error) {
+        double top_error = fabs(sqrt(pow(floor(dy), 2.0) + pow(x, 2.0)) - len);
+        double bottom_error = fabs(sqrt(pow(ceil(dy), 2.0) + pow(x, 2.0)) - len);
+        if (dif_min > top_error) {
             p[0] = x;
             p[1] = (int)floor(dy);
-            dif_min = pre_error;
-        } else if (dif_min > post_error) {
+            dif_min = top_error;
+        } else if (dif_min > bottom_error) {
             p[0] = x;
             p[1] = (int)ceil(dy);
-            dif_min = post_error;
+            dif_min = bottom_error;
         }
     }
 
-    point.push_back(p[0]);
-    point.push_back(p[1]);
-    grid_piece.push_back(point);
-    point.clear();
+    grid_piece.outer().push_back(point_i(p[0],p[1]));
 
     // 回転角を算出
     double theta_1;
@@ -937,31 +990,47 @@ void ImageRecognition::placeGrid(polygon_t vertex)
     } else {
         theta_1 = atan(first_y / first_x);
     }
-    double theta_2 = atan(grid_piece[1][1] / grid_piece[1][0]);
+    double theta_2 = atan((double)grid_piece.outer().at(1).y() / (double)grid_piece.outer().at(1).x());
     double theta = theta_2 - theta_1;
 
+    // 2つの角度から選ぶ
+    if (theta_2 != 0) {
+        double sec_x = polygon.outer().at(2).x() - polygon.outer().at(0).x();
+        double sec_y = polygon.outer().at(2).y() - polygon.outer().at(0).y();
+        double acute_x = sec_x * cos(theta) - sec_y * sin(theta);
+        double acute_y = sec_x * sin(theta) + sec_y * cos(theta);
+        double obtuse_x = sec_x * cos(M_PI/2-theta_2-theta_1) - sec_y * sin(M_PI/2-theta_2-theta_1);
+        double obtuse_y = sec_x * sin(M_PI/2-theta_2-theta_1) + sec_y * cos(M_PI/2-theta_2-theta_1);
+        double dacute_len = pow(acute_x - round(acute_x), 2.0) + pow(acute_y - round(acute_y), 2.0);
+        double dobtuse_len = pow(obtuse_x - round(obtuse_x), 2.0) + pow(obtuse_y - round(obtuse_y), 2.0);
+
+        if (dobtuse_len < dacute_len) theta = M_PI / 2 - theta_2 - theta_1;
+    }
     // 全ての点を回転後のいちに移動
-    polygon_t polygon;
-    polygon.outer().push_back(point_t(0,0));
-    for (unsigned int i=1; i<vertex.outer().size(); i++) {
-        double x = vertex.outer().at(i).x() - vertex.outer().at(0).x();
-        double y = vertex.outer().at(i).y() - vertex.outer().at(0).y();
+    polygon_t turn;
+    turn.outer().push_back(point_t(0,0));
+    for (unsigned int i=1; i<size; i++) {
+        double x = polygon.outer().at(i).x() - polygon.outer().at(0).x();
+        double y = polygon.outer().at(i).y() - polygon.outer().at(0).y();
         double move_x = x * cos(theta) - y * sin(theta);
         double move_y = x * sin(theta) + y * cos(theta);
-        polygon.outer().push_back(point_t(move_x,move_y));
+        turn.outer().push_back(point_t(move_x,move_y));
     }
 
     // 全ての点の座標をグリッドに変換
-    for (unsigned int i=2; i<polygon.outer().size(); i++) {
-        double x = (polygon.outer().at(i).x() - polygon.outer().at(0).x()) * r / 2.5;
-        double y = (polygon.outer().at(i).y() - polygon.outer().at(0).y()) * r / 2.5;
-        point.push_back(round(x));
-        point.push_back(round(y));
-        grid_piece.push_back(point);
-        point.clear();
+    for (unsigned int i=2; i<size; i++) {
+        double x = turn.outer().at(i).x() * r / 2.5;
+        double y = turn.outer().at(i).y() * r / 2.5;
+        grid_piece.outer().push_back(point_i(round(x),round(y)));
     }
 
-    cv::waitKey(100000);
+    procon::NeoExpandedPolygon piece;
+    piece.setPolygon(grid_piece);
+
+    auto inst = NeoSinglePolygonDisplay::createInstance(piece, "Grid");
+    inst->show();
+
+    cv::waitKey(10000);
 
     return;
 }
