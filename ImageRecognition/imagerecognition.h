@@ -42,7 +42,7 @@ private:
     std::vector<cv::Vec4f> houghLine(cv::Mat src_image);
     cv::Mat HSVDetection(cv::Mat src_image);
     std::vector<cv::Mat> dividePiece(cv::Mat src_image);
-    void placeGrid(polygon_t vertex);
+    polygon_i placeGrid(polygon_t vertex);
 
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;

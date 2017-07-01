@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "spdlog/spdlog.h"
+#include "imagerecognition.h"
 
 namespace Ui {
 class Kunugida;

@@ -77,8 +77,9 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
+    std::vector<polygon_i> pieces;
     for (unsigned int i=0; i<polygons.size(); i++) {
-        placeGrid(polygons[i]);
+        pieces.push_back(placeGrid(polygons[i]));
     }
 
     // fieldクラスのデータに変換
@@ -907,12 +908,9 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
     return pieces_images;
 }
 
-void ImageRecognition::placeGrid(polygon_t vertex)
+polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 {
     unsigned int size = vertex.outer().size();
-
-    // 図形を生成できなければ排除
-    if (size < 4) return;
 
     /*
     // 最も長い辺から始める（誤差を減らす）
@@ -1030,7 +1028,7 @@ void ImageRecognition::placeGrid(polygon_t vertex)
     auto inst = NeoSinglePolygonDisplay::createInstance(piece, "Grid");
     inst->show();
 
-    cv::waitKey(10000);
+    //cv::waitKey(10000);
 
-    return;
+    return grid_piece;
 }
