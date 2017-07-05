@@ -20,6 +20,7 @@ private:
     Ui::ProbMaker *ui;
     void run();
     std::vector<std::pair<point_i,point_i>> lines;
+    std::vector<polygon_i> print_polygons;
 
 protected:
     void paintEvent(QPaintEvent *);
