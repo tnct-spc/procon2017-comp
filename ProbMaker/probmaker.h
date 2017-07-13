@@ -18,12 +18,18 @@ public:
 
 private:
     Ui::ProbMaker *ui;
-    void run();
     std::vector<std::pair<point_i,point_i>> lines;
     std::vector<polygon_i> print_polygons;
 
+private slots:
+    void run();
+
+signals:
+    void nextLoop();
+
 protected:
     void paintEvent(QPaintEvent *);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // PROBMAKER_H

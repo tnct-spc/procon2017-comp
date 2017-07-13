@@ -16,13 +16,15 @@ class NeoSinglePolygonDisplay : public QWidget
     Q_OBJECT
 
 public:
-    static std::unique_ptr<NeoSinglePolygonDisplay> createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name);
+//    static std::unique_ptr<NeoSinglePolygonDisplay> createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name);
     explicit NeoSinglePolygonDisplay(QWidget *parent = 0);
     ~NeoSinglePolygonDisplay();
+    void setWindowName(std::string window_name);
+    void setPolygon(polygon_i polygon);
 
 private:
     Ui::NeoSinglePolygonDisplay *ui;
-    procon::NeoExpandedPolygon polygon;
+    polygon_i polygon;
 
 protected:
     void paintEvent(QPaintEvent *);

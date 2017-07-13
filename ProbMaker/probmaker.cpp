@@ -7,16 +7,31 @@
 #include <boost/math/common_factor_rt.hpp>
 
 #include <numeric>
+#include <vector>
+#include <cmath>
 #include <random>
 
 #include <QPainter>
+#include <QPushButton>
+#include <QKeyEvent>
+#include <QEventLoop>
+
 
 ProbMaker::ProbMaker(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ProbMaker)
 {
     ui->setupUi(this);
-    this->run();
+    connect(this->ui->next_phase,&QPushButton::clicked,this,&ProbMaker::run);
+//    this->run();
+    //本番の101*65
+    polygon_i base_polygon;
+    base_polygon.outer().push_back(point_i(0,0));
+    base_polygon.outer().push_back(point_i(0,65));
+    base_polygon.outer().push_back(point_i(101,65));
+    base_polygon.outer().push_back(point_i(101,0));
+    base_polygon.outer().push_back(point_i(0,0));
+    this->print_polygons.push_back(base_polygon);
 }
 
 ProbMaker::~ProbMaker()
@@ -158,6 +173,8 @@ void ProbMaker::run()
         //切断店の挿入
         new_points1.push_back(start_side_cut_points.at(start_dot_num));
         new_points2.push_back(start_side_cut_points.at(start_dot_num));
+
+        ++a;
         
         while(true){
             new_points2.push_back(polygon.outer().at(a));
@@ -171,6 +188,8 @@ void ProbMaker::run()
         //切断点の挿入
         new_points1.push_back(end_side_cut_points.at(end_dot_num));
         new_points2.push_back(end_side_cut_points.at(end_dot_num));
+
+        ++a;
         
         //new_points2はここで終点なのでindexが0の座標を最後に挿入する
         new_points2.push_back(new_points2.at(0));
@@ -194,11 +213,17 @@ void ProbMaker::run()
                 return point1.x() == point2.x() && point1.y() == point2.y();
             };
 
+            std::cout << "debugguggggggasdkljgklajsldkgkla" << std::endl;
+            std::cout << check_same_point(point_i(100,99),point_i(100,99)) << std::endl;
+            std::cout << check_same_point(point_i(100,100),point_i(100,99)) << std::endl;
+
+
             for (int index = 0; index < polygon.outer().size() - 1; ++index) {
                 if(!check_same_point(polygon.outer().at(index),polygon.outer().at(index+1))){
                     deleted_duplicated_point_polygon.outer().push_back(polygon.outer().at(index));
                 }
             }
+            deleted_duplicated_point_polygon.outer().push_back(polygon.outer().at(polygon.outer().size()-1));
             
         	return deleted_duplicated_point_polygon;
         };
@@ -223,24 +248,173 @@ void ProbMaker::run()
         std::cout << "connect polygon" << std::endl;
     };
     
-    //本番の101*65
-    polygon_i base_polygon;
-    base_polygon.outer().push_back(point_i(0,0));
-    base_polygon.outer().push_back(point_i(0,65));
-    base_polygon.outer().push_back(point_i(101,65));
-    base_polygon.outer().push_back(point_i(101,0));
-    base_polygon.outer().push_back(point_i(0,0));
+    auto find_iikanji_polygon = [&devide_polygon](polygon_i polygon)->std::pair<polygon_i,polygon_i>{
+        auto check_polygon = [](std::pair<polygon_i,polygon_i> polygons)->bool{
+            //polygonの面積をチェック
+            const double first_polygon_area = boost::geometry::area(polygons.first);
+            const double second_polygon_area = boost::geometry::area(polygons.second);
+            const double total_area = first_polygon_area + second_polygon_area;
 
-    auto polygons = devide_polygon(base_polygon);
-    this->print_polygons.push_back(polygons.first);
-    this->print_polygons.push_back(polygons.second);
+            //全体の合計から少なくともこれだけの面積はほしいってやつ
+            const double threshold = 0.2;
+
+            if(first_polygon_area > second_polygon_area){
+                if(second_polygon_area > total_area * threshold){
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                if(first_polygon_area > total_area * threshold){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        auto check_inner_angle = [](polygon_i polygon,double degree_threshold){
+            auto calc_angle = [](polygon_i polygon,int pos){
+                int x1,y1,x2,y2;
+
+                //posが0だと戻らないといけないから
+                if(pos == 0){
+                    x1 = polygon.outer().at(pos).x() - polygon.outer().at(polygon.outer().size() - 2).x();
+                    y1 = polygon.outer().at(pos).y() - polygon.outer().at(polygon.outer().size() - 2).y();
+                    x2 = polygon.outer().at(pos).x() - polygon.outer().at(pos + 1).x();
+                    y2 = polygon.outer().at(pos).y() - polygon.outer().at(pos + 1).y();
+                }else{
+                    x1 = polygon.outer().at(pos).x() - polygon.outer().at(pos - 1).x();
+                    y1 = polygon.outer().at(pos).y() - polygon.outer().at(pos - 1).y();
+                    x2 = polygon.outer().at(pos).x() - polygon.outer().at(pos + 1).x();
+                    y2 = polygon.outer().at(pos).y() - polygon.outer().at(pos + 1).y();
+                }
+
+                double bb = std::abs(x1 * x2 + y1 * y2) / (std::sqrt(x1 * x1 + y1 * y1) * std::sqrt(x2 * x2 + y2 * y2));
+                double angle = std::acos(bb);
+
+                return angle;
+            };
+
+            auto radian2dgree = [](double rad){
+                return (rad / M_PI) * 180;
+            };
+
+//            std::cout << "jpeg slfaj;sd" << std::endl;
+//            std::cout << calc_angle(polygon,0) << std::endl;
+//            std::cout << radian2dgree(calc_angle(polygon,0)) << std::endl;
+
+            for (int index = 0; index < polygon.outer().size() - 1; ++index) {
+                double degree = radian2dgree(calc_angle(polygon,index));
+                std::cout << "kakudooooo" << degree << std::endl;
+
+                if(degree < degree_threshold){
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        while(true){
+            std::pair<polygon_i,polygon_i> polygons_buf;
+            polygons_buf = devide_polygon(polygon);
+
+            std::cout << "debugging" << std::endl;
+
+            if(check_polygon(polygons_buf)){
+                if(check_inner_angle(polygon,60)){
+                    return polygons_buf;
+                }
+            }
+        }
+    };
+    
+
+    //一番面積の大きいpolygonのindexを持ってくる
+    auto find_greatest_area_polygon = [](std::vector<polygon_i> polygons){
+        int current_greatest_area_polygon_index = 0;
+
+        for (int index = 0; index < polygons.size(); ++index) {
+            if(boost::geometry::area(polygons.at(index)) > boost::geometry::area(polygons.at(current_greatest_area_polygon_index))){
+                current_greatest_area_polygon_index = index;
+            }
+        }
+        return current_greatest_area_polygon_index;
+    };
+
+    auto devide_vectorrrrred_polygon = [&find_greatest_area_polygon,&find_iikanji_polygon](std::vector<polygon_i> polygons)->std::vector<polygon_i>{
+        int greatest_area_polygon_index = find_greatest_area_polygon(polygons);
+        std::cout << "greatest polygon number:" << greatest_area_polygon_index << std::endl;
+        polygon_i polygon_buff;
+        polygon_buff = polygons.at(greatest_area_polygon_index);
+//        polygons.erase(polygons.begin() + greatest_area_polygon_index);
+
+        std::vector<polygon_i> return_polygons;
+//        std::copy(polygons.begin(),polygons.end(),std::back_inserter(return_polygons));
+        for (int index = 0; index < polygons.size(); ++index) {
+            if(index != greatest_area_polygon_index){
+                return_polygons.push_back(polygons.at(index));
+            }
+        }
+
+        std::pair<polygon_i,polygon_i> polygons_buf = find_iikanji_polygon(polygon_buff);
+        return_polygons.push_back(polygons_buf.first);
+        return_polygons.push_back(polygons_buf.second);
+
+        return return_polygons;
+    };
+
+    std::pair<polygon_i,polygon_i> devided_polygon = devide_polygon(this->print_polygons[0]);
+    std::cout << "oppsdjfklajfksld;nlkvas " << std::endl;
+    std::cout << "first" << boost::geometry::dsv(devided_polygon.first) << std::endl;
+    std::cout << "second" << boost::geometry::dsv(devided_polygon.second) << std::endl;
+
+
+//    while(true){
+//        std::vector<polygon_i> polygon_buf;
+
+//        std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygon_buf));
+//		this->print_polygons.clear();
+
+//        auto polygons = find_iikanji_polygon(base_polygon);
+//    }
+//    this->print_polygons.push_back(polygons.first);
+//    this->print_polygons.push_back(polygons.second);
+
+    std::cout << "DEVIDE" << std::endl;
+
+    std::vector<polygon_i> polygonn = devide_vectorrrrred_polygon(this->print_polygons);
+    this->print_polygons.clear();
+    std::copy(polygonn.begin(),polygonn.end(),std::back_inserter(this->print_polygons));
+
+
+    int counnnter = 0;
+    for(auto polygon: this->print_polygons ){
+        NeoSinglePolygonDisplay disp;
+        disp.setPolygon(polygon);
+        disp.setWindowName(std::to_string(counnnter));
+        disp.show();
+        std::cout << counnnter << std::endl << boost::geometry::dsv(polygon) << std::endl;
+
+        ++counnnter;
+    }
+
+    this->update();
+
+//    QEventLoop event;
+//    connect(this,&ProbMaker::nextLoop,&event,&QEventLoop::quit);
+//    event.exec();
+
+    
+
 }
 
 void ProbMaker::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setPen(QPen(QColor("#000000")));
-    constexpr int grid_size = 17;
+    constexpr int grid_size = 10;
     constexpr int max_col = 101;
     constexpr int max_row = 61;
     for (int col= 0; col < max_col; ++col) {
@@ -259,11 +433,12 @@ void ProbMaker::paintEvent(QPaintEvent *)
             painter.drawPolygon(&polygon.front(),polygon.size());
         }
     }
-
+    painter.setPen(QPen(QColor("#00ffff")));
     auto draw_polygon = [&painter,&grid_size](polygon_i polygon){
         std::vector<QPoint> print_points;
         for(auto point : polygon.outer()){
             print_points.push_back(QPoint(point.x()*grid_size,point.y()*grid_size));
+            painter.drawPoint(point.x(),point.y());
         }
         painter.drawPolygon(&print_points.front(),print_points.size());
     };
@@ -271,6 +446,30 @@ void ProbMaker::paintEvent(QPaintEvent *)
     for(auto polygon : this->print_polygons){
         draw_polygon(polygon);
     }
+
+    auto draw_points = [&painter,&grid_size](polygon_i polygon){
+        int counter = 0;
+        for(auto point : polygon.outer() ){
+            painter.drawEllipse(point.x()*grid_size,point.y()*grid_size,10,10);
+            painter.drawText(point.x()*grid_size,point.y()*grid_size+ 10,QString(QString::fromStdString(std::to_string(counter))));
+            ++counter;
+
+        }
+
+    };
+
+    painter.setPen(QPen(QColor("#000000")));
+    for(auto polygon : this->print_polygons){
+       draw_points(polygon);
+    }
 }
 
+void ProbMaker::keyPressEvent(QKeyEvent *event){
+    std::cout << event->key() << std::endl;
 
+    //if pressed a key
+    if(event->key() == 65){
+        std::cout << "wweeeeeee" << std::endl;
+        emit nextLoop();
+    }
+}
