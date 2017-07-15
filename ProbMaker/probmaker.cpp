@@ -5,6 +5,9 @@
 #include <boost/geometry/geometry.hpp>
 #include <boost/math/tools/fraction.hpp>
 #include <boost/math/common_factor_rt.hpp>
+#include <boost/polygon/voronoi.hpp>
+
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include <numeric>
 #include <vector>
@@ -22,7 +25,7 @@ ProbMaker::ProbMaker(QWidget *parent) :
     ui(new Ui::ProbMaker)
 {
     ui->setupUi(this);
-    connect(this->ui->next_phase,&QPushButton::clicked,this,&ProbMaker::run);
+//    connect(this->ui->next_phase,&QPushButton::clicked,this,&ProbMaker::run);
 //    this->run();
     //本番の101*65
     polygon_i base_polygon;
@@ -32,6 +35,9 @@ ProbMaker::ProbMaker(QWidget *parent) :
     base_polygon.outer().push_back(point_i(101,0));
     base_polygon.outer().push_back(point_i(0,0));
     this->print_polygons.push_back(base_polygon);
+
+    //ドロネーの三角形分割
+    delaunay_triangulation();
 }
 
 ProbMaker::~ProbMaker()
@@ -39,7 +45,36 @@ ProbMaker::~ProbMaker()
     delete ui;
 }
 
-void ProbMaker::run()
+void ProbMaker::delaunay_triangulation()
+{
+
+    std::mt19937 mt;
+    std::uniform_int_distribution<int> x_distribution(0,101);
+    std::uniform_int_distribution<int> y_distribution(0,65);
+    std::vector<cv::Point2f> points;
+    for (int var = 0; var < 100; ++var) {
+        int x = x_distribution(mt);
+        int y = y_distribution(mt);
+
+        points.push_back(cv::Point2f(x,y));
+    }
+
+    cv::Subdiv2D subdiv;
+    subdiv.initDelaunay(cv::Rect(0,0,150,100));
+    subdiv.insert(points);
+
+    std::vector<cv::Vec6f> triangles;
+    subdiv.getTriangleList(triangles);
+    for(auto vec : triangles){
+        polygon_i poly_buf;
+        poly_buf.outer().push_back(point_i(vec[0],vec[1]));
+        poly_buf.outer().push_back(point_i(vec[2],vec[3]));
+        poly_buf.outer().push_back(point_i(vec[4],vec[5]));
+        this->print_polygons.push_back(poly_buf);
+    }
+}
+
+void ProbMaker::step()
 {
     //polygonのvectorから一番面積が大きいやつのindexを持ってくるやつ
     auto greatest_area = [](std::vector<polygon_i> polygons)->unsigned int{
@@ -323,7 +358,7 @@ void ProbMaker::run()
             std::cout << "debugging" << std::endl;
 
             if(check_polygon(polygons_buf)){
-                if(check_inner_angle(polygon,60)){
+                if(check_inner_angle(polygon,20)){
                     return polygons_buf;
                 }
             }

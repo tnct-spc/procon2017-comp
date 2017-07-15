@@ -15,6 +15,7 @@ class ProbMaker : public QWidget
 public:
     explicit ProbMaker(QWidget *parent = 0);
     ~ProbMaker();
+    void delaunay_triangulation();
 
 private:
     Ui::ProbMaker *ui;
@@ -22,7 +23,7 @@ private:
     std::vector<polygon_i> print_polygons;
 
 private slots:
-    void run();
+    void step();
 
 signals:
     void nextLoop();
