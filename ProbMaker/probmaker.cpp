@@ -66,12 +66,31 @@ void ProbMaker::delaunay_triangulation()
     std::vector<cv::Vec6f> triangles;
     subdiv.getTriangleList(triangles);
     for(auto vec : triangles){
-        polygon_i poly_buf;
-        poly_buf.outer().push_back(point_i(vec[0],vec[1]));
-        poly_buf.outer().push_back(point_i(vec[2],vec[3]));
-        poly_buf.outer().push_back(point_i(vec[4],vec[5]));
-        this->print_polygons.push_back(poly_buf);
+        bool flag = false;
+
+        auto check = [&](auto a){
+            if(a > 300) flag = true;
+        };
+
+        for (int a = 0; a < 6; ++a) {
+            check(vec[a]);
+        }
+
+        if(!flag){
+            polygon_i poly_buf;
+            poly_buf.outer().push_back(point_i(vec[0],vec[1]));
+            poly_buf.outer().push_back(point_i(vec[2],vec[3]));
+            poly_buf.outer().push_back(point_i(vec[4],vec[5]));
+            poly_buf.outer().push_back(point_i(vec[0],vec[1]));
+            this->print_polygons.push_back(poly_buf);
+        }
     }
+    std::cout << "delaunay trianglation completed" << std::endl;
+
+    for(auto polygon : this->print_polygons){
+        std::cout << boost::geometry::dsv(polygon) << std::endl;
+    }
+
 }
 
 void ProbMaker::step()
