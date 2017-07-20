@@ -1,5 +1,5 @@
 
-#include "qrlibruary.h"
+#include "qrlibrary.h"
 
 using namespace cv;
 using namespace zbar;

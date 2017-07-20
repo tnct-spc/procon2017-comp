@@ -26,11 +26,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    qrlibruary.cpp
+    qrlibrary.cpp
 
 HEADERS += \
         mainwindow.h \
-    qrlibruary.h
+    qrlibrary.h
 
 FORMS += \
         mainwindow.ui

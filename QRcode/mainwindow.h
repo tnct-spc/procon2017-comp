@@ -8,7 +8,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "qrlibruary.h"
+#include "qrlibrary.h"
 
 namespace Ui {
 class MainWindow;
