@@ -16,7 +16,7 @@ class NeoSinglePolygonDisplay : public QWidget
     Q_OBJECT
 
 public:
-//    static std::unique_ptr<NeoSinglePolygonDisplay> createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name);
+    static std::unique_ptr<NeoSinglePolygonDisplay> createInstance(QWidget *widget,polygon_i const& print_polygon,std::string window_name);
     explicit NeoSinglePolygonDisplay(QWidget *parent = 0);
     ~NeoSinglePolygonDisplay();
     void setWindowName(std::string window_name);

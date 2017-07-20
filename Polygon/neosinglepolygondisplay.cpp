@@ -19,14 +19,14 @@ NeoSinglePolygonDisplay::~NeoSinglePolygonDisplay()
 }
 
 //std::unique_ptr<NeoSinglePolygonDisplay> createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name);
-//std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name)
-//{
-//    std::unique_ptr<NeoSinglePolygonDisplay> instance(new NeoSinglePolygonDisplay());
-//    instance->polygon = print_polygon;
-//    instance->setWindowTitle(QString::fromStdString(window_name));
+std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance(QWidget *parent,polygon_i const& print_polygon,std::string window_name)
+{
+    std::unique_ptr<NeoSinglePolygonDisplay> instance(new NeoSinglePolygonDisplay(parent));
+    instance->setPolygon(print_polygon);
+    instance->setWindowTitle(QString::fromStdString(window_name));
 
-//    return std::move(instance);
-//}
+    return std::move(instance);
+}
 
 void NeoSinglePolygonDisplay::setWindowName(std::string window_name)
 {

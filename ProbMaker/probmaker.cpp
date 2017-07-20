@@ -34,7 +34,7 @@ ProbMaker::ProbMaker(QWidget *parent) :
     base_polygon.outer().push_back(point_i(101,65));
     base_polygon.outer().push_back(point_i(101,0));
     base_polygon.outer().push_back(point_i(0,0));
-    this->print_polygons.push_back(base_polygon);
+//    this->print_polygons.push_back(base_polygon);
 
     //ドロネーの三角形分割
     delaunay_triangulation();
@@ -85,11 +85,32 @@ void ProbMaker::delaunay_triangulation()
             this->print_polygons.push_back(poly_buf);
         }
     }
-    std::cout << "delaunay trianglation completed" << std::endl;
 
-    for(auto polygon : this->print_polygons){
-        std::cout << boost::geometry::dsv(polygon) << std::endl;
-    }
+    polygon_i base_polygon;
+    base_polygon.outer().push_back(point_i(0,0));
+    base_polygon.outer().push_back(point_i(0,65));
+    base_polygon.outer().push_back(point_i(101,65));
+    base_polygon.outer().push_back(point_i(101,0));
+    base_polygon.outer().push_back(point_i(0,0));
+
+    std::vector<polygon_i> out;
+
+    boost::geometry::difference(base_polygon,this->print_polygons[0],out);
+
+    NeoSinglePolygonDisplay::createInstance(this,this->print_polygons[0],"hogehoge")->show();
+    NeoSinglePolygonDisplay::createInstance(this,this->print_polygons[1],"fugapiyo")->show();
+//    for (unsigned int index = 1; index < this->print_polygons.size(); ++index) {
+//        boost::geometry::difference(out[0],this->print_polygons[index],out);
+//    }
+
+//    std::cout << boost::geometry::dsv(out[0]) << std::endl;
+//    std::cout << out.size() << std::endl;
+
+//    std::cout << "delaunay trianglation completed" << std::endl;
+
+//    for(auto polygon : this->print_polygons){
+//	    std::cout << boost::geometry::dsv(polygon) << std::endl;
+//    }
 
 }
 
@@ -468,9 +489,9 @@ void ProbMaker::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setPen(QPen(QColor("#000000")));
-    constexpr int grid_size = 10;
+    constexpr int grid_size = 15;
     constexpr int max_col = 101;
-    constexpr int max_row = 61;
+    constexpr int max_row = 65;
     for (int col= 0; col < max_col; ++col) {
         for(int row = 0; row < max_row; ++row){
             std::vector<QPoint> polygon;

@@ -1,7 +1,7 @@
 #include "singlepolygondisplay.h"
 #include "ui_singlepolygondisplay.h"
 
-SinglePolygonDisplay::SinglePolygonDisplay(QWidget *parent = 0) :
+SinglePolygonDisplay::SinglePolygonDisplay(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SinglePolygonDisplay)
 {
