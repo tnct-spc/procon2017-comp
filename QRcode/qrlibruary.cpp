@@ -30,7 +30,7 @@ std::string QRLibruary::Decoder(bool s)
 
     std::cout << "Camera size : " << dWidth << " x " << dHeight << std::endl;
 
-    resizedW = (dWidth = dHeight) / 2;
+    resizedW = (dWidth - dHeight) / 2;
 
     namedWindow("Press Esc to exit",CV_WINDOW_NORMAL);
     if(dHeight < 600){
