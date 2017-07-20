@@ -35,9 +35,10 @@ HEADERS += \
 FORMS += \
         mainwindow.ui
 
-DEPENDPATH += /usr/local/Cellar/opencv3/3.2.0/include
-INCLUDEPATH += /usr/local/Cellar/opencv3/3.2.0/include
-DEPENDPATH += /usr/local/Cellar/zbar/0.10_4/include
-INCLUDEPATH += /usr/local/Cellar/zbar/0.10_4/include
-LIBS += -L/usr/local/Cellar/opencv3/3.2.0/lib -lopencv_shape -lopencv_stitching -lopencv_objdetect -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_ml -lopencv_imgproc -lopencv_flann -lopencv_core
-LIBS += /usr/local/Cellar/zbar/0.10_4/lib/libzbar.dylib
+LIBS += -L/usr/lib -lzbar
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
+}
