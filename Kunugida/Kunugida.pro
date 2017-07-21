@@ -70,15 +70,12 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
 
-<<<<<<< HEAD
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
 
-=======
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QRcode/release/ -lQRcode
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QRcode/debug/ -lQRcode
 else:unix: LIBS += -L$$OUT_PWD/../QRcode/ -lQRcode
 
 INCLUDEPATH += $$PWD/../QRcode
 DEPENDPATH += $$PWD/../QRCode
->>>>>>> 121d3d6a2fdffef63196c3dcd970a39586d0e685

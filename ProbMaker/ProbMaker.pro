@@ -43,8 +43,5 @@ INCLUDEPATH += $$PWD/../DisplayAnswer
 DEPENDPATH += $$PWD/../DisplayAnswer
 
 
-<<<<<<< HEAD
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
-=======
->>>>>>> 121d3d6a2fdffef63196c3dcd970a39586d0e685
