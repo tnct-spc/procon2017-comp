@@ -335,7 +335,7 @@ procon::NeoExpandedPolygon procon::NeoExpandedPolygon::operator =
 
 // member
 
-// åvéZÇÇ‹Ç∆ÇﬂÇƒçsÇ§
+// Ë®àÁÆó„Çí„Åæ„Å®„ÇÅ„Å¶Ë°å„ÅÜ
 void procon::NeoExpandedPolygon::updatePolygon(bool calc)
 {
     if(calc) {
@@ -344,7 +344,7 @@ void procon::NeoExpandedPolygon::updatePolygon(bool calc)
         calcSideAngle();
         calcSideSlope();
     } else {
-        //std::cout << "updatePolygonÇÕïKóvÇ»Ç≠Ç»Ç¡ÇΩÇÊ" << std::endl;
+        //std::cout << "updatePolygon„ÅØÂøÖË¶Å„Å™„Åè„Å™„Å£„Åü„Çà" << std::endl;
     }
 }
 
@@ -358,18 +358,18 @@ void procon::NeoExpandedPolygon::inversePolygon()
 
     polygon_i translate_polygon;
 
-    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformgo(-centerx,0);
+    boost::geometry::strategy::transform::translate_transformer<int,2,2> transformgo(-centerx,0);
     boost::geometry::transform(polygon,translate_polygon,transformgo);
 
     polygon_i inversedPolygon;
 
     for(point_i point : translate_polygon.outer()){
-        inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<double>(-point.x(),point.y()));
+        inversedPolygon.outer().push_back(boost::geometry::model::d2::point_xy<int>(-point.x(),point.y()));
     }
 
     polygon_i returnPolygon;
 
-    boost::geometry::strategy::transform::translate_transformer<double,2,2> transformback(centerx,0);
+    boost::geometry::strategy::transform::translate_transformer<int,2,2> transformback(centerx,0);
     boost::geometry::transform(inversedPolygon,returnPolygon,transformback);
 
     boost::geometry::reverse(returnPolygon);
@@ -377,6 +377,7 @@ void procon::NeoExpandedPolygon::inversePolygon()
     this->updatePolygon(true);
 }
 
+/*
 void procon::NeoExpandedPolygon::rotatePolygon(double degree)
 {
     polygon_i goPolygon;
@@ -403,11 +404,12 @@ void procon::NeoExpandedPolygon::rotatePolygon(double degree)
         if (slope > pi) slope -= pi;
     }
 }
+*/
 
-void procon::NeoExpandedPolygon::translatePolygon(double x, double y)
+void procon::NeoExpandedPolygon::translatePolygon(int x, int y)
 {
     polygon_i translatedPolygon;
-    boost::geometry::strategy::transform::translate_transformer<double,2,2> backTranslate(x,y);
+    boost::geometry::strategy::transform::translate_transformer<int,2,2> backTranslate(x,y);
     boost::geometry::transform(polygon,translatedPolygon,backTranslate);
 
 
@@ -417,13 +419,14 @@ void procon::NeoExpandedPolygon::translatePolygon(double x, double y)
     polygon = translatedPolygon;
 }
 
+/*
 void procon::NeoExpandedPolygon::setPolygonAngle(double degree)
 {
     polygon_i goPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> goTranslate(-centerx,-centery);
     boost::geometry::transform(polygon,goPolygon,goTranslate);
 
-    //âÒì]ó 
+    //ÂõûËª¢Èáè
     double ddegree = degree - difference_of_default_degree;
 
     while(ddegree < 0){
@@ -449,15 +452,16 @@ void procon::NeoExpandedPolygon::setPolygonAngle(double degree)
         if (slope > pi) slope -= pi;
     }
 }
+*/
 
-void procon::NeoExpandedPolygon::setPolygonPosition(double x, double y)
+void procon::NeoExpandedPolygon::setPolygonPosition(int x, int y)
 {
-    double dx = x - centerx;
-    double dy = y - centery;
+    int dx = x - centerx;
+    int dy = y - centery;
 
     polygon_i translatedPolygon;
 
-    boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(dx,dy);
+    boost::geometry::strategy::transform::translate_transformer<int,2,2> translate(dx,dy);
     boost::geometry::transform(polygon,translatedPolygon,translate);
 
     centerx = x;

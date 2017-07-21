@@ -72,18 +72,18 @@ public:
     void updatePolygon(bool calc = false);
 
     void inversePolygon();
-    void rotatePolygon(double degree);
-    void translatePolygon(double x,double y);
+    //void rotatePolygon(double degree);
+    void translatePolygon(int x,int y);
 
-    void setPolygonAngle(double degree);
-    void setPolygonPosition(double x,double y);
+    //void setPolygonAngle(double degree);
+    void setPolygonPosition(int x,int y);
 
     void sortJointedPieces();
 
     double difference_of_default_degree = 0;
 
-    double centerx = 0;
-    double centery = 0;
+    int centerx = 0;
+    int centery = 0;
 
     bool is_inverse = false;
 };
