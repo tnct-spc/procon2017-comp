@@ -9,7 +9,7 @@ QRLibrary::QRLibrary()
     std::cout << "QR Libruary initialized" << std::endl;
 }
 
-std::string QRLibrary::Decoder(bool s)
+std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
 {
     int resizedW;
     std::string code = {""};
@@ -19,7 +19,6 @@ std::string QRLibrary::Decoder(bool s)
     if (!cap.isOpened())  // if not success, exit program
     {
         std::cout << "Cannot open the video cam" << std::endl;
-        return ("Error");
     }
 
     ImageScanner scanner;
@@ -36,6 +35,8 @@ std::string QRLibrary::Decoder(bool s)
     if(dHeight < 600){
         resizeWindow("Press Esc to exit", 600, 600);
     }
+
+    std::pair<std::vector<polygon_i>,polygon_i> decoded_polygons;
 
     while (1)
     {
@@ -84,6 +85,13 @@ std::string QRLibrary::Decoder(bool s)
                 std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
             }
             std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
+
+            for(auto polygon : qrtrans.getPieceData()){
+                decoded_polygons.first.push_back(polygon);
+            }
+            for(auto point: qrtrans.getFrameData().outer()){
+                decoded_polygons.second.outer().push_back(point);
+            }
         }
 
         imshow("Press esc key to exit", frame);
@@ -99,7 +107,8 @@ std::string QRLibrary::Decoder(bool s)
         }
     }
 
-    code = "Type: " + type + "\n\n\"" + code + "\"";
-    return code;
+//    code = "Type: " + type + "\n\n\"" + code + "\"";
+//    return code;
+    return decoded_polygons;
 }
 

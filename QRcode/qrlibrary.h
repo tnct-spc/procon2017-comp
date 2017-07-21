@@ -8,11 +8,13 @@
 #include <opencv2/opencv.hpp>
 #include <zbar.h>
 
+#include "qrtranslatetopolygon.h"
+
 class QRLibrary
 {
 public:
     QRLibrary();
-    std::string Decoder(bool s);
+    std::pair<std::vector<polygon_i>,polygon_i> Decoder(bool s);
 };
 
 #endif // QRLIBRUARY_H
