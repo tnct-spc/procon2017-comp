@@ -53,12 +53,4 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     };
     drawGrid();
-
-
-
-
-
-
-
-
 }
