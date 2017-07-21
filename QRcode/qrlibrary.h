@@ -8,10 +8,10 @@
 #include <opencv2/opencv.hpp>
 #include <zbar.h>
 
-class QRLibruary
+class QRLibrary
 {
 public:
-    QRLibruary();
+    QRLibrary();
     std::string Decoder(bool s);
 };
 

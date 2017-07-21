@@ -1,5 +1,6 @@
 #include "kunugida.h"
 #include "ui_kunugida.h"
+#include "qrlibrary.h"
 
 #include <iostream>
 
@@ -23,6 +24,8 @@ Kunugida::~Kunugida()
 void Kunugida::run()
 {
     std::cout << "Run" << std::endl;
+    QRLibrary lib;
+    lib.Decoder(true);
     this->finishedProcess();
 }
 

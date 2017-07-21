@@ -22,7 +22,7 @@ using namespace cv;
 
 void MainWindow::takePicture()
 {
-    QRLibruary lib;
+    QRLibrary lib;
     decodedCode = lib.Decoder(isAuto());
     std::cout << "----------------------Result----------------------\n" << decodedCode << std::endl;
     result << decodedCode << std::endl;

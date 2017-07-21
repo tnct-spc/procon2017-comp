@@ -4,12 +4,12 @@
 using namespace cv;
 using namespace zbar;
 
-QRLibruary::QRLibruary()
+QRLibrary::QRLibrary()
 {
     std::cout << "QR Libruary initialized" << std::endl;
 }
 
-std::string QRLibruary::Decoder(bool s)
+std::string QRLibrary::Decoder(bool s)
 {
     int resizedW;
     std::string code = {""};
