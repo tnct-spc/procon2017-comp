@@ -25,12 +25,16 @@ std::vector<int> colon;
 std::vector<std::vector<int>> qrvector;
 std::vector<int> framevector;
 std::string qrinput;
+std::vector<polygon_i> polygon;
+polygon_i framepolygon;
 int shapecount;
 bool useframedata = false;
 public:
-    std::vector<polygon_i> polygon;
-    polygon_i framepolygon;
+    std::vector<polygon_i> getPieceData();
+    polygon_i getFrameData();
     QrTranslateToPolygon(std::string qrinp);
+
+    int get();
 };
 
 #endif // QRTRANSLATETOPOLYGON_H

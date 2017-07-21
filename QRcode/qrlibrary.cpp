@@ -80,10 +80,10 @@ std::string QRLibruary::Decoder(bool s)
             }
             std::cout << "Angle: " << r.angle << std::endl;
             QrTranslateToPolygon qrtrans(code);
-            for(unsigned int tes=0;tes<qrtrans.polygon.size();tes++){
-                std::cout << "polygon:" << bg::dsv(qrtrans.polygon[tes]) << std::endl;
+            for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
+                std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
             }
-            std::cout << "frame" << bg::dsv(qrtrans.framepolygon) << std::endl;
+            std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
         }
 
         imshow("Press esc key to exit", frame);

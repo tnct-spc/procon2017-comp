@@ -47,6 +47,13 @@ void QrTranslateToPolygon::findColon(){
         }
     }
 }
+std::vector<polygon_i> QrTranslateToPolygon::getPieceData(){
+    return polygon;
+}
+polygon_i QrTranslateToPolygon::getFrameData(){
+    return framepolygon;
+}
+
 void QrTranslateToPolygon::splitQrInput(){
     splitedqrinput.resize(shapecount);
     for(int tes=0;tes<shapecount;tes++){
