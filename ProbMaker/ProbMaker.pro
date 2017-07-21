@@ -30,7 +30,7 @@ LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
-else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+else:unix: LIBS += -L$$OUT_PWD/../Polygon -lPolygon
 
 INCLUDEPATH += $$PWD/../Polygon
 DEPENDPATH += $$PWD/../Polygon
@@ -43,5 +43,8 @@ INCLUDEPATH += $$PWD/../DisplayAnswer
 DEPENDPATH += $$PWD/../DisplayAnswer
 
 
+<<<<<<< HEAD
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
+=======
+>>>>>>> 121d3d6a2fdffef63196c3dcd970a39586d0e685
