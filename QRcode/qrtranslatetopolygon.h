@@ -19,16 +19,16 @@ private:
     void splitQrInput();
     void splitBasisOfSpace(std::string &str,std::vector<int> &qrvec);
     void translateToPolygon(std::vector<int> &intvec,polygon_i &polygon);
-std::vector<std::string> splitedqrinput;
-std::string framestring;
-std::vector<int> colon;
-std::vector<std::vector<int>> qrvector;
-std::vector<int> framevector;
-std::string qrinput;
-std::vector<polygon_i> polygon;
-polygon_i framepolygon;
-int shapecount;
-bool useframedata = false;
+    std::vector<std::string> splitedqrinput;
+    std::string framestring;
+    std::vector<int> colon;
+    std::vector<std::vector<int>> qrvector;
+    std::vector<int> framevector;
+    std::string qrinput;
+    std::vector<polygon_i> polygon;
+    polygon_i framepolygon;
+    int shapecount;
+    bool useframedata = false;
 public:
     std::vector<polygon_i> getPieceData();
     polygon_i getFrameData();

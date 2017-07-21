@@ -12,7 +12,8 @@
 #include "../Polygon/neoexpandedpolygon.h"
 
 
-QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp){
+QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
+{
     qrinput = qrinp;
     findColon();
     splitQrInput();
@@ -27,7 +28,9 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp){
     }
     if(useframedata)translateToPolygon(framevector,framepolygon);
 }
-void QrTranslateToPolygon::findColon(){
+
+void QrTranslateToPolygon::findColon()
+{
     int cou=0;
     shapecount = std::stod(qrinput);
     qrvector.resize(shapecount);
@@ -47,21 +50,25 @@ void QrTranslateToPolygon::findColon(){
         }
     }
 }
-std::vector<polygon_i> QrTranslateToPolygon::getPieceData(){
+
+std::vector<polygon_i> QrTranslateToPolygon::getPieceData()
+{
     return polygon;
 }
+
 polygon_i QrTranslateToPolygon::getFrameData(){
     return framepolygon;
 }
 
-void QrTranslateToPolygon::splitQrInput(){
+void QrTranslateToPolygon::splitQrInput()
+{
     splitedqrinput.resize(shapecount);
     for(int tes=0;tes<shapecount;tes++){
         splitedqrinput[tes]=qrinput.substr(colon[tes]+1,colon[tes+1]-colon[tes]-1);
     }
 }
-void QrTranslateToPolygon::splitBasisOfSpace(std::string &str,std::vector<int> &qrvec){
 
+void QrTranslateToPolygon::splitBasisOfSpace(std::string &str,std::vector<int> &qrvec){
         int cou=0;
         FIND:
         for(unsigned int num=0;num<=str.size();num++){
