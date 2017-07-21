@@ -15,7 +15,7 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
 
-    imageRecognitonTest();
+//    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 }
