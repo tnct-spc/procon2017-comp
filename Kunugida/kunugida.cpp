@@ -1,5 +1,6 @@
 #include "kunugida.h"
 #include "ui_kunugida.h"
+#include "qrlibrary.h"
 
 #include <iostream>
 
@@ -24,6 +25,8 @@ void Kunugida::run()
 {
     std::cout << "Run" << std::endl;
     logger->info("Run Button Clicked");
+    QRLibrary lib;
+    lib.Decoder(true);
     this->finishedProcess();
 }
 
