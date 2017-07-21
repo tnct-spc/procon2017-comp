@@ -1,3 +1,5 @@
+
+#include "qrtranslatetopolygon.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,23 +12,7 @@
 #include "../Polygon/neoexpandedpolygon.h"
 
 
-class QrTransToPolygon{
-    //QrTransToPolygon.polygonがピースの情報のvector配列
-    //QrTransToPolygon.framepolygonが枠の情報
-private:
-std::vector<std::string> splitedqrinput;
-std::string framestring;
-std::vector<int> colon;
-std::vector<std::vector<int>> qrvector;
-std::vector<int> framevector;
-std::string qrinput;
-int shapecount;
-bool useframedata = false;
-public:
-
-std::vector<polygon_i> polygon;
-polygon_i framepolygon;
-QrTransToPolygon(std::string qrinp){
+QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp){
     qrinput = qrinp;
     findColon();
     splitQrInput();
@@ -41,7 +27,7 @@ QrTransToPolygon(std::string qrinp){
     }
     if(useframedata)translateToPolygon(framevector,framepolygon);
 }
-void findColon(){
+void QrTranslateToPolygon::findColon(){
     int cou=0;
     shapecount = std::stod(qrinput);
     qrvector.resize(shapecount);
@@ -61,13 +47,13 @@ void findColon(){
         }
     }
 }
-void splitQrInput(){
+void QrTranslateToPolygon::splitQrInput(){
     splitedqrinput.resize(shapecount);
     for(int tes=0;tes<shapecount;tes++){
         splitedqrinput[tes]=qrinput.substr(colon[tes]+1,colon[tes+1]-colon[tes]-1);
     }
 }
-void splitBasisOfSpace(std::string &str,std::vector<int> &qrvec){
+void QrTranslateToPolygon::splitBasisOfSpace(std::string &str,std::vector<int> &qrvec){
 
         int cou=0;
         FIND:
@@ -85,14 +71,13 @@ void splitBasisOfSpace(std::string &str,std::vector<int> &qrvec){
         }
         qrvec.resize(qrvec[0]*2+1);
 }
-void translateToPolygon(std::vector<int> &intvec,polygon_i &polygon){
+void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i &polygon){
     for(unsigned int tes=0;tes<intvec.size()/2;tes++){
         polygon.outer().push_back(point_i(intvec[tes*2+1],intvec[tes*2+2]));
     }
     polygon.outer().push_back(point_i(intvec[1],intvec[2]));
 }
 
-};
 /*
 int main()
 {

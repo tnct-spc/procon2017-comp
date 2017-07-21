@@ -27,11 +27,12 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         qrlibrary.cpp \
-        qrtranslatetopolygon.cpp \
+        qrtranslatetopolygon.cpp
 
 HEADERS += \
         mainwindow.h \
-        qrlibrary.h
+        qrlibrary.h \
+        qrtranslatetopolygon.h
 
 FORMS += \
         mainwindow.ui

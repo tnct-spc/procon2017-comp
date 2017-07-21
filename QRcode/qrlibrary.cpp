@@ -1,4 +1,4 @@
-
+#include "qrtranslatetopolygon.h"
 #include "qrlibrary.h"
 
 using namespace cv;
@@ -79,6 +79,11 @@ std::string QRLibruary::Decoder(bool s)
                 line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);
             }
             std::cout << "Angle: " << r.angle << std::endl;
+            QrTranslateToPolygon qrtrans(code);
+            for(unsigned int tes=0;tes<qrtrans.polygon.size();tes++){
+                std::cout << "polygon:" << bg::dsv(qrtrans.polygon[tes]) << std::endl;
+            }
+            std::cout << "frame" << bg::dsv(qrtrans.framepolygon) << std::endl;
         }
 
         imshow("Press esc key to exit", frame);
