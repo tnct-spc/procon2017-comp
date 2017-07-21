@@ -21,7 +21,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const QString back_ground_color = "#00FFFF";
 
     const int window_width = this->width();
-    const int window_height = this->width();
+    const int window_height = this->height();
 
     // 101 x 65
     const int grid_row = 65;
