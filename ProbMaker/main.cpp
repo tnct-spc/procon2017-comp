@@ -1,6 +1,6 @@
 #include "probmaker.h"
-#include "neosinglepolygondisplay.h"
 #include <QApplication>
+#include "neopolygonviewer.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
     polygon.outer().push_back(point_i(0,0));
     procon::NeoExpandedPolygon polygonn;
     polygonn.setPolygon(polygon);
+
+    NeoPolygonViewer::getInstance();
 
 //    auto aa = NeoSinglePolygonDisplay::createInstance(polygonn,"hogehoge");
 //    aa->show();

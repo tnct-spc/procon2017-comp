@@ -19,35 +19,18 @@ NeoSinglePolygonDisplay::~NeoSinglePolygonDisplay()
 }
 
 //std::unique_ptr<NeoSinglePolygonDisplay> createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name);
-<<<<<<< HEAD
-std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance(QWidget *parent,polygon_i const& print_polygon,std::string window_name)
-{
-    std::unique_ptr<NeoSinglePolygonDisplay> instance(new NeoSinglePolygonDisplay(parent));
-=======
 std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance(polygon_i const& print_polygon,std::string window_name)
 {
     std::unique_ptr<NeoSinglePolygonDisplay> instance(new NeoSinglePolygonDisplay());
->>>>>>> develop
     instance->setPolygon(print_polygon);
     instance->setWindowTitle(QString::fromStdString(window_name));
 
     return std::move(instance);
 }
 
-<<<<<<< HEAD
-void NeoSinglePolygonDisplay::setWindowName(std::string window_name)
-{
-    this->setWindowTitle(QString::fromStdString(window_name));
-}
-
 void NeoSinglePolygonDisplay::setPolygon(polygon_i _polygon)
 {
     this->polygon = _polygon;
-=======
-void NeoSinglePolygonDisplay::setPolygon(polygon_i polygon)
-{
-    this->polygon = polygon;
->>>>>>> develop
 }
 
 void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
@@ -86,11 +69,7 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
     std::vector<QPoint> polygon_points;
-<<<<<<< HEAD
-    for(int a = 0;a < this->polygon.outer().size(); a++){
-=======
     for(unsigned int a = 0;a < this->polygon.outer().size(); a++){
->>>>>>> develop
         int x_buf = grid_size * (polygon.outer()[a].x() - minmaxX.second->x()) + left_right_margin;
         int y_buf = grid_size * (polygon.outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
         polygon_points.push_back(QPoint(x_buf,y_buf));

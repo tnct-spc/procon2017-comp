@@ -1,6 +1,6 @@
 #include "probmaker.h"
 #include "ui_probmaker.h"
-#include "neosinglepolygondisplay.h"
+#include "neopolygonviewer.h"
 
 #include <boost/geometry/geometry.hpp>
 #include <boost/math/tools/fraction.hpp>
@@ -97,8 +97,20 @@ void ProbMaker::delaunay_triangulation()
 
     boost::geometry::difference(base_polygon,this->print_polygons[0],out);
 
-    NeoSinglePolygonDisplay::createInstance(this,this->print_polygons[0],"hogehoge")->show();
-    NeoSinglePolygonDisplay::createInstance(this,this->print_polygons[1],"fugapiyo")->show();
+    std::cout << "werreagas" << boost::geometry::dsv(out[1]) << std::endl;
+
+    NeoPolygonViewer::getInstance().displayPolygon(out[0],"0");
+    NeoPolygonViewer::getInstance().displayPolygon(out[1],"1");
+
+
+    for(auto polygon : this->print_polygons){
+        boost::geometry::reverse(polygon);
+        std::cout << boost::geometry::dsv(polygon) << "  area:" << boost::geometry::area(polygon) <<std::endl;
+    }
+
+
+//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[0],"hogehoge")->show();
+//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[1],"fugapiyo")->show();
 //    for (unsigned int index = 1; index < this->print_polygons.size(); ++index) {
 //        boost::geometry::difference(out[0],this->print_polygons[index],out);
 //    }
@@ -466,12 +478,6 @@ void ProbMaker::step()
 
     int counnnter = 0;
     for(auto polygon: this->print_polygons ){
-        NeoSinglePolygonDisplay disp;
-        disp.setPolygon(polygon);
-        disp.setWindowName(std::to_string(counnnter));
-        disp.show();
-        std::cout << counnnter << std::endl << boost::geometry::dsv(polygon) << std::endl;
-
         ++counnnter;
     }
 
@@ -489,6 +495,7 @@ void ProbMaker::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setPen(QPen(QColor("#000000")));
+    constexpr int buf = 10;
     constexpr int grid_size = 15;
     constexpr int max_col = 101;
     constexpr int max_row = 65;
