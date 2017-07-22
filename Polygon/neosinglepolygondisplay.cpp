@@ -19,13 +19,18 @@ NeoSinglePolygonDisplay::~NeoSinglePolygonDisplay()
 }
 
 //std::unique_ptr<NeoSinglePolygonDisplay> createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name);
-std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name)
+std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance(polygon_i const& print_polygon,std::string window_name)
 {
     std::unique_ptr<NeoSinglePolygonDisplay> instance(new NeoSinglePolygonDisplay());
-    instance->polygon = print_polygon;
+    instance->setPolygon(print_polygon);
     instance->setWindowTitle(QString::fromStdString(window_name));
 
     return std::move(instance);
+}
+
+void NeoSinglePolygonDisplay::setPolygon(polygon_i polygon)
+{
+    this->polygon = polygon;
 }
 
 void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
@@ -42,8 +47,8 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
 
     //push_back points to std::vector<QPoint>
     std::vector<QPoint> points;
-    for(unsigned int a = 0; a < polygon.getPolygon().outer().size(); a++){
-        points.push_back(QPoint(polygon.getPolygon().outer()[a].x(),polygon.getPolygon().outer()[a].y()));
+    for(unsigned int a = 0; a < polygon.outer().size(); a++){
+        points.push_back(QPoint(polygon.outer()[a].x(),polygon.outer()[a].y()));
     }
     
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() > b.x(); });
@@ -64,9 +69,9 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
     std::vector<QPoint> polygon_points;
-    for(int a = 0;a < this->polygon.getPolygon().outer().size(); a++){
-        int x_buf = grid_size * (polygon.getPolygon().outer()[a].x() - minmaxX.second->x()) + left_right_margin;
-        int y_buf = grid_size * (polygon.getPolygon().outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
+    for(unsigned int a = 0;a < this->polygon.outer().size(); a++){
+        int x_buf = grid_size * (polygon.outer()[a].x() - minmaxX.second->x()) + left_right_margin;
+        int y_buf = grid_size * (polygon.outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
         polygon_points.push_back(QPoint(x_buf,y_buf));
     }
     painter.setPen(QPen(QColor("#00FFFF")));
