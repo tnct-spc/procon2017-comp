@@ -4,6 +4,7 @@ SUBDIRS += \
     Utilities\
     Polygon \
     ImageRecognition \
+    QRcode \
     DisplayAnswer \
     Solver \
     ProbMaker \
