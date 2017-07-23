@@ -26,8 +26,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     // 101 x 65
     const int grid_row = 65;
     const int grid_col = 101;
-    const int grid_margin = 2;
-
+    const int grid_margin = 1;
     QPainter painter(this);
 
     //draw background
