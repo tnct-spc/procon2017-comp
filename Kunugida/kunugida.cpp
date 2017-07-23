@@ -13,6 +13,9 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
+
+    board = std::make_shared<NeoAnswerBoard>();
+    board->show();
 }
 
 Kunugida::~Kunugida()
