@@ -10,7 +10,7 @@ class NeoPolygonViewer : public QWidget
 
 public:
     static NeoPolygonViewer& getInstance();
-    void displayPolygon(polygon_i const& polygon, std::string wname = "");
+    void displayPolygon(polygon_i const& polygon, std::string wname, bool enlarged_polygon);
 
 private:
     explicit NeoPolygonViewer(QWidget *parent = 0);
