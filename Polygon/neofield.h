@@ -29,7 +29,7 @@ private:
     double total_evaluation = 0;
 
 public:
-    bool operator || (Field & field_id);
+    bool operator || (NeoField & field_id);
 
     //constructor
     NeoField();

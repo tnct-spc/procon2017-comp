@@ -11,35 +11,35 @@ procon::NeoField::NeoField()
 
 /*---------------------public--------------------------*/
 //setter
-void procon::Field::setFrame(NeoExpandedPolygon const& frame)
+void procon::NeoField::setFrame(NeoExpandedPolygon const& frame)
 {
     field_frame = frame;
 }
 
-void procon::Field::setPiece(procon::NeoExpandedPolygon piece)
+void procon::NeoField::setPiece(procon::NeoExpandedPolygon piece)
 {
     field_pieces.push_back(piece);
 }
 
-void procon::Field::setPiece(NeoExpandedPolygon piece, double x, double y)
+void procon::NeoField::setPiece(NeoExpandedPolygon piece, double x, double y)
 {
     piece.setPolygonPosition(x,y);
     field_pieces.push_back(piece);
 }
 
-void procon::Field::setPiece(procon::NeoExpandedPolygon piece, int n, double x, double y)
+void procon::NeoField::setPiece(procon::NeoExpandedPolygon piece, int n, double x, double y)
 {
     piece.setPolygonPosition(x,y);
     field_pieces.at(n) = piece;
 }
 
-void procon::Field::setElementaryFrame(procon::NeoExpandedPolygon const& frame)
+void procon::NeoField::setElementaryFrame(procon::NeoExpandedPolygon const& frame)
 {
     elementary_frame = frame;
 }
 
 
-void procon::Field::setElementaryPieces(std::vector<procon::NeoExpandedPolygon> const& pieces)
+void procon::NeoField::setElementaryPieces(std::vector<procon::NeoExpandedPolygon> const& pieces)
 {
     elementary_pieces = pieces;
     elementary_inverse_pieces.clear();
@@ -49,98 +49,98 @@ void procon::Field::setElementaryPieces(std::vector<procon::NeoExpandedPolygon> 
     }
 }
 
-void procon::Field::setIsPlaced(const std::array<bool,50> &IsPlaced)
+void procon::NeoField::setIsPlaced(const std::array<bool,50> &IsPlaced)
 {
     isPlaced = IsPlaced;
 }
 
-void procon::Field::setIsPlaced(int const& piece_id)
+void procon::NeoField::setIsPlaced(int const& piece_id)
 {
     isPlaced.at(piece_id) = true;
 }
 
-void procon::Field::sumTotalEvaluation(const double &eva)
+void procon::NeoField::sumTotalEvaluation(const double &eva)
 {
     total_evaluation += eva;
 }
 
 //getter
-std::vector<procon::NeoExpandedPolygon> const& procon::Field::getPieces() const
+std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getPieces() const
 {
     return field_pieces;
 }
 
-procon::NeoExpandedPolygon const& procon::Field::getPiece(const int &n) const
+procon::NeoExpandedPolygon const& procon::NeoField::getPiece(const int &n) const
 {
     return field_pieces.at(n);
 }
 
-procon::NeoExpandedPolygon const& procon::Field::getFrame() const
+procon::NeoExpandedPolygon const& procon::NeoField::getFrame() const
 {
     return field_frame;
 }
 
 
-procon::NeoExpandedPolygon const& procon::Field::getElementaryFrame() const
+procon::NeoExpandedPolygon const& procon::NeoField::getElementaryFrame() const
 {
     return elementary_frame;
 }
 
 
-std::vector<procon::NeoExpandedPolygon> const& procon::Field::getElementaryPieces() const
+std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryPieces() const
 {
     return elementary_pieces;
 }
 
 
-std::vector<procon::NeoExpandedPolygon> const& procon::Field::getElementaryInversePieces() const
+std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryInversePieces() const
 {
     return elementary_inverse_pieces;
 }
 
-int procon::Field::getPiecesSize() const
+int procon::NeoField::getPiecesSize() const
 {
     return static_cast<int>(field_pieces.size());
 }
 
-std::array<bool,50> const& procon::Field::getIsPlaced() const
+std::array<bool,50> const& procon::NeoField::getIsPlaced() const
 {
     return isPlaced;
 }
 
-int procon::Field::getFieldScore() const
+int procon::NeoField::getFieldScore() const
 {
     return field_pieces.size();
 }
 
-double procon::Field::getMinAngle() const
+double procon::NeoField::getMinAngle() const
 {
     return min_angle;
 }
 
-double procon::Field::getMinSide() const
+double procon::NeoField::getMinSide() const
 {
     return min_side;
 }
 
 
-std::bitset<50> const& procon::Field::getPieceID() const
+std::bitset<50> const& procon::NeoField::getPieceID() const
 {
     return piece_id;
 }
 
-double procon::Field::getTotalEvaluation() const
+double procon::NeoField::getTotalEvaluation() const
 {
     return total_evaluation;
 }
 //remove
-void procon::Field::removePiece(int n)
+void procon::NeoField::removePiece(int n)
 {
     field_pieces.erase(field_pieces.begin() + n);
 }
 
 //is_
-bool procon::Field::isPuttable(procon::NeoExpandedPolygon polygon)
+bool procon::NeoField::isPuttable(procon::NeoExpandedPolygon polygon)
 {
     for (auto inner_ring : field_frame.getPolygon().inners()){
         if(!boost::geometry::within(polygon.getPolygon(),inner_ring)) return false;
@@ -152,19 +152,19 @@ bool procon::Field::isPuttable(procon::NeoExpandedPolygon polygon)
     return true;
 }
 
-void procon::Field::printFrame()
+void procon::NeoField::printFrame()
 {
     std::cout << bg::dsv(elementary_frame.getPolygon()) << std::endl;
 }
 
-void procon::Field::printPiece()
+void procon::NeoField::printPiece()
 {
     for (auto p : elementary_pieces){
         std::cout << bg::dsv(p.getPolygon()) << std::endl;
     }
 }
 
-polygon_i procon::Field::translatePolygon(polygon_i polygon, double x, double y)
+polygon_i procon::NeoField::translatePolygon(polygon_i polygon, double x, double y)
 {
     polygon_i translatedPolygon;
     boost::geometry::strategy::transform::translate_transformer<double,2,2> translate(x,y);
@@ -172,7 +172,7 @@ polygon_i procon::Field::translatePolygon(polygon_i polygon, double x, double y)
     return translatedPolygon;
 }
 
-void procon::Field::calcMinAngleSide()
+void procon::NeoField::calcMinAngleSide()
 {
     //result buffer
     double min_anglee = 10000;
@@ -201,7 +201,7 @@ void procon::Field::calcMinAngleSide()
     min_side = min_sidee;
 }
 
-bool procon::Field::operator || (Field & field) {
+bool procon::NeoField::operator || (NeoField & field) {
     if (this->piece_id != field.piece_id) return false;
 
     //ソート（これによって比較が可能に)
@@ -229,7 +229,7 @@ bool procon::Field::operator || (Field & field) {
     return true;
 }
 
-void procon::Field::calcFieldID()
+void procon::NeoField::calcFieldID()
 {
     for (auto & piece : field_frame.getJointedPieces()) {
          piece_id.set(piece.getId());
