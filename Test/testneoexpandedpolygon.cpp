@@ -24,18 +24,19 @@ bool TestNeoExpandedPolygon::run()
             std::cout << "(" << point.x() << ", " << point.y() << "), ";
         }
 
-        std::cout << std::endl;
+        std::cout << std::endl << std::endl;
     };
 
     auto out = [](std::vector<procon::NeoExpandedPolygon> expolies, std::string name)
     {
-        std::cout << name << " -> " << std::endl;
+        std::cout << name << std::endl;
 
         for(auto itr : expolies) {
             procon::NeoExpandedPolygon expoly = itr;
             polygon_i poly = expoly.getPolygon();
             point_i point;
 
+            std::cout << " -> ";
             for(auto itr1 : poly.outer()) {
                 point = itr1;
                 std::cout << "(" << point.x() << ", " << point.y() << "), ";
@@ -43,6 +44,7 @@ bool TestNeoExpandedPolygon::run()
 
             std::cout << std::endl;
         }
+        std::cout << std::endl;
     };
 
     expoly1.resetPolygonForce(poly1);
