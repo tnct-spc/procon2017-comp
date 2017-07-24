@@ -6,7 +6,7 @@
 
 namespace bg = boost::geometry;
 using point_i = bg::model::d2::point_xy<int>;
-using ring_t = bg::model::ring<point_i>;
+//using ring_t = bg::model::ring<point_i>;
 using polygon_i = bg::model::polygon<point_i,true,true,std::vector,std::vector,std::allocator,std::allocator>;
 
 namespace procon {
