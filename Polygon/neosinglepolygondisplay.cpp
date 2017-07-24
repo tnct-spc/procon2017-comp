@@ -19,11 +19,12 @@ NeoSinglePolygonDisplay::~NeoSinglePolygonDisplay()
 }
 
 //std::unique_ptr<NeoSinglePolygonDisplay> createInstance(procon::NeoExpandedPolygon const& print_polygon,std::string window_name);
-std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance(polygon_i const& print_polygon,std::string window_name)
+std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance(polygon_i const& print_polygon,std::string window_name,bool enlarge_polygogn)
 {
     std::unique_ptr<NeoSinglePolygonDisplay> instance(new NeoSinglePolygonDisplay());
     instance->setPolygon(print_polygon);
     instance->setWindowTitle(QString::fromStdString(window_name));
+    instance->setIsEnlargedPolygon(enlarge_polygogn);
 
     return std::move(instance);
 }
@@ -33,11 +34,16 @@ void NeoSinglePolygonDisplay::setPolygon(polygon_i _polygon)
     this->polygon = _polygon;
 }
 
+void NeoSinglePolygonDisplay::setIsEnlargedPolygon(bool is_enlarged_polygon)
+{
+    this->enlarged_polygon = is_enlarged_polygon;
+}
+
 void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 
-    const int grid_margin = 2;
+    const int grid_margin = 4;
 
     int window_width = this->width();
     int window_height = this->height();
@@ -54,8 +60,8 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() > b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.y() > b.y(); });
 
-    int grid_col = minmaxX.first->x() - minmaxX.second->x();
-    int grid_row = minmaxY.first->y() - minmaxY.second->y();
+    int grid_col = enlarged_polygon ? 135 : minmaxX.first->x() - minmaxX.second->x();
+    int grid_row = enlarged_polygon ? 65 : minmaxY.first->y() - minmaxY.second->y();
 
     const int grid_size =
                     window_width <= window_height
@@ -70,8 +76,8 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
 
     std::vector<QPoint> polygon_points;
     for(unsigned int a = 0;a < this->polygon.outer().size(); a++){
-        int x_buf = grid_size * (polygon.outer()[a].x() - minmaxX.second->x()) + left_right_margin;
-        int y_buf = grid_size * (polygon.outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
+        int x_buf = enlarged_polygon ? grid_size * polygon.outer()[a].x() + left_right_margin : grid_size * (polygon.outer()[a].x() - minmaxX.second->x()) + left_right_margin;
+        int y_buf = enlarged_polygon ? grid_size * polygon.outer()[a].y() + top_buttom_margin : grid_size * (polygon.outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
         polygon_points.push_back(QPoint(x_buf,y_buf));
     }
     painter.setPen(QPen(QColor("#00FFFF")));
