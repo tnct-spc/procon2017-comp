@@ -1,6 +1,9 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
+
 #include "field.h"
+#include "expandedpolygon.h"
+
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -58,12 +61,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
     auto setField = [&]{
         procon::ExpandedPolygon polygon;
-        framepolygon.outer().push_back(point_i(5,5));
-        framepolygon.outer().push_back(point_i(85,7));
-        framepolygon.outer().push_back(point_i(75,48));
-        framepolygon.outer().push_back(point_i(18,57));
-        framepolygon.outer().push_back(point_i(5,5));
-
+        framepolygon.outer().push_back(point_t(5,5));
+        framepolygon.outer().push_back(point_t(85,7));
+        framepolygon.outer().push_back(point_t(75,48));
+        framepolygon.outer().push_back(point_t(18,57));
+        framepolygon.outer().push_back(point_t(5,5));
+        polygon.resetPolygonForce(framepolygon);
         field.setFrame(polygon);
     };
     auto drawFrame = [&]{
@@ -71,7 +74,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
         QPointF points[4];
         for(int tes = 0;tes < 4; tes++){
-            points[tes] = getPosition(framepolygon.outer().at(tes));
+            points[tes] = getPosition(field.getFrame().getPolygon().outer().at(tes));
         }
         painter.setBrush(QBrush(QColor(back_ground_color)));
         painter.drawPolygon(points,4);
@@ -80,6 +83,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     drawGrid();
 }
-QPointF NeoAnswerBoard::getPosition(point_i point){
+QPointF NeoAnswerBoard::getPosition(point_t point){
     return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
 }

@@ -14,6 +14,12 @@
 #include <vector>
 #include "field.h"
 #include "neoexpandedpolygon.h"
+#include "expandedpolygon.h"
+
+namespace bg = boost::geometry;
+using point_t = bg::model::d2::point_xy<double>;
+using ring_t = bg::model::ring<point_t>;
+using polygon_t = bg::model::polygon<point_t,true,true,std::vector,std::vector,std::allocator,std::allocator>;
 
 namespace Ui {
 class NeoAnswerBoard;
@@ -29,10 +35,10 @@ public:
 
 private:
     Ui::NeoAnswerBoard *ui;
-    polygon_i getPolygon();
-    std::vector<polygon_i> piecepolygon;
-    polygon_i framepolygon;
-    QPointF getPosition(point_i point);
+    polygon_t getPolygon();
+    std::vector<polygon_t> piecepolygon;
+    polygon_t framepolygon;
+    QPointF getPosition(point_t point);
     int grid_size;
     int top_bottom_margin;
     int left_right_margin;
