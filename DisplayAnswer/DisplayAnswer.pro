@@ -26,7 +26,7 @@ HEADERS +=\
     answerboard.h \
     answerdock.h
 
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 unix {
     target.path = /usr/lib

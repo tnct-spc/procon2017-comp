@@ -25,7 +25,8 @@ SOURCES += \
     singlepolygondisplay.cpp \
     polygonviewer.cpp \
     fit.cpp \
-    neoexpandedpolygon.cpp
+    neoexpandedpolygon.cpp \
+    neofield.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -35,10 +36,11 @@ HEADERS += \
     singlepolygondisplay.h \
     polygonviewer.h \
     fit.h \
-    neoexpandedpolygon.h
+    neoexpandedpolygon.h \
+    neofield.h
 
 LIBS += -lboost_system -lboost_thread
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 INSTALLS += target
 

@@ -16,7 +16,7 @@ CONFIG   += precompile_header
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 SOURCES += main.cpp\
     testdisplayanswer.cpp \
