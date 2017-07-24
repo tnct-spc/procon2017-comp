@@ -1,11 +1,13 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
+#include "utilities.h"
 
 #include <QPainter>
 #include <QPaintEvent>
 #include <QColor>
 #include <iostream>
 #include <random>
+#include <array>
 #include <opencv2/core/core.hpp>
 #include <boost/geometry/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
@@ -26,11 +28,20 @@ NeoAnswerBoard::~NeoAnswerBoard()
 {
     delete ui;
 }
-void NeoAnswerBoard::setRandomColor()
+QRgb NeoAnswerBoard::NeosetRandomColors()
 {
-    std::random_device rnd;
-    std::uniform_int_distribution<int> rand255(0, 255);
-    QRgb randomcolors = (rand255(rnd), rand255(rnd), rand255(rnd), 255);
+    int color_elem[3];
+    color_elem[0] = 255;
+    color_elem[1] = rand() % 256;
+    color_elem[2] = 0;
+    int color_r_index = rand() % 3;
+    int r_bin = rand() % 2;
+    int color_g_index = (color_r_index + 1 +  r_bin) % 3;
+    int color_b_index = (color_r_index + 1 + !r_bin) % 3;
+    // openFrameworksの色構造体に色を格納
+    // color.set(red, green, blue);で色を作成できる
+    ofColor color;
+    color.set(color_elem[color_r_index], color_elem[color_g_index], color_elem[color_b_index]);
 }
 
 void NeoAnswerBoard::beforePolygon()
@@ -84,7 +95,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     auto testColors = [&]{
-        painter.setBrush(QBrush(QColor(randomcolors)));
+        painter.setBrush(QBrush(QColor(random_colors->at(9)[2], random_colors->at(8)[1], random_colors->at(7)[0])));
         static const QPointF points[4] = {
             QPointF(10.0, 80.0),
             QPointF(20.0, 10.0),
@@ -92,8 +103,16 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             QPointF(90.0, 70.0)
         };
         painter.drawPolygon(points, 4);
+        QRgb hooo = NeosetRandomColors();
+        painter.setBrush(QBrush(QColor(hooo)));
+        static const QPointF pointss[4] = {
+            QPointF(100.0, 400.0),
+            QPointF(200.0, 100.0),
+            QPointF(800.0, 300.0),
+            QPointF(900.0, 700.0)
+        };
+        painter.drawPolygon(pointss, 4);
     };
-
-    testColors();
     drawGrid();
+    testColors();
 }
