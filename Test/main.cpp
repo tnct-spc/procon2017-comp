@@ -2,6 +2,7 @@
 #include <QApplication>
 #include "utilities.h"
 
+#include "testneoexpandedpolygon.h"
 #include "testdisplayanswer.h"
 #include "testjoinpolygon.h"
 #include "testsearchsamelength.h"
@@ -11,10 +12,11 @@ int Test()
     int ERROR_CNT = 0;
 
     std::vector<TesterWraper*> TESTER;
-    TESTER.push_back(new TesterWraper);
-    TESTER.push_back(new TestDisplayAnswer);
-    TESTER.push_back(new TestJoinPolygon);
-    TESTER.push_back(new testSearchSameLength);
+    TESTER.push_back(new TestNeoExpandedPolygon);
+//    TESTER.push_back(new TesterWraper);
+//    TESTER.push_back(new TestDisplayAnswer);
+//    TESTER.push_back(new TestJoinPolygon);
+//    TESTER.push_back(new testSearchSameLength);
 
     for(auto tester : TESTER){
         if(!tester->run()){
