@@ -180,7 +180,7 @@ void procon::NeoExpandedPolygon::calcSideAngle()
 void procon::NeoExpandedPolygon::calcSideSlope() {
     calcSize();
     side_slope.clear();
-    inners_side_slope.clear();
+    //inners_side_slope.clear();
 
     for (int i = 0;i < size;i++) {
         const double x = polygon.outer().at(i).x() - polygon.outer().at(i + 1).x();

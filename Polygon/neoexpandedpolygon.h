@@ -2,6 +2,7 @@
 #define NEOEXPANDEDPOLYGON_H
 
 #include "fit.h"
+#include "precompile.h"
 
 namespace bg = boost::geometry;
 using point_i = bg::model::d2::point_xy<int>;
