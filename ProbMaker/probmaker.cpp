@@ -6,6 +6,7 @@
 #include <boost/math/tools/fraction.hpp>
 #include <boost/math/common_factor_rt.hpp>
 #include <boost/polygon/voronoi.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -35,6 +36,68 @@ ProbMaker::ProbMaker(QWidget *parent) :
     base_polygon.outer().push_back(point_i(101,0));
     base_polygon.outer().push_back(point_i(0,0));
 //    this->print_polygons.push_back(base_polygon);
+
+    polygon_i poly_a;
+    bg::exterior_ring(poly_a) = boost::assign::list_of<point_i>
+        (0, 0)
+        (2, 0)
+        (2, 2)
+        (0, 2)
+        (0, 0)
+        ;
+    polygon_i poly_b;
+    bg::exterior_ring(poly_b) = boost::assign::list_of<point_i>
+        (2, 0)
+        (4, 0)
+        (4, 2)
+        (20, 20)
+        (2, 0)
+        ;
+
+    std::vector<polygon_i> polyyygon;
+    boost::geometry::union_(poly_a,poly_b,polyyygon);
+    std::cout << boost::geometry::intersects(poly_a,poly_b) << std::endl;
+
+    NeoPolygonViewer::getInstance().displayPolygon(poly_a,"aaaa");
+    NeoPolygonViewer::getInstance().displayPolygon(poly_b,"bbbb");
+//    NeoPolygonViewer::getInstance().displayPolygon(polyyygon[0]);
+    for(auto pol : polyyygon){
+        NeoPolygonViewer::getInstance().displayPolygon(pol,"hgoehgoe");
+    }
+
+
+        //ひとつめの引数
+    polygon_i poly_1;
+    boost::geometry::exterior_ring(poly_1) = boost::assign::list_of<point_i>
+            (0,0)
+            (5,1)
+            (4,5)
+            (0,0)
+            ;
+    boost::geometry::reverse(poly_1);
+    //ふたつめの引数
+    polygon_i poly_2;
+    boost::geometry::exterior_ring(poly_2) = boost::assign::list_of<point_i>
+            (4,5)
+            (10,6)
+            (5,1)
+            (4,5)
+            ;
+
+    std::cout << boost::geometry::area(poly_1) << std::endl;
+    std::cout << boost::geometry::area(poly_2) << std::endl;
+
+    //くっつける部分
+    std::vector<polygon_i> vector;
+    boost::geometry::union_(poly_1,poly_2,vector);
+    polygon_i poly3;
+    poly3=vector.at(0);
+    //表示部分
+    std::cout<<vector.size()<<std::endl;
+    std::cout<<boost::geometry::dsv(poly3)<<std::endl;
+    NeoPolygonViewer::getInstance().displayPolygon(poly3,"connected");
+    NeoPolygonViewer::getInstance().displayPolygon(poly_1,"polygon1");
+    NeoPolygonViewer::getInstance().displayPolygon(poly_2,"polygon2");
 
     //ドロネーの三角形分割
     delaunay_triangulation();
@@ -69,7 +132,7 @@ void ProbMaker::delaunay_triangulation()
         bool flag = false;
 
         auto check = [&](auto a){
-            if(a > 300) flag = true;
+            if(-300 > a || a > 300) flag = true;
         };
 
         for (int a = 0; a < 6; ++a) {
@@ -99,8 +162,8 @@ void ProbMaker::delaunay_triangulation()
 
     std::cout << "werreagas" << boost::geometry::dsv(out[1]) << std::endl;
 
-    NeoPolygonViewer::getInstance().displayPolygon(out[0],"0");
-    NeoPolygonViewer::getInstance().displayPolygon(out[1],"1");
+//    NeoPolygonViewer::getInstance().displayPolygon(out[0],"0");
+//    NeoPolygonViewer::getInstance().displayPolygon(out[1],"1");
 
 
     for(auto polygon : this->print_polygons){
@@ -108,6 +171,13 @@ void ProbMaker::delaunay_triangulation()
         std::cout << boost::geometry::dsv(polygon) << "  area:" << boost::geometry::area(polygon) <<std::endl;
     }
 
+//    for(auto polygon_a : this->print_polygons){
+//        for(auto polygon_b : this->print_polygons){
+//            std::vector<polygon_i> pollygon;
+//            boost::geometry::union_(polygon_a,polygon_b,pollygon);
+//            std::cout << pollygon.size() << std::endl;
+//        }
+//    }
 
 //    NeoSinglePolygonDisplay::createInstance(this->print_polygons[0],"hogehoge")->show();
 //    NeoSinglePolygonDisplay::createInstance(this->print_polygons[1],"fugapiyo")->show();
@@ -535,9 +605,7 @@ void ProbMaker::paintEvent(QPaintEvent *)
             painter.drawEllipse(point.x()*grid_size,point.y()*grid_size,10,10);
             painter.drawText(point.x()*grid_size,point.y()*grid_size+ 10,QString(QString::fromStdString(std::to_string(counter))));
             ++counter;
-
         }
-
     };
 
     painter.setPen(QPen(QColor("#000000")));
