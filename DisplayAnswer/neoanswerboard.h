@@ -25,11 +25,10 @@ private:
     polygon_i framepolygon;
     QPointF getPosition(point_i point);
     int grid_size;
-    int top_buttom_margin;
+    int top_bottom_margin;
     int left_right_margin;
     int top_margin;
-
-    //Field field;
+    procon::Field field;
 
 protected:
     void paintEvent(QPaintEvent *event);

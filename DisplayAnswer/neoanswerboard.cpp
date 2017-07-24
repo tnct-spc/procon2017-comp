@@ -1,5 +1,6 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
+#include "field.h"
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -19,7 +20,6 @@ NeoAnswerBoard::~NeoAnswerBoard()
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
     const QString back_ground_color = "#00FFFF";
-
     const int window_width = this->width();
     const int window_height = this->height();
 
@@ -37,12 +37,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //draw grid
     auto drawGrid = [&]{
-        int splitedheight = window_height/2;
+        const int splitedheight = window_height/2;
         grid_size =
                 window_width <= splitedheight
                 ? window_width / (grid_col + grid_margin)
                 : splitedheight / (grid_row + grid_margin);
-        top_buttom_margin = (splitedheight - grid_size * grid_row) / 2;
+        top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
         left_right_margin = (window_width - grid_size * grid_col) / 2;
 
         top_margin = grid_size * grid_margin;
@@ -50,19 +50,22 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
         for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
             int x = current_col * grid_size + left_right_margin;
-            painter.drawLine(x,top_buttom_margin,x,splitedheight - top_buttom_margin);
+            painter.drawLine(x,top_bottom_margin,x,splitedheight - top_bottom_margin);
         }
         for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
-            int y = current_row * grid_size + top_buttom_margin;
+            int y = current_row * grid_size + top_bottom_margin;
             painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
         }
     };
     auto setField = [&]{
+        procon::ExpandedPolygon polygon;
         framepolygon.outer().push_back(point_i(5,5));
         framepolygon.outer().push_back(point_i(85,7));
         framepolygon.outer().push_back(point_i(75,48));
         framepolygon.outer().push_back(point_i(18,57));
         framepolygon.outer().push_back(point_i(5,5));
+
+        field.setFrame(polygon);
     };
     auto drawFrame = [&]{
         painter.setBrush(QBrush(QColor(QString("#00FF00")))); //set color
@@ -77,5 +80,5 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
 }
 QPointF NeoAnswerBoard::getPosition(point_i point){
-    return QPointF(left_right_margin + point.x() * grid_size, top_buttom_margin + point.y() * grid_size);
+    return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
 }
