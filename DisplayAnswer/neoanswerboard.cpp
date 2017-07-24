@@ -3,6 +3,15 @@
 
 #include <QPainter>
 #include <QPaintEvent>
+#include <iostream>
+
+#include <boost/geometry/geometry.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/strategies/transform.hpp>
+#include <boost/geometry/strategies/transform/matrix_transformers.hpp>
+#include <boost/geometry/algorithms/disjoint.hpp>
+#include "../Polygon/neoexpandedpolygon.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
@@ -39,17 +48,19 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 window_width <= window_height
                 ? window_width / (grid_col + grid_margin)
                 : window_height / (grid_row + grid_margin);
-        const int top_buttom_margin = (window_height - grid_size * grid_row) / 2;
+        const int top_margin = (window_height - grid_size * grid_row) / 2;
+        const int bottom_margin = top_margin + (window_height / 2);
         const int left_right_margin = (window_width - grid_size * grid_col) / 2;
 
         for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
             int x = current_col * grid_size + left_right_margin;
-            painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
+            painter.drawLine(x,top_margin,x,window_height - top_margin);
         }
         for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
-            int y = current_row * grid_size + top_buttom_margin;
+            int y = current_row * grid_size + top_margin;
             painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
         }
     };
     drawGrid();
+
 }

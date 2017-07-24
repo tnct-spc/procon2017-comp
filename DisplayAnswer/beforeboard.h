@@ -1,5 +1,5 @@
-#ifndef NEOANSWERBOARD_H
-#define NEOANSWERBOARD_H
+#ifndef BEFOREBOARD_H
+#define BEFOREBOARD_H
 
 #include <QWidget>
 #include <field.h>
@@ -13,23 +13,22 @@
 #include "../Polygon/neoexpandedpolygon.h"
 
 namespace Ui {
-class NeoAnswerBoard;
+class BeforeBoard;
 }
 
-class NeoAnswerBoard : public QWidget
+class BeforeBoard : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit NeoAnswerBoard(QWidget *parent = 0);
-    ~NeoAnswerBoard();
+    explicit BeforeBoard(QWidget *parent = 0);
+    ~BeforeBoard();
 
 private:
-    Ui::NeoAnswerBoard *ui;
-    polygon_i getPolygon();
+    Ui::BeforeBoard *ui;
 
 protected:
     void paintEvent(QPaintEvent *event);
 };
 
-#endif // NEOANSWERBOARD_H
+#endif // BEFOREBOARD_H
