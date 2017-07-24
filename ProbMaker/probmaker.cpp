@@ -58,11 +58,11 @@ ProbMaker::ProbMaker(QWidget *parent) :
     boost::geometry::union_(poly_a,poly_b,polyyygon);
     std::cout << boost::geometry::intersects(poly_a,poly_b) << std::endl;
 
-    NeoPolygonViewer::getInstance().displayPolygon(poly_a,"aaaa");
-    NeoPolygonViewer::getInstance().displayPolygon(poly_b,"bbbb");
+    NeoPolygonViewer::getInstance().displayPolygon(poly_a,"aaaa",true);
+    NeoPolygonViewer::getInstance().displayPolygon(poly_b,"bbbb",true);
 //    NeoPolygonViewer::getInstance().displayPolygon(polyyygon[0]);
     for(auto pol : polyyygon){
-        NeoPolygonViewer::getInstance().displayPolygon(pol,"hgoehgoe");
+        NeoPolygonViewer::getInstance().displayPolygon(pol,"hgoehgoe",true);
     }
 
 
@@ -95,9 +95,9 @@ ProbMaker::ProbMaker(QWidget *parent) :
     //表示部分
     std::cout<<vector.size()<<std::endl;
     std::cout<<boost::geometry::dsv(poly3)<<std::endl;
-    NeoPolygonViewer::getInstance().displayPolygon(poly3,"connected");
-    NeoPolygonViewer::getInstance().displayPolygon(poly_1,"polygon1");
-    NeoPolygonViewer::getInstance().displayPolygon(poly_2,"polygon2");
+    NeoPolygonViewer::getInstance().displayPolygon(poly3,"connected",true);
+    NeoPolygonViewer::getInstance().displayPolygon(poly_1,"polygon1",true);
+    NeoPolygonViewer::getInstance().displayPolygon(poly_2,"polygon2",true);
 
     //ドロネーの三角形分割
     delaunay_triangulation();
@@ -145,6 +145,12 @@ void ProbMaker::delaunay_triangulation()
             poly_buf.outer().push_back(point_i(vec[2],vec[3]));
             poly_buf.outer().push_back(point_i(vec[4],vec[5]));
             poly_buf.outer().push_back(point_i(vec[0],vec[1]));
+
+            //面積が負だとboostのpolygon conceptに怒られてしまうのです
+            if(0 > boost::geometry::area(poly_buf)){
+                boost::geometry::reverse(poly_buf);
+            }
+
             this->print_polygons.push_back(poly_buf);
         }
     }
@@ -156,28 +162,48 @@ void ProbMaker::delaunay_triangulation()
     base_polygon.outer().push_back(point_i(101,0));
     base_polygon.outer().push_back(point_i(0,0));
 
+    std::vector<polygon_i> polygons;
+    std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygons));
+
     std::vector<polygon_i> out;
+    int a,b;
+    for (a = 0; a < polygons.size(); ++a) {
+        for (b = 1; b < polygons.size(); ++b) {
+            boost::geometry::union_(polygons.at(a),polygons.at(b),out);
 
-    boost::geometry::difference(base_polygon,this->print_polygons[0],out);
+            if(out.size() == 1){
+                goto EXIT;
+            }
+        }
+    }
+    EXIT:
+    //結合した分を消す
+    if(a < b){
+        polygons.erase(polygons.begin() + b);
+        polygons.erase(polygons.begin() + a);
+    }else{
+        polygons.erase(polygons.begin() + a);
+        polygons.erase(polygons.begin() + b);
+    }
+    polygon_i frame = out[0];
 
-    std::cout << "werreagas" << boost::geometry::dsv(out[1]) << std::endl;
+    while(polygons.size() != 0){
+        for (int index = 0; index < polygons.size(); ++index) {
+            std::vector<polygon_i> output_buffer;
+            boost::geometry::union_(frame,polygons.at(index),output_buffer);
 
-//    NeoPolygonViewer::getInstance().displayPolygon(out[0],"0");
-//    NeoPolygonViewer::getInstance().displayPolygon(out[1],"1");
-
-
-    for(auto polygon : this->print_polygons){
-        boost::geometry::reverse(polygon);
-        std::cout << boost::geometry::dsv(polygon) << "  area:" << boost::geometry::area(polygon) <<std::endl;
+            if(output_buffer.size() == 1){
+                polygons.erase(polygons.begin() + index);
+                frame = output_buffer[0];
+            }
+        }
     }
 
-//    for(auto polygon_a : this->print_polygons){
-//        for(auto polygon_b : this->print_polygons){
-//            std::vector<polygon_i> pollygon;
-//            boost::geometry::union_(polygon_a,polygon_b,pollygon);
-//            std::cout << pollygon.size() << std::endl;
-//        }
-//    }
+    NeoPolygonViewer::getInstance().displayPolygon(frame,"frame",true);
+
+//    std::copy(this->print_polygons.begin(),this->print_polygons.end(),)
+
+//    while()
 
 //    NeoSinglePolygonDisplay::createInstance(this->print_polygons[0],"hogehoge")->show();
 //    NeoSinglePolygonDisplay::createInstance(this->print_polygons[1],"fugapiyo")->show();
@@ -566,7 +592,7 @@ void ProbMaker::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setPen(QPen(QColor("#000000")));
     constexpr int buf = 10;
-    constexpr int grid_size = 15;
+    constexpr int grid_size = 10;
     constexpr int max_col = 101;
     constexpr int max_row = 65;
     for (int col= 0; col < max_col; ++col) {
