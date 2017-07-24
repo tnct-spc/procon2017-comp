@@ -29,75 +29,75 @@ ProbMaker::ProbMaker(QWidget *parent) :
 //    connect(this->ui->next_phase,&QPushButton::clicked,this,&ProbMaker::run);
 //    this->run();
     //本番の101*65
-    polygon_i base_polygon;
-    base_polygon.outer().push_back(point_i(0,0));
-    base_polygon.outer().push_back(point_i(0,65));
-    base_polygon.outer().push_back(point_i(101,65));
-    base_polygon.outer().push_back(point_i(101,0));
-    base_polygon.outer().push_back(point_i(0,0));
+//    polygon_i base_polygon;
+//    base_polygon.outer().push_back(point_i(0,0));
+//    base_polygon.outer().push_back(point_i(0,65));
+//    base_polygon.outer().push_back(point_i(101,65));
+//    base_polygon.outer().push_back(point_i(101,0));
+//    base_polygon.outer().push_back(point_i(0,0));
 //    this->print_polygons.push_back(base_polygon);
 
-    polygon_i poly_a;
-    bg::exterior_ring(poly_a) = boost::assign::list_of<point_i>
-        (0, 0)
-        (2, 0)
-        (2, 2)
-        (0, 2)
-        (0, 0)
-        ;
-    polygon_i poly_b;
-    bg::exterior_ring(poly_b) = boost::assign::list_of<point_i>
-        (2, 0)
-        (4, 0)
-        (4, 2)
-        (20, 20)
-        (2, 0)
-        ;
+//    polygon_i poly_a;
+//    bg::exterior_ring(poly_a) = boost::assign::list_of<point_i>
+//        (0, 0)
+//        (2, 0)
+//        (2, 2)
+//        (0, 2)
+//        (0, 0)
+//        ;
+//    polygon_i poly_b;
+//    bg::exterior_ring(poly_b) = boost::assign::list_of<point_i>
+//        (2, 0)
+//        (4, 0)
+//        (4, 2)
+//        (20, 20)
+//        (2, 0)
+//        ;
 
-    std::vector<polygon_i> polyyygon;
-    boost::geometry::union_(poly_a,poly_b,polyyygon);
-    std::cout << boost::geometry::intersects(poly_a,poly_b) << std::endl;
+//    std::vector<polygon_i> polyyygon;
+//    boost::geometry::union_(poly_a,poly_b,polyyygon);
+//    std::cout << boost::geometry::intersects(poly_a,poly_b) << std::endl;
 
-    NeoPolygonViewer::getInstance().displayPolygon(poly_a,"aaaa",true);
-    NeoPolygonViewer::getInstance().displayPolygon(poly_b,"bbbb",true);
-//    NeoPolygonViewer::getInstance().displayPolygon(polyyygon[0]);
-    for(auto pol : polyyygon){
-        NeoPolygonViewer::getInstance().displayPolygon(pol,"hgoehgoe",true);
-    }
+//    NeoPolygonViewer::getInstance().displayPolygon(poly_a,"aaaa",true);
+//    NeoPolygonViewer::getInstance().displayPolygon(poly_b,"bbbb",true);
+////    NeoPolygonViewer::getInstance().displayPolygon(polyyygon[0]);
+//    for(auto pol : polyyygon){
+//        NeoPolygonViewer::getInstance().displayPolygon(pol,"hgoehgoe",true);
+//    }
 
 
-        //ひとつめの引数
-    polygon_i poly_1;
-    boost::geometry::exterior_ring(poly_1) = boost::assign::list_of<point_i>
-            (0,0)
-            (5,1)
-            (4,5)
-            (0,0)
-            ;
-    boost::geometry::reverse(poly_1);
-    //ふたつめの引数
-    polygon_i poly_2;
-    boost::geometry::exterior_ring(poly_2) = boost::assign::list_of<point_i>
-            (4,5)
-            (10,6)
-            (5,1)
-            (4,5)
-            ;
+//        //ひとつめの引数
+//    polygon_i poly_1;
+//    boost::geometry::exterior_ring(poly_1) = boost::assign::list_of<point_i>
+//            (0,0)
+//            (5,1)
+//            (4,5)
+//            (0,0)
+//            ;
+//    boost::geometry::reverse(poly_1);
+//    //ふたつめの引数
+//    polygon_i poly_2;
+//    boost::geometry::exterior_ring(poly_2) = boost::assign::list_of<point_i>
+//            (4,5)
+//            (10,6)
+//            (5,1)
+//            (4,5)
+//            ;
 
-    std::cout << boost::geometry::area(poly_1) << std::endl;
-    std::cout << boost::geometry::area(poly_2) << std::endl;
+//    std::cout << boost::geometry::area(poly_1) << std::endl;
+//    std::cout << boost::geometry::area(poly_2) << std::endl;
 
-    //くっつける部分
-    std::vector<polygon_i> vector;
-    boost::geometry::union_(poly_1,poly_2,vector);
-    polygon_i poly3;
-    poly3=vector.at(0);
-    //表示部分
-    std::cout<<vector.size()<<std::endl;
-    std::cout<<boost::geometry::dsv(poly3)<<std::endl;
-    NeoPolygonViewer::getInstance().displayPolygon(poly3,"connected",true);
-    NeoPolygonViewer::getInstance().displayPolygon(poly_1,"polygon1",true);
-    NeoPolygonViewer::getInstance().displayPolygon(poly_2,"polygon2",true);
+//    //くっつける部分
+//    std::vector<polygon_i> vector;
+//    boost::geometry::union_(poly_1,poly_2,vector);
+//    polygon_i poly3;
+//    poly3=vector.at(0);
+//    //表示部分
+//    std::cout<<vector.size()<<std::endl;
+//    std::cout<<boost::geometry::dsv(poly3)<<std::endl;
+//    NeoPolygonViewer::getInstance().displayPolygon(poly3,"connected",true);
+//    NeoPolygonViewer::getInstance().displayPolygon(poly_1,"polygon1",true);
+//    NeoPolygonViewer::getInstance().displayPolygon(poly_2,"polygon2",true);
 
     //ドロネーの三角形分割
     delaunay_triangulation();
