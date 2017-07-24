@@ -1,6 +1,8 @@
 #include "probmaker.h"
 #include "ui_probmaker.h"
 
+#include <random>
+
 ProbMaker::ProbMaker(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ProbMaker)
@@ -15,31 +17,19 @@ ProbMaker::~ProbMaker()
 
 void ProbMaker::run()
 {
-    //枠を作る
-    pushFrame();
+    std::random_device rad;
+    for (int a = 0; a < 100; ++a) {
+        std::cout << rad() << std::endl;
+    }
 
-    //300回線を引く
-    for(int i=0;i<300;i++) addNewLine();
-
-    //ポリゴンを認識する
-    makePolygon();
-
-    //小さいポリゴンを削除する
-    eraseMinPolygon();
-
-    //ポリゴンの数が50個以下になるように減らす
-    erasePolygonUnderFifty();
-
-    //TestDisplayの再描画
-    this->update();
-
-    //認識したポリゴンを拡張ポリゴンに変換
-    procon::Field field = PolygonToExPolygon();
-
-    //ポリゴンをファイルに出力
-    procon::PolygonIO::exportPolygon(field,"./../output.csv");
+    std::uniform_int_distribution<> rand100(0,120);
+    for (int var = 0; var < 100; ++var) {
+        std::cout << rand100(rad) << std::endl;
+    }
 
 }
+
+
 
 void ProbMaker::pushFrame()
 {
