@@ -2,8 +2,16 @@
 #define NEOANSWERBOARD_H
 
 #include <QWidget>
+#include <field.h>
+#include <iostream>
+#include <boost/geometry/geometry.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/strategies/transform.hpp>
+#include <boost/geometry/strategies/transform/matrix_transformers.hpp>
+#include <boost/geometry/algorithms/disjoint.hpp>
+#include "../Polygon/neoexpandedpolygon.h"
 #include <vector>
-
 #include "field.h"
 #include "neoexpandedpolygon.h"
 
@@ -21,6 +29,7 @@ public:
 
 private:
     Ui::NeoAnswerBoard *ui;
+    polygon_i getPolygon();
     std::vector<polygon_i> piecepolygon;
     polygon_i framepolygon;
     QPointF getPosition(point_i point);

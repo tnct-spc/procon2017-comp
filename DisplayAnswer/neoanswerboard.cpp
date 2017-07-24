@@ -27,27 +27,26 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const int grid_row = 65;
     const int grid_col = 101;
     const int grid_margin = 1;
+    const int splitedheight = window_height/2;
+    grid_size =
+            window_width <= splitedheight
+            ? window_width / (grid_col + grid_margin)
+            : splitedheight / (grid_row + grid_margin);
+    top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
+    left_right_margin = (window_width - grid_size * grid_col) / 2;
+
+    top_margin = grid_size * grid_margin;
     QPainter painter(this);
 
     //draw background
     painter.setBrush(QBrush(QColor(back_ground_color)));
     painter.drawRect(QRect(0,0,window_width,window_height/2));
-    painter.setPen(QPen(QBrush(Qt::black),0.1));
+    painter.setPen(QPen(QBrush(Qt::black),0.5));
 
 
     //draw grid
     auto drawGrid = [&]{
-        const int splitedheight = window_height/2;
-        grid_size =
-                window_width <= splitedheight
-                ? window_width / (grid_col + grid_margin)
-                : splitedheight / (grid_row + grid_margin);
-        top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
-        left_right_margin = (window_width - grid_size * grid_col) / 2;
-
-        top_margin = grid_size * grid_margin;
-
-
+        painter.setPen(QPen(QBrush(Qt::black),0.1));
         for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
             int x = current_col * grid_size + left_right_margin;
             painter.drawLine(x,top_bottom_margin,x,splitedheight - top_bottom_margin);
@@ -68,16 +67,18 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         field.setFrame(polygon);
     };
     auto drawFrame = [&]{
-        painter.setBrush(QBrush(QColor(QString("#00FF00")))); //set color
+        painter.setBrush(QBrush(QColor(236,182,138))); //set color
+        painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
         QPointF points[4];
         for(int tes = 0;tes < 4; tes++){
             points[tes] = getPosition(framepolygon.outer().at(tes));
         }
+        painter.setBrush(QBrush(QColor(back_ground_color)));
         painter.drawPolygon(points,4);
     };
     setField();
-    drawGrid();
     drawFrame();
+    drawGrid();
 }
 QPointF NeoAnswerBoard::getPosition(point_i point){
     return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
