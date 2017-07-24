@@ -3,8 +3,10 @@
 
 #include <QPainter>
 #include <QPaintEvent>
+#include <QColor>
 #include <iostream>
-
+#include <random>
+#include <opencv2/core/core.hpp>
 #include <boost/geometry/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
@@ -23,6 +25,23 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
 NeoAnswerBoard::~NeoAnswerBoard()
 {
     delete ui;
+}
+void NeoAnswerBoard::setRandomColor()
+{
+    std::random_device rnd;
+    std::uniform_int_distribution<int> rand255(0, 255);
+    QRgb randomcolors = (rand255(rnd), rand255(rnd), rand255(rnd), 255);
+}
+
+void NeoAnswerBoard::beforePolygon()
+{
+    //format
+    //const int picture_width;
+    //const int picture_height;
+    const int window_width = this->width();
+    const int window_height = this->height();
+    const int app_height = window_height / 2;
+    //const int top_bottom_margin;
 }
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
@@ -53,9 +72,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 : splitedheight / (grid_row + grid_margin);
         const int top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
         const int left_right_margin = (window_width - grid_size * grid_col) / 2;
-
         for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
-            int x = current_col * grid_size + left_right_margin;
+            int x = current_col * this->grid_size + left_right_margin;
             painter.drawLine(x,top_bottom_margin,x,splitedheight - top_bottom_margin);
         }
 
@@ -64,21 +82,18 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
         }
     };
-    auto setField = [&]{
-        framepolygon.outer().push_back(point_i(5,5));
-        framepolygon.outer().push_back(point_i(85,7));
-        framepolygon.outer().push_back(point_i(75,48));
-        framepolygon.outer().push_back(point_i(18,57));
-        framepolygon.outer().push_back(point_i(5,5));
+
+    auto testColors = [&]{
+        painter.setBrush(QBrush(QColor(randomcolors)));
+        static const QPointF points[4] = {
+            QPointF(10.0, 80.0),
+            QPointF(20.0, 10.0),
+            QPointF(80.0, 30.0),
+            QPointF(90.0, 70.0)
+        };
+        painter.drawPolygon(points, 4);
     };
-    auto drawFrame = [&]{
-        painter.setBrush(QBrush(QColor(QString("#00FF00")))); //set color
-        QPointF points[4];
-        for(int tes = 0;tes < 4; tes++){
-            points[tes] = getPosition(framepolygon.outer().at(tes));
-        }
-        painter.drawPolygon(points,4);
-    };
-    setField();
-    drawGrid();   
+
+    testColors();
+    drawGrid();
 }

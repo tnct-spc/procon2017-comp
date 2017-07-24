@@ -29,18 +29,14 @@ public:
 
 private:
     Ui::NeoAnswerBoard *ui;
-    polygon_i getPolygon();
-    std::vector<polygon_i> piecepolygon;
-    polygon_i framepolygon;
-    QPointF getPosition(point_i point);
+    QRgb randomcolors;
     int grid_size;
-    int top_buttom_margin;
-    int left_right_margin;
-    int top_margin;
 
     //Field field;
 
 protected:
+    void setRandomColor();
+    void beforePolygon();
     void paintEvent(QPaintEvent *event);
 };
 
