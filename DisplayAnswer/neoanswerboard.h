@@ -27,6 +27,7 @@ private:
     int grid_size;
     int top_buttom_margin;
     int left_right_margin;
+    int top_margin;
 
     //Field field;
 
