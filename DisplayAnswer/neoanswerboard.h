@@ -32,6 +32,13 @@ public:
 private:
     Ui::NeoAnswerBoard *ui;
     int grid_size;
+<<<<<<< HEAD
+=======
+    int top_bottom_margin;
+    int left_right_margin;
+    int top_margin;
+    procon::Field field;
+>>>>>>> a7fe985b2eb145cc480c994eefb7db0f21ff7a81
 
 protected:
     void beforePolygon();
