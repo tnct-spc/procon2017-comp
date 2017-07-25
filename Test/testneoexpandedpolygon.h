@@ -2,7 +2,7 @@
 #define TESTNEOEXPANDEDPOLYGON_H
 #include "testerwraper.h"
 
-class TestNeoExpandedPolygon : TesterWraper
+class TestNeoExpandedPolygon : public TesterWraper
 {
 public:
     TestNeoExpandedPolygon();
