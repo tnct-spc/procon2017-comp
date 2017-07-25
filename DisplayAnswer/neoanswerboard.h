@@ -27,13 +27,11 @@ class NeoAnswerBoard : public QWidget
 public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
-    static void setRandomColors(const std::vector<cv::Vec3b>& random_colors);
+    QRgb NeosetRandomColors();
 
 private:
     Ui::NeoAnswerBoard *ui;
     int grid_size;
-    QRgb NeosetRandomColors();
-    static std::unique_ptr<std::vector<cv::Vec3b>> random_colors;
 
 protected:
     void beforePolygon();

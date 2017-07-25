@@ -30,18 +30,11 @@ NeoAnswerBoard::~NeoAnswerBoard()
 }
 QRgb NeoAnswerBoard::NeosetRandomColors()
 {
-    int color_elem[3];
-    color_elem[0] = 255;
-    color_elem[1] = rand() % 256;
-    color_elem[2] = 0;
-    int color_r_index = rand() % 3;
-    int r_bin = rand() % 2;
-    int color_g_index = (color_r_index + 1 +  r_bin) % 3;
-    int color_b_index = (color_r_index + 1 + !r_bin) % 3;
-    // openFrameworksの色構造体に色を格納
-    // color.set(red, green, blue);で色を作成できる
-    ofColor color;
-    color.set(color_elem[color_r_index], color_elem[color_g_index], color_elem[color_b_index]);
+    std::random_device rnd;
+    std::uniform_int_distribution<int> rand255;
+    QRgb randomcolors = (rand255(rnd), rand255(rnd), rand255(rnd), 255);
+    return randomcolors;
+
 }
 
 void NeoAnswerBoard::beforePolygon()
@@ -95,7 +88,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     auto testColors = [&]{
-        painter.setBrush(QBrush(QColor(random_colors->at(9)[2], random_colors->at(8)[1], random_colors->at(7)[0])));
+        QRgb hoge = NeosetRandomColors();
+        painter.setBrush(QBrush(QColor(hoge)));
         static const QPointF points[4] = {
             QPointF(10.0, 80.0),
             QPointF(20.0, 10.0),
