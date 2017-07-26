@@ -275,6 +275,24 @@ void ProbMaker::GA()
                                                 //あたりまえだけど、-1してstd::out_of_range回避
         std::uniform_int_distribution<> random(0,can_connect_polygon_number.size() - 1);
         int connecting_polygon_index = random(rnd);
+
+
+        counter = 0;
+        std::vector<std::pair<double,int>> size;
+        for(auto i : can_connect_polygon_number){
+            std::pair<double,int> buf;
+            buf.first = boost::geometry::area(pieces[i]);
+            buf.second = counter;
+            ++counter;
+            size.push_back(buf);
+        }
+
+        std::sort(size.begin(),size.end(),[](auto a,auto b){
+            return a.first < b.first;
+        });
+
+        connecting_polygon_index = size[0].second;
+
         polygon_i connecting_polygon = pieces.at(can_connect_polygon_number[connecting_polygon_index]);
 
         std::vector<polygon_i> output;
@@ -289,7 +307,7 @@ void ProbMaker::GA()
 
     std::vector<polygon_i> pieces;
     std::copy(polygons.begin(),polygons.end(),std::back_inserter(pieces));
-    for (int var = 0; var < 150; ++var) {
+    for (int var = 0; var < 140; ++var) {
         std::vector<polygon_i> pieces_buf = connect_near_by_polygon(pieces);
         pieces.clear();
         std::copy(pieces_buf.begin(),pieces_buf.end(),std::back_inserter(pieces));
