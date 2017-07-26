@@ -7,20 +7,43 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
 {
     ui->setupUi(this);
     setField();
-    setRandomColors();
+    setRandomColors(5);
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
 {
     delete ui;
 }
-void NeoAnswerBoard::setRandomColors()
+void NeoAnswerBoard::setRandomColors(int threshold)
 {
     std::random_device rnd;
-    std::uniform_int_distribution<> rand255(0, 255);
+    std::uniform_int_distribution<int> rand255(0, 255);
+    cv::Vec3b up_colors;
+    cv::Vec3b down_colors;
     colors.resize(field.getPieces().size());
+    cv::Vec3b frame_color = {236,182,138};
+    int flag, ured, ugreen, ublue, dred, dgreen, dblue;
     for(int i = 0; i < field.getPieces().size(); ++i){
-        colors[i] = {rand255(rnd), rand255(rnd), rand255(rnd)};
+        flag = 1;
+        while(flag){
+            flag = 0;
+            colors[i] = {rand255(rnd), rand255(rnd), rand255(rnd)};
+            for(int j = 0; j < i; j++){
+                up_colors = {colors[i][0] + threshold, colors[i][1] + threshold, colors[i][2] + threshold};
+                down_colors = {colors[i][0] - threshold, colors[i][1] - threshold, colors[i][2] - threshold};
+                if(colors[i][0] < up_colors[0] && colors[i][0] > down_colors[0] ){
+                    if(colors[i][1] < up_colors[1] && colors[i][1] > down_colors[1]){
+                        if(colors[i][2] < up_colors[2] && colors[i][2] > down_colors[2]){
+                            flag = 1;
+                            break;
+                        }
+                    }
+                }else if(colors[i] == frame_color){
+                    flag = 1;
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -84,7 +107,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     };
     auto drawFrame = [&]{
-        painter.setBrush(QBrush(QColor(236,182,138))); //frame color
+        painter.setBrush(QBrush(QColor(236,182,138, 200))); //frame color
         painter.setPen(QPen(QBrush(Qt::black),0.5));
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
         QPointF points[4];
@@ -97,7 +120,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     auto drawPiece = [&]{
         painter.setBrush(QBrush(QColor(126,12,228))); //random color
         for(unsigned int pnum =0; pnum < field.getPieces().size(); pnum++){
-            painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2])));
+            painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
             int pcount = field.getPiece(pnum).getSize();
             QPointF points[pcount];
             for(int tes = 0;tes < pcount; tes++){
