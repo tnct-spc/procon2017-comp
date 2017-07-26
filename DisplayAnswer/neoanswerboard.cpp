@@ -111,13 +111,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             }
             painter.drawPolygon(points,pcount);
             //draw piece id
-            QLinearGradient gradient(0,0,window_width,window_height);
-            gradient.setColorAt(0.0,Qt::white);
-            gradient.setColorAt(1.0,Qt::black);
-            QBrush brush;
-            painter.setPen(QPen(QBrush(QColor(10,250,10)), 1.0)); //text color
-            painter.setBrush(QBrush(QColor(Qt::green)));
-            painter.setFont(QFont("Decorative", grid_size*4, QFont::Thin)); // text font
+            painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
+            painter.setBackgroundMode(Qt::OpaqueMode);
+            painter.setBackground(QBrush(Qt::white));
+            painter.setPen(QPen(QBrush(Qt::red), 0.5));
                   //get polygon center
                   boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
                   QPointF piececenter = getPosition(center);
