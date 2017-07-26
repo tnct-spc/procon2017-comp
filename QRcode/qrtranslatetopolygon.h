@@ -10,7 +10,7 @@
 #include <boost/geometry/strategies/transform.hpp>
 #include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
-#include "../Polygon/neoexpandedpolygon.h"
+#include "neoexpandedpolygon.h"
 
 class QrTranslateToPolygon
 {

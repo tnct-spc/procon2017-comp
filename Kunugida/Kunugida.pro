@@ -36,7 +36,7 @@ FORMS    += kunugida.ui
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon

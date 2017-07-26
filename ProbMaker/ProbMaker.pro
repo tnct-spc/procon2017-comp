@@ -35,10 +35,14 @@ TEMPLATE = app
 
 CONFIG   += precompile_header
 
+<<<<<<< HEAD
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
 LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+=======
+LIBS += -L/usr/lib `pkg-config --libs opencv`
+>>>>>>> neoexpandedpolygon
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
