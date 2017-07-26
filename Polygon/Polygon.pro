@@ -26,6 +26,7 @@ SOURCES += \
     polygonviewer.cpp \
     fit.cpp \
     neoexpandedpolygon.cpp \
+    neofield.cpp \
     neosinglepolygondisplay.cpp \
     neopolygonviewer.cpp
 
@@ -38,6 +39,7 @@ HEADERS += \
     polygonviewer.h \
     fit.h \
     neoexpandedpolygon.h \
+    neofield.h \
     neosinglepolygondisplay.h \
     neopolygonviewer.h
 

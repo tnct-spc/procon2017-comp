@@ -13,6 +13,7 @@ namespace procon {
 
 class NeoExpandedPolygon
 {
+private:
     //メンバ
     int size;
     int id;
@@ -90,6 +91,5 @@ public:
 };
 
 }
-
 
 #endif // NEOEXPANDEDPOLYGON_H
