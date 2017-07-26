@@ -63,7 +63,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Solver/ -lSolver
 INCLUDEPATH += $$PWD/../Solver
 DEPENDPATH += $$PWD/../Solver
 
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
 else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
@@ -74,3 +73,9 @@ DEPENDPATH += $$PWD/../Utilities
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QRcode/release/ -lQRcode
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QRcode/debug/ -lQRcode
+else:unix: LIBS += -L$$OUT_PWD/../QRcode/ -lQRcode
+
+INCLUDEPATH += $$PWD/../QRcode
+DEPENDPATH += $$PWD/../QRCode

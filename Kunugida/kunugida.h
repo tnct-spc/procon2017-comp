@@ -3,7 +3,11 @@
 
 #include <QMainWindow>
 #include "spdlog/spdlog.h"
+<<<<<<< HEAD
 #include "neoanswerboard.h"
+=======
+#include "imagerecognition.h"
+>>>>>>> origin
 
 namespace Ui {
 class Kunugida;
@@ -16,6 +20,7 @@ class Kunugida : public QMainWindow
 public:
     explicit Kunugida(QWidget *parent = 0);
     void run();
+    void imageRecognitonTest();
     ~Kunugida();
 
 private:
