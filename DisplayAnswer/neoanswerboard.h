@@ -1,16 +1,16 @@
 #ifndef NEOANSWERBOARD_H
 #define NEOANSWERBOARD_H
 
-#include <QWidget>
-#include <opencv2/core/core.hpp>
-#include <field.h>
-#include <iostream>
-#include <boost/geometry/geometry.hpp>
+#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/strategies/transform.hpp>
 #include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
+#include <QWidget>
+#include <opencv2/core/core.hpp>
+#include <field.h>
+#include <iostream>
 #include <random>
 #include <vector>
 #include <string>
@@ -46,6 +46,7 @@ private:
     int left_right_margin;
     int top_margin;
     procon::Field field;
+    point_t center;
 
 protected:
     void beforePolygon();

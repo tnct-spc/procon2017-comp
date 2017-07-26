@@ -24,17 +24,6 @@ void NeoAnswerBoard::setRandomColors()
     }
 }
 
-void NeoAnswerBoard::beforePolygon()
-{
-    //format
-    //const int picture_width;
-    //const int picture_height;
-    const int window_width = this->width();
-    const int window_height = this->height();
-    const int app_height = window_height / 2;
-    //const int top_bottom_margin;
-}
-
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
     const QString back_ground_color = "#00FFFF";
@@ -91,9 +80,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(back_ground_color)));
         painter.drawPolygon(points,4);
     };
-    auto drawPiece = [&]{
+    auto drawPiece = [&](int pnum){
         painter.setBrush(QBrush(QColor(126,12,228))); //random color
-        for(unsigned int pnum =0; pnum < field.getPieces().size(); pnum++){
             painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2])));
             int pcount = field.getPiece(pnum).getSize();
             QPointF points[pcount];
@@ -101,25 +89,20 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
             }
             painter.drawPolygon(points,pcount);
-        }
+        //draw piece id
+        painter.setPen(QPen(QColor(10,250,10))); //text color
+        painter.setFont(QFont("Decorative", grid_size*4, QFont::Bold)); // text font
+              //get polygon center
+              boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+              QPointF piececenter = getPosition(center);
+              painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
     };
-    auto drawPieceId = [&]{
-      painter.setPen(QPen(QColor(10,250,10))); //text color
-      painter.setFont(QFont("Decorative", grid_size*4, QFont::Bold)); // text font
-        for(unsigned int pnum = 0; pnum < field.getPieces().size(); pnum++){
-            //get polygon center
-            point_t center = {0,0};
-           // boost::geometry::centroid(field.getPiece(pnum),center);
 
-            QPointF piececenter = getPosition(field.getPiece(pnum).getPolygon().outer().at(0));
-            //painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
-            painter.drawText(piececenter, QString::fromStdString(field.getPiece(pnum).makeMultiIdString())); //cannnot use now
-        }
-    };
 
     drawFrame();
-    drawPiece();
-    drawPieceId();
+    for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
+            drawPiece(piece_num);
+    }
     drawGrid();
 }
 QPointF NeoAnswerBoard::getPosition(point_t point){
