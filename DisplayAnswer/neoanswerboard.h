@@ -2,6 +2,7 @@
 #define NEOANSWERBOARD_H
 
 #include <QWidget>
+#include <opencv2/core/core.hpp>
 #include <field.h>
 #include <iostream>
 #include <boost/geometry/geometry.hpp>
@@ -32,6 +33,7 @@ class NeoAnswerBoard : public QWidget
 public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
+    QRgb NeosetRandomColors();
 
 private:
     Ui::NeoAnswerBoard *ui;
@@ -43,6 +45,7 @@ private:
     procon::Field field;
 
 protected:
+    void beforePolygon();
     void paintEvent(QPaintEvent *event);
 };
 
