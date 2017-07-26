@@ -12,13 +12,14 @@ NeoAnswerBoard::~NeoAnswerBoard()
 {
     delete ui;
 }
-QRgb NeoAnswerBoard::NeosetRandomColors()
+void NeoAnswerBoard::setRandomColors()
 {
     std::random_device rnd;
-    std::uniform_int_distribution<int> rand255;
-    QRgb randomcolors = (static_cast<void>(rand255(rnd)), static_cast<void>(rand255(rnd)), static_cast<void>(rand255(rnd)), 255);
-    return randomcolors;
-
+    std::uniform_int_distribution<> rand255(0, 255);
+    colors.resize(field.getPieces().size());
+    for(int i = 0; i < field.getPieces().size(); ++i){
+        colors[i] = {rand255(rnd), rand255(rnd), rand255(rnd)};
+    }
 }
 
 void NeoAnswerBoard::beforePolygon()
@@ -78,26 +79,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     };
 
-    auto testColors = [&]{
-
-
-        static const QPointF points[4] = {
-            QPointF(10.0, 80.0),
-            QPointF(20.0, 10.0),
-            QPointF(80.0, 30.0),
-            QPointF(90.0, 70.0)
-        };
-        painter.drawPolygon(points, 4);
-        static const QPointF pointss[4] = {
-            QPointF(100.0, 400.0),
-            QPointF(200.0, 100.0),
-            QPointF(800.0, 300.0),
-            QPointF(900.0, 700.0)
-        };
-        painter.drawPolygon(pointss, 4);
-    };
-    drawGrid();
-    testColors();
     auto setField = [&]{
         procon::ExpandedPolygon polygon;
         procon::ExpandedPolygon poly0;
@@ -140,7 +121,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
     auto drawFrame = [&]{
         painter.setBrush(QBrush(QColor(236,182,138))); //frame color
-            painter.setPen(QPen(QBrush(Qt::black),0.5));
+        painter.setPen(QPen(QBrush(Qt::black),0.5));
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
         QPointF points[4];
         for(int tes = 0;tes < 4; tes++){
@@ -152,6 +133,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     auto drawPiece = [&]{
         painter.setBrush(QBrush(QColor(126,12,228))); //random color
         for(unsigned int pnum =0; pnum < field.getPieces().size(); pnum++){
+            painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2])));
             int pcount = field.getPiece(pnum).getSize();
             QPointF points[pcount];
             for(int tes = 0;tes < pcount; tes++){
@@ -174,6 +156,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     };
     setField();
+    setRandomColors();
     drawFrame();
     drawPiece();
     drawPieceId();

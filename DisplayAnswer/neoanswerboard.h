@@ -11,6 +11,7 @@
 #include <boost/geometry/strategies/transform.hpp>
 #include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
+#include <random>
 #include <vector>
 #include <string>
 #include "field.h"
@@ -33,11 +34,12 @@ class NeoAnswerBoard : public QWidget
 public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
-    QRgb NeosetRandomColors();
 
 private:
     Ui::NeoAnswerBoard *ui;
     QPointF getPosition(point_t point);
+    std::vector<cv::Vec3b> colors;
+    void setRandomColors();
     int grid_size;
     int top_bottom_margin;
     int left_right_margin;
