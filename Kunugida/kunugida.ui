@@ -41,6 +41,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="ImageRecognitonTestCheckBox">
+        <property name="text">
+         <string>ImageRecognitonTest</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout"/>
+      </item>
      </layout>
     </item>
    </layout>

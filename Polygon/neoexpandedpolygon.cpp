@@ -80,7 +80,27 @@ void procon::NeoExpandedPolygon::calcSideLength()
 
 void procon::NeoExpandedPolygon::calcSideAngle()
 {
-    auto calcAngle = [&](point_i p1,point_i p2,point_i p3,int pos/*,std::vector<point_i> inner = {}*/)->double{
+    point_i p, p1, p2;
+    std::vector<point_i> outer = polygon.outer();
+
+    if(!calcSize_flag) calcSize();
+    side_angle.clear();
+
+    for(int i = 0; i < size; ++i) {
+        p = outer.at(i);
+
+        p1 = (i == 0) ? outer.at(size - 1) : outer.at(i - 1);
+        std::complex<double> cp1(static_cast<double> (p1.x() - p.x()), static_cast<double> (p1.y() - p.y()));
+
+        p2 = outer.at(i + 1);
+        std::complex<double> cp2(static_cast<double> (p2.x() - p.x()), static_cast<double> (p2.y() - p.y()));
+
+        double arg = std::arg(cp2 / cp1);
+        side_angle.push_back((signbit(arg)) ? M_PI * 2 + arg : arg);
+    }
+
+    /*
+    auto calcAngle = [&](point_i p1,point_i p2,point_i p3,int pos,std::vector<point_i> inner = {})->double{
 
         auto isMajorAngle = [&](point_i p1,point_i p2,point_i p3)->bool {
             point_i p4((p1.x() + p3.x()) / 2 , (p1.y() + p3.y()) / 2);
@@ -93,27 +113,23 @@ void procon::NeoExpandedPolygon::calcSideAngle()
             point_i end_point(end_x,end_y);
             //bg::model::segment<point_t> judge_segment(p2,end_point);
             int intersect_num = 0,points_size = size;
-            /*
             if (!inner.empty()){
                 points_size = static_cast<int>(inner.size() - 1);
             }
-            */
             for (int i = 0;i < points_size;i++) {
                 // skip tonari
                 if(i==pos || i+1 == pos || (pos==0 && i==points_size-1)) continue;
                 point_i pa,pb;
-                /*
                 if (!inner.empty()) {
                     pa = inner.at(i);
                     pb = inner.at(i+1);
                 } else {
-                */
                     pa = polygon.outer().at(i);
                     pb = polygon.outer().at(i+1);
-                //}
+                }
                 //bg::model::segment<point_t> side_segment(pa,pb);
                 intersect_num += static_cast<int>(Utilities::cross_check(p2,end_point,pa,pb));
-                //intersect_num += static_cast<int>(bg::intersects(side_segment,judge_segment));
+                intersect_num += static_cast<int>(bg::intersects(side_segment,judge_segment));
             }
 
             return (intersect_num % 2 == 0) ? true : false;
@@ -142,7 +158,7 @@ void procon::NeoExpandedPolygon::calcSideAngle()
 
     if(!calcSize_flag) calcSize();
     side_angle.clear();
-    //inners_side_angle.clear();
+    inners_side_angle.clear();
 
     for (int i = -1;i < size - 1;i++){
         point_i p1;
@@ -156,7 +172,6 @@ void procon::NeoExpandedPolygon::calcSideAngle()
         side_angle.push_back(calcAngle(p1,p2,p3,i+1));
     }
 
-    /*
     for (auto inner : polygon.inners()) {
         std::vector<double> inner_side_angle;
         const int inner_size = static_cast<int>(inner.size() - 1);

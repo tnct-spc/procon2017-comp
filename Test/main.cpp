@@ -6,6 +6,7 @@
 #include "testdisplayanswer.h"
 #include "testjoinpolygon.h"
 #include "testsearchsamelength.h"
+#include "neopolygonviewer.h"
 
 int Test()
 {
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
 {
     std::cout<<"***START TEST***"<<std::endl;
     QApplication a(argc, argv);
+    NeoPolygonViewer::getInstance();
 
     int error_cnt = Test();
 

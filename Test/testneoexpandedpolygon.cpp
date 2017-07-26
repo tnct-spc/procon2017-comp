@@ -1,4 +1,5 @@
 #include "neoexpandedpolygon.h"
+#include "neopolygonviewer.h"
 #include "testneoexpandedpolygon.h"
 
 TestNeoExpandedPolygon::TestNeoExpandedPolygon()
@@ -9,6 +10,9 @@ TestNeoExpandedPolygon::TestNeoExpandedPolygon()
 bool TestNeoExpandedPolygon::run()
 {
     polygon_i poly1{{{1, 1}, {1, 3}, {3, 3}, {3, 8}, {4, 8}, {4, 1}, {1, 1}}};
+
+    NeoPolygonViewer::getInstance().displayPolygon(poly1,"poly1",false);
+
     procon::NeoExpandedPolygon expoly1;
 
     auto out = [](procon::NeoExpandedPolygon expoly, std::string name)

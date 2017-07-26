@@ -90,4 +90,6 @@ public:
 };
 
 }
+
+
 #endif // NEOEXPANDEDPOLYGON_H
