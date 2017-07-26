@@ -3,11 +3,8 @@
 
 #include <QMainWindow>
 #include "spdlog/spdlog.h"
-<<<<<<< HEAD
 #include "neoanswerboard.h"
-=======
 #include "imagerecognition.h"
->>>>>>> origin
 
 namespace Ui {
 class Kunugida;

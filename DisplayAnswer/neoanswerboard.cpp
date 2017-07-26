@@ -37,7 +37,8 @@ void NeoAnswerBoard::beforePolygon()
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
-    const QString back_ground_color = "#00FFFF";
+    const QString up_back_ground_color = "#00FFFF";
+    const QString down_back_ground_color = "#66CDAA";
     const int window_width = this->width();
     const int window_height = this->height();
 
@@ -57,8 +58,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     //draw background
-    painter.setBrush(QBrush(QColor(back_ground_color)));
+    painter.setBrush(QBrush(QColor(up_back_ground_color)));
     painter.drawRect(QRect(0,0,window_width,window_height/2));
+    painter.setBrush(QBrush(QColor(down_back_ground_color)));
+    painter.drawRect(QRect(0, window_height/2, window_width, window_height));
 
 
     //draw grid
@@ -88,7 +91,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         for(int tes = 0;tes < 4; tes++){
             points[tes] = getPosition(field.getFrame().getPolygon().outer().at(tes));
         }
-        painter.setBrush(QBrush(QColor(back_ground_color)));
+        painter.setBrush(QBrush(QColor(up_back_ground_color)));
         painter.drawPolygon(points,4);
     };
     auto drawPiece = [&]{
