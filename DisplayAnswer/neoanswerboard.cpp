@@ -47,7 +47,6 @@ void NeoAnswerBoard::setRandomColors(int threshold)
     }
 }
 
-
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
     const QString up_back_ground_color = "#00FFFF";
@@ -66,6 +65,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             : splitedheight / (grid_row + grid_margin);
     top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
     left_right_margin = (window_width - grid_size * grid_col) / 2;
+
     QPainter painter(this);
 
     //draw background
@@ -91,7 +91,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //draw frame
     auto drawFrame = [&]{
         painter.setBrush(QBrush(QColor(236,182,138, 200))); //frame color
-        painter.setPen(QPen(QBrush(Qt::black),0.5));
+        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
         QPointF points[4];
         for(int tes = 0;tes < 4; tes++){
@@ -101,10 +101,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawPolygon(points,4);
     };
 
-    //draw piece
-    auto drawPiece = [&]{
-        painter.setBrush(QBrush(QColor(126,12,228))); //random color
-        for(unsigned int pnum =0; pnum < field.getPieces().size(); pnum++){
+    auto drawPiece = [&](int pnum){
+            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
             painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
             int pcount = field.getPiece(pnum).getSize();
             QPointF points[pcount];
@@ -112,22 +110,18 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
             }
             painter.drawPolygon(points,pcount);
-        }
-    };
-
-    //draw peiceid
-    auto drawPieceId = [&]{
-      painter.setPen(QPen(QBrush(QColor(10,250,10)), 0.5)); //text color
-      painter.setFont(QFont("Decorative", grid_size*4, QFont::Bold)); // text font
-        for(unsigned int pnum = 0; pnum < field.getPieces().size(); pnum++){
-            //get polygon center
-            point_t center = {0,0};
-           // boost::geometry::centroid(field.getPiece(pnum),center);
-
-            QPointF piececenter = getPosition(field.getPiece(pnum).getPolygon().outer().at(0));
-            //painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
-            painter.drawText(piececenter, QString::fromStdString(field.getPiece(pnum).makeMultiIdString())); //cannnot use now
-        }
+            //draw piece id
+            QLinearGradient gradient(0,0,window_width,window_height);
+            gradient.setColorAt(0.0,Qt::white);
+            gradient.setColorAt(1.0,Qt::black);
+            QBrush brush;
+            painter.setPen(QPen(QBrush(QColor(10,250,10)), 1.0)); //text color
+            painter.setBrush(QBrush(QColor(Qt::green)));
+            painter.setFont(QFont("Decorative", grid_size*4, QFont::Thin)); // text font
+                  //get polygon center
+                  boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+                  QPointF piececenter = getPosition(center);
+                  painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
     };
 
     auto drawBeforePicture = [&]{
@@ -138,9 +132,11 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                                grid_row*grid_size));
     };
 
+
     drawFrame();
-    drawPiece();
-    drawPieceId();
+    for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
+            drawPiece(piece_num);
+    }
     drawGrid();
     drawBeforePicture();
 }
