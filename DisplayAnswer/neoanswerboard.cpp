@@ -61,6 +61,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
     auto setField = [&]{
         procon::ExpandedPolygon polygon;
+        procon::ExpandedPolygon poly0;
+        procon::ExpandedPolygon poly1;
+        procon::ExpandedPolygon poly2;
+        std::vector<polygon_t> piecepolygon(3);
+        polygon_t framepolygon;
+
         framepolygon.outer().push_back(point_t(5,5));
         framepolygon.outer().push_back(point_t(85,7));
         framepolygon.outer().push_back(point_t(75,48));
@@ -68,9 +74,33 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         framepolygon.outer().push_back(point_t(5,5));
         polygon.resetPolygonForce(framepolygon);
         field.setFrame(polygon);
+
+        piecepolygon[0].outer().push_back(point_t(5,5));
+        piecepolygon[0].outer().push_back(point_t(45,6));
+        piecepolygon[0].outer().push_back(point_t(25,15));
+        piecepolygon[0].outer().push_back(point_t(5,5));
+        polygon.resetPolygonForce(piecepolygon[0]);
+        field.setPiece(polygon);
+
+        piecepolygon[1].outer().push_back(point_t(45,6));
+        piecepolygon[1].outer().push_back(point_t(65,36));
+        piecepolygon[1].outer().push_back(point_t(45,35));
+        piecepolygon[1].outer().push_back(point_t(45,6));
+        polygon.resetPolygonForce(piecepolygon[1]);
+        field.setPiece(polygon);
+
+        piecepolygon[2].outer().push_back(point_t(12,32));
+        piecepolygon[2].outer().push_back(point_t(15,21));
+        piecepolygon[2].outer().push_back(point_t(35,23));
+        piecepolygon[2].outer().push_back(point_t(44,35));
+        piecepolygon[2].outer().push_back(point_t(32,45));
+        piecepolygon[2].outer().push_back(point_t(7,12));
+        polygon.resetPolygonForce(piecepolygon[2]);
+        field.setPiece(polygon);
+
     };
     auto drawFrame = [&]{
-        painter.setBrush(QBrush(QColor(236,182,138))); //set color
+        painter.setBrush(QBrush(QColor(236,182,138))); //frame color
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
         QPointF points[4];
         for(int tes = 0;tes < 4; tes++){
@@ -79,8 +109,34 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(back_ground_color)));
         painter.drawPolygon(points,4);
     };
+    auto drawPiece = [&]{
+        painter.setBrush(QBrush(QColor(126,12,228))); //random color
+        for(unsigned int pnum = 0; pnum < field.getPieces().size(); pnum++){
+            int pcount = field.getPiece(pnum).getSize();
+            QPointF points[pcount];
+            for(int tes = 0;tes < pcount; tes++){
+                points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+            }
+            painter.drawPolygon(points,pcount);
+        }
+    };
+    auto drawPieceId = [&]{
+      painter.setPen(QPen(QColor(10,250,10))); //text color
+      painter.setFont(QFont("Decorative", grid_size*4, QFont::Bold)); // text font
+        for(unsigned int pnum = 0; pnum < field.getPieces().size(); pnum++){
+            //get polygon center
+            point_t center = {0,0};
+           // boost::geometry::centroid(field.getPiece(pnum),center);
+
+            QPointF piececenter = getPosition(field.getPiece(pnum).getPolygon().outer().at(0));
+            //painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
+            painter.drawText(piececenter, QString::fromStdString(field.getPiece(pnum).makeMultiIdString())); //cannnot use now
+        }
+    };
     setField();
     drawFrame();
+    drawPiece();
+    drawPieceId();
     drawGrid();
 }
 QPointF NeoAnswerBoard::getPosition(point_t point){

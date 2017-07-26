@@ -10,8 +10,8 @@
 #include <boost/geometry/strategies/transform.hpp>
 #include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
-#include "../Polygon/neoexpandedpolygon.h"
 #include <vector>
+#include <string>
 #include "field.h"
 #include "neoexpandedpolygon.h"
 #include "expandedpolygon.h"
@@ -35,9 +35,6 @@ public:
 
 private:
     Ui::NeoAnswerBoard *ui;
-    polygon_t getPolygon();
-    std::vector<polygon_t> piecepolygon;
-    polygon_t framepolygon;
     QPointF getPosition(point_t point);
     int grid_size;
     int top_bottom_margin;
