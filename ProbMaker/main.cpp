@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     polygon.outer().push_back(point_i(3,3));
     polygon.outer().push_back(point_i(0,0));
     procon::NeoExpandedPolygon polygonn;
-    polygonn.setPolygon(polygon);
+    polygonn.resetPolygonForce(polygon);
 
     NeoPolygonViewer::getInstance();
 
