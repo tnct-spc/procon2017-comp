@@ -16,6 +16,7 @@ public:
     explicit ProbMaker(QWidget *parent = 0);
     ~ProbMaker();
     void delaunay_triangulation();
+    void GA();
 
 private:
     Ui::ProbMaker *ui;

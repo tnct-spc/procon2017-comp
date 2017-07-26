@@ -101,6 +101,7 @@ ProbMaker::ProbMaker(QWidget *parent) :
 
     //ドロネーの三角形分割
     delaunay_triangulation();
+    GA();
 }
 
 ProbMaker::~ProbMaker()
@@ -198,6 +199,7 @@ void ProbMaker::delaunay_triangulation()
             }
         }
     }
+    this->frame = frame;
 
     NeoPolygonViewer::getInstance().displayPolygon(frame,"frame",true);
 
@@ -220,6 +222,83 @@ void ProbMaker::delaunay_triangulation()
 //	    std::cout << boost::geometry::dsv(polygon) << std::endl;
 //    }
 
+}
+
+void ProbMaker::GA()
+{
+    typedef std::vector<std::vector<int>> State;
+    
+   	std::vector<polygon_i> polygons;
+    std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygons));
+    polygon_i frame = this->frame;
+
+    std::random_device rnd;
+    
+    auto connect_near_by_polygon = [](std::vector<polygon_i> pieces){
+
+        std::vector<polygon_i> back_up_polygon;
+        std::copy(pieces.begin(),pieces.end(),std::back_inserter(back_up_polygon));
+
+        ONCE_MORE:
+
+
+        std::random_device rnd;
+        //真に遺憾ですが、乱数を投入してしまいます
+        std::uniform_int_distribution<> randomm(0,pieces.size() - 1);
+        int connect_polygon_index = randomm(rnd);
+
+        polygon_i connect_polygon = pieces[connect_polygon_index];
+		
+        pieces.erase(pieces.begin() + connect_polygon_index);
+
+        int counter = 0;
+        std::vector<int> can_connect_polygon_number;
+        for(auto piece : pieces){
+            std::vector<polygon_i> out;
+            boost::geometry::union_(connect_polygon,piece,out);
+
+            if(out.size() == 1){
+                std::cout << "find can connect polygon" << std::endl;
+                can_connect_polygon_number.push_back(counter);
+            }
+
+            ++counter;
+        }
+
+        if(can_connect_polygon_number.size() == 0){
+            pieces.clear();
+            std::copy(back_up_polygon.begin(),back_up_polygon.end(),std::back_inserter(pieces));
+            goto ONCE_MORE;
+        }
+
+        //connect可能な中から適当に選ぶ
+                                                //あたりまえだけど、-1してstd::out_of_range回避
+        std::uniform_int_distribution<> random(0,can_connect_polygon_number.size() - 1);
+        int connecting_polygon_index = random(rnd);
+        polygon_i connecting_polygon = pieces.at(can_connect_polygon_number[connecting_polygon_index]);
+
+        std::vector<polygon_i> output;
+        boost::geometry::union_(connect_polygon,connecting_polygon,output);
+        //connectしたわけなので、元からのpolygonは除去
+        pieces.erase(pieces.begin() + can_connect_polygon_number[connecting_polygon_index]);
+
+        pieces.push_back(output[0]);
+
+        return pieces;
+    };
+
+    std::vector<polygon_i> pieces;
+    std::copy(polygons.begin(),polygons.end(),std::back_inserter(pieces));
+    for (int var = 0; var < 150; ++var) {
+        std::vector<polygon_i> pieces_buf = connect_near_by_polygon(pieces);
+        pieces.clear();
+        std::copy(pieces_buf.begin(),pieces_buf.end(),std::back_inserter(pieces));
+    }
+
+    this->print_polygons.clear();
+    std::copy(pieces.begin(),pieces.end(),std::back_inserter(this->print_polygons));
+    
+    
 }
 
 void ProbMaker::step()
