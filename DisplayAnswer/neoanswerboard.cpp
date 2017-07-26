@@ -1,26 +1,5 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
-#include "utilities.h"
-
-#include <QPainter>
-#include <QPaintEvent>
-#include <QColor>
-#include <iostream>
-#include <random>
-#include <array>
-#include <opencv2/core/core.hpp>
-#include <boost/geometry/geometry.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/strategies/transform.hpp>
-#include <boost/geometry/strategies/transform/matrix_transformers.hpp>
-#include <boost/geometry/algorithms/disjoint.hpp>
-#include "../Polygon/neoexpandedpolygon.h"
-#include "field.h"
-#include "expandedpolygon.h"
-
-#include <QPainter>
-#include <QPaintEvent>
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
@@ -37,7 +16,7 @@ QRgb NeoAnswerBoard::NeosetRandomColors()
 {
     std::random_device rnd;
     std::uniform_int_distribution<int> rand255;
-    QRgb randomcolors = (rand255(rnd), rand255(rnd), rand255(rnd), 255);
+    QRgb randomcolors = (static_cast<void>(rand255(rnd)), static_cast<void>(rand255(rnd)), static_cast<void>(rand255(rnd)), 255);
     return randomcolors;
 
 }
@@ -77,11 +56,11 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //draw background
     painter.setBrush(QBrush(QColor(back_ground_color)));
     painter.drawRect(QRect(0,0,window_width,window_height/2));
-    painter.setPen(QPen(QBrush(Qt::black),0.5));
 
 
     //draw grid
     auto drawGrid = [&]{
+        painter.setPen(QPen(QBrush(Qt::black),0.1));
         const int splitedheight = window_height/2;
         grid_size =
                 window_width <= splitedheight
@@ -100,8 +79,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     auto testColors = [&]{
-        QRgb hoge = NeosetRandomColors();
-        painter.setBrush(QBrush(QColor(hoge)));
+
+
         static const QPointF points[4] = {
             QPointF(10.0, 80.0),
             QPointF(20.0, 10.0),
@@ -109,8 +88,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             QPointF(90.0, 70.0)
         };
         painter.drawPolygon(points, 4);
-        QRgb hooo = NeosetRandomColors();
-        painter.setBrush(QBrush(QColor(hooo)));
         static const QPointF pointss[4] = {
             QPointF(100.0, 400.0),
             QPointF(200.0, 100.0),
@@ -163,6 +140,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
     auto drawFrame = [&]{
         painter.setBrush(QBrush(QColor(236,182,138))); //frame color
+            painter.setPen(QPen(QBrush(Qt::black),0.5));
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
         QPointF points[4];
         for(int tes = 0;tes < 4; tes++){
@@ -173,8 +151,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
     auto drawPiece = [&]{
         painter.setBrush(QBrush(QColor(126,12,228))); //random color
-        for(unsigned int pnum =
-0; pnum < field.getPieces().size(); pnum++){
+        for(unsigned int pnum =0; pnum < field.getPieces().size(); pnum++){
             int pcount = field.getPiece(pnum).getSize();
             QPointF points[pcount];
             for(int tes = 0;tes < pcount; tes++){

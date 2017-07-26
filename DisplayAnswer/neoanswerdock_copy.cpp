@@ -12,7 +12,7 @@
 
 NeoAnswerDock::NeoAnswerDock(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::AnswerDock)
+    ui(new Ui::NeoAnswerDock)
 {
     ui->setupUi(this);
 
