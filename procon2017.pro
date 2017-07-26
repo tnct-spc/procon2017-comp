@@ -11,4 +11,4 @@ SUBDIRS += \
     Hazama \
     Test \
     Slave \
-    Kunugida
+    Kunugida \
