@@ -18,6 +18,9 @@ Kunugida::Kunugida(QWidget *parent) :
 //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
+
+    board = std::make_shared<NeoAnswerBoard>();
+    board->show();
 }
 
 Kunugida::~Kunugida()

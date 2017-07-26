@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "spdlog/spdlog.h"
 #include "imagerecognition.h"
+#include "neoanswerboard.h"
 
 namespace Ui {
 class Kunugida;
@@ -23,6 +24,7 @@ private:
     Ui::Kunugida *ui;
     std::shared_ptr<spdlog::logger> logger;
     bool is_running = false;
+    std::shared_ptr<NeoAnswerBoard> board;
     void finishedProcess();
     void startProcess();
 
