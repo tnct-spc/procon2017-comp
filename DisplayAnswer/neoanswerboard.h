@@ -41,10 +41,9 @@ private:
     void setField();
     std::vector<cv::Vec3b> colors;
     void setRandomColors(int threshold);
+    int left_right_margin;
     int grid_size;
     int top_bottom_margin;
-    int left_right_margin;
-    int top_margin;
     procon::Field field;
 
 protected:
