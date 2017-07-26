@@ -38,6 +38,7 @@ public:
 private:
     Ui::NeoAnswerBoard *ui;
     QPointF getPosition(point_t point);
+    void setField();
     std::vector<cv::Vec3b> colors;
     void setRandomColors();
     int grid_size;
