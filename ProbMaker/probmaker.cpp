@@ -684,6 +684,16 @@ void ProbMaker::step()
 
 }
 
+std::vector<polygon_i> ProbMaker::getPieces()
+{
+    return this->print_polygons;
+}
+
+polygon_i ProbMaker::getFrame()
+{
+    return frame;
+}
+
 void ProbMaker::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
