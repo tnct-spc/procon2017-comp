@@ -143,12 +143,21 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawPolygon(points,pcount);
     };
 
+    auto drawProcessingLine = [&](int pnum){
+        boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+        QPointF afterpiececenter = getPosition(center);
+        QPointF beforepiececenter = getPiecePosition(center);
+        painter.setPen(QPen(QBrush(Qt::yellow), 0.5));
+        painter.drawLine(afterpiececenter, beforepiececenter);
+    };
+
 
     drawFrame();
     drawDownBackground();
     for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
             drawAfterPiece(piece_num);
             drawBeforePiece(piece_num);
+            drawProcessingLine(piece_num);
     }
     drawGrid();
 }
@@ -158,7 +167,7 @@ QPointF NeoAnswerBoard::getPosition(point_t point){
 
 QPointF NeoAnswerBoard::getPiecePosition(point_t point)
 {
-    return QPoint(left_right_margin + point.x() * grid_size, down_up_y + point.y() * grid_size);
+    return QPointF(left_right_margin + point.x() * grid_size, down_up_y + point.y() * grid_size);
 }
 
 void NeoAnswerBoard::setField(){
