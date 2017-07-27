@@ -1,10 +1,11 @@
-#include "kunugida.h"
+﻿#include "kunugida.h"
 #include "ui_kunugida.h"
 #include "qrlibrary.h"
 #include "neofield.h"
 #include "probmaker.h"
 
 #include <iostream>
+#include <stdlib.h>
 
 #include <QDebug>
 #include <QPushButton>
@@ -52,10 +53,19 @@ void Kunugida::run()
         //selected scanner
         logger->info("Selected Scanner DataSource");
 
+        char command[256]="sh ../../procon2017-comp/Kunugida/getimage.sh";
+        cv::Mat mat;
+        if(system(command)==0){
+            //うまくスキャンしたときの処理
+            mat = cv::imread("../../procon2017-comp/Kunugida/hoge.png");
+            std::cout<<"できた"<<std::endl;
+        }else{
+            //残念ながらスキャンできなかったときの処理
+            std::cout<<"できない"<<std::endl;
+        }
     }else if(ui->image_data_button->isChecked()){
         //selected image
         logger->info("Selected ImageData DataSource");
-
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 

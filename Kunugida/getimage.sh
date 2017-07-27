@@ -1,8 +1,10 @@
 #!/bin/sh
 
 devicename=$(scanimage -L | sed -r '/scanner/!d'| sed -r "s/(^.+\`)|('.+$)//g")
-echo ${devicename}
 wait
 scanimage --device "${devicename}" --format=png --mode Color --resolution 480 > hoge.png
-wait
-chromium hoge.png
+
+if [ $? -gt 0 ]; then
+    # エラー処理
+    exit 2
+fi
