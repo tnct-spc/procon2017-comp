@@ -65,6 +65,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             : splitedheight / (grid_row + grid_margin);
     top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
     left_right_margin = (window_width - grid_size * grid_col) / 2;
+    down_up_y = splitedheight + top_bottom_margin;
 
     QPainter painter(this);
 
@@ -101,7 +102,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawPolygon(points,4);
     };
 
-    auto drawPiece = [&](int pnum){
+    //draw after piece
+    auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
             painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
             int pcount = field.getPiece(pnum).getSize();
@@ -121,24 +123,42 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                   painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
     };
 
-    auto drawBeforePicture = [&]{
+    //draw down backdround
+    auto drawDownBackground = [&]{
         painter.setBrush(QBrush(QColor(Qt::white)));
         painter.drawRect(QRect(left_right_margin,
-                               splitedheight+top_bottom_margin,
+                               down_up_y,
                                grid_col*grid_size,
                                grid_row*grid_size));
     };
 
+    auto drawBeforePiece = [&](int pnum){
+        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+        painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
+        int pcount = field.getPiece(pnum).getSize();
+        QPointF points[pcount];
+        for(int tes = 0;tes < pcount; tes++){
+            points[tes] = getPiecePosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+        }
+        painter.drawPolygon(points,pcount);
+    };
+
 
     drawFrame();
+    drawDownBackground();
     for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
-            drawPiece(piece_num);
+            drawAfterPiece(piece_num);
+            drawBeforePiece(piece_num);
     }
     drawGrid();
-    drawBeforePicture();
 }
 QPointF NeoAnswerBoard::getPosition(point_t point){
     return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
+}
+
+QPointF NeoAnswerBoard::getPiecePosition(point_t point)
+{
+    return QPoint(left_right_margin + point.x() * grid_size, down_up_y + point.y() * grid_size);
 }
 
 void NeoAnswerBoard::setField(){
