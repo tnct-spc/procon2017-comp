@@ -488,7 +488,6 @@ void ProbMaker::step()
 
         auto delete_depulicated_point = [](polygon_i polygon)->polygon_i{
           	polygon_i deleted_duplicated_point_polygon;
-
             auto check_same_point = [](point_i point1,point_i point2)->bool{
                 return point1.x() == point2.x() && point1.y() == point2.y();
             };

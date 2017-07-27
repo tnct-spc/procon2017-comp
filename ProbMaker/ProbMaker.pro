@@ -7,7 +7,7 @@
 QT       += core gui widgets
 
 TARGET = ProbMaker
-TEMPLATE = app
+TEMPLATE = lib
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -29,9 +29,6 @@ HEADERS  += probmaker.h
 FORMS    += probmaker.ui
 
 CONFIG += c++14
-
-TARGET = ProbMaker
-TEMPLATE = app
 
 CONFIG   += precompile_header
 
