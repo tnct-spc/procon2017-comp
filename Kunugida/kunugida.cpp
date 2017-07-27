@@ -57,7 +57,8 @@ void Kunugida::run()
         cv::Mat mat;
         if(system(command)==0){
             //うまくスキャンしたときの処理
-            mat = cv::imread("../../procon2017-comp/Kunugida/hoge.png");
+            mat = cv::imread("hoge.png");
+            cv::imshow("でででん",mat);
             std::cout<<"できた"<<std::endl;
         }else{
             //残念ながらスキャンできなかったときの処理
