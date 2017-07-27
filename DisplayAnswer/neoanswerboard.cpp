@@ -101,8 +101,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawPolygon(points,4);
     };
 
-    auto drawPiece = [&](int pnum){
-            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+    auto drawAfterPiece = [&](int pnum){
+            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
             painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
             int pcount = field.getPiece(pnum).getSize();
             QPointF points[pcount];
@@ -115,10 +115,21 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             painter.setBackgroundMode(Qt::OpaqueMode);
             painter.setBackground(QBrush(Qt::white));
             painter.setPen(QPen(QBrush(Qt::red), 0.5));
-                  //get polygon center
-                  boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
-                  QPointF piececenter = getPosition(center);
-                  painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
+            //get polygon center
+            boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+            QPointF piececenter = getPosition(center);
+            painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
+            //draw corner begin id
+            painter.setPen(QPen(QBrush(Qt::black), 0.5));
+            QPointF corner_begin = getPosition(field.getPiece(pnum).getPolygon().outer().at(0));
+            corner_begin.setX(corner_begin.x() < piececenter.x()
+                              ? corner_begin.x() + grid_size * 3
+                              : corner_begin.x() + grid_size * 3 );
+            corner_begin.setY(corner_begin.y() < piececenter.y()
+                              ? corner_begin.y() + grid_size * 3
+                              : corner_begin.y() + grid_size * 3 );
+            painter.drawText(corner_begin, QString("s"+QString::number(field.getPiece(pnum).getId())));
+
     };
 
     auto drawBeforePicture = [&]{
@@ -132,7 +143,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     drawFrame();
     for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
-            drawPiece(piece_num);
+            drawAfterPiece(piece_num);
     }
     drawGrid();
     drawBeforePicture();
