@@ -28,7 +28,7 @@ HEADERS +=\
     answerdock.h \
     neoanswerboard.h
 
-LIBS += -L/usr/lib `pkg-config --libs opencv`
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
 unix {
     target.path = /usr/lib

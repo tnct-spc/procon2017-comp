@@ -36,7 +36,7 @@ FORMS    += kunugida.ui
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
-LIBS += -L/usr/lib `pkg-config --libs opencv`
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
@@ -70,13 +70,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/release/ -lProbMaker
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/debug/ -lProbMaker
-else:unix: LIBS += -L$$OUT_PWD/../ProbMaker/ -lProbMaker
-
-INCLUDEPATH += $$PWD/../ProbMaker
-DEPENDPATH += $$PWD/../ProbMaker
-
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
 
@@ -86,3 +79,11 @@ else:unix: LIBS += -L$$OUT_PWD/../QRcode/ -lQRcode
 
 INCLUDEPATH += $$PWD/../QRcode
 DEPENDPATH += $$PWD/../QRCode
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/release/ -lProbMaker
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/debug/ -lProbMaker
+else:unix: LIBS += -L$$OUT_PWD/../ProbMaker/ -lProbMaker
+
+INCLUDEPATH += $$PWD/../ProbMaker
+DEPENDPATH += $$PWD/../ProbMaker
+

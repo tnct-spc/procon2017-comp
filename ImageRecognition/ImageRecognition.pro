@@ -23,7 +23,7 @@ SOURCES += imagerecognition.cpp
 HEADERS += imagerecognition.h\
         imagerecognition_global.h
 
-LIBS += -L/usr/lib `pkg-config --libs opencv`
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
 unix {
     target.path = /usr/lib

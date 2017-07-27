@@ -31,7 +31,7 @@ HEADERS  += hazama.h \
 
 FORMS    += hazama.ui
 
-LIBS += -L/usr/lib `pkg-config --libs opencv`
+LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
@@ -65,7 +65,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
-
 
 include(qhttpserver/qhttpserver.pri)
 
