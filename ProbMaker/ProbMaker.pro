@@ -48,13 +48,6 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/relea
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/debug/ -lDisplayAnswer
 else:unix: LIBS += -L$$OUT_PWD/../DisplayAnswer/ -lDisplayAnswer
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
-else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
-
-INCLUDEPATH += $$PWD/../Utilities
-DEPENDPATH += $$PWD/../Utilities
-
 INCLUDEPATH += $$PWD/../DisplayAnswer
 DEPENDPATH += $$PWD/../DisplayAnswer
 
