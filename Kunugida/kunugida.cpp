@@ -1,12 +1,14 @@
 #include "kunugida.h"
 #include "ui_kunugida.h"
 #include "qrlibrary.h"
+#include "neofield.h"
 
 #include <iostream>
 
 #include <QDebug>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QRadioButton>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
@@ -30,10 +32,31 @@ Kunugida::~Kunugida()
 
 void Kunugida::run()
 {
-    std::cout << "Run" << std::endl;
     logger->info("Run Button Clicked");
-    QRLibrary lib;
-    lib.Decoder(true);
+
+    procon::NeoField field;
+
+    if(ui->probmaker_button->isChecked()){
+        //selected probmaker
+        logger->info("Selected ProbMaker DataSource");
+
+    }else if(ui->scanner_button->isChecked()){
+        //selected scanner
+        logger->info("Selected Scanner DataSource");
+
+    }else if(ui->image_data_button->isChecked()){
+        //selected image
+        logger->info("Selected ImageData DataSource");
+
+    }
+//    TODO: ここまでで各データソースから読み込むようにする
+
+
+
+
+//    QRLibrary lib;
+//    lib.Decoder(true);
+    
     this->finishedProcess();
 }
 
