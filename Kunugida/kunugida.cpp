@@ -2,6 +2,7 @@
 #include "ui_kunugida.h"
 #include "qrlibrary.h"
 #include "neofield.h"
+#include "probmaker.h"
 
 #include <iostream>
 
@@ -39,6 +40,9 @@ void Kunugida::run()
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
         logger->info("Selected ProbMaker DataSource");
+
+        ProbMaker PbMaker;
+
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
