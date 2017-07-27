@@ -201,7 +201,7 @@ void ProbMaker::delaunay_triangulation()
     }
     this->frame = frame;
 
-    NeoPolygonViewer::getInstance().displayPolygon(frame,"frame",true);
+//    NeoPolygonViewer::getInstance().displayPolygon(frame,"frame",true);
 
 //    std::copy(this->print_polygons.begin(),this->print_polygons.end(),)
 
