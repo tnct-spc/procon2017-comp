@@ -48,7 +48,7 @@ HEADERS += \
     polygon.h
 
 LIBS += -lboost_system -lboost_thread
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 INSTALLS += target
 
