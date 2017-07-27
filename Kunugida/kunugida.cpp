@@ -41,8 +41,12 @@ void Kunugida::run()
         //selected probmaker
         logger->info("Selected ProbMaker DataSource");
 
-        ProbMaker PbMaker;
+        ProbMaker *PbMaker = new ProbMaker();
 
+        //もしProbMakerの結果を表示したければ下をコメントアウト
+        PbMaker->show();
+        std::vector<polygon_i> pieces = PbMaker->getPieces();
+        polygon_i frame = PbMaker->getFrame();
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
