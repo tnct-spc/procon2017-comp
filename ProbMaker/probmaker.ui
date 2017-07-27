@@ -13,19 +13,6 @@
   <property name="windowTitle">
    <string>ProbMaker</string>
   </property>
-  <widget class="QPushButton" name="next_phase">
-   <property name="geometry">
-    <rect>
-     <x>720</x>
-     <y>610</y>
-     <width>281</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Next Phase</string>
-   </property>
-  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
