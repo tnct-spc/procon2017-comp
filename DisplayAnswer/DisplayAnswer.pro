@@ -21,16 +21,12 @@ DEFINES += DISPLAYANSWER_LIBRARY
 SOURCES += \
     answerboard.cpp \
     answerdock.cpp \
-    neoanswerboard.cpp \
-    ../Utilities/neoanswerdock.cpp \
-    neoanswerdock.cpp
+    neoanswerboard.cpp
 
 HEADERS +=\
     answerboard.h \
     answerdock.h \
-    neoanswerboard.h \
-    ../Utilities/neoanswerdock.h \
-    neoanswerdock.h
+    neoanswerboard.h
 
 LIBS += -L/usr/local/lib `pkg-config --libs opencv`
 
@@ -42,9 +38,7 @@ unix {
 FORMS += \
     answerboard.ui \
     answerdock.ui \
-    neoanswerboard.ui \
-    ../Utilities/neoanswerdock.ui \
-    neoanswerdock.ui
+    neoanswerboard.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
