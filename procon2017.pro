@@ -12,3 +12,4 @@ SUBDIRS += \
     Test \
     Slave \
     Kunugida \
+    NeoSolver
