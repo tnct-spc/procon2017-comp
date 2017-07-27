@@ -129,6 +129,15 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                               ? corner_begin.y() + grid_size * 3
                               : corner_begin.y() + grid_size * 3 );
             painter.drawText(corner_begin, QString("s"+QString::number(field.getPiece(pnum).getId())));
+            //draw evalution
+            painter.setBackgroundMode(Qt::TransparentMode);
+            QColor evalution_color = {255,0,255};
+            painter.setPen(QPen(QBrush(evalution_color),10));
+            painter.setFont(QFont("Deciratuve",grid_size*5,QFont::Bold));
+            QPointF evalution_point = {window_width/15,window_height/15};
+            painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+"     :     "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
+            //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"     :     "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
+            //draw number
 
     };
 
