@@ -17,6 +17,8 @@ public:
     ~ProbMaker();
     void delaunay_triangulation();
     void GA();
+    std::vector<polygon_i> getPieces();
+    polygon_i getFrame();
 
 private:
     Ui::ProbMaker *ui;

@@ -7,7 +7,7 @@
 QT       += core gui widgets
 
 TARGET = ProbMaker
-TEMPLATE = app
+TEMPLATE = lib
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -30,9 +30,6 @@ FORMS    += probmaker.ui
 
 CONFIG += c++14
 
-TARGET = ProbMaker
-TEMPLATE = app
-
 CONFIG   += precompile_header
 
 # Use Precompiled headers (PCH)
@@ -50,13 +47,6 @@ DEPENDPATH += $$PWD/../Polygon
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/release/ -lDisplayAnswer
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/debug/ -lDisplayAnswer
 else:unix: LIBS += -L$$OUT_PWD/../DisplayAnswer/ -lDisplayAnswer
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
-else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
-
-INCLUDEPATH += $$PWD/../Utilities
-DEPENDPATH += $$PWD/../Utilities
 
 INCLUDEPATH += $$PWD/../DisplayAnswer
 DEPENDPATH += $$PWD/../DisplayAnswer
