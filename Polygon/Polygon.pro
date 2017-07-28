@@ -26,9 +26,11 @@ SOURCES += \
     polygonviewer.cpp \
     fit.cpp \
     neoexpandedpolygon.cpp \
-    neofield.cpp \
     neosinglepolygondisplay.cpp \
-    neopolygonviewer.cpp
+    neopolygonviewer.cpp \
+    form.cpp \
+    neofield.cpp \
+    polygon.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -39,9 +41,11 @@ HEADERS += \
     polygonviewer.h \
     fit.h \
     neoexpandedpolygon.h \
-    neofield.h \
     neosinglepolygondisplay.h \
-    neopolygonviewer.h
+    neopolygonviewer.h \
+    form.h \
+    neofield.h \
+    polygon.h
 
 LIBS += -lboost_system -lboost_thread
 LIBS += -L/usr/lib `pkg-config --libs opencv`
