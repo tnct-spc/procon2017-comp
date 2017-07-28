@@ -27,13 +27,14 @@ class NeoAnswerBoard : public QWidget
 public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
+    void setField(procon::NeoField input_field);
 
 private:
     Ui::NeoAnswerBoard *ui;
     QPointF getPosition(point_i point);
-    void setField();
     std::vector<cv::Vec3b> colors;
     void setRandomColors(int threshold);
+    void firstField();
     int left_right_margin;
     int grid_size;
     int top_bottom_margin;

@@ -6,7 +6,7 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     ui(new Ui::NeoAnswerBoard)
 {
     ui->setupUi(this);
-    setField();
+    firstField();
     setRandomColors(20);
 }
 
@@ -161,7 +161,12 @@ QPointF NeoAnswerBoard::getPosition(point_i point){
     return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
 }
 
-void NeoAnswerBoard::setField(){
+void NeoAnswerBoard::setField(procon::NeoField input_field){
+    field=input_field;
+}
+
+void NeoAnswerBoard::firstField(){
+    procon::NeoField inpfield;
     procon::NeoExpandedPolygon polygon;
     procon::NeoExpandedPolygon poly0;
     procon::NeoExpandedPolygon poly1;
@@ -175,21 +180,21 @@ void NeoAnswerBoard::setField(){
     framepolygon.outer().push_back(point_i(18,57));
     framepolygon.outer().push_back(point_i(5,5));
     polygon.resetPolygonForce(framepolygon);
-    field.setFrame(polygon);
+    inpfield.setFrame(polygon);
 
     piecepolygon[0].outer().push_back(point_i(5,5));
     piecepolygon[0].outer().push_back(point_i(45,6));
     piecepolygon[0].outer().push_back(point_i(25,15));
     piecepolygon[0].outer().push_back(point_i(5,5));
     polygon.resetPolygonForce(piecepolygon[0]);
-    field.setPiece(polygon);
+    inpfield.setPiece(polygon);
 
     piecepolygon[1].outer().push_back(point_i(45,6));
     piecepolygon[1].outer().push_back(point_i(65,36));
     piecepolygon[1].outer().push_back(point_i(45,35));
     piecepolygon[1].outer().push_back(point_i(45,6));
     polygon.resetPolygonForce(piecepolygon[1]);
-    field.setPiece(polygon);
+    inpfield.setPiece(polygon);
 
     piecepolygon[2].outer().push_back(point_i(12,32));
     piecepolygon[2].outer().push_back(point_i(15,21));
@@ -198,6 +203,7 @@ void NeoAnswerBoard::setField(){
     piecepolygon[2].outer().push_back(point_i(32,45));
     piecepolygon[2].outer().push_back(point_i(7,12));
     polygon.resetPolygonForce(piecepolygon[2]);
-    field.setPiece(polygon);
+    inpfield.setPiece(polygon);
 
+    setField(inpfield);
 };
