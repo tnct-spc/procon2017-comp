@@ -29,6 +29,13 @@ HEADERS += neosolver.h\
         neosolver_global.h \
     Algorithm/algorithmwrapper.h
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
+else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+
+INCLUDEPATH += $$PWD/../Polygon
+DEPENDPATH += $$PWD/../Polygon
+
 unix {
     target.path = /usr/lib
     INSTALLS += target
