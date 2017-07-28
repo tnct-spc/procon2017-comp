@@ -1,11 +1,13 @@
 #ifndef TESTALGORTITHM_H
 #define TESTALGORTITHM_H
 
+#include "algorithmwrapper.h"
 
-class TestAlgortithm
+class TestAlgortithm : public AlgorithmWrapper
 {
 public:
     TestAlgortithm();
+    void run(procon::NeoField field);
 };
 
 #endif // TESTALGORTITHM_H

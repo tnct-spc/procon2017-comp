@@ -3,6 +3,7 @@
 
 #include "neosolver_global.h"
 #include "Algorithm/algorithmwrapper.h"
+#include "neofield.h"
 
 #include <QObject>
 
@@ -13,12 +14,13 @@ class NEOSOLVERSHARED_EXPORT NeoSolver : public QObject
 public:
     NeoSolver();
     ~NeoSolver();
+    void run(procon::NeoField field,int algorithm_number);
 
 private:
-    std::vector<*AlgorithmWrapper> Algorithms;
+    std::vector<AlgorithmWrapper*> Algorithms;
 
 signals:
-    void throwAnswer()
+    void throwAnswer(procon::NeoField field);
 
 };
 
