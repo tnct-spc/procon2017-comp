@@ -64,18 +64,23 @@ void Kunugida::run()
         //selected scanner
         logger->info("Selected Scanner DataSource");
 
-        char command[256]="sh ../../procon2017-comp/Kunugida/getimage.sh";
-        cv::Mat first_scan;
-        if(system(command)==0){
-            //うまくスキャンしたときの処理
-            first_scan = cv::imread("hoge.png");
-            cv::imshow("でででん",first_scan);
-            std::cout<<"一回スキャンできた"<<std::endl;
-        }else{
-            //残念ながらスキャンできなかったときの処理
-            std::cout<<"一回スキャンできない"<<std::endl;
+        cv::Mat first_scan = scanImage();
+        cv::imshow("いっこめ",first_scan);
+        cv::Mat second_scan;
+        if(!first_scan.empty()){
+            QMessageBox message_box;
+            message_box.setText("スキャン実行");
+            QPushButton *button0 = message_box.addButton(tr("cansel"),QMessageBox::ActionRole);
+            QPushButton *button1 = message_box.addButton(tr("start"),QMessageBox::ActionRole);
+            message_box.exec();
+            if(message_box.clickedButton() == button0){
+                //キャンセル時
+            }else if(message_box.clickedButton() == button1){
+                //二回目実行時
+                second_scan = scanImage();
+                cv::imshow("にこめ",second_scan);
+            }
         }
-
     }else if(ui->image_data_button->isChecked()){
         //selected image
         logger->info("Selected ImageData DataSource");
@@ -105,6 +110,7 @@ void Kunugida::finishedProcess()
     this->is_running = false;
 }
 
+
 void Kunugida::startProcess()
 {
     this->is_running = true;
@@ -119,4 +125,19 @@ void Kunugida::imageRecognitonTest()
 
     ImageRecognition imrec;
     procon::Field PDATA = imrec.run(nocframe, nocpieces);
+}
+
+cv::Mat Kunugida::scanImage()
+{
+    char command[256]="sh ../../procon2017-comp/Kunugida/getimage.sh";
+    cv::Mat mat;
+    if(system(command)==0){
+        //うまくスキャンしたときの処理
+        mat = cv::imread("hoge.png");
+        std::cout<<"スキャンできた"<<std::endl;
+    }else{
+        //残念ながらスキャンできなかったときの処理
+        std::cout<<"スキャンできない"<<std::endl;
+    }
+    return mat;
 }

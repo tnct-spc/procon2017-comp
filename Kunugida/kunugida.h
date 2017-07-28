@@ -27,6 +27,7 @@ private:
     std::shared_ptr<NeoAnswerBoard> board;
     void finishedProcess();
     void startProcess();
+    cv::Mat scanImage();
 
 private slots:
     void clickedRunButton();
