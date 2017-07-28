@@ -23,11 +23,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += neosolver.cpp \
-    Algorithm/algorithmwrapper.cpp
+    Algorithm/algorithmwrapper.cpp \
+    Algorithm/testalgortithm.cpp
 
 HEADERS += neosolver.h\
         neosolver_global.h \
-    Algorithm/algorithmwrapper.h
+    Algorithm/algorithmwrapper.h \
+    Algorithm/testalgortithm.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
