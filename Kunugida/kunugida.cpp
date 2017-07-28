@@ -65,9 +65,9 @@ void Kunugida::run()
         logger->info("Selected Scanner DataSource");
 
         cv::Mat first_scan = scanImage();
-        cv::imshow("いっこめ",first_scan);
         cv::Mat second_scan;
         if(!first_scan.empty()){
+            cv::imshow("いっこめ",first_scan);
             QMessageBox message_box;
             message_box.setText("スキャン実行");
             QPushButton *button0 = message_box.addButton(tr("cansel"),QMessageBox::ActionRole);
