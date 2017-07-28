@@ -157,46 +157,46 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawGrid();
     drawBeforePicture();
 }
-QPointF NeoAnswerBoard::getPosition(point_t point){
+QPointF NeoAnswerBoard::getPosition(point_i point){
     return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
 }
 
 void NeoAnswerBoard::setField(){
-    procon::ExpandedPolygon polygon;
-    procon::ExpandedPolygon poly0;
-    procon::ExpandedPolygon poly1;
-    procon::ExpandedPolygon poly2;
-    std::vector<polygon_t> piecepolygon(3);
-    polygon_t framepolygon;
+    procon::NeoExpandedPolygon polygon;
+    procon::NeoExpandedPolygon poly0;
+    procon::NeoExpandedPolygon poly1;
+    procon::NeoExpandedPolygon poly2;
+    std::vector<polygon_i> piecepolygon(3);
+    polygon_i framepolygon;
 
-    framepolygon.outer().push_back(point_t(5,5));
-    framepolygon.outer().push_back(point_t(85,7));
-    framepolygon.outer().push_back(point_t(75,48));
-    framepolygon.outer().push_back(point_t(18,57));
-    framepolygon.outer().push_back(point_t(5,5));
+    framepolygon.outer().push_back(point_i(5,5));
+    framepolygon.outer().push_back(point_i(85,7));
+    framepolygon.outer().push_back(point_i(75,48));
+    framepolygon.outer().push_back(point_i(18,57));
+    framepolygon.outer().push_back(point_i(5,5));
     polygon.resetPolygonForce(framepolygon);
     field.setFrame(polygon);
 
-    piecepolygon[0].outer().push_back(point_t(5,5));
-    piecepolygon[0].outer().push_back(point_t(45,6));
-    piecepolygon[0].outer().push_back(point_t(25,15));
-    piecepolygon[0].outer().push_back(point_t(5,5));
+    piecepolygon[0].outer().push_back(point_i(5,5));
+    piecepolygon[0].outer().push_back(point_i(45,6));
+    piecepolygon[0].outer().push_back(point_i(25,15));
+    piecepolygon[0].outer().push_back(point_i(5,5));
     polygon.resetPolygonForce(piecepolygon[0]);
     field.setPiece(polygon);
 
-    piecepolygon[1].outer().push_back(point_t(45,6));
-    piecepolygon[1].outer().push_back(point_t(65,36));
-    piecepolygon[1].outer().push_back(point_t(45,35));
-    piecepolygon[1].outer().push_back(point_t(45,6));
+    piecepolygon[1].outer().push_back(point_i(45,6));
+    piecepolygon[1].outer().push_back(point_i(65,36));
+    piecepolygon[1].outer().push_back(point_i(45,35));
+    piecepolygon[1].outer().push_back(point_i(45,6));
     polygon.resetPolygonForce(piecepolygon[1]);
     field.setPiece(polygon);
 
-    piecepolygon[2].outer().push_back(point_t(12,32));
-    piecepolygon[2].outer().push_back(point_t(15,21));
-    piecepolygon[2].outer().push_back(point_t(35,23));
-    piecepolygon[2].outer().push_back(point_t(44,35));
-    piecepolygon[2].outer().push_back(point_t(32,45));
-    piecepolygon[2].outer().push_back(point_t(7,12));
+    piecepolygon[2].outer().push_back(point_i(12,32));
+    piecepolygon[2].outer().push_back(point_i(15,21));
+    piecepolygon[2].outer().push_back(point_i(35,23));
+    piecepolygon[2].outer().push_back(point_i(44,35));
+    piecepolygon[2].outer().push_back(point_i(32,45));
+    piecepolygon[2].outer().push_back(point_i(7,12));
     polygon.resetPolygonForce(piecepolygon[2]);
     field.setPiece(polygon);
 
