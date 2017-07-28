@@ -25,10 +25,21 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     board->show();
+
+    //スキャナのデバイス名を取得
+    char command[256]="sh ../../procon2017-comp/Kunugida/getdevicename.sh";
+    if(system(command)==0){
+        //うまくデバイス名を取得できたときの処理
+        std::cout<<"デバイス名取得できた"<<std::endl;
+    }else{
+        //デバイス名を取得できなかったときの処理
+        std::cout<<"デバイス名取得できない"<<std::endl;
+    }
 }
 
 Kunugida::~Kunugida()
 {
+    system("echo > devicename.txt");
     delete ui;
 }
 
@@ -54,24 +65,22 @@ void Kunugida::run()
         logger->info("Selected Scanner DataSource");
 
         char command[256]="sh ../../procon2017-comp/Kunugida/getimage.sh";
-        cv::Mat mat;
+        cv::Mat first_scan;
         if(system(command)==0){
             //うまくスキャンしたときの処理
-            mat = cv::imread("hoge.png");
-            cv::imshow("でででん",mat);
-            std::cout<<"できた"<<std::endl;
+            first_scan = cv::imread("hoge.png");
+            cv::imshow("でででん",first_scan);
+            std::cout<<"一回スキャンできた"<<std::endl;
         }else{
             //残念ながらスキャンできなかったときの処理
-            std::cout<<"できない"<<std::endl;
+            std::cout<<"一回スキャンできない"<<std::endl;
         }
+
     }else if(ui->image_data_button->isChecked()){
         //selected image
         logger->info("Selected ImageData DataSource");
     }
 //    TODO: ここまでで各データソースから読み込むようにする
-
-
-
 
 //    QRLibrary lib;
 //    lib.Decoder(true);
