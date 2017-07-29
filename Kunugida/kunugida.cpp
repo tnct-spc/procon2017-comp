@@ -3,6 +3,7 @@
 #include "qrlibrary.h"
 #include "neofield.h"
 #include "probmaker.h"
+#include "neosolver.h"
 
 #include <iostream>
 
@@ -59,7 +60,13 @@ void Kunugida::run()
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 
+//    TODO: algorithm_numberをGUIで選択できるようにする
+    int algorithm_number = 0;
 
+
+    NeoSolver *solver = new NeoSolver();
+    connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
+    solver->run(field,0);
 
 
 //    QRLibrary lib;
@@ -78,6 +85,11 @@ void Kunugida::clickedRunButton()
         //warning
         logger->warn("solving process is already running");
     }
+}
+
+void Kunugida::emitAnswer(procon::NeoField field)
+{
+   logger->info("emitted answer");
 }
 
 void Kunugida::finishedProcess()

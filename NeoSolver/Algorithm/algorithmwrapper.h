@@ -3,13 +3,15 @@
 
 #include "neofield.h"
 
-class AlgorithmWrapper
+class AlgorithmWrapper : public QObject
 {
+    Q_OBJECT
+
 public:
     AlgorithmWrapper();
     ~AlgorithmWrapper();
     void init();
-    void run();
+    void run(procon::NeoField field);
     void submitAnswer(procon::NeoField field);
 
 signals:

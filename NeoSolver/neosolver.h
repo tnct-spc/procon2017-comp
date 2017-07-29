@@ -6,6 +6,7 @@
 #include "neofield.h"
 
 #include <QObject>
+#include <QApplication>
 
 class NEOSOLVERSHARED_EXPORT NeoSolver : public QObject
 {
@@ -22,6 +23,8 @@ private:
 signals:
     void throwAnswer(procon::NeoField field);
 
+private slots:
+    void emitAnswer(procon::NeoField field);
 };
 
 #endif // NEOSOLVER_H
