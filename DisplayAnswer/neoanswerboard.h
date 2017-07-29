@@ -39,7 +39,6 @@ private:
     int grid_size;
     int top_bottom_margin;
     procon::NeoField field;
-    point_i center;
 
 protected:
     void beforePolygon();

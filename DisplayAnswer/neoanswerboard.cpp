@@ -109,18 +109,23 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
             painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
-            int pcount = field.getPiece(pnum).getSize();
-            QPointF points[pcount];
-            for(int tes = 0;tes < pcount; tes++){
-                points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+//            int pcount = field.getPiece(pnum).getSize();
+//            QPointF points[pcount];
+//            for(int tes = 0;tes < pcount; tes++){
+//                points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+//            }
+            std::vector<QPointF> points;
+            for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
+                points.push_back(getPosition(point));
             }
-            painter.drawPolygon(points,pcount);
+            painter.drawPolygon(&points.front(),points.size());
             //draw piece id
             painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
             painter.setBackgroundMode(Qt::OpaqueMode);
             painter.setBackground(QBrush(Qt::white));
             painter.setPen(QPen(QBrush(Qt::red), 0.5));
-            //get polygon center
+            //boostの関数を用いてpolygonの中心
+            point_i center;
             boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
             QPointF piececenter = getPosition(center);
             painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
