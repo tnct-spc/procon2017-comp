@@ -29,9 +29,9 @@ std::unique_ptr<NeoSinglePolygonDisplay> NeoSinglePolygonDisplay::createInstance
     return std::move(instance);
 }
 
-void NeoSinglePolygonDisplay::setPolygon(polygon_i polygon)
+void NeoSinglePolygonDisplay::setPolygon(polygon_i _polygon)
 {
-    this->polygon = polygon;
+    this->polygon = _polygon;
 }
 
 void NeoSinglePolygonDisplay::setIsEnlargedPolygon(bool is_enlarged_polygon)
@@ -60,7 +60,7 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() > b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.y() > b.y(); });
 
-    int grid_col = enlarged_polygon ? 135 : minmaxX.first->x() - minmaxX.second->x();
+    int grid_col = enlarged_polygon ? 101 : minmaxX.first->x() - minmaxX.second->x();
     int grid_row = enlarged_polygon ? 65 : minmaxY.first->y() - minmaxY.second->y();
 
     const int grid_size =

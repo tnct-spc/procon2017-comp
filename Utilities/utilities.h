@@ -6,11 +6,16 @@
 #define TO_STRING(VariableName) # VariableName
 
 #include "utilities_global.h"
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #define debugprint(S); std::cout<<"["<<__FILE__<<"]"<<"["<<std::to_string(__LINE__)<<"] "<<S<<std::endl;
 
 namespace bg = boost::geometry;
 using point_t = bg::model::d2::point_xy<double>;
+using point_i = bg::model::d2::point_xy<int>;
+using line_i = bg::model::linestring<point_i>;
 
 class UTILITIESSHARED_EXPORT Utilities
 {
@@ -60,6 +65,11 @@ public:
             if(b2.x() < cross_pointX && b1.x() > cross_pointX) cr2 = true;
         }
         return cr1 && cr2;
+    }
+
+    static bool cross_check(point_i a1, point_i a2, point_i b1, point_i b2){
+        line_i line1{a1, a2}, line2{b1, b2};
+        return bg::intersects(line1, line2);
     }
 
     static int inc(int num,int size, int len=1){

@@ -1023,7 +1023,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     }
 
     procon::NeoExpandedPolygon piece;
-    piece.setPolygon(grid_piece);
+    piece.resetPolygonForce(grid_piece);
 
 //    auto inst = NeoSinglePolygonDisplay::createInstance(piece, "Grid");
 //    inst->show();
