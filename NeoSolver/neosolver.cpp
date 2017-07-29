@@ -15,11 +15,14 @@ void NeoSolver::run(procon::NeoField field, int algorithm_number)
 {
     Algorithms.push_back(new TestAlgortithm());
 
+    field.setFrame(field.getElementaryFrame());
     emitAnswer(field);
 
     connect(Algorithms.at(algorithm_number),&AlgorithmWrapper::throwAnswer,this,&NeoSolver::emitAnswer);
     Algorithms.at(algorithm_number)->init();
     Algorithms.at(algorithm_number)->run(field);
+
+
 
     std::cout << "neosolver " << std::endl;
 

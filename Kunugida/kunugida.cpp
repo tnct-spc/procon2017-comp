@@ -4,6 +4,7 @@
 #include "neofield.h"
 #include "probmaker.h"
 #include "neosolver.h"
+#include "neoexpandedpolygon.h"
 
 #include <iostream>
 
@@ -46,8 +47,21 @@ void Kunugida::run()
 
         //もしProbMakerの結果を表示したければ下をコメントアウト
         PbMaker->show();
-        std::vector<polygon_i> pieces = PbMaker->getPieces();
-        polygon_i frame = PbMaker->getFrame();
+        std::vector<polygon_i> pieces_ = PbMaker->getPieces();
+        polygon_i frame_ = PbMaker->getFrame();
+
+        std::vector<procon::NeoExpandedPolygon> pieces;
+        procon::NeoExpandedPolygon frame;
+
+        for(auto piece : pieces_){
+            procon::NeoExpandedPolygon buf;
+            buf.resetPolygonForce(piece);
+            pieces.push_back(buf);
+        }
+        frame.resetPolygonForce(frame_);
+
+        field.setElementaryFrame(frame);
+        field.setElementaryPieces(pieces);
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -90,6 +104,7 @@ void Kunugida::clickedRunButton()
 void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
+   this->board->setField(field);
 }
 
 void Kunugida::finishedProcess()

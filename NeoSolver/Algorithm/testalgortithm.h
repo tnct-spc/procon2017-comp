@@ -7,6 +7,7 @@ class TestAlgortithm : public AlgorithmWrapper
 {
 public:
     TestAlgortithm();
+    void init();
     void run(procon::NeoField field);
 };
 
