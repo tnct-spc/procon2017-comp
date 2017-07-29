@@ -93,12 +93,17 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(236,182,138, 200))); //frame color
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
-        QPointF points[4];
-        for(int tes = 0;tes < 4; tes++){
-            points[tes] = getPosition(field.getFrame().getPolygon().outer().at(tes));
+//        QPointF points[4];
+//        for(int tes = 0;tes < 4; tes++){
+//            points[tes] = getPosition(field.getFrame().getPolygon().outer().at(tes));
+//        }
+
+        std::vector<QPointF> frame_points;
+        for(auto point : field.getFrame().getPolygon().outer()){
+            frame_points.push_back(getPosition(point));
         }
         painter.setBrush(QBrush(QColor(up_back_ground_color)));
-        painter.drawPolygon(points,4);
+        painter.drawPolygon(&frame_points.front(),frame_points.size());
     };
 
     auto drawAfterPiece = [&](int pnum){
