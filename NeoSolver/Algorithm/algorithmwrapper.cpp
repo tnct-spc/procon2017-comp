@@ -29,5 +29,4 @@ void AlgorithmWrapper::submitAnswer(procon::NeoField field)
     QEventLoop loop;
     QTimer::singleShot(1, &loop, SLOT(quit()));
     loop.exec();
-
 }
