@@ -177,6 +177,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     auto drawProcessingLine = [&](int pnum){
+        point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
         QPointF afterpiececenter = getPosition(center);
         QPointF beforepiececenter = getPiecePosition(center);
