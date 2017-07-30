@@ -6,25 +6,29 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     ui(new Ui::NeoAnswerBoard)
 {
     ui->setupUi(this);
-    //firstField();
-    setRandomColors(10);
+
+    firstField();
+    //色を生成
+    setRandomColors(255);
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
 {
     delete ui;
 }
+//色生成用関数
 void NeoAnswerBoard::setRandomColors(int threshold)
 {
     std::random_device rnd;
     std::uniform_int_distribution<int> rand255(0, 255);
-    cv::Vec3b up_colors;
-    cv::Vec3b down_colors;
-    colors.resize(field.getPieces().size());
-    cv::Vec3b frame_color = {236,182,138};
-    int flag;
+    cv::Vec3b up_colors;//threshold上限値
+    cv::Vec3b down_colors;//threshold下限値
+    colors.resize(field.getPieces().size());//ピース分の領域を確保
+    cv::Vec3b frame_color_down = {236-threshold,182-threshold,138-threshold};
+    cv::Vec3b frame_color_up = {236+threshold,182+threshold,138+threshold};//Frame色とかぶらないように
+    bool flag;
     for(int i = 0; i < field.getPieces().size(); ++i){
-        flag = 1;
+        flag = true;
         while(flag){
             flag = 0;
             colors[i] = {rand255(rnd), rand255(rnd), rand255(rnd)};
@@ -34,17 +38,21 @@ void NeoAnswerBoard::setRandomColors(int threshold)
                 if(colors[i][0] < up_colors[0] && colors[i][0] > down_colors[0] ){
                     if(colors[i][1] < up_colors[1] && colors[i][1] > down_colors[1]){
                         if(colors[i][2] < up_colors[2] && colors[i][2] > down_colors[2]){
-                            flag = 1;
+                            flag = true;
                             break;
                         }
                     }
-                }else if(colors[i] == frame_color){
-                    flag = 1;
-                    break;
-                }
-            }
-        }
-    }
+                }else if(colors[i][0] < frame_color_up[0] && colors[i][0] > frame_color_down[0] ){
+                          if(colors[i][1] < frame_color_up[1] && colors[i][1] > frame_color_down[1]){
+                              if(colors[i][2] < frame_color_up[2] && colors[i][2] > frame_color_down[2]){
+                                  flag = true;
+                                  break;
+                              }
+                          }
+                      }
+              }
+          }
+      }
 }
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
@@ -111,7 +119,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //draw after piece
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-           // painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));     // errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+            painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));     // errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 //            int pcount = field.getPiece(pnum).getSize();
 //            QPointF points[pcount];
 //            for(int tes = 0;tes < pcount; tes++){
@@ -136,7 +144,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     auto drawBeforePiece = [&](int pnum){
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
-        //painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));     // errorrrrrrrrrrrrrrrrrrrrrrrrr
+        painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));     // errorrrrrrrrrrrrrrrrrrrrrrrrr
         int pcount = field.getPiece(pnum).getSize();
         QPointF points[pcount];
         for(int tes = 0;tes < pcount; tes++){
@@ -150,14 +158,14 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setBackground(QBrush(Qt::white));
-        painter.setPen(QPen(QBrush(Qt::red), 0.5));
+        painter.setPen(QPen(QBrush(Qt::red), 0.3));
         //centroidで中心にidを描画
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
         QPointF piececenter = getPosition(center);
         painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
         //draw corner begin id
-        painter.setPen(QPen(QBrush(Qt::black), 0.5));
+        painter.setPen(QPen(QBrush(Qt::black), 0.3));
         QPointF corner_begin = getPosition(field.getPiece(pnum).getPolygon().outer().at(0));
         corner_begin.setX(corner_begin.x() < piececenter.x()
                           ? corner_begin.x() + grid_size * 3
@@ -186,7 +194,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         QPointF evalution_point = {window_width/15,window_height/15};
         painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+"     :     "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"     :     "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
-        //draw number
     };
 
 
