@@ -7,9 +7,9 @@
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsRectItem>
-#include "field.h"
+#include "neofield.h"
 #include "utilities.h"
-#include "answerboard.h"
+#include "neoanswerboard.h"
 
 
 namespace Ui {
@@ -23,15 +23,15 @@ class NeoAnswerDock : public QWidget
 public:
     explicit NeoAnswerDock(QWidget *parent = 0);
     ~NeoAnswerDock();
-    void addAnswer(procon::Field const& field);
+    void addAnswer(procon::NeoField const& field);
 
 private:
     Ui::NeoAnswerDock *ui;
-    std::vector<procon::Field> fields;
+    std::vector<procon::NeoField> fields;
 private slots:
     void clickedAnswer(int id);
 signals:
-    void selectField(procon::Field field);
+    void selectField(procon::NeoField field);
 };
 
 #endif // NEOANSWERDOCK_H

@@ -19,13 +19,12 @@ NeoAnswerDock::~NeoAnswerDock()
     delete ui;
 }
 
-void NeoAnswerDock::addAnswer(const procon::Field &field)
+void NeoAnswerDock::addAnswer(const procon::NeoField &field)
 {
     fields.push_back(field);
-    AnswerBoard* answer_board = new AnswerBoard(fields.size()-1, true);
+    NeoAnswerBoard* answer_board = new NeoAnswerBoard();
     answer_board->setField(field);
     answer_board->setFixedSize(300,300);
-    connect(answer_board,&AnswerBoard::clicked_with_id,this,&NeoAnswerDock::clickedAnswer);
 
     this->ui->board_container->addWidget(answer_board,fields.size()/4,fields.size()%4);
 }
