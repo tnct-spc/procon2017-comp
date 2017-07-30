@@ -7,8 +7,8 @@ class TestAlgortithm : public AlgorithmWrapper
 {
 public:
     TestAlgortithm();
-    void init();
-    void run(procon::NeoField field);
+    void init() override;
+    void run(procon::NeoField field) override;
 };
 
 #endif // TESTALGORTITHM_H

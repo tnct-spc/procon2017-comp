@@ -10,8 +10,8 @@ class AlgorithmWrapper : public QObject
 public:
     AlgorithmWrapper();
     ~AlgorithmWrapper();
-    void init();
-    void run(procon::NeoField field);
+    virtual void init();
+    virtual void run(procon::NeoField field);
     void submitAnswer(procon::NeoField field);
 
 signals:

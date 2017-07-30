@@ -17,7 +17,7 @@ void AlgorithmWrapper::init(){
 
 void AlgorithmWrapper::run(procon::NeoField field)
 {
-
+    std::cout << "algorithmwarpper called" << std::endl;
     return;
 }
 
