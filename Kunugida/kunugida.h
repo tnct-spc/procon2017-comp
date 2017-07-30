@@ -5,6 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "neoanswerboard.h"
 #include "imagerecognition.h"
+#include "neofield.h"
 
 namespace Ui {
 class Kunugida;
@@ -30,6 +31,7 @@ private:
 
 private slots:
     void clickedRunButton();
+    void emitAnswer(procon::NeoField field);
 };
 
 #endif // KUNUGIDA_H
