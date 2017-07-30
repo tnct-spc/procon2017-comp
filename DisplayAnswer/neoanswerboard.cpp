@@ -7,7 +7,7 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
 {
     ui->setupUi(this);
     //firstField();
-    setRandomColors(50);
+    setRandomColors(10);
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
@@ -108,11 +108,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(up_back_ground_color)));
         painter.drawPolygon(&frame_points.front(),frame_points.size());
     };
-
     //draw after piece
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
+           // painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));     // errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 //            int pcount = field.getPiece(pnum).getSize();
 //            QPointF points[pcount];
 //            for(int tes = 0;tes < pcount; tes++){
@@ -137,7 +136,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     auto drawBeforePiece = [&](int pnum){
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
-        painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
+        //painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));     // errorrrrrrrrrrrrrrrrrrrrrrrrr
         int pcount = field.getPiece(pnum).getSize();
         QPointF points[pcount];
         for(int tes = 0;tes < pcount; tes++){
