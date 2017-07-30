@@ -6,7 +6,7 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     ui(new Ui::NeoAnswerBoard)
 {
     ui->setupUi(this);
-    setField();
+    firstField();
     setRandomColors(20);
 }
 
@@ -104,7 +104,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //draw after piece
     auto drawAfterPiece = [&](int pnum){
-            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
             painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
             int pcount = field.getPiece(pnum).getSize();
             QPointF points[pcount];
@@ -117,10 +117,30 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             painter.setBackgroundMode(Qt::OpaqueMode);
             painter.setBackground(QBrush(Qt::white));
             painter.setPen(QPen(QBrush(Qt::red), 0.5));
-                  //get polygon center
-                  boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
-                  QPointF piececenter = getPosition(center);
-                  painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
+            //get polygon center
+            boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+            QPointF piececenter = getPosition(center);
+            painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
+            //draw corner begin id
+            painter.setPen(QPen(QBrush(Qt::black), 0.5));
+            QPointF corner_begin = getPosition(field.getPiece(pnum).getPolygon().outer().at(0));
+            corner_begin.setX(corner_begin.x() < piececenter.x()
+                              ? corner_begin.x() + grid_size * 3
+                              : corner_begin.x() + grid_size * 3 );
+            corner_begin.setY(corner_begin.y() < piececenter.y()
+                              ? corner_begin.y() + grid_size * 3
+                              : corner_begin.y() + grid_size * 3 );
+            painter.drawText(corner_begin, QString("s"+QString::number(field.getPiece(pnum).getId())));
+            //draw evalution
+            painter.setBackgroundMode(Qt::TransparentMode);
+            QColor evalution_color = {255,0,255};
+            painter.setPen(QPen(QBrush(evalution_color),10));
+            painter.setFont(QFont("Deciratuve",grid_size*5,QFont::Bold));
+            QPointF evalution_point = {window_width/15,window_height/15};
+            painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+"     :     "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
+            //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"     :     "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
+            //draw number
+
     };
 
     //draw down backdround
@@ -161,52 +181,58 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     }
     drawGrid();
 }
-QPointF NeoAnswerBoard::getPosition(point_t point){
+QPointF NeoAnswerBoard::getPosition(point_i point){
     return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
 }
 
-QPointF NeoAnswerBoard::getPiecePosition(point_t point)
+QPointF NeoAnswerBoard::getPiecePosition(point_i point)
 {
     return QPointF(left_right_margin + point.x() * grid_size, down_up_y + point.y() * grid_size);
 }
 
-void NeoAnswerBoard::setField(){
-    procon::ExpandedPolygon polygon;
-    procon::ExpandedPolygon poly0;
-    procon::ExpandedPolygon poly1;
-    procon::ExpandedPolygon poly2;
-    std::vector<polygon_t> piecepolygon(3);
-    polygon_t framepolygon;
+void NeoAnswerBoard::setField(procon::NeoField input_field){
+    field=input_field;
+}
 
-    framepolygon.outer().push_back(point_t(5,5));
-    framepolygon.outer().push_back(point_t(85,7));
-    framepolygon.outer().push_back(point_t(75,48));
-    framepolygon.outer().push_back(point_t(18,57));
-    framepolygon.outer().push_back(point_t(5,5));
+void NeoAnswerBoard::firstField(){
+    procon::NeoField inpfield;
+    procon::NeoExpandedPolygon polygon;
+    procon::NeoExpandedPolygon poly0;
+    procon::NeoExpandedPolygon poly1;
+    procon::NeoExpandedPolygon poly2;
+    std::vector<polygon_i> piecepolygon(3);
+    polygon_i framepolygon;
+
+    framepolygon.outer().push_back(point_i(5,5));
+    framepolygon.outer().push_back(point_i(85,7));
+    framepolygon.outer().push_back(point_i(75,48));
+    framepolygon.outer().push_back(point_i(18,57));
+    framepolygon.outer().push_back(point_i(5,5));
     polygon.resetPolygonForce(framepolygon);
-    field.setFrame(polygon);
+    inpfield.setFrame(polygon);
 
-    piecepolygon[0].outer().push_back(point_t(5,5));
-    piecepolygon[0].outer().push_back(point_t(45,6));
-    piecepolygon[0].outer().push_back(point_t(25,15));
-    piecepolygon[0].outer().push_back(point_t(5,5));
+    piecepolygon[0].outer().push_back(point_i(5,5));
+    piecepolygon[0].outer().push_back(point_i(45,6));
+    piecepolygon[0].outer().push_back(point_i(25,15));
+    piecepolygon[0].outer().push_back(point_i(5,5));
     polygon.resetPolygonForce(piecepolygon[0]);
-    field.setPiece(polygon);
+    inpfield.setPiece(polygon);
 
-    piecepolygon[1].outer().push_back(point_t(45,6));
-    piecepolygon[1].outer().push_back(point_t(65,36));
-    piecepolygon[1].outer().push_back(point_t(45,35));
-    piecepolygon[1].outer().push_back(point_t(45,6));
+    piecepolygon[1].outer().push_back(point_i(45,6));
+    piecepolygon[1].outer().push_back(point_i(65,36));
+    piecepolygon[1].outer().push_back(point_i(45,35));
+    piecepolygon[1].outer().push_back(point_i(45,6));
     polygon.resetPolygonForce(piecepolygon[1]);
-    field.setPiece(polygon);
+    inpfield.setPiece(polygon);
 
-    piecepolygon[2].outer().push_back(point_t(12,32));
-    piecepolygon[2].outer().push_back(point_t(15,21));
-    piecepolygon[2].outer().push_back(point_t(35,23));
-    piecepolygon[2].outer().push_back(point_t(44,35));
-    piecepolygon[2].outer().push_back(point_t(32,45));
-    piecepolygon[2].outer().push_back(point_t(7,12));
+    piecepolygon[2].outer().push_back(point_i(12,32));
+    piecepolygon[2].outer().push_back(point_i(15,21));
+    piecepolygon[2].outer().push_back(point_i(35,23));
+    piecepolygon[2].outer().push_back(point_i(44,35));
+    piecepolygon[2].outer().push_back(point_i(32,45));
+    piecepolygon[2].outer().push_back(point_i(7,12));
     polygon.resetPolygonForce(piecepolygon[2]);
-    field.setPiece(polygon);
+    inpfield.setPiece(polygon);
 
+    setField(inpfield);
 };
