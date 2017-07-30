@@ -2,19 +2,22 @@
 #include <QApplication>
 #include "utilities.h"
 
+#include "testneoexpandedpolygon.h"
 #include "testdisplayanswer.h"
 #include "testjoinpolygon.h"
 #include "testsearchsamelength.h"
+#include "neopolygonviewer.h"
 
 int Test()
 {
     int ERROR_CNT = 0;
 
     std::vector<TesterWraper*> TESTER;
-    TESTER.push_back(new TesterWraper);
-    TESTER.push_back(new TestDisplayAnswer);
-    TESTER.push_back(new TestJoinPolygon);
-    TESTER.push_back(new testSearchSameLength);
+//    TESTER.push_back(new TestNeoExpandedPolygon);
+//    TESTER.push_back(new TesterWraper);
+//    TESTER.push_back(new TestDisplayAnswer);
+//    TESTER.push_back(new TestJoinPolygon);
+//    TESTER.push_back(new testSearchSameLength);
 
     for(auto tester : TESTER){
         if(!tester->run()){
@@ -30,6 +33,7 @@ int main(int argc, char *argv[])
 {
     std::cout<<"***START TEST***"<<std::endl;
     QApplication a(argc, argv);
+    NeoPolygonViewer::getInstance();
 
     int error_cnt = Test();
 
