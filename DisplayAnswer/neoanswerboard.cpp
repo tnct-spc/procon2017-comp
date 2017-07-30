@@ -7,24 +7,27 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
 {
     ui->setupUi(this);
     firstField();
-    setRandomColors(20);
+    //色を生成
+    setRandomColors(255);
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
 {
     delete ui;
 }
+//色生成用関数
 void NeoAnswerBoard::setRandomColors(int threshold)
 {
     std::random_device rnd;
     std::uniform_int_distribution<int> rand255(0, 255);
-    cv::Vec3b up_colors;
-    cv::Vec3b down_colors;
-    colors.resize(field.getPieces().size());
-    cv::Vec3b frame_color = {236,182,138};
-    int flag;
+    cv::Vec3b up_colors;//threshold上限値
+    cv::Vec3b down_colors;//threshold下限値
+    colors.resize(field.getPieces().size());//ピース分の領域を確保
+    cv::Vec3b frame_color_down = {236-threshold,182-threshold,138-threshold};
+    cv::Vec3b frame_color_up = {236+threshold,182+threshold,138+threshold};//Frame色とかぶらないように
+    bool flag;
     for(int i = 0; i < field.getPieces().size(); ++i){
-        flag = 1;
+        flag = true;
         while(flag){
             flag = 0;
             colors[i] = {rand255(rnd), rand255(rnd), rand255(rnd)};
@@ -34,17 +37,21 @@ void NeoAnswerBoard::setRandomColors(int threshold)
                 if(colors[i][0] < up_colors[0] && colors[i][0] > down_colors[0] ){
                     if(colors[i][1] < up_colors[1] && colors[i][1] > down_colors[1]){
                         if(colors[i][2] < up_colors[2] && colors[i][2] > down_colors[2]){
-                            flag = 1;
+                            flag = true;
                             break;
                         }
                     }
-                }else if(colors[i] == frame_color){
-                    flag = 1;
-                    break;
-                }
-            }
-        }
-    }
+                }else if(colors[i][0] < frame_color_up[0] && colors[i][0] > frame_color_down[0] ){
+                          if(colors[i][1] < frame_color_up[1] && colors[i][1] > frame_color_down[1]){
+                              if(colors[i][2] < frame_color_up[2] && colors[i][2] > frame_color_down[2]){
+                                  flag = true;
+                                  break;
+                              }
+                          }
+                      }
+              }
+          }
+      }
 }
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
@@ -177,6 +184,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     auto drawProcessingLine = [&](int pnum){
+        point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
         QPointF afterpiececenter = getPosition(center);
         QPointF beforepiececenter = getPiecePosition(center);
