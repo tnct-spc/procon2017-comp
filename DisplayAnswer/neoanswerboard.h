@@ -42,7 +42,6 @@ private:
     int top_bottom_margin;
     int down_up_y;
     procon::NeoField field;
-    point_i center;
 
 protected:
     void beforePolygon();
