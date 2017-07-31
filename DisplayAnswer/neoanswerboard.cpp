@@ -25,6 +25,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const int window_width = this->width();
     const int window_height = this->height();
 
+    //色リスト
     QStringList colorlist;
         colorlist << "#f39700"
                   << "#e60012"
@@ -76,7 +77,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                   << "#8b0000"
                   << "#8b008b"
                   << "#00ffff";
-        QVector<QString> list = colorlist.toVector();
+    //色リストをQVectorに格納
+    QVector<QString> list = colorlist.toVector();
 
     // 101 x 65
     const int grid_row = 65;
@@ -139,9 +141,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             painter.drawPolygon(&frame_points.front(),frame_points.size());
         }
     };
-    //draw after piece
+    //処理後ピースを描画
     auto drawAfterPiece = [&](int pnum){
-            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.2)); // draw piece
+            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
             painter.setBrush(QBrush(QColor(list[pnum])));
 //            int pcount = field.getPiece(pnum).getSize();
 //            QPointF points[pcount];
@@ -167,7 +169,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //処理前ピースを描画
     auto drawBeforePiece = [&](int pnum){
-        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.2));
+        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
         painter.setBrush(QBrush(QColor(list[pnum])));
         int pcount = field.getPiece(pnum).getSize();
         QPointF points[pcount];
