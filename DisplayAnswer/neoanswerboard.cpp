@@ -201,7 +201,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     }
     for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
         drawPieceId(piece_num);
-        drawProcessingLine(piece_num);
+        if(SINGLE_MODE==false)drawProcessingLine(piece_num);
     }
     drawEvalution();
     drawGrid();
