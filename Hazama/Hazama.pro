@@ -66,7 +66,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
 
-
 include(qhttpserver/qhttpserver.pri)
 
 unix {
