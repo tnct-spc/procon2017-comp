@@ -125,16 +125,21 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 //        }
 //        painter.setBrush(QBrush(QColor(up_back_ground_color)));
 //        painter.drawPolygon(points,pcount);
-        std::vector<QPointF> frame_points;
-        for(auto point : field.getFrame().getPolygon().outer()){
-            frame_points.push_back(getPosition(point));
+
+        std::vector<procon::NeoExpandedPolygon> frame__;
+        frame__ = field.getFrame();
+        for(auto frame_ : frame__ ){
+            std::vector<QPointF> frame_points;
+            for(auto point : frame_.getPolygon().outer()){
+                frame_points.push_back(getPosition(point));
+            }
+            painter.setBrush(QBrush(QColor(up_back_ground_color)));
+            painter.drawPolygon(&frame_points.front(),frame_points.size());
         }
-        painter.setBrush(QBrush(QColor(up_back_ground_color)));
-        painter.drawPolygon(&frame_points.front(),frame_points.size());
     };
     //draw after piece
     auto drawAfterPiece = [&](int pnum){
-            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
+            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.2)); // draw piece
             painter.setBrush(QBrush(QColor(list[pnum])));
 //            int pcount = field.getPiece(pnum).getSize();
 //            QPointF points[pcount];
@@ -160,7 +165,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //処理前ピースを描画
     auto drawBeforePiece = [&](int pnum){
-        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.2));
         painter.setBrush(QBrush(QColor(list[pnum])));
         int pcount = field.getPiece(pnum).getSize();
         QPointF points[pcount];
@@ -175,8 +180,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         //draw piece id
         painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
-        painter.setPen(QPen(QBrush(Qt::black), 0.5));
-        painter.setBackground(QBrush(QColor(255,255,255,255)));
+        painter.setBackground(QBrush(QColor(list[pnum])));
+        painter.setPen(QPen(QBrush(Qt::white), 0.3));
         //centroidで中心にidを描画
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
@@ -201,11 +206,21 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         QColor evalution_color = {255,0,255};
         painter.setPen(QPen(QBrush(evalution_color),10));
         //painter.setFont(QFont("Deciratuve",grid_size*5,QFont::Bold));
-        int evalution_size = left_right_margin/8;
+        int evalution_size = (top_bottom_margin > left_right_margin*5
+                    ?top_bottom_margin/3
+                    :left_right_margin/5);
+        if(window_width < evalution_size * 6)evalution_size = window_width / 6;
         painter.setFont(QFont("Deciratuve",evalution_size,QFont::Bold));
-        QPointF evalution_point = {left_right_margin - evalution_size * 7 ,top_bottom_margin + evalution_size * 2};
-        painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+"  :  "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
-        //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"  :  "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
+        QPointF evalution_point = {grid_size , evalution_size * 2};
+        int jointed_piece_total = 0;
+        std::vector<procon::NeoExpandedPolygon> frame__;
+        frame__ = field.getFrame();
+        for(auto frame_ : frame__){
+            jointed_piece_total += frame_.getJointedPieces().size();
+        }
+        painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+        //painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
+        //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
     };
 
     drawFrame();
@@ -215,8 +230,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             drawBeforePiece(piece_num);
     }
     for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
-        drawPieceId(piece_num);
         if(SINGLE_MODE==false)drawProcessingLine(piece_num);
+        drawPieceId(piece_num);
     }
     drawEvalution();
     drawGrid();
@@ -248,7 +263,9 @@ void NeoAnswerBoard::firstField(){//初期状態でのfieldを設定(実際は�
     framepolygon.outer().push_back(point_i(18,57));
     framepolygon.outer().push_back(point_i(5,5));
     polygon.resetPolygonForce(framepolygon);
-    inpfield.setFrame(polygon);
+    std::vector<procon::NeoExpandedPolygon> polygonvec;
+    polygonvec.push_back(polygon);
+    inpfield.setFrame(polygonvec);
 
     piecepolygon[0].outer().push_back(point_i(5,5));
     piecepolygon[0].outer().push_back(point_i(45,6));
