@@ -13,6 +13,9 @@
 #include <random>
 #include <vector>
 #include <string>
+#include <QStringList>
+#include <QVector>
+#include <QList>
 #include "neofield.h"
 #include "neoexpandedpolygon.h"
 #include <math.h>
@@ -35,9 +38,7 @@ private:
     QPointF getPiecePosition(point_i point);
     void setField();
     QPointF getPosition(point_i point);
-    std::vector<cv::Vec3b> colors;
-    //std::vector<std::vector<int>> colors;
-    void setRandomColors();
+    QVector<QString> list;
     void firstField();
     int left_right_margin;
     int grid_size;
