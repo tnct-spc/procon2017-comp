@@ -202,11 +202,14 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         QColor evalution_color = {255,0,255};
         painter.setPen(QPen(QBrush(evalution_color),10));
         //painter.setFont(QFont("Deciratuve",grid_size*5,QFont::Bold));
-        int evalution_size = left_right_margin/8;
+        int evalution_size = (top_bottom_margin > left_right_margin*5
+                    ?top_bottom_margin/3
+                    :left_right_margin/5);
+        if(window_width < evalution_size * 6)evalution_size = window_width / 6;
         painter.setFont(QFont("Deciratuve",evalution_size,QFont::Bold));
-        QPointF evalution_point = {left_right_margin - evalution_size * 7 ,top_bottom_margin + evalution_size * 2};
-        painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+"  :  "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
-        //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"  :  "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
+        QPointF evalution_point = {grid_size , evalution_size * 2};
+        painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
+        //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
     };
 
     if(field.getPieces().size()!=0)setRandomColors();
