@@ -137,7 +137,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
     //draw after piece
     auto drawAfterPiece = [&](int pnum){
-            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
+            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.2)); // draw piece
             painter.setBrush(QBrush(QColor(list[pnum])));
 //            int pcount = field.getPiece(pnum).getSize();
 //            QPointF points[pcount];
@@ -163,7 +163,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //処理前ピースを描画
     auto drawBeforePiece = [&](int pnum){
-        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.2));
         painter.setBrush(QBrush(QColor(list[pnum])));
         int pcount = field.getPiece(pnum).getSize();
         QPointF points[pcount];
@@ -178,8 +178,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         //draw piece id
         painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
-        painter.setBackground(QBrush(QColor(255,255,255,255)));
-        //painter.setPen(QPen(QBrush(Qt::red), 0.3));
+        painter.setBackground(QBrush(QColor(list[pnum])));
+        painter.setPen(QPen(QBrush(Qt::white), 0.3));
         //centroidで中心にidを描画
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
@@ -228,8 +228,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             drawBeforePiece(piece_num);
     }
     for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
-        drawPieceId(piece_num);
         if(SINGLE_MODE==false)drawProcessingLine(piece_num);
+        drawPieceId(piece_num);
     }
     drawEvalution();
     drawGrid();
