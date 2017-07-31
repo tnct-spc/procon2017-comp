@@ -14,6 +14,10 @@ NeoAnswerBoard::~NeoAnswerBoard()
     delete ui;
 }
 
+void NeoAnswerBoard::setSingleMode(bool inp){
+    single_mode = inp;
+}
+
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
     const QString up_back_ground_color = "#7BAB4F";
@@ -80,7 +84,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const int grid_row = 65;
     const int grid_col = 101;
     const int grid_margin = 1;
-    const int splitedheight = (SINGLE_MODE==true
+    const int splitedheight = (single_mode==true
                                ?window_height
                                :window_height/2);
     grid_size =
@@ -208,7 +212,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         //painter.setFont(QFont("Deciratuve",grid_size*5,QFont::Bold));
         int evalution_size = (top_bottom_margin > left_right_margin*5
                     ?top_bottom_margin/3
-                    :left_right_margin/5);
+                    :left_right_margin/6);
         if(window_width < evalution_size * 6)evalution_size = window_width / 6;
         painter.setFont(QFont("Deciratuve",evalution_size,QFont::Bold));
         QPointF evalution_point = {grid_size , evalution_size * 2};
@@ -230,7 +234,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             drawBeforePiece(piece_num);
     }
     for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
-        if(SINGLE_MODE==false)drawProcessingLine(piece_num);
+        if(single_mode==false)drawProcessingLine(piece_num);
         drawPieceId(piece_num);
     }
     drawEvalution();
