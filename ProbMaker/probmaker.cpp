@@ -166,6 +166,11 @@ void ProbMaker::delaunay_triangulation()
     std::vector<polygon_i> polygons;
     std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygons));
 
+    auto isPointEqual = [](point_i first,point_i second){
+       return first.x() == second.x() && first.y() == second.y();
+    };
+
+
     std::vector<polygon_i> out;
     int a,b;
     for (a = 0; a < polygons.size(); ++a) {
@@ -173,6 +178,8 @@ void ProbMaker::delaunay_triangulation()
             boost::geometry::union_(polygons.at(a),polygons.at(b),out);
 
             if(out.size() == 1){
+
+
                 goto EXIT;
             }
         }
@@ -227,19 +234,19 @@ void ProbMaker::delaunay_triangulation()
 void ProbMaker::GA()
 {
     typedef std::vector<std::vector<int>> State;
-    
-   	std::vector<polygon_i> polygons;
+
+    std::vector<polygon_i> polygons;
     std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygons));
     polygon_i frame = this->frame;
 
     std::random_device rnd;
-    
+
     auto connect_near_by_polygon = [](std::vector<polygon_i> pieces){
 
         std::vector<polygon_i> back_up_polygon;
         std::copy(pieces.begin(),pieces.end(),std::back_inserter(back_up_polygon));
 
-        ONCE_MORE:
+ONCE_MORE:
 
 
         std::random_device rnd;
@@ -248,7 +255,7 @@ void ProbMaker::GA()
         int connect_polygon_index = randomm(rnd);
 
         polygon_i connect_polygon = pieces[connect_polygon_index];
-		
+
         pieces.erase(pieces.begin() + connect_polygon_index);
 
         int counter = 0;
@@ -272,9 +279,10 @@ void ProbMaker::GA()
         }
 
         //connect可能な中から適当に選ぶ
-                                                //あたりまえだけど、-1してstd::out_of_range回避
+        //あたりまえだけど、-1してstd::out_of_range回避
         std::uniform_int_distribution<> random(0,can_connect_polygon_number.size() - 1);
         int connecting_polygon_index = random(rnd);
+
 
 
         counter = 0;
@@ -291,16 +299,47 @@ void ProbMaker::GA()
             return a.first < b.first;
         });
 
-        connecting_polygon_index = size[0].second;
+        for (int index = 0; index < size.size(); ++index) {
 
-        polygon_i connecting_polygon = pieces.at(can_connect_polygon_number[connecting_polygon_index]);
 
-        std::vector<polygon_i> output;
-        boost::geometry::union_(connect_polygon,connecting_polygon,output);
-        //connectしたわけなので、元からのpolygonは除去
-        pieces.erase(pieces.begin() + can_connect_polygon_number[connecting_polygon_index]);
+            connecting_polygon_index = size[index].second;
 
-        pieces.push_back(output[0]);
+            polygon_i connecting_polygon = pieces.at(can_connect_polygon_number[connecting_polygon_index]);
+
+            std::vector<polygon_i> output;
+            boost::geometry::union_(connect_polygon,connecting_polygon,output);
+
+            auto isPointEqual = [](point_i first,point_i second){
+                return first.x() == second.x() && first.y() == second.y();
+            };
+
+            //ピースの中に隣り合わず重複した点があると、2つのpolygonに分離できる状態なのに、分離されないヤバイ感じのになるので。ここで除去
+            bool flag = false;
+            for (int a = 1; a < output[0].outer().size() - 1; ++a) {
+                for (int b = 1; b < output[0].outer().size() - 1; ++b) {
+                    if(a == b){
+                        b++;
+                    }
+
+                    flag += isPointEqual(output[0].outer()[a],output[0].outer()[b]);
+                }
+            }
+
+            std::cout << flag << std::endl;
+
+            if(flag){
+                if(index == (size.size() - 1)){
+                    pieces.clear();
+                    std::copy(back_up_polygon.begin(),back_up_polygon.end(),std::back_inserter(pieces));
+                    goto ONCE_MORE;
+                }
+            }else{
+                //connectしたわけなので、元からのpolygonは除去
+                pieces.erase(pieces.begin() + can_connect_polygon_number[connecting_polygon_index]);
+                pieces.push_back(output[0]);
+                break;
+            }
+        }
 
         return pieces;
     };
@@ -315,8 +354,8 @@ void ProbMaker::GA()
 
     this->print_polygons.clear();
     std::copy(pieces.begin(),pieces.end(),std::back_inserter(this->print_polygons));
-    
-    
+
+
 }
 
 void ProbMaker::step()
