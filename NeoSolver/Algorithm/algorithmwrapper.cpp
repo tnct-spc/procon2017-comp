@@ -43,7 +43,7 @@ int evaluation(procon::NeoExpandedPolygon field,procon::NeoExpandedPolygon polyg
                 return 1;
             }else if(field_angle > polygon_angle){
                 //角に隙間があるとき
-                return 0;
+                return -1;
             }else if(field_angle < polygon_angle){
                 //ポリゴンの角がフレームの角より大きくてありえんとき
                 return -2;
@@ -75,8 +75,9 @@ int evaluation(procon::NeoExpandedPolygon field,procon::NeoExpandedPolygon polyg
             }
         };
 
-        int point;
+        int point=0;
         point = point + about_angle();
+        if(point < 0) return point;
         point = point + about_length();
         return point;
     };
