@@ -21,6 +21,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const int window_width = this->width();
     const int window_height = this->height();
 
+    //色リスト
     QStringList colorlist;
         colorlist << "#f39700"
                   << "#e60012"
@@ -72,7 +73,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                   << "#8b0000"
                   << "#8b008b"
                   << "#00ffff";
-        QVector<QString> list = colorlist.toVector();
+    //色リストをQVectorに格納
+    QVector<QString> list = colorlist.toVector();
 
     // 101 x 65
     const int grid_row = 65;
@@ -173,8 +175,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         //draw piece id
         painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setPen(QPen(QBrush(Qt::black), 0.5));
         painter.setBackground(QBrush(QColor(255,255,255,255)));
-        //painter.setPen(QPen(QBrush(Qt::red), 0.3));
         //centroidで中心にidを描画
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
