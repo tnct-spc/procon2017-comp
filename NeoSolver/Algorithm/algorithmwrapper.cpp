@@ -31,12 +31,12 @@ void AlgorithmWrapper::submitAnswer(procon::NeoField field)
     loop.exec();
 }
 
-int evaluation(procon::NeoExpandedPolygon field , procon::NeoExpandedPolygon polygon)
+std::vector<std::tuple<int , int , int , int>> evaluation(std::vector<procon::NeoExpandedPolygon> field , procon::NeoExpandedPolygon polygon)
 {
     //引数は頂点の番号　0はじまり
-    auto main_evaluation=[field,polygon](int field_point,int polygon_point){
-        auto about_angle = [field,polygon,field_point,polygon_point](){
-            double field_angle = field.getSideAngle().at(field_point);
+    auto main_evaluation=[](procon::NeoExpandedPolygon one_field,int field_point,procon::NeoExpandedPolygon polygon,int polygon_point){
+        auto about_angle = [one_field,polygon,field_point,polygon_point](){
+            double field_angle = one_field.getSideAngle().at(field_point);
             double polygon_angle = polygon.getSideAngle().at(polygon_point);
             if(field_angle == polygon_angle){
                 //フレームとポリゴンの角がちょうどあっているとき
@@ -49,11 +49,11 @@ int evaluation(procon::NeoExpandedPolygon field , procon::NeoExpandedPolygon pol
                 return -2;
             }
         };
-        auto about_length = [field,polygon,field_point,polygon_point](){
+        auto about_length = [one_field,polygon,field_point,polygon_point](){
             int a = field_point - 1;
-            if(a == -1) a = field.getSize() - 1;
-            double field_length1 = field.getSideLength().at(a);
-            double field_length2 = field.getSideLength().at(field_point);
+            if(a == -1) a = one_field.getSize() - 1;
+            double field_length1 = one_field.getSideLength().at(a);
+            double field_length2 = one_field.getSideLength().at(field_point);
 
             a = polygon_point - 1;
             if(a == -1) a = polygon.getSize() - 1;
@@ -75,7 +75,7 @@ int evaluation(procon::NeoExpandedPolygon field , procon::NeoExpandedPolygon pol
             }
         };
 
-        int point=0;
+        int point = 0;
         point = point + about_angle();
         //いまは角の大きさ重視
         if(point < 0) return point;
@@ -83,17 +83,22 @@ int evaluation(procon::NeoExpandedPolygon field , procon::NeoExpandedPolygon pol
         return point;
     };
 
-    int max=0;
-    int field_index = -1 , polygon_index = -1;
-    for(int i = 0 ; i < field.getSize() ; i++){
+    int field_vector_index = -1,field_index = -1 , polygon_index = -1;
+
+    std::vector<std::tuple<int , int , int , int>> vector;
+    for(int i = 0 ; i < field.size() ; i++){
        for(int j = 0 ; j < polygon.getSize() ; j++){
-           int a = main_evaluation(i,j);
-           if(a > max){
-               max = a;
-               field_index = i;
-               polygon_index = j;
+           for(int k = 0 ; k < field.at(i).getPolygon().outer().size() - 1 ; k++){
+               int a = main_evaluation(field.at(i),k,polygon,j);
+               if(a > 0){
+                   field_vector_index = i;
+                   field_index = k;
+                   polygon_index = j;
+
+                   vector.push_back(std::tuple<int , int , int , int>(field_vector_index,field_index,polygon_index,a));
+               }
            }
        }
     }
-
+    return vector;
 }
