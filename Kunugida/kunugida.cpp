@@ -59,8 +59,9 @@ void Kunugida::run()
             pieces.push_back(buf);
         }
         frame.resetPolygonForce(frame_);
-
-        field.setElementaryFrame(frame);
+        std::vector<procon::NeoExpandedPolygon> vec_frame;
+        vec_frame.push_back(frame);
+        field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
     }else if(ui->scanner_button->isChecked()){
