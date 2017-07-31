@@ -7,60 +7,72 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
 {
     ui->setupUi(this);
     firstField();
-    //色を生成
-    setRandomColors(255);
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
 {
     delete ui;
 }
-//色生成用関数
-void NeoAnswerBoard::setRandomColors(int threshold)
-{
-    std::random_device rnd;
-    std::uniform_int_distribution<int> rand255(0, 255);
-    cv::Vec3b up_colors;//threshold上限値
-    cv::Vec3b down_colors;//threshold下限値
-    colors.resize(field.getPieces().size());//ピース分の領域を確保
-    cv::Vec3b frame_color_down = {236-threshold,182-threshold,138-threshold};
-    cv::Vec3b frame_color_up = {236+threshold,182+threshold,138+threshold};//Frame色とかぶらないように
-    bool flag;
-    //色の重複がないか確認
-    for(int i = 0; i < field.getPieces().size(); ++i){
-        flag = true;
-        while(flag){
-            flag = 0;
-            colors[i] = {rand255(rnd), rand255(rnd), rand255(rnd)};
-            for(int j = 0; j < i; j++){
-                up_colors = {colors[i][0] + threshold, colors[i][1] + threshold, colors[i][2] + threshold};
-                down_colors = {colors[i][0] - threshold, colors[i][1] - threshold, colors[i][2] - threshold};
-                if(colors[i][0] < up_colors[0] && colors[i][0] > down_colors[0] ){
-                    if(colors[i][1] < up_colors[1] && colors[i][1] > down_colors[1]){
-                        if(colors[i][2] < up_colors[2] && colors[i][2] > down_colors[2]){
-                            flag = true;
-                            break;
-                        }
-                    }
-                }else if(colors[i][0] < frame_color_up[0] && colors[i][0] > frame_color_down[0] ){
-                          if(colors[i][1] < frame_color_up[1] && colors[i][1] > frame_color_down[1]){
-                              if(colors[i][2] < frame_color_up[2] && colors[i][2] > frame_color_down[2]){
-                                  flag = true;
-                                  break;
-                              }
-                          }
-                      }
-              }
-          }
-      }
-}
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
-    const QString up_back_ground_color = "#00FFFF";
-    const QString down_back_ground_color = "#66CDAA";
+    const QString up_back_ground_color = "#7BAB4F";
+    const QString down_back_ground_color = "#118822";
     const int window_width = this->width();
     const int window_height = this->height();
+
+    QStringList colorlist;
+        colorlist << "#f39700"
+                  << "#e60012"
+                  << "#9caeb7"
+                  << "#00a7db"
+                  << "#00a7db"
+                  << "#d7c447"
+                  << "#9b7cb6"
+                  << "#00ada9"
+                  << "#bb641d"
+                  << "#e85298"
+                  << "#0079c2"
+                  << "#6cbb5a"
+                  << "#b6007a"
+                  << "#e5171f"
+                  << "#522886"
+                  << "#0078ba"
+                  << "#019a66"
+                  << "#e44d93"
+                  << "#814721"
+                  << "#a9cc51"
+                  << "#ee7b1a"
+                  << "#00a0de"
+                  << "#dd3333"
+                  << "#bb3322"
+                  << "#bb3377"
+                  << "#773333"
+                  << "#ee7733"
+                  << "#ffdd00"
+                  << "#ffdd99"
+                  << "#bbbb99"
+                  << "#88bb88"
+                  << "#669966"
+                  << "#66aa88"
+                  << "#99dd66"
+                  << "#339966"
+                  << "#119988"
+                  << "#114433"
+                  << "#225588"
+                  << "#44aacc"
+                  << "#333388"
+                  << "#ff89ff"
+                  << "#ff8989"
+                  << "#99ffcc"
+                  << "#9eff9e"
+                  << "#add6ff"
+                  << "#ffcc99"
+                  << "#00ff00"
+                  << "#8b0000"
+                  << "#8b008b"
+                  << "#00ffff";
+        QVector<QString> list = colorlist.toVector();
 
     // 101 x 65
     const int grid_row = 65;
@@ -120,7 +132,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //draw after piece
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
+            painter.setBrush(QBrush(QColor(list[pnum])));
 //            int pcount = field.getPiece(pnum).getSize();
 //            QPointF points[pcount];
 //            for(int tes = 0;tes < pcount; tes++){
@@ -175,10 +187,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //処理前ピースを描画
     auto drawBeforePiece = [&](int pnum){
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
-        painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
+        painter.setBrush(QBrush(QColor(list[pnum])));
         int pcount = field.getPiece(pnum).getSize();
         QPointF points[pcount];
-        for(int tes = 0;tes < pcount; tes++){
+        for(int tes = 0; tes < pcount; tes++){
             points[tes] = getPiecePosition(field.getPiece(pnum).getPolygon().outer().at(tes));
         }
         painter.drawPolygon(points,pcount);
