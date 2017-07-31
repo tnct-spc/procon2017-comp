@@ -18,6 +18,7 @@
 #include <QList>
 #include "neofield.h"
 #include "neoexpandedpolygon.h"
+#include <math.h>
 
 namespace Ui {
 class NeoAnswerBoard;
@@ -44,6 +45,10 @@ private:
     int top_bottom_margin;
     int down_up_y;
     procon::NeoField field;
+
+    // Only field mode
+    const bool SINGLE_MODE = false;
+
 
 protected:
     void beforePolygon();

@@ -6,7 +6,7 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     ui(new Ui::NeoAnswerBoard)
 {
     ui->setupUi(this);
-    firstField();
+    //firstField();
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
@@ -78,7 +78,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const int grid_row = 65;
     const int grid_col = 101;
     const int grid_margin = 1;
-    const int splitedheight = window_height/2;
+    const int splitedheight = (SINGLE_MODE==true
+                               ?window_height
+                               :window_height/2);
     grid_size =
             window_width <= splitedheight
             ? window_width / (grid_col + grid_margin)
@@ -91,7 +93,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //draw background
     painter.setBrush(QBrush(QColor(up_back_ground_color)));
-    painter.drawRect(QRect(0,0,window_width,window_height/2));
+    painter.drawRect(QRect(0,0,window_width,splitedheight));
     painter.setBrush(QBrush(QColor(down_back_ground_color)));
     painter.drawRect(QRect(0, splitedheight, window_width, window_height));
 
@@ -128,7 +130,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(up_back_ground_color)));
         painter.drawPolygon(&frame_points.front(),frame_points.size());
     };
-
     //draw after piece
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
@@ -144,36 +145,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 points.push_back(getPosition(point));
             }
             painter.drawPolygon(&points.front(),points.size());
-            //draw piece id
-            painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
-            painter.setBackgroundMode(Qt::OpaqueMode);
-            painter.setBackground(QBrush(Qt::white));
-            painter.setPen(QPen(QBrush(Qt::red), 0.5));
-            //centroidで中心にidを描画
-            point_i center;
-            boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
-            QPointF piececenter = getPosition(center);
-            painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
-            //draw corner begin id
-            painter.setPen(QPen(QBrush(Qt::black), 0.5));
-            QPointF corner_begin = getPosition(field.getPiece(pnum).getPolygon().outer().at(0));
-            corner_begin.setX(corner_begin.x() < piececenter.x()
-                              ? corner_begin.x() + grid_size * 3
-                              : corner_begin.x() + grid_size * 3 );
-            corner_begin.setY(corner_begin.y() < piececenter.y()
-                              ? corner_begin.y() + grid_size * 3
-                              : corner_begin.y() + grid_size * 3 );
-            painter.drawText(corner_begin, QString("s"+QString::number(field.getPiece(pnum).getId())));
-            //draw evalution
-            painter.setBackgroundMode(Qt::TransparentMode);
-            QColor evalution_color = {255,0,255};
-            painter.setPen(QPen(QBrush(evalution_color),10));
-            painter.setFont(QFont("Deciratuve",grid_size*5,QFont::Bold));
-            QPointF evalution_point = {window_width/15,window_height/15};
-            painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+"     :     "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
-            //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"     :     "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
-            //draw number
-
     };
 
     //draw down backdround
@@ -184,6 +155,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                                grid_col*grid_size,
                                grid_row*grid_size));
     };
+
     //処理前ピースを描画
     auto drawBeforePiece = [&](int pnum){
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
@@ -195,7 +167,23 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
         painter.drawPolygon(points,pcount);
     };
+
     //処理ピースの可視化
+    auto drawPieceId = [&](int pnum){
+        //draw piece id
+        painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackground(QBrush(QColor(255,255,255,255)));
+        //painter.setPen(QPen(QBrush(Qt::red), 0.3));
+        //centroidで中心にidを描画
+        point_i center;
+        boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+        QPointF piececenter = getPosition(center);
+        piececenter.setX(piececenter.x() - grid_size);
+        piececenter.setY(piececenter.y() + grid_size);
+        painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
+    };
+
     auto drawProcessingLine = [&](int pnum){
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
@@ -205,14 +193,30 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawLine(afterpiececenter, beforepiececenter);
     };
 
+    auto drawEvalution = [&]{
+        //draw evalution
+        painter.setBackgroundMode(Qt::TransparentMode);
+        QColor evalution_color = {255,0,255};
+        painter.setPen(QPen(QBrush(evalution_color),10));
+        //painter.setFont(QFont("Deciratuve",grid_size*5,QFont::Bold));
+        int evalution_size = left_right_margin/8;
+        painter.setFont(QFont("Deciratuve",evalution_size,QFont::Bold));
+        QPointF evalution_point = {left_right_margin - evalution_size * 7 ,top_bottom_margin + evalution_size * 2};
+        painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+"  :  "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
+        //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"  :  "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
+    };
 
     drawFrame();
     drawDownBackground();
     for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
             drawAfterPiece(piece_num);
             drawBeforePiece(piece_num);
-            drawProcessingLine(piece_num);
     }
+    for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
+        drawPieceId(piece_num);
+        if(SINGLE_MODE==false)drawProcessingLine(piece_num);
+    }
+    drawEvalution();
     drawGrid();
 }
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
