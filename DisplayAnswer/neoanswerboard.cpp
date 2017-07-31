@@ -59,10 +59,10 @@ void NeoAnswerBoard::setRandomColors()
     }
     int cou=0;
     int plus_cou;
-    plus_cou = 256 * 9/ field.getPieces().size();
-    for(int r=0;r<256;r+=plus_cou){
-        for(int g=0;g<256;g+=plus_cou){
-            for(int b=0;b<256;b+=plus_cou){
+    plus_cou = 256 * 13/ field.getPieces().size();
+    for(unsigned int r=0;r<256;r+=plus_cou){
+        for(unsigned int g=0;g<256;g+=plus_cou){
+            for(unsigned int b=0;b<256;b+=plus_cou){
                 if(cou<50){
                     colors[cou] = {r,g,b};
                 }
