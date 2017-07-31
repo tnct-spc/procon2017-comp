@@ -26,6 +26,7 @@ void NeoAnswerBoard::setRandomColors(int threshold)
     cv::Vec3b frame_color_down = {236-threshold,182-threshold,138-threshold};
     cv::Vec3b frame_color_up = {236+threshold,182+threshold,138+threshold};//Frame色とかぶらないように
     bool flag;
+    //色の重複がないか確認
     for(int i = 0; i < field.getPieces().size(); ++i){
         flag = true;
         while(flag){
@@ -171,7 +172,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                                grid_col*grid_size,
                                grid_row*grid_size));
     };
-
+    //処理前ピースを描画
     auto drawBeforePiece = [&](int pnum){
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
         painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
@@ -182,7 +183,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
         painter.drawPolygon(points,pcount);
     };
-
+    //処理ピースの可視化
     auto drawProcessingLine = [&](int pnum){
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
@@ -206,8 +207,7 @@ QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgrid�
     return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
 }
 
-QPointF NeoAnswerBoard::getPiecePosition(point_i point)
-{
+QPointF NeoAnswerBoard::getPiecePosition(point_i point){//point_iを下画面の枠と対応させるようにQPointFに変換する
     return QPointF(left_right_margin + point.x() * grid_size, down_up_y + point.y() * grid_size);
 }
 
