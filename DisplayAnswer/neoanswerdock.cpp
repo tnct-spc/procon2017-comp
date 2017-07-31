@@ -26,10 +26,5 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
     answer_board->setField(field);
     answer_board->setFixedSize(300,300);
 
-    this->ui->board_container->addWidget(answer_board,fields.size()/4,fields.size()%4);
-}
-
-void NeoAnswerDock::clickedAnswer(int id)
-{
-    emit selectField(fields.at(id));
+    this->ui->board_container->addWidget(answer_board,fields.size()/2,fields.size()%2);
 }

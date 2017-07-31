@@ -28,10 +28,6 @@ public:
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;
-private slots:
-    void clickedAnswer(int id);
-signals:
-    void selectField(procon::NeoField field);
 };
 
 #endif // NEOANSWERDOCK_H
