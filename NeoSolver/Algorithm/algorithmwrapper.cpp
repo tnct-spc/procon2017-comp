@@ -31,7 +31,7 @@ void AlgorithmWrapper::submitAnswer(procon::NeoField field)
     loop.exec();
 }
 
-std::vector<std::tuple<int , int , int , int>> evaluation(std::vector<procon::NeoExpandedPolygon> field , procon::NeoExpandedPolygon polygon)
+std::vector<std::tuple<int , int , int , int>> AlgorithmWrapper::evaluation(std::vector<procon::NeoExpandedPolygon> field , procon::NeoExpandedPolygon polygon)
 {
     //引数は頂点の番号　0はじまり
     auto main_evaluation=[](procon::NeoExpandedPolygon one_field,int field_point,procon::NeoExpandedPolygon polygon,int polygon_point){
