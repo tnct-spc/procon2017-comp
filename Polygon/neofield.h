@@ -10,11 +10,12 @@ private:
     std::bitset<50> piece_id;
 private:
     //フィールド上のピース&フレーム
-    procon::NeoExpandedPolygon field_frame;
+    std::vector<procon::NeoExpandedPolygon> field_frame;
     std::vector<procon::NeoExpandedPolygon> field_pieces;
 
     //素のピース&フレーム
-    procon::NeoExpandedPolygon elementary_frame;
+    std::vector<procon::NeoExpandedPolygon> elementary_frame;
+    std::vector<std::vector<procon::NeoExpandedPolygon>> elementary_frame_inner_pices;
     std::vector<procon::NeoExpandedPolygon> elementary_pieces;
     std::vector<procon::NeoExpandedPolygon> elementary_inverse_pieces;
 
@@ -29,18 +30,17 @@ private:
     double total_evaluation = 0;
 
 public:
-    bool operator || (NeoField & field_id);
-
     //constructor
     NeoField();
 
     //setter
-    void setFrame(procon::NeoExpandedPolygon const& frame);
+    void setFrame(std::vector<procon::NeoExpandedPolygon> const& frame);
     void setPiece(polygon_i piece);
     void setPiece(procon::NeoExpandedPolygon piece);
     void setPiece(procon::NeoExpandedPolygon piece,double x, double y);
     void setPiece(procon::NeoExpandedPolygon piece,int n,double x = 0,double y = 0);
-    void setElementaryFrame(procon::NeoExpandedPolygon const& frame);
+    void setElementaryFrame(std::vector<procon::NeoExpandedPolygon> const& frame);
+    void setElementaryFrameInnerPieces(std::vector<std::vector<procon::NeoExpandedPolygon>> const& frame_inner_pices);
     void setElementaryPieces(std::vector<procon::NeoExpandedPolygon> const& pieces);
     void setIsPlaced(std::array<bool,50> const& IsPlaced);
     void setIsPlaced(int const& piece_id);
@@ -49,8 +49,9 @@ public:
     //getter
     std::vector<procon::NeoExpandedPolygon> const& getPieces() const;
     procon::NeoExpandedPolygon const& getPiece(int const& n) const;
-    procon::NeoExpandedPolygon const& getFrame() const;
-    procon::NeoExpandedPolygon const& getElementaryFrame() const;
+    std::vector<procon::NeoExpandedPolygon> const& getFrame() const;
+    std::vector<procon::NeoExpandedPolygon> const& getElementaryFrame() const;
+    std::vector<procon::NeoExpandedPolygon> const& getElementaryFrameInnerPices() const;
     std::vector<procon::NeoExpandedPolygon> const& getElementaryPieces() const;
     std::vector<procon::NeoExpandedPolygon> const& getElementaryInversePieces() const;
     std::array<bool,50> const& getIsPlaced() const;
