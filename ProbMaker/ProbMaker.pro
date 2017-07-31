@@ -9,7 +9,7 @@ QT       += core gui widgets
 CONFIG += c++14
 
 TARGET = ProbMaker
-TEMPLATE = app
+TEMPLATE = lib
 
 CONFIG   += precompile_header
 
@@ -26,7 +26,7 @@ FORMS    += probmaker.ui
 
 CONFIG   += precompile_header
 
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon

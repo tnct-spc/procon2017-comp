@@ -9,19 +9,16 @@
 #include <boost/geometry/algorithms/disjoint.hpp>
 #include <QWidget>
 #include <opencv2/core/core.hpp>
-#include <field.h>
 #include <iostream>
 #include <random>
 #include <vector>
 #include <string>
-#include "field.h"
+#include <QStringList>
+#include <QVector>
+#include <QList>
+#include "neofield.h"
 #include "neoexpandedpolygon.h"
-#include "expandedpolygon.h"
-
-namespace bg = boost::geometry;
-using point_t = bg::model::d2::point_xy<double>;
-using ring_t = bg::model::ring<point_t>;
-using polygon_t = bg::model::polygon<point_t,true,true,std::vector,std::vector,std::allocator,std::allocator>;
+#include <math.h>
 
 namespace Ui {
 class NeoAnswerBoard;
@@ -34,18 +31,24 @@ class NeoAnswerBoard : public QWidget
 public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
-
+    void setField(procon::NeoField input_field);
+    void setSingleMode(bool inp);
 private:
     Ui::NeoAnswerBoard *ui;
-    QPointF getPosition(point_t point);
+    QPointF getPiecePosition(point_i point);
     void setField();
-    std::vector<cv::Vec3b> colors;
-    void setRandomColors(int threshold);
+    QPointF getPosition(point_i point);
+    QVector<QString> list;
+    void firstField();
     int left_right_margin;
     int grid_size;
     int top_bottom_margin;
-    procon::Field field;
-    point_t center;
+    int down_up_y;
+    procon::NeoField field;
+
+    // Only field mode
+    bool single_mode = false;
+
 
 protected:
     void beforePolygon();

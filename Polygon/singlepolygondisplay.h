@@ -16,7 +16,7 @@ public:
     ~SinglePolygonDisplay();
 
 private:
-    explicit SinglePolygonDisplay(QWidget *parent);
+    explicit SinglePolygonDisplay(QWidget *parent = 0);
     Ui::SinglePolygonDisplay *ui;
     procon::ExpandedPolygon polygon;
     int scale;
