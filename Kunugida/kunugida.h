@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "spdlog/spdlog.h"
 #include "neoanswerboard.h"
+#include "neoanswerdock.h"
 #include "imagerecognition.h"
 #include "neofield.h"
 
@@ -26,6 +27,7 @@ private:
     std::shared_ptr<spdlog::logger> logger;
     bool is_running = false;
     std::shared_ptr<NeoAnswerBoard> board;
+    std::shared_ptr<NeoAnswerDock> dock_board;
     void finishedProcess();
     void startProcess();
 
