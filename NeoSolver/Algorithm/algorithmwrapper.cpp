@@ -30,3 +30,7 @@ void AlgorithmWrapper::submitAnswer(procon::NeoField field)
     QTimer::singleShot(1, &loop, SLOT(quit()));
     loop.exec();
 }
+
+std::vector<std::pair<procon::NeoField,int>> evaluation(procon::NeoField field)
+{
+}

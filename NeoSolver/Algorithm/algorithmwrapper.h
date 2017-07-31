@@ -13,6 +13,7 @@ public:
     virtual void init();
     virtual void run(procon::NeoField field);
     void submitAnswer(procon::NeoField field);
+    std::vector<std::pair<procon::NeoField,int>> evaluation(procon::NeoField field);
 
 signals:
     void throwAnswer(procon::NeoField field);
