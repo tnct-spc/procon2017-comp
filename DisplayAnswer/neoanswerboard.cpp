@@ -66,7 +66,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const int grid_row = 65;
     const int grid_col = 101;
     const int grid_margin = 1;
-    const int splitedheight = window_height/2;
+    const int splitedheight = (SINGLE_MODE==true
+                               ?window_height
+                               :window_height/2);
     grid_size =
             window_width <= splitedheight
             ? window_width / (grid_col + grid_margin)
@@ -79,7 +81,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //draw background
     painter.setBrush(QBrush(QColor(up_back_ground_color)));
-    painter.drawRect(QRect(0,0,window_width,window_height/2));
+    painter.drawRect(QRect(0,0,window_width,splitedheight));
     painter.setBrush(QBrush(QColor(down_back_ground_color)));
     painter.drawRect(QRect(0, splitedheight, window_width, window_height));
 
@@ -163,6 +165,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
         QPointF piececenter = getPosition(center);
+        piececenter.setX(piececenter.x() - grid_size);
+        piececenter.setY(piececenter.y() + grid_size);
         painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
     };
 
@@ -197,7 +201,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     }
     for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
         drawPieceId(piece_num);
-        //drawProcessingLine(piece_num);
+        drawProcessingLine(piece_num);
     }
     drawEvalution();
     drawGrid();

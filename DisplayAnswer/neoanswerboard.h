@@ -43,6 +43,10 @@ private:
     int down_up_y;
     procon::NeoField field;
 
+    // Only field mode
+    const bool SINGLE_MODE = true;
+
+
 protected:
     void beforePolygon();
     void paintEvent(QPaintEvent *event);
