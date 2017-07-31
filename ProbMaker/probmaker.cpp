@@ -1,13 +1,107 @@
 #include "probmaker.h"
 #include "ui_probmaker.h"
+#include "neopolygonviewer.h"
 
+#include <boost/geometry/geometry.hpp>
+#include <boost/math/tools/fraction.hpp>
+#include <boost/math/common_factor_rt.hpp>
+#include <boost/polygon/voronoi.hpp>
+#include <boost/assign/list_of.hpp>
+
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include <numeric>
+#include <vector>
+#include <cmath>
 #include <random>
 
+#include <QPainter>
+#include <QPushButton>
+#include <QKeyEvent>
+#include <QEventLoop>
+
+
 ProbMaker::ProbMaker(QWidget *parent) :
-    QMainWindow(parent),
+    QWidget(parent),
     ui(new Ui::ProbMaker)
 {
     ui->setupUi(this);
+//    connect(this->ui->next_phase,&QPushButton::clicked,this,&ProbMaker::run);
+//    this->run();
+    //本番の101*65
+//    polygon_i base_polygon;
+//    base_polygon.outer().push_back(point_i(0,0));
+//    base_polygon.outer().push_back(point_i(0,65));
+//    base_polygon.outer().push_back(point_i(101,65));
+//    base_polygon.outer().push_back(point_i(101,0));
+//    base_polygon.outer().push_back(point_i(0,0));
+//    this->print_polygons.push_back(base_polygon);
+
+//    polygon_i poly_a;
+//    bg::exterior_ring(poly_a) = boost::assign::list_of<point_i>
+//        (0, 0)
+//        (2, 0)
+//        (2, 2)
+//        (0, 2)
+//        (0, 0)
+//        ;
+//    polygon_i poly_b;
+//    bg::exterior_ring(poly_b) = boost::assign::list_of<point_i>
+//        (2, 0)
+//        (4, 0)
+//        (4, 2)
+//        (20, 20)
+//        (2, 0)
+//        ;
+
+//    std::vector<polygon_i> polyyygon;
+//    boost::geometry::union_(poly_a,poly_b,polyyygon);
+//    std::cout << boost::geometry::intersects(poly_a,poly_b) << std::endl;
+
+//    NeoPolygonViewer::getInstance().displayPolygon(poly_a,"aaaa",true);
+//    NeoPolygonViewer::getInstance().displayPolygon(poly_b,"bbbb",true);
+////    NeoPolygonViewer::getInstance().displayPolygon(polyyygon[0]);
+//    for(auto pol : polyyygon){
+//        NeoPolygonViewer::getInstance().displayPolygon(pol,"hgoehgoe",true);
+//    }
+
+
+//        //ひとつめの引数
+//    polygon_i poly_1;
+//    boost::geometry::exterior_ring(poly_1) = boost::assign::list_of<point_i>
+//            (0,0)
+//            (5,1)
+//            (4,5)
+//            (0,0)
+//            ;
+//    boost::geometry::reverse(poly_1);
+//    //ふたつめの引数
+//    polygon_i poly_2;
+//    boost::geometry::exterior_ring(poly_2) = boost::assign::list_of<point_i>
+//            (4,5)
+//            (10,6)
+//            (5,1)
+//            (4,5)
+//            ;
+
+//    std::cout << boost::geometry::area(poly_1) << std::endl;
+//    std::cout << boost::geometry::area(poly_2) << std::endl;
+
+//    //くっつける部分
+//    std::vector<polygon_i> vector;
+//    boost::geometry::union_(poly_1,poly_2,vector);
+//    polygon_i poly3;
+//    poly3=vector.at(0);
+//    //表示部分
+//    std::cout<<vector.size()<<std::endl;
+//    std::cout<<boost::geometry::dsv(poly3)<<std::endl;
+//    NeoPolygonViewer::getInstance().displayPolygon(poly3,"connected",true);
+//    NeoPolygonViewer::getInstance().displayPolygon(poly_1,"polygon1",true);
+//    NeoPolygonViewer::getInstance().displayPolygon(poly_2,"polygon2",true);
+
+    //ドロネーの三角形分割
+    delaunay_triangulation();
+    GA();
 }
 
 ProbMaker::~ProbMaker()
@@ -15,507 +109,688 @@ ProbMaker::~ProbMaker()
     delete ui;
 }
 
-void ProbMaker::run()
+void ProbMaker::delaunay_triangulation()
 {
-    std::random_device rad;
-    for (int a = 0; a < 100; ++a) {
-        std::cout << rad() << std::endl;
-    }
 
-    std::uniform_int_distribution<> rand100(0,120);
+    std::mt19937 mt;
+    std::uniform_int_distribution<int> x_distribution(0,101);
+    std::uniform_int_distribution<int> y_distribution(0,65);
+    std::vector<cv::Point2f> points;
     for (int var = 0; var < 100; ++var) {
-        std::cout << rand100(rad) << std::endl;
+        int x = x_distribution(mt);
+        int y = y_distribution(mt);
+
+        points.push_back(cv::Point2f(x,y));
     }
 
-}
+    cv::Subdiv2D subdiv;
+    subdiv.initDelaunay(cv::Rect(0,0,150,100));
+    subdiv.insert(points);
 
+    std::vector<cv::Vec6f> triangles;
+    subdiv.getTriangleList(triangles);
+    for(auto vec : triangles){
+        bool flag = false;
 
-
-void ProbMaker::pushFrame()
-{
-    std::random_device rd;
-    std::uniform_real_distribution<double> rand(0.0,1.0);
-
-    //2cm以上空けて枠を作成
-    double margin = 30 * 2;
-    std::shared_ptr<Dot> dotA = std::make_shared<Dot>(margin+30*rand(rd),margin+30*rand(rd));
-    std::shared_ptr<Dot> dotB = std::make_shared<Dot>(margin+30*rand(rd),900-(margin+30*rand(rd)));
-    std::shared_ptr<Dot> dotC = std::make_shared<Dot>(900-(margin+30*rand(rd)),900-(margin+30*rand(rd)));
-    std::shared_ptr<Dot> dotD = std::make_shared<Dot>(900-(60+margin*rand(rd)),(60+margin*rand(rd)));
-    std::shared_ptr<Line> lineAB = std::make_shared<Line>(dotA, dotB);
-    std::shared_ptr<Line> lineBC = std::make_shared<Line>(dotB, dotC);
-    std::shared_ptr<Line> lineCD = std::make_shared<Line>(dotC, dotD);
-    std::shared_ptr<Line> lineDA = std::make_shared<Line>(dotD, dotA);
-    dotA->connectedLines.push_back(lineAB);
-    dotA->connectedLines.push_back(lineDA);
-    dotB->connectedLines.push_back(lineBC);
-    dotB->connectedLines.push_back(lineAB);
-    dotC->connectedLines.push_back(lineCD);
-    dotC->connectedLines.push_back(lineBC);
-    dotD->connectedLines.push_back(lineDA);
-    dotD->connectedLines.push_back(lineCD);
-    dots.push_back(dotA);
-    dots.push_back(dotB);
-    dots.push_back(dotC);
-    dots.push_back(dotD);
-    lines.push_back(lineAB);
-    lines.push_back(lineBC);
-    lines.push_back(lineCD);
-    lines.push_back(lineDA);
-}
-
-std::shared_ptr<Dot> ProbMaker::pickRandomDotAtAll(std::shared_ptr<Line> &line_pos)
-{
-    std::random_device rd;
-    std::uniform_real_distribution<double> rand(0.0,1.0);
-
-    double sum_can_connection_line_length = 0.0;
-    for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
-        sum_can_connection_line_length += (*line_itr)->can_connection_line_length;
-    }
-    double seek = sum_can_connection_line_length * rand(rd);
-    auto lines_it = lines.begin();
-    while(seek >= 0.0){
-        seek -= (*lines_it)->can_connection_line_length;
-        lines_it++;
-    }
-    lines_it--;
-    line_pos = *lines_it;
-    seek += (*lines_it)->can_connection_line_length + 15;
-    double dotX = seek * cos((*lines_it)->angle) + (*lines_it)->dot1->x;
-    double dotY = seek * sin((*lines_it)->angle) + (*lines_it)->dot1->y;
-    return std::make_shared<Dot>(dotX, dotY);
-}
-
-std::shared_ptr<Dot> ProbMaker::pickRandomDotOnRing(const std::vector<std::shared_ptr<Line>> lines, std::shared_ptr<Line> &line_pos)
-{
-    std::random_device rd;
-    std::uniform_real_distribution<double> rand(0.0,1.0);
-
-    //Select random point of dot on lines
-    double sum_can_connection_line_length = 0.0;
-    for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
-        sum_can_connection_line_length += (*line_itr)->can_connection_line_length;
-    }
-    double seek = sum_can_connection_line_length * rand(rd);
-    auto lines_it = lines.begin();
-    while(seek >= 0.0){
-        seek -= (*lines_it)->can_connection_line_length;
-        lines_it++;
-    }
-    lines_it--;
-    line_pos = *lines_it;
-    seek += (*lines_it)->can_connection_line_length + 15;
-    double dotX = seek * cos((*lines_it)->angle) + (*lines_it)->dot1->x;
-    double dotY = seek * sin((*lines_it)->angle) + (*lines_it)->dot1->y;
-    return std::make_shared<Dot>(dotX, dotY);
-}
-
-bool ProbMaker::isCross(const std::shared_ptr<Line> &line1, const std::shared_ptr<Line> &line2)
-{
-    //2本の線を直線としたときの交点のX座標
-    double cross_pointX = ((*line2).b - (*line1).b)/((*line1).a - (*line2).a);
-
-    //X座標でくらべて、線どうしが交差しているかを判定
-    bool is_cross = ((*line1).dot1->x < cross_pointX ? (*line1).dot1->x : (*line1).dot2->x) < cross_pointX &&
-                    ((*line1).dot1->x < cross_pointX ? (*line1).dot2->x : (*line1).dot1->x) > cross_pointX &&
-                    ((*line2).dot1->x < cross_pointX ? (*line2).dot1->x : (*line2).dot2->x) < cross_pointX &&
-                    ((*line2).dot1->x < cross_pointX ? (*line2).dot2->x : (*line2).dot1->x) > cross_pointX;
-    return is_cross;
-}
-
-bool ProbMaker::isValidLine(const std::shared_ptr<Line> &newL, double startL_angle, double endL_angle)
-{
-    //5mm以上の長さか
-    if((*newL).length < 15.0) return false;
-
-    //他の線と交差していないか
-    for(auto it = lines.begin(), end = lines.end(); it != end; it++){
-        if(isCross((*it), newL)) return false;
-    }
-
-    //25度より鋭い角度になっていないか
-
-    auto NormAngle = [&](double angle){
-        while(angle < 0.0) angle += M_PI;
-        while(angle > M_PI) angle -= M_PI;
-        return angle;
-    };
-
-    double normalized_newL_angle = NormAngle((*newL).angle);
-    double normalized_startL_angle = NormAngle(startL_angle);
-    double normalized_endL_angle = NormAngle(endL_angle);
-
-    double accept_angle = 2 * M_PI * (25.0/360.0);
-
-    double relative_startL_angle = normalized_startL_angle - normalized_newL_angle;
-    double relative_endL_angle = normalized_endL_angle - normalized_newL_angle;
-    if(relative_startL_angle < 0.0) relative_startL_angle += M_PI;
-    if(relative_endL_angle < 0.0) relative_endL_angle += M_PI;
-    if((M_PI - accept_angle) < relative_startL_angle || relative_startL_angle < accept_angle) return false;
-    if((M_PI - accept_angle) < relative_endL_angle || relative_endL_angle < accept_angle) return false;
-
-    return true;
-}
-
-procon::Field ProbMaker::PolygonToExPolygon()
-{
-    polygon_t frame;
-    polygon_t buff;
-    std::vector<polygon_t> pieces;
-    procon::ExpandedPolygon ex_frame;
-    procon::ExpandedPolygon buff2;
-    std::vector<procon::ExpandedPolygon> ex_pieces;
-    procon::Field field;
-
-    //frame
-    for(int j = 0;j < (static_cast<int>(Polygons.at(0).size()));++j){
-        frame.outer().push_back(point_t(Polygons.at(0).at(j).s_dot->x/30,Polygons.at(0).at(j).s_dot->y/30));
-    }
-    frame.outer().push_back(point_t(Polygons.at(0).at(0).s_dot->x/30,Polygons.at(0).at(0).s_dot->y/30));
-    ex_frame.resetPolygonForce(frame);
-    field.setElementaryFrame(ex_frame);
-
-    //polygon
-    for(int i = 1;i < (static_cast<int>(Polygons.size()));++i){
-        pieces.push_back(buff);
-        //cal center
-        double sumX=0.0,sumY=0.0;
-        int polygon_size = Polygons.at(i).size();
-        for(int j = 0;j < polygon_size;++j){
-            sumX += Polygons.at(i).at(j).s_dot->x/30;
-            sumY += Polygons.at(i).at(j).s_dot->y/30;
-        }
-        double reference_point_x = sumX / polygon_size;
-        double reference_point_y = sumY / polygon_size;
-        //put polygon
-        for(int j = 0;j < (static_cast<int>(Polygons.at(i).size()));++j){
-            pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(j).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(j).s_dot->y/30)-reference_point_y));
-        }
-        pieces.at(i-1).outer().push_back(point_t((Polygons.at(i).at(0).s_dot->x/30)-reference_point_x,(Polygons.at(i).at(0).s_dot->y/30)-reference_point_y));
-        ex_pieces.push_back(buff2);
-        ex_pieces.at(i-1).resetPolygonForce(pieces.at(i-1));
-    }
-    field.setElementaryPieces(ex_pieces);
-
-    return field;
-}
-
-void ProbMaker::addNewLine()
-{
-    std::shared_ptr<Dot> start_dot;
-    std::shared_ptr<Dot> end_dot;
-    std::shared_ptr<Line> start_line;
-    std::shared_ptr<Line> end_line;
-    std::shared_ptr<Line> new_line;
-
-    //生成するLineの始点と終点が決まるまで繰り返す
-    while(true){
-        //始点の決定
-        start_dot = pickRandomDotAtAll(start_line);
-
-        //終点の決定
-        for(int i=0;i<10000;i++){
-            end_dot = pickRandomDotAtAll(end_line);
-            //有効な線になるか検査
-            std::shared_ptr<Line> buff_line = std::make_shared<Line>(start_dot, end_dot);
-            double a1 = start_line->angle;
-            double a2 = end_line->angle;
-            if(isValidLine(buff_line , a1,a2)){
-                goto finishSelectLine;
-            }
-        }
-    }
-    finishSelectLine:
-
-    //新しいLineを生成（もともとあったLineを分裂させてくっつける）
-
-    new_line = std::make_shared<Line>(start_dot,end_dot);
-    std::shared_ptr<Line> divided_start_line_1 = std::make_shared<Line>(start_line->dot1, start_dot);
-    std::shared_ptr<Line> divided_start_line_2 = std::make_shared<Line>(start_dot, start_line->dot2);
-    std::shared_ptr<Line> divided_end_line_1 = std::make_shared<Line>(end_line->dot1, end_dot);
-    std::shared_ptr<Line> divided_end_line_2 = std::make_shared<Line>(end_dot, end_line->dot2);
-    //dotsとlinesに新しいdotと新しいlineを登録
-    dots.push_back(start_dot);
-    dots.push_back(end_dot);
-    lines.push_back(new_line);
-    //新しいdotに新しいlineを登録
-    start_dot->connectedLines.push_back(new_line);
-    start_dot->connectedLines.push_back(divided_start_line_1);
-    start_dot->connectedLines.push_back(divided_start_line_2);
-    end_dot->connectedLines.push_back(new_line);
-    end_dot->connectedLines.push_back(divided_end_line_1);
-    end_dot->connectedLines.push_back(divided_end_line_2);
-    //すでにあったdotに新しいlineを登録
-    start_line->dot1->removeConnectedLine(start_line);
-    start_line->dot1->connectedLines.push_back(divided_start_line_1);
-    start_line->dot2->removeConnectedLine(start_line);
-    start_line->dot2->connectedLines.push_back(divided_start_line_2);
-    end_line->dot1->removeConnectedLine(end_line);
-    end_line->dot1->connectedLines.push_back(divided_end_line_1);
-    end_line->dot2->removeConnectedLine(end_line);
-    end_line->dot2->connectedLines.push_back(divided_end_line_2);
-    //分裂前のLineを削除して、分裂後のLineを登録
-    std::list<std::shared_ptr<Line>>::iterator start_line_it;
-    for(auto i=lines.begin(),end=lines.end();i!=end;++i){
-        if(*i == start_line){
-            start_line_it = i;
-            break;
-        }
-    }
-    std::list<std::shared_ptr<Line>>::iterator end_line_it;
-    for(auto i=lines.begin(),end=lines.end();i!=end;++i){
-        if(*i == end_line){
-            end_line_it = i;
-            break;
-        }
-    }
-    lines.erase(start_line_it);
-    lines.push_back(divided_start_line_1);
-    lines.push_back(divided_start_line_2);
-    lines.erase(end_line_it);
-    lines.push_back(divided_end_line_1);
-    lines.push_back(divided_end_line_2);
-}
-
-void ProbMaker::eraseMinPolygon()
-{
-    bool eraseFlag;
-    do{
-        eraseFlag = false;
-        for(auto polygons_it = Polygons.begin(),end = Polygons.end(); polygons_it < end; ++polygons_it){
-            std::vector<struct polygon>& Polygon = *polygons_it;
-
-            bool is_min_polygon = [&]()->bool{
-                //[内包判定]
-                auto includeCheck = [&](std::shared_ptr<Dot> dot){
-                    int cross_cnt = 0;
-                    //点からrandomDotに線を生成(ランダムでないと角っこにぶつかってしまいご判定？)
-                    std::random_device rd;
-                    std::uniform_real_distribution<double> rand(0.0,1.0);
-                    std::shared_ptr<Dot> zero_dot = std::make_shared<Dot>(-5+rand(rd),-5+rand(rd));
-                    std::shared_ptr<Line> line = std::make_shared<Line>(zero_dot,dot);
-                    //線と多角形との交差判定をカウント
-                    for(int i=0;i<(int)Polygon.size();++i){
-                        if(isCross(line, Polygon.at(i).line)) cross_cnt++;
-                    }
-                    //奇数なら内包-true
-                    return cross_cnt%2 == 1 ? true : false;
-                };
-
-                //座標の最大最小xyを取得
-                double minX=900,minY=900,maxX=0,maxY=0;
-                for(auto dot_it = Polygon.begin(), end = Polygon.end(); dot_it < end; ++dot_it){
-                    if((*dot_it).s_dot->x < minX) minX = (*dot_it).s_dot->x;
-                    if((*dot_it).s_dot->x > maxX) maxX = (*dot_it).s_dot->x;
-                    if((*dot_it).s_dot->y < minY) minY = (*dot_it).s_dot->y;
-                    if((*dot_it).s_dot->y > maxY) maxY = (*dot_it).s_dot->y;
-                }
-
-                //正方形の始点を1/6cmずつずらす
-                for(double x = minX; (x+30) < maxX; x += 5){
-                    for(double y = minY; (y+30) < maxY; y += 5){
-                        //正方形の点を生成
-                        std::array<std::shared_ptr<Dot>, 4> square_dot;
-                        square_dot[0] = std::make_shared<Dot>(x   ,y   );
-                        square_dot[1] = std::make_shared<Dot>(x   ,y+30);
-                        square_dot[2] = std::make_shared<Dot>(x+30,y+30);
-                        square_dot[3] = std::make_shared<Dot>(x+30,y   );
-                        //正方形の点と多角形の[内包判定]
-                        if(
-                        includeCheck(square_dot[0]) &&
-                        includeCheck(square_dot[1]) &&
-                        includeCheck(square_dot[2]) &&
-                        includeCheck(square_dot[3])
-                        ){
-                            //正方形の線を生成
-                            std::array<std::shared_ptr<Line>, 4> square_line;
-                            square_line[0] = std::make_shared<Line>(square_dot[0],square_dot[1]);
-                            square_line[1] = std::make_shared<Line>(square_dot[1],square_dot[2]);
-                            square_line[2] = std::make_shared<Line>(square_dot[2],square_dot[3]);
-                            square_line[3] = std::make_shared<Line>(square_dot[3],square_dot[0]);
-                            //正方形の線と多角形の[交差判定]
-                            bool is_duplicate = [&]()->bool{
-                                for(int i=0;i<4;++i){
-                                    for(int j=0;j<(int)Polygon.size();++j){
-                                        if(isCross(square_line[i], Polygon[j].line)) return true;
-                                    }
-                                }
-                                return false;
-                            }();
-
-                            if(is_duplicate){
-                                continue;
-                            }
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }();
-
-            if(is_min_polygon){
-                //正方形を含むことができなかったので、線をひとつ消す
-                eraseFlag = true;
-                eraseRandomLineOnPolygon(Polygon);
-            }
-            continue;
-        }
-        //作りなおす
-        makePolygon();
-    }while(eraseFlag==true);
-}
-
-void ProbMaker::erasePolygonUnderFifty()
-{
-    //50個以下になるまで、線の削除→ポリゴンの作り直し、を繰り返す
-    while(Polygons.size() >= 50){
-
-        //ランダムなポリゴンを指定
-        std::random_device rd;
-        std::uniform_real_distribution<double> rand(0.0,1.0);
-        std::vector<struct polygon>& Polygon = Polygons.at(Polygons.size()*rand(rd));
-
-        //線を一つ削除する
-        eraseRandomLineOnPolygon(Polygon);
-
-        //ポリゴンの再生成
-        makePolygon();
-    }
-}
-
-void ProbMaker::eraseRandomLineOnPolygon(std::vector<struct polygon>& Polygon)
-{
-    auto eraseLine = [&](std::shared_ptr<Line> line){
-        for(auto i=lines.begin(),end=lines.end();i!=end;++i){
-            if(*i == line){
-                lines.erase(i);
-                break;
-            }
-        }
-    };
-
-    auto eraseDot = [&](std::shared_ptr<Dot> dot){
-        for(auto i=dots.begin(),end=dots.end();i!=end;++i){
-            if(*i == dot){
-                dots.erase(i);
-                break;
-            }
-        }
-    };
-
-    std::function<void(std::shared_ptr<Dot> dot)> eraseStick = [&](std::shared_ptr<Dot> dot){
-        if(dot->connectedLines.size() == 1){
-            std::shared_ptr<Line> connectedLine = dot->connectedLines.at(0);
-            std::shared_ptr<Dot> connectedDot = connectedLine->dot1 == dot ? connectedLine->dot2 : connectedLine->dot1;
-            //Erase
-            eraseDot(dot);
-            connectedDot->removeConnectedLine(connectedLine);
-            eraseLine(connectedLine);
-            //Next
-            eraseStick(connectedDot);
-        }
-    };
-
-    //ランダムでポリゴンの一箇所の線を削除
-    int size = Polygon.size();
-    std::random_device rd;
-    std::uniform_real_distribution<double> rand(0.0,1.0);
-    int seek = size * rand(rd);
-    struct polygon& erasedLine = Polygon.at(seek);
-    erasedLine.s_dot->removeConnectedLine(erasedLine.line);
-    erasedLine.e_dot->removeConnectedLine(erasedLine.line);
-    eraseLine(erasedLine.line);
-
-    //点に繋がってる線が一つだけなら再帰的に削除
-    eraseStick(erasedLine.s_dot);
-    if(erasedLine.e_dot->connectedLines.size()==0){
-        eraseDot(erasedLine.e_dot);
-    }else{
-        eraseStick(erasedLine.e_dot);
-    }
-}
-
-void ProbMaker::makePolygon()
-{
-    Polygons.clear();
-
-    //すべてのdotに対して、繋がっているLineを角度順にソートする
-    int dots_size = dots.size();
-    for(int dots_cnt=0; dots_cnt < dots_size; dots_cnt++){
-        std::shared_ptr<Dot> &dot = dots.at(dots_cnt);
-        std::sort(dot->connectedLines.begin(), dot->connectedLines.end(),
-                  [&](const std::shared_ptr<Line> &lhs, const std::shared_ptr<Line> &rhs){
-            double a1 = (lhs->dot1 == dot)? lhs->angle : lhs->angle + M_PI;
-            if(a1 > M_PI) a1 -= 2 * M_PI;
-            double a2 = (rhs->dot1 == dot)? rhs->angle : rhs->angle + M_PI;
-            if(a2 > M_PI) a2 -= 2 * M_PI;
-            return  a1 > a2;
-        });
-    }
-
-    //Reset Line Reference
-    for (auto line_itr = lines.begin(), end = lines.end(); line_itr != end; ++line_itr){
-        (*line_itr)->referenced_from_dot1 = false;
-        (*line_itr)->referenced_from_dot2 = false;
-    }
-
-    //Search
-    for(int dots_cnt=0; dots_cnt < dots_size; dots_cnt++){
-        std::shared_ptr<Dot> &dot = dots.at(dots_cnt);
-        int lines_size = dot->connectedLines.size();
-
-        auto findNextLine = [&](std::vector<std::shared_ptr<Line>> &lines, std::shared_ptr<Line> &line){
-            int size = lines.size();
-            int i;
-            for(i=0;i<size;i++){
-                if(lines.at(i) == line) break;
-            }
-            i++;
-            if(i==size) i=0;
-            return lines.at(i);
+        auto check = [&](auto a){
+            if(-300 > a || a > 300) flag = true;
         };
 
-        for(int lines_cnt=0; lines_cnt < lines_size; lines_cnt++){
-            std::shared_ptr<Line> &line = dot->connectedLines.at(lines_cnt);
+        for (int a = 0; a < 6; ++a) {
+            check(vec[a]);
+        }
 
-            if((line->dot1 == dot && (line->referenced_from_dot1)) ||
-               (line->dot2 == dot && (line->referenced_from_dot2))) continue;
-            //mine
-            std::vector<struct polygon> polygon;
-            std::shared_ptr<Dot> start_dot = dot;
-            std::shared_ptr<Dot> mine_dot = dot;
-            std::shared_ptr<Line> mine_line = line;
-            do{
-                if(mine_line->dot1 == mine_dot){
-                    mine_line->referenced_from_dot1 = true;
-                    polygon.push_back({mine_line,mine_dot,mine_line->dot2});
-                    mine_dot = mine_line->dot2;
-                }else{
-                    mine_line->referenced_from_dot2 = true;
-                    polygon.push_back({mine_line,mine_dot,mine_line->dot1});
-                    mine_dot = mine_line->dot1;
-                }
-                mine_line = findNextLine(mine_dot->connectedLines, mine_line);
-            }while(mine_dot != start_dot);
-            Polygons.push_back(polygon);
+        if(!flag){
+            polygon_i poly_buf;
+            poly_buf.outer().push_back(point_i(vec[0],vec[1]));
+            poly_buf.outer().push_back(point_i(vec[2],vec[3]));
+            poly_buf.outer().push_back(point_i(vec[4],vec[5]));
+            poly_buf.outer().push_back(point_i(vec[0],vec[1]));
+
+            //面積が負だとboostのpolygon conceptに怒られてしまうのです
+            if(0 > boost::geometry::area(poly_buf)){
+                boost::geometry::reverse(poly_buf);
+            }
+
+            this->print_polygons.push_back(poly_buf);
         }
     }
+
+    polygon_i base_polygon;
+    base_polygon.outer().push_back(point_i(0,0));
+    base_polygon.outer().push_back(point_i(0,65));
+    base_polygon.outer().push_back(point_i(101,65));
+    base_polygon.outer().push_back(point_i(101,0));
+    base_polygon.outer().push_back(point_i(0,0));
+
+    std::vector<polygon_i> polygons;
+    std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygons));
+
+    auto isPointEqual = [](point_i first,point_i second){
+       return first.x() == second.x() && first.y() == second.y();
+    };
+
+
+    std::vector<polygon_i> out;
+    int a,b;
+    for (a = 0; a < polygons.size(); ++a) {
+        for (b = 1; b < polygons.size(); ++b) {
+            boost::geometry::union_(polygons.at(a),polygons.at(b),out);
+
+            if(out.size() == 1){
+
+
+                goto EXIT;
+            }
+        }
+    }
+    EXIT:
+    //結合した分を消す
+    if(a < b){
+        polygons.erase(polygons.begin() + b);
+        polygons.erase(polygons.begin() + a);
+    }else{
+        polygons.erase(polygons.begin() + a);
+        polygons.erase(polygons.begin() + b);
+    }
+    polygon_i frame = out[0];
+
+    while(polygons.size() != 0){
+        for (int index = 0; index < polygons.size(); ++index) {
+            std::vector<polygon_i> output_buffer;
+            boost::geometry::union_(frame,polygons.at(index),output_buffer);
+
+            if(output_buffer.size() == 1){
+                polygons.erase(polygons.begin() + index);
+                frame = output_buffer[0];
+            }
+        }
+    }
+    this->frame = frame;
+
+//    NeoPolygonViewer::getInstance().displayPolygon(frame,"frame",true);
+
+//    std::copy(this->print_polygons.begin(),this->print_polygons.end(),)
+
+//    while()
+
+//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[0],"hogehoge")->show();
+//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[1],"fugapiyo")->show();
+//    for (unsigned int index = 1; index < this->print_polygons.size(); ++index) {
+//        boost::geometry::difference(out[0],this->print_polygons[index],out);
+//    }
+
+//    std::cout << boost::geometry::dsv(out[0]) << std::endl;
+//    std::cout << out.size() << std::endl;
+
+//    std::cout << "delaunay trianglation completed" << std::endl;
+
+//    for(auto polygon : this->print_polygons){
+//	    std::cout << boost::geometry::dsv(polygon) << std::endl;
+//    }
+
+}
+
+void ProbMaker::GA()
+{
+    typedef std::vector<std::vector<int>> State;
+
+    std::vector<polygon_i> polygons;
+    std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygons));
+    polygon_i frame = this->frame;
+
+    std::random_device rnd;
+
+    auto connect_near_by_polygon = [](std::vector<polygon_i> pieces){
+
+        std::vector<polygon_i> back_up_polygon;
+        std::copy(pieces.begin(),pieces.end(),std::back_inserter(back_up_polygon));
+
+ONCE_MORE:
+
+
+        std::random_device rnd;
+        //真に遺憾ですが、乱数を投入してしまいます
+        std::uniform_int_distribution<> randomm(0,pieces.size() - 1);
+        int connect_polygon_index = randomm(rnd);
+
+        polygon_i connect_polygon = pieces[connect_polygon_index];
+
+        pieces.erase(pieces.begin() + connect_polygon_index);
+
+        int counter = 0;
+        std::vector<int> can_connect_polygon_number;
+        for(auto piece : pieces){
+            std::vector<polygon_i> out;
+            boost::geometry::union_(connect_polygon,piece,out);
+
+            if(out.size() == 1){
+                std::cout << "find can connect polygon" << std::endl;
+                can_connect_polygon_number.push_back(counter);
+            }
+
+            ++counter;
+        }
+
+        if(can_connect_polygon_number.size() == 0){
+            pieces.clear();
+            std::copy(back_up_polygon.begin(),back_up_polygon.end(),std::back_inserter(pieces));
+            goto ONCE_MORE;
+        }
+
+        //connect可能な中から適当に選ぶ
+        //あたりまえだけど、-1してstd::out_of_range回避
+        std::uniform_int_distribution<> random(0,can_connect_polygon_number.size() - 1);
+        int connecting_polygon_index = random(rnd);
+
+
+
+        counter = 0;
+        std::vector<std::pair<double,int>> size;
+        for(auto i : can_connect_polygon_number){
+            std::pair<double,int> buf;
+            buf.first = boost::geometry::area(pieces[i]);
+            buf.second = counter;
+            ++counter;
+            size.push_back(buf);
+        }
+
+        std::sort(size.begin(),size.end(),[](auto a,auto b){
+            return a.first < b.first;
+        });
+
+        for (int index = 0; index < size.size(); ++index) {
+
+
+            connecting_polygon_index = size[index].second;
+
+            polygon_i connecting_polygon = pieces.at(can_connect_polygon_number[connecting_polygon_index]);
+
+            std::vector<polygon_i> output;
+            boost::geometry::union_(connect_polygon,connecting_polygon,output);
+
+            auto isPointEqual = [](point_i first,point_i second){
+                return first.x() == second.x() && first.y() == second.y();
+            };
+
+            //ピースの中に隣り合わず重複した点があると、2つのpolygonに分離できる状態なのに、分離されないヤバイ感じのになるので。ここで除去
+            bool flag = false;
+            for (int a = 1; a < output[0].outer().size() - 1; ++a) {
+                for (int b = 1; b < output[0].outer().size() - 1; ++b) {
+                    if(a == b){
+                        b++;
+                    }
+
+                    flag += isPointEqual(output[0].outer()[a],output[0].outer()[b]);
+                }
+            }
+
+            std::cout << flag << std::endl;
+
+            if(flag){
+                if(index == (size.size() - 1)){
+                    pieces.clear();
+                    std::copy(back_up_polygon.begin(),back_up_polygon.end(),std::back_inserter(pieces));
+                    goto ONCE_MORE;
+                }
+            }else{
+                //connectしたわけなので、元からのpolygonは除去
+                pieces.erase(pieces.begin() + can_connect_polygon_number[connecting_polygon_index]);
+                pieces.push_back(output[0]);
+                break;
+            }
+        }
+
+        return pieces;
+    };
+
+    std::vector<polygon_i> pieces;
+    std::copy(polygons.begin(),polygons.end(),std::back_inserter(pieces));
+    for (int var = 0; var < 140; ++var) {
+        std::vector<polygon_i> pieces_buf = connect_near_by_polygon(pieces);
+        pieces.clear();
+        std::copy(pieces_buf.begin(),pieces_buf.end(),std::back_inserter(pieces));
+    }
+
+    this->print_polygons.clear();
+    std::copy(pieces.begin(),pieces.end(),std::back_inserter(this->print_polygons));
+
+
+}
+
+void ProbMaker::step()
+{
+    //polygonのvectorから一番面積が大きいやつのindexを持ってくるやつ
+    auto greatest_area = [](std::vector<polygon_i> polygons)->unsigned int{
+
+        int current_biggest_polygon_number = 0;
+        double current_biggest_polygon_area = 0;
+        int current_polygon_number = 0;
+
+        for(auto polygon : polygons){
+            double current_area = boost::geometry::area(polygon);
+            if(current_biggest_polygon_area < current_area){
+                current_biggest_polygon_area = current_area;
+                current_biggest_polygon_number = current_polygon_number;
+            }
+            ++current_polygon_number;
+        }
+        return current_biggest_polygon_number;
+    };
+
+    //いい感じに乱数でpolygonを切断して
+    auto devide_polygon = [](polygon_i polygon)->std::pair<polygon_i,polygon_i>{
+        std::random_device rnd;
+        std::uniform_int_distribution<> random(0,polygon.outer().size() - 2);
+
+        auto calc_great_common_divisor = [](int a,int b)->int{
+            return boost::math::gcd(a,b);
+        };
+
+        //切り始める辺と終わりの辺[0~...]
+        int start_side = random(rnd);
+        int end_side = random(rnd);
+
+        //同じ番号が来られると困るのでこんな感じに違うのが出るまでやり続ける
+        while(end_side == start_side){
+            end_side = random(rnd);
+        }
+
+        //start_side < end_side になるように変更
+        if(start_side > end_side){
+            int tmp = start_side;
+            start_side = end_side;
+            end_side = tmp;
+        }
+
+        std::vector<point_i> start_side_cut_points;
+        std::vector<point_i> end_side_cut_points;
+
+        //(x,y)ともに整数になるパターンを列挙するため傾きを求める
+        int start_side_gcd = calc_great_common_divisor(std::abs(polygon.outer().at(start_side + 1).x() - polygon.outer().at(start_side).x()),
+                                                         std::abs(polygon.outer().at(start_side + 1).y() - polygon.outer().at(start_side).y()));
+        int end_side_gcd = calc_great_common_divisor(std::abs(polygon.outer().at(end_side + 1).x() - polygon.outer().at(end_side).x()),
+                                                       std::abs(polygon.outer().at(end_side + 1).y() - polygon.outer().at(end_side).y()));
+
+        int start_dx = (polygon.outer().at(start_side + 1).x() - polygon.outer().at(start_side).x()) / start_side_gcd;
+        int start_dy = (polygon.outer().at(start_side + 1).y() - polygon.outer().at(start_side).y()) / start_side_gcd;
+
+        if(start_dx == 0){
+            start_dy = start_dy > 0 ? 1 : -1;
+        }else if(start_dy == 0){
+            start_dx = start_dx > 0 ? 1 : -1;
+        }
+
+        int end_dx = (polygon.outer().at(end_side + 1).x() - polygon.outer().at(end_side).x()) / end_side_gcd;
+        int end_dy = (polygon.outer().at(end_side + 1).y() - polygon.outer().at(end_side).y()) / end_side_gcd;
+
+        if(end_dx == 0){
+            end_dy = end_dy > 0 ? 1 : -1;
+        }else if(end_dy == 0){
+            end_dx = end_dx > 0 ? 1 : -1;
+        }
+
+        int current_x = polygon.outer().at(start_side).x();
+        int current_y = polygon.outer().at(start_side).y();
+
+        //開始点になれる可能性のある点を列挙
+        while((current_x != polygon.outer().at(start_side + 1).x()) || (current_y != polygon.outer().at(start_side + 1).y())){
+            start_side_cut_points.push_back(point_i(current_x,current_y));
+
+            current_x += start_dx;
+            current_y += start_dy;
+        }
+        start_side_cut_points.push_back(point_i(current_x,current_y));
+
+        //終点になれる可能性のある点を列挙
+        current_x = polygon.outer().at(end_side).x();
+        current_y = polygon.outer().at(end_side).y();
+//        std::cout << "current_X:" << current_x << "current_y:" << current_y << std::endl;
+//        std::cout << "point_x" << polygon.outer().at(end_side + 1).x() << "point_y" << polygon.outer().at(end_side + 1).y() <<  std::endl;
+
+//        std::cout << (current_x != polygon.outer().at(end_side + 1).x()) << (current_y != polygon.outer().at(end_side + 1).y()) << std::endl;
+//        std::cout << ((current_x != polygon.outer().at(end_side + 1).x()) && (current_y != polygon.outer().at(end_side + 1).y())) << std::endl;
+//        std::cout << (false && true) << std::endl;
+
+        while((current_x != polygon.outer().at(end_side + 1).x()) || (current_y != polygon.outer().at(end_side + 1).y())){
+            end_side_cut_points.push_back(point_i(current_x,current_y));
+
+            current_x += end_dx;
+            current_y += end_dy;
+        }
+        end_side_cut_points.push_back(point_i(current_x,current_y));
+
+//        for(auto point: start_side_cut_points){
+//            std::cout << "start:" << "x:" << point.x() << "y" << point.y() << std::endl;
+//        }
+//        for(auto point: end_side_cut_points){
+//            std::cout << "end" << "x:" << point.x() << "y" << point.y() << std::endl;
+//        }
+        
+        //実際に切る点を決める乱数生成
+		std::uniform_int_distribution<> start_dot_random(0,start_side_cut_points.size() - 1);
+        std::uniform_int_distribution<> end_dot_random(0,end_side_cut_points.size() - 1);
+        
+        int start_dot_num = start_dot_random(rnd);
+        int end_dot_num = end_dot_random(rnd);
+
+        //new points vector
+        std::vector<point_i> new_points1;
+        std::vector<point_i> new_points2;
+
+        int a = 0;
+        while(true){
+            //start dot numにたどり着くまでpush_back
+            new_points1.push_back(polygon.outer().at(a));
+            if(a == start_side){
+                break;
+            }
+
+            ++a;
+        }
+        
+        //切断店の挿入
+        new_points1.push_back(start_side_cut_points.at(start_dot_num));
+        new_points2.push_back(start_side_cut_points.at(start_dot_num));
+
+        ++a;
+        
+        while(true){
+            new_points2.push_back(polygon.outer().at(a));
+            if(a == end_side){
+                break;
+            }
+
+            ++a;
+        }
+
+        //切断点の挿入
+        new_points1.push_back(end_side_cut_points.at(end_dot_num));
+        new_points2.push_back(end_side_cut_points.at(end_dot_num));
+
+        ++a;
+        
+        //new_points2はここで終点なのでindexが0の座標を最後に挿入する
+        new_points2.push_back(new_points2.at(0));
+
+        while (true) {
+            new_points1.push_back(polygon.outer().at(a));
+            if(a == polygon.outer().size() - 1){
+                break;
+            }
+
+            a++;
+        }
+
+        //new_points2はここで終点なのでindexが0の座標を最後に挿入
+        new_points1.push_back(new_points1.at(0));
+
+        auto delete_depulicated_point = [](polygon_i polygon)->polygon_i{
+          	polygon_i deleted_duplicated_point_polygon;
+            auto check_same_point = [](point_i point1,point_i point2)->bool{
+                return point1.x() == point2.x() && point1.y() == point2.y();
+            };
+
+            std::cout << "debugguggggggasdkljgklajsldkgkla" << std::endl;
+            std::cout << check_same_point(point_i(100,99),point_i(100,99)) << std::endl;
+            std::cout << check_same_point(point_i(100,100),point_i(100,99)) << std::endl;
+
+
+            for (int index = 0; index < polygon.outer().size() - 1; ++index) {
+                if(!check_same_point(polygon.outer().at(index),polygon.outer().at(index+1))){
+                    deleted_duplicated_point_polygon.outer().push_back(polygon.outer().at(index));
+                }
+            }
+            deleted_duplicated_point_polygon.outer().push_back(polygon.outer().at(polygon.outer().size()-1));
+            
+        	return deleted_duplicated_point_polygon;
+        };
+
+        auto points_to_polygon = [](std::vector<point_i> points)->polygon_i{
+            polygon_i return_polygon;
+            for(auto point : points){
+                return_polygon.outer().push_back(point);
+            }
+            return return_polygon;
+        };
+
+        std::pair<polygon_i,polygon_i> polygons;
+        polygons.first = delete_depulicated_point(points_to_polygon(new_points1));
+        polygons.second = delete_depulicated_point(points_to_polygon(new_points2));
+
+        return polygons;
+    };
+
+    auto connect_polygon = [](){
+        //polygon同士の結合
+        std::cout << "connect polygon" << std::endl;
+    };
+    
+    auto find_iikanji_polygon = [&devide_polygon](polygon_i polygon)->std::pair<polygon_i,polygon_i>{
+        auto check_polygon = [](std::pair<polygon_i,polygon_i> polygons)->bool{
+            //polygonの面積をチェック
+            const double first_polygon_area = boost::geometry::area(polygons.first);
+            const double second_polygon_area = boost::geometry::area(polygons.second);
+            const double total_area = first_polygon_area + second_polygon_area;
+
+            //全体の合計から少なくともこれだけの面積はほしいってやつ
+            const double threshold = 0.2;
+
+            if(first_polygon_area > second_polygon_area){
+                if(second_polygon_area > total_area * threshold){
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                if(first_polygon_area > total_area * threshold){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        auto check_inner_angle = [](polygon_i polygon,double degree_threshold){
+            auto calc_angle = [](polygon_i polygon,int pos){
+                int x1,y1,x2,y2;
+
+                //posが0だと戻らないといけないから
+                if(pos == 0){
+                    x1 = polygon.outer().at(pos).x() - polygon.outer().at(polygon.outer().size() - 2).x();
+                    y1 = polygon.outer().at(pos).y() - polygon.outer().at(polygon.outer().size() - 2).y();
+                    x2 = polygon.outer().at(pos).x() - polygon.outer().at(pos + 1).x();
+                    y2 = polygon.outer().at(pos).y() - polygon.outer().at(pos + 1).y();
+                }else{
+                    x1 = polygon.outer().at(pos).x() - polygon.outer().at(pos - 1).x();
+                    y1 = polygon.outer().at(pos).y() - polygon.outer().at(pos - 1).y();
+                    x2 = polygon.outer().at(pos).x() - polygon.outer().at(pos + 1).x();
+                    y2 = polygon.outer().at(pos).y() - polygon.outer().at(pos + 1).y();
+                }
+
+                double bb = std::abs(x1 * x2 + y1 * y2) / (std::sqrt(x1 * x1 + y1 * y1) * std::sqrt(x2 * x2 + y2 * y2));
+                double angle = std::acos(bb);
+
+                return angle;
+            };
+
+            auto radian2dgree = [](double rad){
+                return (rad / M_PI) * 180;
+            };
+
+//            std::cout << "jpeg slfaj;sd" << std::endl;
+//            std::cout << calc_angle(polygon,0) << std::endl;
+//            std::cout << radian2dgree(calc_angle(polygon,0)) << std::endl;
+
+            for (int index = 0; index < polygon.outer().size() - 1; ++index) {
+                double degree = radian2dgree(calc_angle(polygon,index));
+                std::cout << "kakudooooo" << degree << std::endl;
+
+                if(degree < degree_threshold){
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        while(true){
+            std::pair<polygon_i,polygon_i> polygons_buf;
+            polygons_buf = devide_polygon(polygon);
+
+            std::cout << "debugging" << std::endl;
+
+            if(check_polygon(polygons_buf)){
+                if(check_inner_angle(polygon,20)){
+                    return polygons_buf;
+                }
+            }
+        }
+    };
+    
+
+    //一番面積の大きいpolygonのindexを持ってくる
+    auto find_greatest_area_polygon = [](std::vector<polygon_i> polygons){
+        int current_greatest_area_polygon_index = 0;
+
+        for (int index = 0; index < polygons.size(); ++index) {
+            if(boost::geometry::area(polygons.at(index)) > boost::geometry::area(polygons.at(current_greatest_area_polygon_index))){
+                current_greatest_area_polygon_index = index;
+            }
+        }
+        return current_greatest_area_polygon_index;
+    };
+
+    auto devide_vectorrrrred_polygon = [&find_greatest_area_polygon,&find_iikanji_polygon](std::vector<polygon_i> polygons)->std::vector<polygon_i>{
+        int greatest_area_polygon_index = find_greatest_area_polygon(polygons);
+        std::cout << "greatest polygon number:" << greatest_area_polygon_index << std::endl;
+        polygon_i polygon_buff;
+        polygon_buff = polygons.at(greatest_area_polygon_index);
+//        polygons.erase(polygons.begin() + greatest_area_polygon_index);
+
+        std::vector<polygon_i> return_polygons;
+//        std::copy(polygons.begin(),polygons.end(),std::back_inserter(return_polygons));
+        for (int index = 0; index < polygons.size(); ++index) {
+            if(index != greatest_area_polygon_index){
+                return_polygons.push_back(polygons.at(index));
+            }
+        }
+
+        std::pair<polygon_i,polygon_i> polygons_buf = find_iikanji_polygon(polygon_buff);
+        return_polygons.push_back(polygons_buf.first);
+        return_polygons.push_back(polygons_buf.second);
+
+        return return_polygons;
+    };
+
+    std::pair<polygon_i,polygon_i> devided_polygon = devide_polygon(this->print_polygons[0]);
+    std::cout << "oppsdjfklajfksld;nlkvas " << std::endl;
+    std::cout << "first" << boost::geometry::dsv(devided_polygon.first) << std::endl;
+    std::cout << "second" << boost::geometry::dsv(devided_polygon.second) << std::endl;
+
+
+//    while(true){
+//        std::vector<polygon_i> polygon_buf;
+
+//        std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygon_buf));
+//		this->print_polygons.clear();
+
+//        auto polygons = find_iikanji_polygon(base_polygon);
+//    }
+//    this->print_polygons.push_back(polygons.first);
+//    this->print_polygons.push_back(polygons.second);
+
+    std::cout << "DEVIDE" << std::endl;
+
+    std::vector<polygon_i> polygonn = devide_vectorrrrred_polygon(this->print_polygons);
+    this->print_polygons.clear();
+    std::copy(polygonn.begin(),polygonn.end(),std::back_inserter(this->print_polygons));
+
+
+    int counnnter = 0;
+    for(auto polygon: this->print_polygons ){
+        ++counnnter;
+    }
+
+    this->update();
+
+//    QEventLoop event;
+//    connect(this,&ProbMaker::nextLoop,&event,&QEventLoop::quit);
+//    event.exec();
+
+    
+
+}
+
+std::vector<polygon_i> ProbMaker::getPieces()
+{
+    return this->print_polygons;
+}
+
+polygon_i ProbMaker::getFrame()
+{
+    return frame;
 }
 
 void ProbMaker::paintEvent(QPaintEvent *)
 {
-    const int marginX = 60;
-    const int marginY = 65;
     QPainter painter(this);
-    painter.setPen(QPen(Qt::black, 1));
+    painter.setPen(QPen(QColor("#000000")));
+    constexpr int buf = 10;
+    constexpr int grid_size = 10;
+    constexpr int max_col = 101;
+    constexpr int max_row = 65;
+    for (int col= 0; col < max_col; ++col) {
+        for(int row = 0; row < max_row; ++row){
+            std::vector<QPoint> polygon;
+            polygon.push_back(QPoint(col*grid_size,row*grid_size));
+            polygon.push_back(QPoint(col*grid_size+grid_size,row*grid_size));
+            polygon.push_back(QPoint(col*grid_size+grid_size,row*grid_size+grid_size));
+            polygon.push_back(QPoint(col*grid_size,row*grid_size+grid_size));
+            polygon.push_back(QPoint(col*grid_size,row*grid_size));
 
-    auto drawLine = [&](std::shared_ptr<Line> line){
-        painter.drawLine(QPointF(line->dot1->x/1.3+marginX, line->dot1->y/1.3+marginY), QPointF(line->dot2->x/1.3+marginX, line->dot2->y/1.3+marginY));
+            if((row+col) % 2 == 0)
+                painter.setBrush(QBrush(QColor("#fef4f4")));
+            else
+                painter.setBrush(QBrush(QColor("#e6b422")));
+            painter.drawPolygon(&polygon.front(),polygon.size());
+        }
+    }
+    painter.setPen(QPen(QColor("#00ffff")));
+    auto draw_polygon = [&painter,&grid_size](polygon_i polygon){
+        std::vector<QPoint> print_points;
+        for(auto point : polygon.outer()){
+            print_points.push_back(QPoint(point.x()*grid_size,point.y()*grid_size));
+            painter.drawPoint(point.x(),point.y());
+        }
+        painter.drawPolygon(&print_points.front(),print_points.size());
     };
 
-    //すべてのlineを描画
-    for(auto it = lines.begin(), end = lines.end(); it != end; it++){
-        drawLine(*it);
+    for(auto polygon : this->print_polygons){
+        draw_polygon(polygon);
+    }
+
+    auto draw_points = [&painter,&grid_size](polygon_i polygon){
+        int counter = 0;
+        for(auto point : polygon.outer() ){
+            painter.drawEllipse(point.x()*grid_size,point.y()*grid_size,10,10);
+            painter.drawText(point.x()*grid_size,point.y()*grid_size+ 10,QString(QString::fromStdString(std::to_string(counter))));
+            ++counter;
+        }
+    };
+
+    painter.setPen(QPen(QColor("#000000")));
+    for(auto polygon : this->print_polygons){
+       draw_points(polygon);
+    }
+}
+
+void ProbMaker::keyPressEvent(QKeyEvent *event){
+    std::cout << event->key() << std::endl;
+
+    //if pressed a key
+    if(event->key() == 65){
+        std::cout << "wweeeeeee" << std::endl;
+        emit nextLoop();
     }
 }
