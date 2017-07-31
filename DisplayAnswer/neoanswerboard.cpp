@@ -14,6 +14,10 @@ NeoAnswerBoard::~NeoAnswerBoard()
     delete ui;
 }
 
+void NeoAnswerBoard::setSingleMode(bool inp){
+    single_mode = inp;
+}
+
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
     const QString up_back_ground_color = "#7BAB4F";
@@ -78,7 +82,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const int grid_row = 65;
     const int grid_col = 101;
     const int grid_margin = 1;
-    const int splitedheight = (SINGLE_MODE==true
+    const int splitedheight = (single_mode==true
                                ?window_height
                                :window_height/2);
     grid_size =
@@ -228,7 +232,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             drawBeforePiece(piece_num);
     }
     for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
-        if(SINGLE_MODE==false)drawProcessingLine(piece_num);
+        if(single_mode==false)drawProcessingLine(piece_num);
         drawPieceId(piece_num);
     }
     drawEvalution();
