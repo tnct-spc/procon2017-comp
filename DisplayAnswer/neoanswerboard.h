@@ -31,6 +31,8 @@ public:
 
 private:
     Ui::NeoAnswerBoard *ui;
+    QPointF getPiecePosition(point_i point);
+    void setField();
     QPointF getPosition(point_i point);
     std::vector<cv::Vec3b> colors;
     void setRandomColors(int threshold);
@@ -38,6 +40,7 @@ private:
     int left_right_margin;
     int grid_size;
     int top_bottom_margin;
+    int down_up_y;
     procon::NeoField field;
 
 protected:
