@@ -31,7 +31,7 @@ void AlgorithmWrapper::submitAnswer(procon::NeoField field)
     loop.exec();
 }
 
-int evaluation(procon::NeoExpandedPolygon field,procon::NeoExpandedPolygon polygon)
+int evaluation(procon::NeoExpandedPolygon field , procon::NeoExpandedPolygon polygon)
 {
     //引数は頂点の番号　0はじまり
     auto main_evaluation=[field,polygon](int field_point,int polygon_point){
@@ -77,16 +77,23 @@ int evaluation(procon::NeoExpandedPolygon field,procon::NeoExpandedPolygon polyg
 
         int point=0;
         point = point + about_angle();
+        //いまは角の大きさ重視
         if(point < 0) return point;
         point = point + about_length();
         return point;
     };
 
     int max=0;
+    int field_index = -1 , polygon_index = -1;
     for(int i = 0 ; i < field.getSize() ; i++){
        for(int j = 0 ; j < polygon.getSize() ; j++){
            int a = main_evaluation(i,j);
-           if(a > max) max = a;
+           if(a > max){
+               max = a;
+               field_index = i;
+               polygon_index = j;
+           }
        }
     }
+
 }
