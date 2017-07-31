@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1070</height>
+    <width>1240</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>1301</width>
-     <height>1061</height>
+     <width>640</width>
+     <height>660</height>
     </rect>
    </property>
    <property name="widgetResizable">
@@ -30,8 +30,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1299</width>
-      <height>1059</height>
+      <width>638</width>
+      <height>658</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
@@ -39,6 +39,9 @@
       <layout class="QGridLayout" name="board_container">
        <property name="rightMargin">
         <number>0</number>
+       </property>
+       <property name="horizontalSpacing">
+        <number>2</number>
        </property>
       </layout>
      </item>
@@ -48,7 +51,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>1370</x>
+     <x>680</x>
      <y>30</y>
      <width>511</width>
      <height>211</height>
@@ -57,7 +60,7 @@
    <property name="font">
     <font>
      <family>Century Schoolbook L</family>
-     <pointsize>56</pointsize>
+     <pointsize>48</pointsize>
      <weight>50</weight>
      <italic>true</italic>
      <bold>false</bold>
@@ -70,10 +73,10 @@
   <widget class="QGraphicsView" name="Picture">
    <property name="geometry">
     <rect>
-     <x>1310</x>
+     <x>650</x>
      <y>0</y>
-     <width>611</width>
-     <height>1080</height>
+     <width>580</width>
+     <height>720</height>
     </rect>
    </property>
   </widget>
