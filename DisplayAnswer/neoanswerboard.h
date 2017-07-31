@@ -15,6 +15,7 @@
 #include <string>
 #include "neofield.h"
 #include "neoexpandedpolygon.h"
+#include <math.h>
 
 namespace Ui {
 class NeoAnswerBoard;
@@ -35,7 +36,8 @@ private:
     void setField();
     QPointF getPosition(point_i point);
     std::vector<cv::Vec3b> colors;
-    void setRandomColors(int threshold);
+    //std::vector<std::vector<int>> colors;
+    void setRandomColors();
     void firstField();
     int left_right_margin;
     int grid_size;
@@ -44,7 +46,7 @@ private:
     procon::NeoField field;
 
     // Only field mode
-    const bool SINGLE_MODE = true;
+    const bool SINGLE_MODE = false;
 
 
 protected:

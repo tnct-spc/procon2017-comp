@@ -7,9 +7,9 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    firstField();
+    //firstField();
     //色を生成
-    setRandomColors(50);
+    //setRandomColors();
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
@@ -17,9 +17,9 @@ NeoAnswerBoard::~NeoAnswerBoard()
     delete ui;
 }
 //色生成用関数
-void NeoAnswerBoard::setRandomColors(int threshold)
+void NeoAnswerBoard::setRandomColors()
 {
-    std::random_device rnd;
+    /*std::random_device rnd;
     std::uniform_int_distribution<int> rand255(0, 255);
     cv::Vec3b up_colors;//threshold上限値
     cv::Vec3b down_colors;//threshold下限値
@@ -52,7 +52,24 @@ void NeoAnswerBoard::setRandomColors(int threshold)
                       }
               }
           }
-      }
+      }*/
+    colors.resize(50);
+    for(int tes=0;tes<50;tes++){
+       // colors[tes].resize(3,0);
+    }
+    int cou=0;
+    int plus_cou;
+    plus_cou = 256 * 9/ field.getPieces().size();
+    for(int r=0;r<256;r+=plus_cou){
+        for(int g=0;g<256;g+=plus_cou){
+            for(int b=0;b<256;b+=plus_cou){
+                if(cou<50){
+                    colors[cou] = {r,g,b};
+                }
+                cou++;
+            }
+        }
+    }
 }
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
@@ -192,7 +209,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+"  :  "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
     };
 
-
+    if(field.getPieces().size()!=0)setRandomColors();
     drawFrame();
     drawDownBackground();
     for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
