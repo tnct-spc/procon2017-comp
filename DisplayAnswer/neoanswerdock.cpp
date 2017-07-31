@@ -25,6 +25,6 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
     NeoAnswerBoard* answer_board = new NeoAnswerBoard();
     answer_board->setField(field);
     answer_board->setSingleMode(true);
-    answer_board->setFixedSize(640,640);
-    this->ui->board_container->addWidget(answer_board,fields.size()/2,fields.size()%2);
+    answer_board->setFixedSize(400, 400);
+    this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 3, (fields.size() - 1 ) % 3);
 }
