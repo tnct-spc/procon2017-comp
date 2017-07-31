@@ -46,7 +46,7 @@ private:
     procon::NeoField field;
 
     // Only field mode
-    const bool SINGLE_MODE = false;
+    const bool SINGLE_MODE = true;
 
 
 protected:
