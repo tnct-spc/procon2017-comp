@@ -32,7 +32,7 @@ public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
-
+    void setSingleMode(bool inp);
 private:
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
@@ -47,7 +47,7 @@ private:
     procon::NeoField field;
 
     // Only field mode
-    const bool SINGLE_MODE = false;
+    bool single_mode = false;
 
 
 protected:
