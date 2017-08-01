@@ -14,7 +14,7 @@ NeoAnswerBoard::~NeoAnswerBoard()
     delete ui;
 }
 
-void NeoAnswerBoard::setSingleMode(bool inp){
+void NeoAnswerBoard::setDockMode(bool inp){
     single_mode = inp;
 }
 
@@ -81,8 +81,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     QVector<QString> list = colorlist.toVector();
 
     // 101 x 65
-    const int grid_row = 65;
-    const int grid_col = 101;
+    frame_margin = 16; //枠の最低限の幅(左右の合計)
+    const int grid_row = 65 + frame_margin;
+    const int grid_col = 101 + frame_margin;
     const int grid_margin = 1;
     const int splitedheight = (single_mode==true
                                ?window_height
@@ -91,9 +92,14 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             window_width <= splitedheight
             ? window_width / (grid_col + grid_margin)
             : splitedheight / (grid_row + grid_margin);
+    //grid_size -= grid_size*8;
     top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
     left_right_margin = (window_width - grid_size * grid_col) / 2;
     down_up_y = splitedheight + top_bottom_margin;
+
+    //余白(枠の部分)を設定
+    //top_bottom_margin += grid_size*8;
+    //left_right_margin += grid_size*8;
 
     QPainter painter(this);
 
@@ -241,11 +247,15 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawGrid();
 }
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
-    return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
+    int pointx = point.x() + frame_margin/2;
+    int pointy = point.y() + frame_margin/2;
+    return QPointF(left_right_margin + pointx * grid_size, top_bottom_margin + pointy * grid_size);
 }
 
 QPointF NeoAnswerBoard::getPiecePosition(point_i point){//point_iを下画面の枠と対応させるようにQPointFに変換する
-    return QPointF(left_right_margin + point.x() * grid_size, down_up_y + point.y() * grid_size);
+    int pointx = point.x() + frame_margin/2;
+    int pointy = point.y() + frame_margin/2;
+    return QPointF(left_right_margin + pointx * grid_size, down_up_y + pointy * grid_size);
 }
 
 void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
