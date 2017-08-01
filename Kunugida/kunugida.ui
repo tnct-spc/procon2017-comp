@@ -50,7 +50,7 @@
          <item>
           <widget class="QRadioButton" name="probmaker_button">
            <property name="text">
-            <string>ProbMaker</string>
+            <string>ProbMa&amp;ker</string>
            </property>
           </widget>
          </item>
@@ -64,25 +64,48 @@
          <item>
           <widget class="QRadioButton" name="image_data_button">
            <property name="text">
-            <string>ImageData</string>
+            <string>I&amp;mageData</string>
            </property>
           </widget>
          </item>
         </layout>
        </widget>
       </item>
+     </layout>
+    </item>
+    <item row="0" column="3">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QCheckBox" name="ImageRecognitonTestCheckBox">
-          <property name="text">
-           <string>ImageRecognitonTest</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QCheckBox" name="ImageRecognitonTestCheckBox">
+        <property name="text">
+         <string>ImageRecognitonTest</string>
+        </property>
+       </widget>
       </item>
      </layout>
+    </item>
+    <item row="0" column="2">
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Algorithm</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QRadioButton" name="test_algorithm_button">
+         <property name="text">
+          <string>TestA&amp;lgorithm</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="beamsearch_button">
+         <property name="text">
+          <string>BeamSearch</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -92,7 +115,7 @@
      <x>0</x>
      <y>0</y>
      <width>598</width>
-     <height>19</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
