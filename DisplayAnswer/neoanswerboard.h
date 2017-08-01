@@ -32,8 +32,9 @@ public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
-    void setSingleMode(bool inp);
+    void setDockMode(bool inp);
 private:
+    int frame_margin;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
     void setField();
