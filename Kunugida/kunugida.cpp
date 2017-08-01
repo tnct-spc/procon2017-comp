@@ -66,7 +66,6 @@ void Kunugida::run()
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
-        board->update();
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner

@@ -14,9 +14,11 @@ NeoAnswerBoard::~NeoAnswerBoard()
     delete ui;
 }
 
-void NeoAnswerBoard::setSingleMode(bool inp){
+void NeoAnswerBoard::setSingleMode(bool inp)
+{
     single_mode = inp;
 }
+
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
@@ -194,12 +196,13 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     //処理線を描画
-    auto drawProcessingLine = [&](int pnum){
+    auto drawProcessingLine = [&](){
         point_i center;
-        boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+        boost::geometry::centroid(field.getPiece(point_id).getPolygon(),center);
         QPointF afterpiececenter = getPosition(center);
         QPointF beforepiececenter = getPiecePosition(center);
-        painter.setPen(QPen(QBrush(Qt::yellow), 0.5));
+        if(selecter == true) painter.setPen(QPen(QBrush(Qt::red), 0.7));
+        if(selecter == false) painter.setPen(QPen(QBrush(Qt::blue), 0.7));
         painter.drawLine(afterpiececenter, beforepiececenter);
     };
 
@@ -229,16 +232,55 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     drawDownBackground();
     for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
-            drawAfterPiece(piece_num);
-            drawBeforePiece(piece_num);
+        drawAfterPiece(piece_num);
+        drawBeforePiece(piece_num);
     }
     for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
-        if(single_mode==false)drawProcessingLine(piece_num);
         drawPieceId(piece_num);
+    }
+    if(paintif == true){
+        point_i center;
+        boost::geometry::centroid(field.getPiece(point_id).getPolygon(),center);
+        QPointF afterpiececenter = getPosition(center);
+        QPointF beforepiececenter = getPiecePosition(center);
+        if(selecter == true){
+            painter.setPen(QPen(QBrush(Qt::red), 0.7));
+            painter.drawLine(afterpiececenter, beforepiececenter);
+        }
+        if(selecter == false){
+            painter.setPen(QPen(QBrush(Qt::blue), 0.7));
+            painter.drawLine(afterpiececenter, beforepiececenter);
+        }
+        paintif = false;
     }
     drawEvalution();
     drawGrid();
 }
+
+void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
+{
+    int max_id = field.getPieces().size();
+    int point_id = 0;
+    bool selecter;//true = left, false = right
+    bool paintif = false;
+    if(point_id <= max_id){
+        switch(event->key()){
+            case 16781616:
+                ++point_id;
+                selecter = true;
+                paintif = true;
+                break;
+            case 16777220:
+                ++point_id;
+                selecter = false;
+                paintif = true;
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
     return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
 }
@@ -249,6 +291,7 @@ QPointF NeoAnswerBoard::getPiecePosition(point_i point){//point_iを下画面の
 
 void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     field=input_field;
+    this->update();
 }
 
 void NeoAnswerBoard::firstField(){//初期状態でのfieldを設定(実際は使わない)

@@ -33,6 +33,7 @@ public:
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
     void setSingleMode(bool inp);
+
 private:
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
@@ -49,10 +50,15 @@ private:
     // Only field mode
     bool single_mode = false;
 
+    //draw processingLine
+    int point_id;
+    bool selecter;
+    bool paintif;
 
 protected:
     void beforePolygon();
     void paintEvent(QPaintEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // NEOANSWERBOARD_H
