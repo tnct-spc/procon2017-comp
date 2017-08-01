@@ -13,7 +13,7 @@ public:
     virtual void init();
     virtual void run(procon::NeoField field);
     void submitAnswer(procon::NeoField field);
-    int evaluation(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon polygon);
+    std::vector<std::tuple<int , int , int , int>> evaluation(std::vector<procon::NeoExpandedPolygon> field, procon::NeoExpandedPolygon polygon);
 
 signals:
     void throwAnswer(procon::NeoField field);

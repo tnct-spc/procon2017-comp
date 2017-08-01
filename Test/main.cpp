@@ -7,6 +7,7 @@
 #include "testjoinpolygon.h"
 #include "testsearchsamelength.h"
 #include "neopolygonviewer.h"
+#include "testalgorithmwrapper.h"
 
 int Test()
 {
@@ -18,6 +19,7 @@ int Test()
 //    TESTER.push_back(new TestDisplayAnswer);
 //    TESTER.push_back(new TestJoinPolygon);
 //    TESTER.push_back(new testSearchSameLength);
+    TESTER.push_back(new TestAlgorithmWrapper);
 
     for(auto tester : TESTER){
         if(!tester->run()){
