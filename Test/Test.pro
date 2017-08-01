@@ -24,14 +24,16 @@ SOURCES += main.cpp\
     testerwraper.cpp \
     testsearchsamelength.cpp \
     testneoexpandedpolygon.cpp \
-    testalgorithmwrapper.cpp
+    testalgorithmwrapper.cpp \
+    testevaluation.cpp
 
 HEADERS += testdisplayanswer.h\
     testjoinpolygon.h \
     testerwraper.h \
     testsearchsamelength.h \
     testneoexpandedpolygon.h \
-    testalgorithmwrapper.h
+    testalgorithmwrapper.h \
+    testevaluation.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
