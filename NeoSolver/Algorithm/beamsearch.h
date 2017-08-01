@@ -17,6 +17,14 @@ public:
 
 };
 
+class LightField
+{
+public:
+    std::vector<polygon_i> frame;
+    std::vector<polygon_i> pieces;
+    std::array<bool,50> is_placed;
+};
+
 class BeamSearch : public AlgorithmWrapper
 {
 public:
