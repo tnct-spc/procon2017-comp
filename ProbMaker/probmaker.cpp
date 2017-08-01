@@ -167,12 +167,14 @@ void ProbMaker::delaunay_triangulation()
     std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygons));
 
     std::vector<polygon_i> out;
-    int a,b;
+    unsigned int a,b;
     for (a = 0; a < polygons.size(); ++a) {
         for (b = 1; b < polygons.size(); ++b) {
             boost::geometry::union_(polygons.at(a),polygons.at(b),out);
 
             if(out.size() == 1){
+
+
                 goto EXIT;
             }
         }
@@ -189,7 +191,7 @@ void ProbMaker::delaunay_triangulation()
     polygon_i frame = out[0];
 
     while(polygons.size() != 0){
-        for (int index = 0; index < polygons.size(); ++index) {
+        for (unsigned int index = 0; index < polygons.size(); ++index) {
             std::vector<polygon_i> output_buffer;
             boost::geometry::union_(frame,polygons.at(index),output_buffer);
 
@@ -226,20 +228,18 @@ void ProbMaker::delaunay_triangulation()
 
 void ProbMaker::GA()
 {
-    typedef std::vector<std::vector<int>> State;
-    
-   	std::vector<polygon_i> polygons;
+    std::vector<polygon_i> polygons;
     std::copy(this->print_polygons.begin(),this->print_polygons.end(),std::back_inserter(polygons));
     polygon_i frame = this->frame;
 
     std::random_device rnd;
-    
+
     auto connect_near_by_polygon = [](std::vector<polygon_i> pieces){
 
         std::vector<polygon_i> back_up_polygon;
         std::copy(pieces.begin(),pieces.end(),std::back_inserter(back_up_polygon));
 
-        ONCE_MORE:
+ONCE_MORE:
 
 
         std::random_device rnd;
@@ -248,7 +248,7 @@ void ProbMaker::GA()
         int connect_polygon_index = randomm(rnd);
 
         polygon_i connect_polygon = pieces[connect_polygon_index];
-		
+
         pieces.erase(pieces.begin() + connect_polygon_index);
 
         int counter = 0;
@@ -272,9 +272,10 @@ void ProbMaker::GA()
         }
 
         //connect可能な中から適当に選ぶ
-                                                //あたりまえだけど、-1してstd::out_of_range回避
+        //あたりまえだけど、-1してstd::out_of_range回避
         std::uniform_int_distribution<> random(0,can_connect_polygon_number.size() - 1);
         int connecting_polygon_index = random(rnd);
+
 
 
         counter = 0;
@@ -291,16 +292,47 @@ void ProbMaker::GA()
             return a.first < b.first;
         });
 
-        connecting_polygon_index = size[0].second;
+        for (unsigned int index = 0; index < size.size(); ++index) {
 
-        polygon_i connecting_polygon = pieces.at(can_connect_polygon_number[connecting_polygon_index]);
 
-        std::vector<polygon_i> output;
-        boost::geometry::union_(connect_polygon,connecting_polygon,output);
-        //connectしたわけなので、元からのpolygonは除去
-        pieces.erase(pieces.begin() + can_connect_polygon_number[connecting_polygon_index]);
+            connecting_polygon_index = size[index].second;
 
-        pieces.push_back(output[0]);
+            polygon_i connecting_polygon = pieces.at(can_connect_polygon_number[connecting_polygon_index]);
+
+            std::vector<polygon_i> output;
+            boost::geometry::union_(connect_polygon,connecting_polygon,output);
+
+            auto isPointEqual = [](point_i first,point_i second){
+                return first.x() == second.x() && first.y() == second.y();
+            };
+
+            //ピースの中に隣り合わず重複した点があると、2つのpolygonに分離できる状態なのに、分離されないヤバイ感じのになるので。ここで除去
+            bool flag = false;
+            for (unsigned int a = 1; a < output[0].outer().size() - 1; ++a) {
+                for (unsigned int b = 1; b < output[0].outer().size() - 1; ++b) {
+                    if(a == b){
+                        b++;
+                    }
+
+                    flag += isPointEqual(output[0].outer()[a],output[0].outer()[b]);
+                }
+            }
+
+            std::cout << flag << std::endl;
+
+            if(flag){
+                if(index == (size.size() - 1)){
+                    pieces.clear();
+                    std::copy(back_up_polygon.begin(),back_up_polygon.end(),std::back_inserter(pieces));
+                    goto ONCE_MORE;
+                }
+            }else{
+                //connectしたわけなので、元からのpolygonは除去
+                pieces.erase(pieces.begin() + can_connect_polygon_number[connecting_polygon_index]);
+                pieces.push_back(output[0]);
+                break;
+            }
+        }
 
         return pieces;
     };
@@ -315,30 +347,12 @@ void ProbMaker::GA()
 
     this->print_polygons.clear();
     std::copy(pieces.begin(),pieces.end(),std::back_inserter(this->print_polygons));
-    
-    
+
+
 }
 
 void ProbMaker::step()
 {
-    //polygonのvectorから一番面積が大きいやつのindexを持ってくるやつ
-    auto greatest_area = [](std::vector<polygon_i> polygons)->unsigned int{
-
-        int current_biggest_polygon_number = 0;
-        double current_biggest_polygon_area = 0;
-        int current_polygon_number = 0;
-
-        for(auto polygon : polygons){
-            double current_area = boost::geometry::area(polygon);
-            if(current_biggest_polygon_area < current_area){
-                current_biggest_polygon_area = current_area;
-                current_biggest_polygon_number = current_polygon_number;
-            }
-            ++current_polygon_number;
-        }
-        return current_biggest_polygon_number;
-    };
-
     //いい感じに乱数でpolygonを切断して
     auto devide_polygon = [](polygon_i polygon)->std::pair<polygon_i,polygon_i>{
         std::random_device rnd;
@@ -432,14 +446,14 @@ void ProbMaker::step()
 		std::uniform_int_distribution<> start_dot_random(0,start_side_cut_points.size() - 1);
         std::uniform_int_distribution<> end_dot_random(0,end_side_cut_points.size() - 1);
         
-        int start_dot_num = start_dot_random(rnd);
-        int end_dot_num = end_dot_random(rnd);
+        unsigned int start_dot_num = start_dot_random(rnd);
+        unsigned int end_dot_num = end_dot_random(rnd);
 
         //new points vector
         std::vector<point_i> new_points1;
         std::vector<point_i> new_points2;
 
-        int a = 0;
+        unsigned int a = 0;
         while(true){
             //start dot numにたどり着くまでpush_back
             new_points1.push_back(polygon.outer().at(a));
@@ -497,7 +511,7 @@ void ProbMaker::step()
             std::cout << check_same_point(point_i(100,100),point_i(100,99)) << std::endl;
 
 
-            for (int index = 0; index < polygon.outer().size() - 1; ++index) {
+            for (unsigned int index = 0; index < polygon.outer().size() - 1; ++index) {
                 if(!check_same_point(polygon.outer().at(index),polygon.outer().at(index+1))){
                     deleted_duplicated_point_polygon.outer().push_back(polygon.outer().at(index));
                 }
@@ -522,11 +536,6 @@ void ProbMaker::step()
         return polygons;
     };
 
-    auto connect_polygon = [](){
-        //polygon同士の結合
-        std::cout << "connect polygon" << std::endl;
-    };
-    
     auto find_iikanji_polygon = [&devide_polygon](polygon_i polygon)->std::pair<polygon_i,polygon_i>{
         auto check_polygon = [](std::pair<polygon_i,polygon_i> polygons)->bool{
             //polygonの面積をチェック
@@ -584,7 +593,7 @@ void ProbMaker::step()
 //            std::cout << calc_angle(polygon,0) << std::endl;
 //            std::cout << radian2dgree(calc_angle(polygon,0)) << std::endl;
 
-            for (int index = 0; index < polygon.outer().size() - 1; ++index) {
+            for (unsigned int index = 0; index < polygon.outer().size() - 1; ++index) {
                 double degree = radian2dgree(calc_angle(polygon,index));
                 std::cout << "kakudooooo" << degree << std::endl;
 
@@ -614,7 +623,7 @@ void ProbMaker::step()
     auto find_greatest_area_polygon = [](std::vector<polygon_i> polygons){
         int current_greatest_area_polygon_index = 0;
 
-        for (int index = 0; index < polygons.size(); ++index) {
+        for (unsigned int index = 0; index < polygons.size(); ++index) {
             if(boost::geometry::area(polygons.at(index)) > boost::geometry::area(polygons.at(current_greatest_area_polygon_index))){
                 current_greatest_area_polygon_index = index;
             }
@@ -623,7 +632,7 @@ void ProbMaker::step()
     };
 
     auto devide_vectorrrrred_polygon = [&find_greatest_area_polygon,&find_iikanji_polygon](std::vector<polygon_i> polygons)->std::vector<polygon_i>{
-        int greatest_area_polygon_index = find_greatest_area_polygon(polygons);
+        unsigned int greatest_area_polygon_index = find_greatest_area_polygon(polygons);
         std::cout << "greatest polygon number:" << greatest_area_polygon_index << std::endl;
         polygon_i polygon_buff;
         polygon_buff = polygons.at(greatest_area_polygon_index);
@@ -631,7 +640,7 @@ void ProbMaker::step()
 
         std::vector<polygon_i> return_polygons;
 //        std::copy(polygons.begin(),polygons.end(),std::back_inserter(return_polygons));
-        for (int index = 0; index < polygons.size(); ++index) {
+        for (unsigned int index = 0; index < polygons.size(); ++index) {
             if(index != greatest_area_polygon_index){
                 return_polygons.push_back(polygons.at(index));
             }
@@ -669,7 +678,7 @@ void ProbMaker::step()
 
 
     int counnnter = 0;
-    for(auto polygon: this->print_polygons ){
+    for(auto polygon: this->print_polygons){
         ++counnnter;
     }
 
@@ -697,7 +706,6 @@ void ProbMaker::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setPen(QPen(QColor("#000000")));
-    constexpr int buf = 10;
     constexpr int grid_size = 10;
     constexpr int max_col = 101;
     constexpr int max_row = 65;
