@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>598</width>
-    <height>318</height>
+    <width>831</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Run</string>
+         <string>　　Run　　</string>
         </property>
         <property name="iconSize">
          <size>
@@ -114,7 +114,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>598</width>
+     <width>831</width>
      <height>30</height>
     </rect>
    </property>
