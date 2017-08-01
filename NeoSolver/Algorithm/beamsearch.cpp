@@ -4,15 +4,15 @@
 
 BeamSearch::BeamSearch()
 {
-
+    logger = spdlog::get("beamsearch");
 }
 
 void BeamSearch::init()
 {
 #ifdef DEBUG_MODE
-    std::cout << "DEBUG MODE" << std::endl;
+    logger->info("debug mode");
 #else
-    std::cout << "EFFICIENT MODE" << std::endl;
+    logger->info("efficient mode");
 #endif
 }
 
