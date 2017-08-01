@@ -1,6 +1,6 @@
 TEMPLATE = app
-CONFIG += console c++11
-CONFIG -= app_bundle
-CONFIG -= qt
-
+CONFIG += console c++14
+QT       += core gui widgets network
 SOURCES += main.cpp
+
+
