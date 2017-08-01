@@ -1,4 +1,6 @@
 #include "testevaluation.h"
+#include "neoexpandedpolygon.h"
+#include "Evaluation/evaluation.h"
 
 TestEvaluation::TestEvaluation()
 {
@@ -35,8 +37,8 @@ bool TestEvaluation::run()
     polygon.resetPolygonForce({{{20,5},{20,8},{21,6},{22,8},{22,5},{20,5}}});
     polygons.push_back(polygon);
 
-    AlgorithmWrapper aw;
-    aw.evaluation(frames,polygons.at(0));
+    Evaluation evaluation;
+    evaluation.evaluation(frames,polygons.at(0));
 
     std::cout << boost::geometry::dsv(frames.at(1).getPolygon().outer().at(0)) << std::endl;
     std::cout << boost::geometry::dsv(frames.at(1).getPolygon().outer().at(1)) << std::endl;
