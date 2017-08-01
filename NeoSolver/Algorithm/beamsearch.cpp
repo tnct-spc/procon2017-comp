@@ -2,6 +2,12 @@
 
 #define DEBUG_MODE
 
+void connect_polygon(polygon_i& frame, polygon_i& connecting_polygon,Connect connection){
+
+
+
+}
+
 BeamSearch::BeamSearch()
 {
     logger = spdlog::get("beamsearch");
