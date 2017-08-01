@@ -7,13 +7,11 @@
 class Connect
 {
 public:
-    enum DotOrLine { Dot, Line };
+    int frame_side_num = -1;
+    int polygon_side_num = -1;
 
-    int start_num;
-    int end_num;
-
-    DotOrLine start;
-    DotOrLine end;
+    int frame_point_num = -1;
+    int polygon_point_num = -1;
 
 };
 
