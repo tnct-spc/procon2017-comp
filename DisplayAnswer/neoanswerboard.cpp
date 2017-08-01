@@ -97,14 +97,14 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
 
-    //draw background
+    //上部背景を描画
     painter.setBrush(QBrush(QColor(up_back_ground_color)));
     painter.drawRect(QRect(0,0,window_width,splitedheight));
     painter.setBrush(QBrush(QColor(down_back_ground_color)));
     painter.drawRect(QRect(0, splitedheight, window_width, window_height));
 
 
-    //draw grid
+    //グリッドを描画
     auto drawGrid = [&]{
         painter.setPen(QPen(QBrush(Qt::black),0.1));
         for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
@@ -117,7 +117,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     };
 
-    //draw frame
+    //上画面フレームを描画
     auto drawFrame = [&]{
         painter.setBrush(QBrush(QColor(236,182,138, 200))); //frame color
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
@@ -158,7 +158,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             painter.drawPolygon(&points.front(),points.size());
     };
 
-    //draw down backdround
+    //下画面背景を描画
     auto drawDownBackground = [&]{
         painter.setBrush(QBrush(QColor(Qt::white)));
         painter.drawRect(QRect(left_right_margin,
@@ -179,22 +179,21 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawPolygon(points,pcount);
     };
 
-    //処理ピースの可視化
+    //ピースIdを描画
     auto drawPieceId = [&](int pnum){
-        //draw piece id
         painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setBackground(QBrush(QColor(list[pnum])));
         painter.setPen(QPen(QBrush(Qt::white), 0.3));
-        //centroidで中心にidを描画
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
         QPointF piececenter = getPosition(center);
         piececenter.setX(piececenter.x() - grid_size);
         piececenter.setY(piececenter.y() + grid_size);
-        painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
+        painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
     };
 
+    //処理線を描画
     auto drawProcessingLine = [&](int pnum){
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
@@ -204,8 +203,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawLine(afterpiececenter, beforepiececenter);
     };
 
+    //評価値を描画
     auto drawEvalution = [&]{
-        //draw evalution
         painter.setBackgroundMode(Qt::TransparentMode);
         QColor evalution_color = {255,0,255};
         painter.setPen(QPen(QBrush(evalution_color),10));
