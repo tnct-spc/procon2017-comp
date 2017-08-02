@@ -64,12 +64,9 @@ std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpa
     //それぞれ評価値、フレームのインデックス、ポリゴンのインデックス
     int evaluation , frame_index , polygon_index;
     std::vector<std::tuple<int , int , int>> vector;
-    for(int k = 0 ; k < frame.getSize() ; k++){
-        for(int j = 0 ; j < polygon.getSize() ; j++){
-            frame_index = k;
-            polygon_index = j;
+    for(frame_index = 0 ; frame_index < frame.getSize() ; frame_index++){
+        for(polygon_index = 0 ; polygon_index < polygon.getSize() ; polygon_index++){
             evaluation = main_evaluation(frame_index , polygon_index);
-
             vector.push_back(std::tuple<int , int , int>(evaluation , frame_index , polygon_index));
         }
     }
