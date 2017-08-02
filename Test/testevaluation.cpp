@@ -14,19 +14,19 @@ bool TestEvaluation::run()
     polygon_i boost_polygon;
 
     bg::exterior_ring ( boost_polygon ) = boost::assign::list_of < point_i >
-            (2,4) (3,12) (5,13) (6,13) (7,11) (10,2) (2,4);
+            (2,4) (3,12) (5,13) (6,13) (7,11) (10,2) (7,2) (2,4);
     nep.resetPolygonForce ( boost_polygon );
     frames.push_back ( nep );
 
-    bg::exterior_ring ( boost_polygon ) = boost::assign::list_of < point_i >
-            (10,15) (15,15) (15,14) (17,14) (17,15) (20,15) (19,6) (10,15);
-    nep.resetPolygonForce(boost_polygon);
-    frames.push_back(nep);
+//    bg::exterior_ring ( boost_polygon ) = boost::assign::list_of < point_i >
+//            (10,15) (15,15) (15,14) (17,14) (17,15) (20,15) (19,6) (10,15);
+//    nep.resetPolygonForce(boost_polygon);
+//    frames.push_back(nep);
 
-    bg::exterior_ring ( boost_polygon ) = boost::assign::list_of < point_i >
-            (12,3) (17,4) (19,2) (12,3);
-    nep.resetPolygonForce ( boost_polygon );
-    frames.push_back ( nep );
+//    bg::exterior_ring ( boost_polygon ) = boost::assign::list_of < point_i >
+//            (12,3) (17,4) (19,2) (12,3);
+//    nep.resetPolygonForce ( boost_polygon );
+//    frames.push_back ( nep );
 
 
     std::vector<procon::NeoExpandedPolygon> polygons;
@@ -61,9 +61,11 @@ bool TestEvaluation::run()
 
     typedef std::tuple<int , int , int , int> mytuple;
     std::vector<mytuple> vector;
-    vector = (new Evaluation)->evaluation(frames,polygons.at(0));
+    vector = (new Evaluation) -> evaluation(frames , polygons.at(0));
 
-    std::cout << vector.size() << std::endl;
+    int field_vector_index,field_index,polygon_index,evaluation;
+    mytuple(field_vector_index,field_index,polygon_index,evaluation) = vector.at(0);
+    std::cout << polygon_index << std::endl;
 
     return true;
 }
