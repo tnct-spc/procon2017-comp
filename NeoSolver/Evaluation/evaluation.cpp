@@ -45,24 +45,6 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
         );
         vector.push_back(
                     my_tuple(
-                        length(frame_side_index1 , polygon_side_index2),
-                        frame_side_index1,
-                        polygon_side_index2,
-                        frame_point_index,
-                        polygon_point_index
-                    )
-        );
-        vector.push_back(
-                    my_tuple(
-                        length(frame_side_index2 , polygon_side_index1),
-                        frame_side_index2,
-                        polygon_side_index1,
-                        frame_point_index,
-                        polygon_point_index
-                    )
-        );
-        vector.push_back(
-                    my_tuple(
                         length(frame_side_index2 , polygon_side_index2),
                         frame_side_index2,
                         polygon_side_index2,
