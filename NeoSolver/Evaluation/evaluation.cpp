@@ -10,9 +10,9 @@ Evaluation::Evaluation()
 std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {
     //それぞれのNEPの頂点を引数として渡し、評価値を返す
-    auto main_evaluation=[frame , polygon](int frame_index , int polygon_index){
+    auto main_evaluation=[&frame , &polygon](int frame_index , int polygon_index){
         //角について評価
-        auto about_angle = [frame , polygon , frame_index , polygon_index](){
+        auto about_angle = [&frame , &polygon , frame_index , polygon_index](){
             double frame_angle = frame.getSideAngle().at(frame_index);
             double polygon_angle = polygon.getSideAngle().at(polygon_index);
             if(frame_angle == polygon_angle){
@@ -27,7 +27,7 @@ std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpa
             }
         };
         //辺について評価
-        auto about_length = [frame , polygon , frame_index , polygon_index](){
+        auto about_length = [&frame , &polygon , frame_index , polygon_index](){
             int a = frame_index - 1;
             if(a == -1) a = frame.getSize() - 1;
             double frame_length1 = frame.getSideLength().at(a);
