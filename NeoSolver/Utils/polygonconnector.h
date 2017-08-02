@@ -5,12 +5,12 @@ class Connect
 {
 public:
     //接するべき辺の若い方のpointのindex
-    int frame_side_num = -1;
-    int polygon_side_num = -1;
+    int frame_side_index = -1;
+    int polygon_side_index = -1;
 
     //触れてるべき頂点のindex
-    int frame_point_num = -1;
-    int polygon_point_num = -1;
+    int frame_point_index = -1;
+    int polygon_point_index = -1;
 
 };
 
