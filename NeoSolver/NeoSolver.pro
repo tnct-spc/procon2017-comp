@@ -32,12 +32,16 @@ LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 SOURCES += neosolver.cpp \
     Algorithm/algorithmwrapper.cpp \
-    Algorithm/testalgortithm.cpp
+    Algorithm/testalgortithm.cpp \
+    polygonconnector.cpp \
+    Utils/polygonconnector.cpp
 
 HEADERS += neosolver.h\
         neosolver_global.h \
     Algorithm/algorithmwrapper.h \
-    Algorithm/testalgortithm.h
+    Algorithm/testalgortithm.h \
+    polygonconnector.h \
+    Utils/polygonconnector.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
