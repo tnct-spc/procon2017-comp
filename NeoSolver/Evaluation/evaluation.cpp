@@ -7,38 +7,38 @@ Evaluation::Evaluation()
 }
 
 
-std::vector<std::tuple<int , int , int , int>> Evaluation::evaluation(std::vector<procon::NeoExpandedPolygon> field , procon::NeoExpandedPolygon polygon)
+std::vector<std::tuple<int , int , int , int>> Evaluation::evaluation(std::vector<procon::NeoExpandedPolygon> const& frame , procon::NeoExpandedPolygon const& polygon)
 {
     //引数は頂点の番号　0はじまり
-    auto main_evaluation=[](procon::NeoExpandedPolygon one_field,int field_point,procon::NeoExpandedPolygon polygon,int polygon_point){
-        auto about_angle = [one_field,polygon,field_point,polygon_point](){
-            double field_angle = one_field.getSideAngle().at(field_point);
+    auto main_evaluation=[](procon::NeoExpandedPolygon one_frame,int frame_point,procon::NeoExpandedPolygon polygon,int polygon_point){
+        auto about_angle = [one_frame,polygon,frame_point,polygon_point](){
+            double frame_angle = one_frame.getSideAngle().at(frame_point);
             double polygon_angle = polygon.getSideAngle().at(polygon_point);
-            if(field_angle == polygon_angle){
+            if(frame_angle == polygon_angle){
                 //フレームとポリゴンの角がちょうどあっているとき
                 return 1;
-            }else if(field_angle > polygon_angle){
+            }else if(frame_angle > polygon_angle){
                 //角に隙間があるとき
                 return -1;
-            }else if(field_angle < polygon_angle){
+            }else if(frame_angle < polygon_angle){
                 //ポリゴンの角がフレームの角より大きくてありえんとき
                 return -2;
             }
         };
-        auto about_length = [one_field,polygon,field_point,polygon_point](){
-            int a = field_point - 1;
-            if(a == -1) a = one_field.getSize() - 1;
-            double field_length1 = one_field.getSideLength().at(a);
-            double field_length2 = one_field.getSideLength().at(field_point);
+        auto about_length = [one_frame,polygon,frame_point,polygon_point](){
+            int a = frame_point - 1;
+            if(a == -1) a = one_frame.getSize() - 1;
+            double frame_length1 = one_frame.getSideLength().at(a);
+            double field_length2 = one_frame.getSideLength().at(frame_point);
 
             a = polygon_point - 1;
             if(a == -1) a = polygon.getSize() - 1;
             double polygon_length1 = polygon.getSideLength().at(a);
             double polygon_length2 = polygon.getSideLength().at(polygon_point);
 
-            bool b = field_length1 == polygon_length1;
+            bool b = frame_length1 == polygon_length1;
             bool c = field_length2 == polygon_length2;
-            bool d = field_length1 == polygon_length2;
+            bool d = frame_length1 == polygon_length2;
             bool e = field_length2 == polygon_length1;
             if((b && c) || (d && e)){
                 //2辺ちょうどあっている
@@ -59,22 +59,22 @@ std::vector<std::tuple<int , int , int , int>> Evaluation::evaluation(std::vecto
         return point;
     };
 
-    int field_vector_index = -1,field_index = -1 , polygon_index = -1;
+    int frame_vector_index = -1,frame_index = -1 , polygon_index = -1;
 
     std::vector<std::tuple<int , int , int , int>> vector;
-    for(int i = 0 ; i < field.size() ; i++){
-       for(int j = 0 ; j < polygon.getSize() ; j++){
-           for(int k = 0 ; k < field.at(i).getPolygon().outer().size() - 1 ; k++){
-               int a = main_evaluation(field.at(i),k,polygon,j);
-               if(a > 0){
-                   field_vector_index = i;
-                   field_index = k;
+    for(int i = 0 ; i < frame.size() ; i++){
+        for(int k = 0 ; k < frame.at(i).getSize() ; k++){
+            for(int j = 0 ; j < polygon.getSize() ; j++){
+               int a = main_evaluation(frame.at(i),k,polygon,j);
+               if(a > -100){
+                   frame_vector_index = i;
+                   frame_index = k;
                    polygon_index = j;
 
-                   vector.push_back(std::tuple<int , int , int , int>(field_vector_index,field_index,polygon_index,a));
+                   vector.push_back(std::tuple<int , int , int , int>(frame_vector_index,frame_index,polygon_index,a));
                }
-           }
-       }
+            }
+        }
     }
     return vector;
 }
