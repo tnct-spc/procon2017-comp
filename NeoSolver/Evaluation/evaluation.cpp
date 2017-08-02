@@ -86,18 +86,26 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
 
     };
 
+    typedef std::tuple<int , int , int , int ,int> my_tuple;
     int frame_point_index , polygon_point_index;
-    std::vector<std::tuple<int , int , int , int , int>> vector;
+    std::vector<my_tuple> vector;
     for(frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
             if(angle_status(frame_point_index , polygon_point_index) == 1){
                 //フレームとポリゴンの角がちょうどあっているとき
             }else if(angle_status(frame_point_index , polygon_point_index) == 0){
                 //角に隙間があるとき
-                std::vector<std::tuple<int , int  , int , int , int>> v = gap_evaluation(frame_point_index , polygon_point_index);
+                std::vector<my_tuple> v = gap_evaluation(frame_point_index , polygon_point_index);
                 vector.insert(vector.end() , v.begin() , v.end());
             }else if(angle_status(frame_point_index , polygon_point_index) == -1){
                 //ポリゴンの角がフレームの角より大きくてありえんとき
+                vector.push_back(my_tuple(-1,
+                                          minus_one(frame , frame_point_index),
+                                          minus_one(polygon , polygon_point_index),
+                                          frame_point_index,
+                                          polygon_point_index
+                                          )
+                                 );
             }
         }
     }
