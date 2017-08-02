@@ -15,7 +15,6 @@
 #include <string>
 #include <QStringList>
 #include <QVector>
-#include <QList>
 #include "neofield.h"
 #include "neoexpandedpolygon.h"
 #include <math.h>
@@ -33,13 +32,15 @@ public:
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
     void setDockMode(bool inp);
+
 private:
+    QStringList colorlist;
+    QVector<QString> list;
     int frame_margin;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
     void setField();
     QPointF getPosition(point_i point);
-    QVector<QString> list;
     void firstField();
     int left_right_margin;
     int grid_size;
@@ -63,7 +64,7 @@ private:
 
 protected:
     void beforePolygon();
-    void paintEvent(QPaintEvent *event);
+    void paintEvent();
     void keyPressEvent(QKeyEvent *event);
 };
 

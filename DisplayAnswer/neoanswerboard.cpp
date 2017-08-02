@@ -1,4 +1,4 @@
-#include "neoanswerboard.h":
+#include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
@@ -6,7 +6,6 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     ui(new Ui::NeoAnswerBoard)
 {
     ui->setupUi(this);
-    //firstField();
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
@@ -136,11 +135,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 //        painter.setBrush(QBrush(QColor(up_back_ground_color)));
 //        painter.drawPolygon(points,pcount);
 
-        std::vector<procon::NeoExpandedPolygon> frame__;
-        frame__ = field.getFrame();
-        for(auto frame_ : frame__ ){
+        for(auto& frame : field.getFrame() ){
             std::vector<QPointF> frame_points;
-            for(auto point : frame_.getPolygon().outer()){
+            for(auto point : frame.getPolygon().outer()){
                 frame_points.push_back(getPosition(point));
             }
             painter.setBrush(QBrush(QColor(up_back_ground_color)));
@@ -179,8 +176,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(list[pnum])));
         int pcount = field.getPiece(pnum).getSize();
         QPointF points[pcount];
-        for(int tes = 0; tes < pcount; tes++){
-            points[tes] = getPiecePosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+        for(int locate = 0; locate < pcount; locate++){
+            points[locate] = getPiecePosition(field.getPiece(pnum).getPolygon().outer().at(locate));
         }
         painter.drawPolygon(points,pcount);
     };
@@ -244,11 +241,11 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     drawFrame();
     drawDownBackground();
-    for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
+    for(int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
         drawAfterPiece(piece_num);
         drawBeforePiece(piece_num);
     }
-    for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
+    for(int piece_num =0; piece_num < field.getPieces().size(); ++piece_num){
         drawPieceId(piece_num);
     }
 
