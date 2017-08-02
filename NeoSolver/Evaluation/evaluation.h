@@ -6,7 +6,7 @@ class Evaluation
 {
 public:
     Evaluation();
-    std::vector<std::tuple<int , int , int , int>> evaluation(std::vector<procon::NeoExpandedPolygon> const& frame, procon::NeoExpandedPolygon const& polygon);
+    std::vector<std::tuple<int , int , int>> evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon);
 };
 
 #endif // EVALUATION_H

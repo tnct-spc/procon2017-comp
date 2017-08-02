@@ -7,7 +7,7 @@ Evaluation::Evaluation()
 }
 
 
-std::vector<std::tuple<int , int , int , int>> Evaluation::evaluation(std::vector<procon::NeoExpandedPolygon> const& frame , procon::NeoExpandedPolygon const& polygon)
+std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {
     //引数は頂点の番号　0はじまり
     auto main_evaluation=[](procon::NeoExpandedPolygon one_frame,int frame_point,procon::NeoExpandedPolygon polygon,int polygon_point){
@@ -59,22 +59,18 @@ std::vector<std::tuple<int , int , int , int>> Evaluation::evaluation(std::vecto
         return point;
     };
 
-    int frame_vector_index = -1,frame_index = -1 , polygon_index = -1;
+    int evaluation = -1 , frame_index = -1 , polygon_index = -1;
 
-    std::vector<std::tuple<int , int , int , int>> vector;
-    for(int i = 0 ; i < frame.size() ; i++){
-        for(int k = 0 ; k < frame.at(i).getSize() ; k++){
-            for(int j = 0 ; j < polygon.getSize() ; j++){
-               int a = main_evaluation(frame.at(i),k,polygon,j);
-               if(a > -100){
-                   frame_vector_index = i;
-                   frame_index = k;
-                   polygon_index = j;
+    std::vector<std::tuple<int , int , int >> vector;
+    for(int k = 0 ; k < frame.getSize() ; k++){
+        for(int j = 0 ; j < polygon.getSize() ; j++){
+            evaluation = main_evaluation(frame,k,polygon,j);
+            frame_index = k;
+            polygon_index = j;
 
-                   vector.push_back(std::tuple<int , int , int , int>(frame_vector_index,frame_index,polygon_index,a));
-               }
-            }
+            vector.push_back(std::tuple<int , int , int>(evaluation , frame_index , polygon_index));
         }
     }
+
     return vector;
 }
