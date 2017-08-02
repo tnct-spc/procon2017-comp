@@ -1,6 +1,9 @@
 #ifndef POLYGONCONNECTOR_H
 #define POLYGONCONNECTOR_H
 
+#include "precompile.h"
+#include "neoexpandedpolygon.h"
+
 class Connect
 {
 public:
@@ -18,6 +21,7 @@ class PolygonConnector
 {
 public:
     PolygonConnector();
+    std::pair<procon::NeoExpandedPolygon, procon::NeoExpandedPolygon> connect(procon::NeoExpandedPolygon field, procon::NeoExpandedPolygon piece, Connect connecter);
 };
 
 #endif // POLYGONCONNECTOR_H
