@@ -70,8 +70,25 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
     };
 
     //各同士がちょうどあっているとき評価値の集まりを返す
-    auto agreement_evaluation = [&frame , &polygon](){
+    auto agreement_evaluation = [&minus_one , &length , &frame , &polygon](int frame_point_index , int polygon_point_index){
+        int frame_side_index1 = minus_one(frame , frame_point_index);
+        int frame_side_index2 = frame_point_index;
+        int polygon_side_index1 = minus_one(polygon , polygon_point_index);
+        int polygon_side_index2 = polygon_point_index;
 
+        //それぞれ評価値 , frame_side_index , polygon_side_index , frame_point_index , polygon_point_index
+        typedef std::tuple<int , int , int , int , int> my_tuple;
+        std::vector<my_tuple> vector;
+        vector.push_back(
+                    my_tuple(
+                        length(frame_side_index1 , polygon_side_index1) + length(frame_side_index2 , polygon_side_index2),
+                        frame_side_index1,
+                        polygon_side_index1,
+                        frame_point_index,
+                        polygon_point_index
+                             )
+                    );
+        return vector;
     };
 
     typedef std::tuple<int , int , int , int ,int> my_tuple;
@@ -81,6 +98,8 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
         for(polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
             if(angle_status(frame_point_index , polygon_point_index) == 1){
                 //フレームとポリゴンの角がちょうどあっているとき
+                std::vector<my_tuple> v = agreement_evaluation(frame_point_index , polygon_point_index);
+                vector.insert(vector.end() , v.begin() , v.end());
             }else if(angle_status(frame_point_index , polygon_point_index) == 0){
                 //角に隙間があるとき
                 std::vector<my_tuple> v = gap_evaluation(frame_point_index , polygon_point_index);
