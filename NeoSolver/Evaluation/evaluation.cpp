@@ -16,8 +16,21 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
         return index;
     };
 
+    //角の状態を返す
+    auto angle_status = [&frame , &polygon](int frame_point_index , int polygon_point_index){
+        double frame_angle = frame.getSideAngle().at(frame_point_index);
+        double polygon_angle = polygon.getSideAngle().at(polygon_point_index);
+        //フレームとポリゴンの角がちょうどあっているとき
+        if(frame_angle == polygon_angle) return 1;
+        //角に隙間があるとき
+        else if(frame_angle > polygon_angle) return 0;
+        //ポリゴンの角がフレームの角より大きくてありえんとき
+        else if(frame_angle < polygon_angle) return -1;
+
+    };
+
     //隙間があるとき評価値の集まりを返す
-    auto gap_evaluation=[&minus_one , &frame , &polygon](int frame_point_index , int polygon_point_index){
+    auto gap_evaluation = [&minus_one , &frame , &polygon](int frame_point_index , int polygon_point_index){
         //
         auto length = [&frame , &polygon](int frame_index , int polygon_index){
             double frame_length = frame.getSideLength().at(frame_index);
@@ -55,16 +68,8 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
         return vector;
     };
 
-    //角の状態を返す
-    auto angle_status = [&frame , &polygon](int frame_point_index , int polygon_point_index){
-        double frame_angle = frame.getSideAngle().at(frame_point_index);
-        double polygon_angle = polygon.getSideAngle().at(polygon_point_index);
-        //フレームとポリゴンの角がちょうどあっているとき
-        if(frame_angle == polygon_angle) return 1;
-        //角に隙間があるとき
-        else if(frame_angle > polygon_angle) return 0;
-        //ポリゴンの角がフレームの角より大きくてありえんとき
-        else if(frame_angle < polygon_angle) return -1;
+    //各同士がちょうどあっているとき評価値の集まりを返す
+    auto agreement_evaluation = [&frame , &polygon](){
 
     };
 
