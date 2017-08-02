@@ -10,10 +10,10 @@ Evaluation::Evaluation()
 std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {
     //引数は頂点の番号　0はじまり
-    auto main_evaluation=[](procon::NeoExpandedPolygon one_frame,int frame_point,procon::NeoExpandedPolygon polygon,int polygon_point){
-        auto about_angle = [one_frame,polygon,frame_point,polygon_point](){
-            double frame_angle = one_frame.getSideAngle().at(frame_point);
-            double polygon_angle = polygon.getSideAngle().at(polygon_point);
+    auto main_evaluation=[frame , polygon](int frame_index , int polygon_index){
+        auto about_angle = [frame , polygon , frame_index , polygon_index](){
+            double frame_angle = frame.getSideAngle().at(frame_index);
+            double polygon_angle = polygon.getSideAngle().at(polygon_index);
             if(frame_angle == polygon_angle){
                 //フレームとポリゴンの角がちょうどあっているとき
                 return 1;
@@ -25,16 +25,16 @@ std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpa
                 return -2;
             }
         };
-        auto about_length = [one_frame,polygon,frame_point,polygon_point](){
-            int a = frame_point - 1;
-            if(a == -1) a = one_frame.getSize() - 1;
-            double frame_length1 = one_frame.getSideLength().at(a);
-            double field_length2 = one_frame.getSideLength().at(frame_point);
+        auto about_length = [frame , polygon , frame_index , polygon_index](){
+            int a = frame_index - 1;
+            if(a == -1) a = frame.getSize() - 1;
+            double frame_length1 = frame.getSideLength().at(a);
+            double field_length2 = frame.getSideLength().at(frame_index);
 
-            a = polygon_point - 1;
+            a = polygon_index - 1;
             if(a == -1) a = polygon.getSize() - 1;
             double polygon_length1 = polygon.getSideLength().at(a);
-            double polygon_length2 = polygon.getSideLength().at(polygon_point);
+            double polygon_length2 = polygon.getSideLength().at(polygon_index);
 
             bool b = frame_length1 == polygon_length1;
             bool c = field_length2 == polygon_length2;
@@ -59,14 +59,14 @@ std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpa
         return point;
     };
 
-    int evaluation = -1 , frame_index = -1 , polygon_index = -1;
+    int evaluation , frame_index , polygon_index;
 
-    std::vector<std::tuple<int , int , int >> vector;
+    std::vector<std::tuple<int , int , int>> vector;
     for(int k = 0 ; k < frame.getSize() ; k++){
         for(int j = 0 ; j < polygon.getSize() ; j++){
-            evaluation = main_evaluation(frame,k,polygon,j);
             frame_index = k;
             polygon_index = j;
+            evaluation = main_evaluation(frame_index , polygon_index);
 
             vector.push_back(std::tuple<int , int , int>(evaluation , frame_index , polygon_index));
         }
