@@ -100,13 +100,27 @@ ProbMaker::ProbMaker(QWidget *parent) :
 //    NeoPolygonViewer::getInstance().displayPolygon(poly_2,"polygon2",true);
 
     //ドロネーの三角形分割
-    delaunay_triangulation();
-    GA();
+//    delaunay_triangulation();
+//    GA();
+    angulated_graphic();
 }
 
 ProbMaker::~ProbMaker()
 {
     delete ui;
+}
+
+void ProbMaker::angulated_graphic(){
+    polygon_i sample_frame;//   テストで枠を生成
+    sample_frame.outer().push_back(point_i(12,0));
+    sample_frame.outer().push_back(point_i(82,0));
+    sample_frame.outer().push_back(point_i(95,24));
+    sample_frame.outer().push_back(point_i(100,64));
+    sample_frame.outer().push_back(point_i(20,64));
+    sample_frame.outer().push_back(point_i(0,10));
+    sample_frame.outer().push_back(point_i(12,0));
+    frame = sample_frame;
+
 }
 
 void ProbMaker::delaunay_triangulation()

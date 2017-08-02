@@ -17,6 +17,7 @@ public:
     ~ProbMaker();
     void delaunay_triangulation();
     void GA();
+    void angulated_graphic();
     std::vector<polygon_i> getPieces();
     polygon_i getFrame();
 
