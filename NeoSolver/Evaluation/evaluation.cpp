@@ -76,10 +76,9 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
         for(polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
             if(angle_status(frame_point_index , polygon_point_index) == 1){
                 //フレームとポリゴンの角がちょうどあっているとき
-                vector.push_back(my_tuple(length(
-                                              minus_one(frame , frame_point_index),
-                                              minus_one(polygon , polygon_point_index)
-                                              )
+                int frame_side_index = minus_one(frame , frame_point_index);
+                int point_side_index = minus_one(polygon , polygon_point_index);
+                vector.push_back(my_tuple(length(frame_side_index , point_side_index)
                                           + length(frame_point_index , polygon_point_index),
                                           minus_one(frame , frame_point_index),
                                           minus_one(polygon , polygon_point_index),
