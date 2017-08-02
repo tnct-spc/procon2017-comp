@@ -29,15 +29,16 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
 
     };
 
+    //辺の状態を返す
+    auto length = [&frame , &polygon](int frame_index , int polygon_index){
+        double frame_length = frame.getSideLength().at(frame_index);
+        double polygon_length = polygon.getSideLength().at(polygon_index);
+        if(frame_length == polygon_length) return 1;
+        else return 0;
+    };
+
     //隙間があるとき評価値の集まりを返す
-    auto gap_evaluation = [&minus_one , &frame , &polygon](int frame_point_index , int polygon_point_index){
-        //
-        auto length = [&frame , &polygon](int frame_index , int polygon_index){
-            double frame_length = frame.getSideLength().at(frame_index);
-            double polygon_length = polygon.getSideLength().at(polygon_index);
-            if(frame_length == polygon_length) return 1;
-            else return 0;
-        };
+    auto gap_evaluation = [&minus_one , &length , &frame , &polygon](int frame_point_index , int polygon_point_index){
 
         int frame_side_index1 = minus_one(frame , frame_point_index);
         int frame_side_index2 = frame_point_index;
