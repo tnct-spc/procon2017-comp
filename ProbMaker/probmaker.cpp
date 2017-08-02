@@ -110,16 +110,28 @@ ProbMaker::~ProbMaker()
     delete ui;
 }
 
+int ProbMaker::retRnd(int num){
+    std::random_device rand;
+    std::mt19937 mt(rand());
+    std::uniform_int_distribution<int> rnd(0,num-1);//randomを返すだけ
+    std::cout << rnd(mt) << std::endl;
+    return rnd(mt);
+}
+
 void ProbMaker::angulated_graphic(){
+
     polygon_i sample_frame;//   テストで枠を生成
     sample_frame.outer().push_back(point_i(12,0));
-    sample_frame.outer().push_back(point_i(82,0));
-    sample_frame.outer().push_back(point_i(95,24));
-    sample_frame.outer().push_back(point_i(100,64));
-    sample_frame.outer().push_back(point_i(20,64));
-    sample_frame.outer().push_back(point_i(0,10));
+    sample_frame.outer().push_back(point_i(80,0));
+    sample_frame.outer().push_back(point_i(101,20));
+    sample_frame.outer().push_back(point_i(101,65));
+    sample_frame.outer().push_back(point_i(20,65));
+    sample_frame.outer().push_back(point_i(20,52));
+    sample_frame.outer().push_back(point_i(0,12));
     sample_frame.outer().push_back(point_i(12,0));
     frame = sample_frame;
+    print_polygons.push_back(sample_frame);
+
 
 }
 

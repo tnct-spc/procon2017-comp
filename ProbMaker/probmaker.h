@@ -25,6 +25,7 @@ private:
     Ui::ProbMaker *ui;
     std::vector<std::pair<point_i,point_i>> lines;
     std::vector<polygon_i> print_polygons;
+    int retRnd(int pnum);
     polygon_i frame;
 
 private slots:
