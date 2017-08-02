@@ -4,6 +4,9 @@
 #include "precompile.h"
 #include "neoexpandedpolygon.h"
 
+namespace bg = boost::geometry;
+typedef std::complex<double> complex_d;
+
 class Connect
 {
 public:
@@ -21,7 +24,8 @@ class PolygonConnector
 {
 public:
     PolygonConnector();
-    std::pair<procon::NeoExpandedPolygon, procon::NeoExpandedPolygon> connect(procon::NeoExpandedPolygon field, procon::NeoExpandedPolygon piece, Connect connecter);
+    std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> PolygonConnector::connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter);
+    polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, int first_index, int second_index);
 };
 
 #endif // POLYGONCONNECTOR_H
