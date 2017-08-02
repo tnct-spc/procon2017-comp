@@ -36,8 +36,8 @@ int Test()
 int main(int argc, char *argv[])
 {
     std::cout<<"***START TEST***"<<std::endl;
-    QApplication a(argc, argv);
-    NeoPolygonViewer::getInstance();
+//    QApplication a(argc, argv);
+//    NeoPolygonViewer::getInstance();
 
     int error_cnt = Test();
 
@@ -46,5 +46,6 @@ int main(int argc, char *argv[])
     } else {
         std::cout << "***FAILED! "<<error_cnt<<" tests return false***" << std::endl;
     }
-    return a.exec();
+    return 0;
+//    return a.exec();
 }
