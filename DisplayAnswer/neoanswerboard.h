@@ -34,8 +34,6 @@ public:
     void setDockMode(bool inp);
 
 private:
-    QStringList colorlist;
-    QVector<QString> list;
     int frame_margin;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
@@ -64,7 +62,7 @@ private:
 
 protected:
     void beforePolygon();
-    void paintEvent();
+    void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
 };
 

@@ -147,18 +147,18 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //処理後ピースを描画
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            painter.setBrush(QBrush(QColor(list[pnum])));
-//            int pcount = field.getPiece(pnum).getSize();
-//            QPointF points[pcount];
-//            for(int tes = 0;tes < pcount; tes++){
-//                points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
-//            }
-//            painter.drawPolygon(points,pcount);
-            std::vector<QPointF> points;
-            for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
-                points.push_back(getPosition(point));
-            }
-            painter.drawPolygon(&points.front(),points.size());
+                painter.setBrush(QBrush(QColor(list[pnum])));
+//              int pcount = field.getPiece(pnum).getSize();
+//              QPointF points[pcount];
+//              for(int tes = 0;tes < pcount; tes++){
+//                  points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+//              }
+//              painter.drawPolygon(points,pcount);
+                std::vector<QPointF> points;
+                for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
+                    points.push_back(getPosition(point));
+                }
+                painter.drawPolygon(&points.front(),points.size());
     };
 
     //下画面フレームを描画
@@ -202,7 +202,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         boost::geometry::centroid(polygon_list[blue_id], center);
         QPointF aftercentroid = getPosition(center);
         QPointF beforecentroid = getPiecePosition(center);
-        painter.setPen(QPen(QBrush(Qt::blue), 1.0));
+        painter.setPen(QPen(QBrush(Qt::blue), 2.0));
         painter.drawLine(aftercentroid, beforecentroid);
     };
 
@@ -212,7 +212,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         boost::geometry::centroid(polygon_list[red_id], center);
         QPointF aftercentroid = getPosition(center);
         QPointF beforecentroid = getPiecePosition(center);
-        painter.setPen(QPen(QBrush(Qt::red), 1.0));
+        painter.setPen(QPen(QBrush(Qt::red), 2.0));
         painter.drawLine(aftercentroid, beforecentroid);
     };
 
@@ -243,7 +243,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawDownBackground();
     for(int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
         drawAfterPiece(piece_num);
-        drawBeforePiece(piece_num);
     }
     for(int piece_num =0; piece_num < field.getPieces().size(); ++piece_num){
         drawPieceId(piece_num);
@@ -253,19 +252,33 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         if(point_id == -1){
             point_id++;
             red_id = point_id;
+            drawBeforePiece(point_id);
             drawRedProcessingLine();
             point_id++;
             blue_id = point_id;
+            drawBeforePiece(point_id);
             drawBlueProcessingLine();
 
         }
         if(point_id != -1){
             if(selecter){
                 red_id = point_id;
+                for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                    drawBeforePiece(piecenumber);
+                }
+                for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                    drawBeforePiece(piecenumber);
+                }
                 drawRedProcessingLine();
                 drawBlueProcessingLine();
             }else{
                 blue_id = point_id;
+                for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                    drawBeforePiece(piecenumber);
+                }
+                for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                    drawBeforePiece(piecenumber);
+                }
                 drawBlueProcessingLine();
                 drawRedProcessingLine();
             }
