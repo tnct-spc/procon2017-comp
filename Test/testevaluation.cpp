@@ -59,20 +59,25 @@ bool TestEvaluation::run()
     nep.resetPolygonForce(boost_polygon);
     polygons.push_back(nep);
 
-    typedef std::tuple<int , int , int > mytuple;
+    typedef std::tuple<int , int , int , int ,int> mytuple;
     std::vector<mytuple> vector;
 
     Evaluation *e = new Evaluation();
     vector = e->evaluation(frames.at(0) , polygons.at(0));
 
-    int evaluation , field_index , polygon_index;
+    int evaluation , field_side_index , polygon_side_index , field_point_index , polygon_point_index;
     for(mytuple i : vector){
         evaluation = std::get<0>(i);
-        field_index = std::get<1>(i);
-        polygon_index = std::get<2>(i);
+        field_side_index = std::get<1>(i);
+        polygon_side_index = std::get<2>(i);
+        field_point_index = std::get<3>(i);
+        polygon_point_index = std::get<4>(i);
         std::cout << "evaluation = " << evaluation
-                  << " , field_index = " << field_index
-                  << " , polygon_index = " << polygon_index<< std::endl;
+                  << " , field_side_index = " << field_side_index
+                  << " , polygon_side_index = " << polygon_side_index
+                  << " , field_point_index = " << field_point_index
+                  << " , polygon_point_index = " << polygon_point_index
+                  << std::endl;
     }
 
     return true;
