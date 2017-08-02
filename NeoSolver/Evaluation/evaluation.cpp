@@ -54,10 +54,11 @@ std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpa
         };
 
         //上の結果を集計する
+        int const angle_weight = 1;
+        int const length_weight = 1;
         int point = 0;
-        point = point + about_angle();
-        if(point < 0) return point;
-        point = point + about_length();
+        point = point + about_angle() * angle_weight;
+        point = point + about_length() * length_weight;
         return point;
     };
 
