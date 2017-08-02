@@ -64,11 +64,12 @@ bool TestEvaluation::run()
 
     Evaluation *e = new Evaluation();
     vector = e->evaluation(frames.at(0) , polygons.at(0));
-//    vector = (new Evaluation) -> evaluation();
 
     int evaluation , field_index , polygon_index;
     for(mytuple i : vector){
-        mytuple(evaluation , field_index , polygon_index) = i;
+        evaluation = std::get<0>(i);
+        field_index = std::get<1>(i);
+        polygon_index = std::get<2>(i);
         std::cout << "evaluation = " << evaluation
                   << " , field_index = " << field_index
                   << " , polygon_index = " << polygon_index<< std::endl;
