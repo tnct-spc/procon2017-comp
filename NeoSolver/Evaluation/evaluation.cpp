@@ -9,14 +9,15 @@ Evaluation::Evaluation()
 
 std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {    
+    //NEPの要素数をマイナス1するだけのらむだ
+    auto minus_one = [](procon::NeoExpandedPolygon nep , int index){
+        index =index - 1;
+        if(index == -1) index = nep.getSize() - 1;
+        return index;
+    };
+
     //隙間があるとき評価値の集まりを返す
-    auto gap_evaluation=[&frame , &polygon](int frame_point_index , int polygon_point_index){
-        //NEPの要素数をマイナス1するだけのらむだ
-        auto minus_one = [](procon::NeoExpandedPolygon nep , int index){
-            index =index - 1;
-            if(index == -1) index = nep.getSize();
-            return index;
-        };
+    auto gap_evaluation=[&minus_one , &frame , &polygon](int frame_point_index , int polygon_point_index){
         //
         auto length = [&frame , &polygon](int frame_index , int polygon_index){
             double frame_length = frame.getSideLength().at(frame_index);
