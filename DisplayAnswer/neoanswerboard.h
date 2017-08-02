@@ -32,9 +32,9 @@ public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
-    void setSingleMode(bool inp);
-
+    void setDockMode(bool inp);
 private:
+    int frame_margin;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
     void setField();
@@ -50,9 +50,13 @@ private:
     // Only field mode
     bool single_mode = false;
 
+    //make id_list
+    std::vector<polygon_i> polygon_list;
+
     //draw processingLine
-    int point_id;
-    bool selecter;
+    point_i center;
+    int point_id = -1;
+    bool selecter;//true = left, false = right
     bool paintif;
 
 protected:

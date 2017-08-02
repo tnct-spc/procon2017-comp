@@ -14,8 +14,7 @@ NeoAnswerBoard::~NeoAnswerBoard()
     delete ui;
 }
 
-void NeoAnswerBoard::setSingleMode(bool inp)
-{
+void NeoAnswerBoard::setDockMode(bool inp){
     single_mode = inp;
 }
 
@@ -83,8 +82,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     QVector<QString> list = colorlist.toVector();
 
     // 101 x 65
-    const int grid_row = 65;
-    const int grid_col = 101;
+    frame_margin = 16; //枠の最低限の幅(左右の合計)
+    const int grid_row = 65 + frame_margin;
+    const int grid_col = 101 + frame_margin;
     const int grid_margin = 1;
     const int splitedheight = (single_mode==true
                                ?window_height
@@ -93,13 +93,18 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             window_width <= splitedheight
             ? window_width / (grid_col + grid_margin)
             : splitedheight / (grid_row + grid_margin);
+    //grid_size -= grid_size*8;
     top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
     left_right_margin = (window_width - grid_size * grid_col) / 2;
     down_up_y = splitedheight + top_bottom_margin;
 
+    //余白(枠の部分)を設定
+    //top_bottom_margin += grid_size*8;
+    //left_right_margin += grid_size*8;
+
     QPainter painter(this);
 
-    //上部背景を描画
+    //背景を描画
     painter.setBrush(QBrush(QColor(up_back_ground_color)));
     painter.drawRect(QRect(0,0,window_width,splitedheight));
     painter.setBrush(QBrush(QColor(down_back_ground_color)));
@@ -160,7 +165,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             painter.drawPolygon(&points.front(),points.size());
     };
 
-    //下画面背景を描画
+    //下画面フレームを描画
     auto drawDownBackground = [&]{
         painter.setBrush(QBrush(QColor(Qt::white)));
         painter.drawRect(QRect(left_right_margin,
@@ -198,12 +203,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //処理線を描画
     auto drawProcessingLine = [&](){
         point_i center;
-        boost::geometry::centroid(field.getPiece(point_id).getPolygon(),center);
-        QPointF afterpiececenter = getPosition(center);
-        QPointF beforepiececenter = getPiecePosition(center);
-        if(selecter == true) painter.setPen(QPen(QBrush(Qt::red), 0.7));
-        if(selecter == false) painter.setPen(QPen(QBrush(Qt::blue), 0.7));
-        painter.drawLine(afterpiececenter, beforepiececenter);
+        boost::geometry::centroid(polygon_list[point_id], center);
+        QPointF aftercentroid = getPosition(center);
+        QPointF beforecentroid = getPiecePosition(center);
+        if(selecter == true) painter.setPen(QPen(QBrush(Qt::red), 1.0));
+        if(selecter == false) painter.setPen(QPen(QBrush(Qt::blue), 1.0));
+        painter.drawLine(aftercentroid, beforecentroid);
     };
 
     //評価値を描画
@@ -238,60 +243,61 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
         drawPieceId(piece_num);
     }
-    if(paintif == true){
-        point_i center;
-        boost::geometry::centroid(field.getPiece(point_id).getPolygon(),center);
-        QPointF afterpiececenter = getPosition(center);
-        QPointF beforepiececenter = getPiecePosition(center);
-        if(selecter == true){
-            painter.setPen(QPen(QBrush(Qt::red), 0.7));
-            painter.drawLine(afterpiececenter, beforepiececenter);
+
+    if(paintif){
+        if(point_id != -1){
+            drawProcessingLine();
+            paintif = false;
         }
-        if(selecter == false){
-            painter.setPen(QPen(QBrush(Qt::blue), 0.7));
-            painter.drawLine(afterpiececenter, beforepiececenter);
-        }
-        paintif = false;
     }
+
     drawEvalution();
     drawGrid();
 }
 
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
-    int max_id = field.getPieces().size();
-    int point_id = 0;
-    bool selecter;//true = left, false = right
-    bool paintif = false;
-    if(point_id <= max_id){
-        switch(event->key()){
-            case 16781616:
-                ++point_id;
-                selecter = true;
-                paintif = true;
-                break;
-            case 16777220:
-                ++point_id;
-                selecter = false;
-                paintif = true;
-                break;
-            default:
-                break;
+    int hoge = field.getPieces().size();
+    if(point_id < hoge - 1){
+        paintif = true;
+        if(event->key() == Qt::Key_L){
+            selecter = true;
+            point_id++;
         }
+        if(event->key() == Qt::Key_P){
+            selecter = false;
+            point_id++;
+        }
+        this->update();
     }
 }
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
-    return QPointF(left_right_margin + point.x() * grid_size, top_bottom_margin + point.y() * grid_size);
+    int pointx = point.x() + frame_margin/2;
+    int pointy = point.y() + frame_margin/2;
+    return QPointF(left_right_margin + pointx * grid_size, top_bottom_margin + pointy * grid_size);
 }
 
 QPointF NeoAnswerBoard::getPiecePosition(point_i point){//point_iを下画面の枠と対応させるようにQPointFに変換する
-    return QPointF(left_right_margin + point.x() * grid_size, down_up_y + point.y() * grid_size);
+    int pointx = point.x() + frame_margin/2;
+    int pointy = point.y() + frame_margin/2;
+    return QPointF(left_right_margin + pointx * grid_size, down_up_y + pointy * grid_size);
 }
 
 void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     field=input_field;
+    paintif = true;
     this->update();
+
+    polygon_list.clear();
+    std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
+    std::sort(pieces.begin(), pieces.end(), [](const procon::NeoExpandedPolygon& a, const procon::NeoExpandedPolygon& b)->bool{
+        return a.getId() < b.getId();
+    });
+    for(auto piece : pieces){
+        if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
+        std::cout << piece.getId() << std::endl;
+    }
 }
 
 void NeoAnswerBoard::firstField(){//初期状態でのfieldを設定(実際は使わない)
