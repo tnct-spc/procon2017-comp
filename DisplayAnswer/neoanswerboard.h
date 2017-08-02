@@ -56,6 +56,8 @@ private:
     //draw processingLine
     point_i center;
     int point_id = -1;
+    int red_id;
+    int blue_id;
     bool selecter;//true = left, false = right
     bool paintif;
 

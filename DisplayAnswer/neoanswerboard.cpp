@@ -18,7 +18,6 @@ void NeoAnswerBoard::setDockMode(bool inp){
     single_mode = inp;
 }
 
-
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
     const QString up_back_ground_color = "#7BAB4F";
@@ -200,14 +199,23 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
     };
 
-    //処理線を描画
-    auto drawProcessingLine = [&](){
+    //青処理線を描画
+    auto drawBlueProcessingLine = [&](){
         point_i center;
-        boost::geometry::centroid(polygon_list[point_id], center);
+        boost::geometry::centroid(polygon_list[blue_id], center);
         QPointF aftercentroid = getPosition(center);
         QPointF beforecentroid = getPiecePosition(center);
-        if(selecter == true) painter.setPen(QPen(QBrush(Qt::red), 1.0));
-        if(selecter == false) painter.setPen(QPen(QBrush(Qt::blue), 1.0));
+        painter.setPen(QPen(QBrush(Qt::blue), 1.0));
+        painter.drawLine(aftercentroid, beforecentroid);
+    };
+
+    //赤処理線を描画
+    auto drawRedProcessingLine = [&](){
+        point_i center;
+        boost::geometry::centroid(polygon_list[red_id], center);
+        QPointF aftercentroid = getPosition(center);
+        QPointF beforecentroid = getPiecePosition(center);
+        painter.setPen(QPen(QBrush(Qt::red), 1.0));
         painter.drawLine(aftercentroid, beforecentroid);
     };
 
@@ -245,10 +253,27 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     }
 
     if(paintif){
-        if(point_id != -1){
-            drawProcessingLine();
-            paintif = false;
+        if(point_id == -1){
+            point_id++;
+            red_id = point_id;
+            drawRedProcessingLine();
+            point_id++;
+            blue_id = point_id;
+            drawBlueProcessingLine();
+
         }
+        if(point_id != -1){
+            if(selecter){
+                red_id = point_id;
+                drawRedProcessingLine();
+                drawBlueProcessingLine();
+            }else{
+                blue_id = point_id;
+                drawBlueProcessingLine();
+                drawRedProcessingLine();
+            }
+        }
+        paintif = false;
     }
 
     drawEvalution();
@@ -260,11 +285,11 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
     int hoge = field.getPieces().size();
     if(point_id < hoge - 1){
         paintif = true;
-        if(event->key() == Qt::Key_L){
+        if(event->key() == Qt::Key_A){
             selecter = true;
             point_id++;
         }
-        if(event->key() == Qt::Key_P){
+        if(event->key() == Qt::Key_L){
             selecter = false;
             point_id++;
         }
