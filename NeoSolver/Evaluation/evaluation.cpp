@@ -62,6 +62,19 @@ std::vector<std::tuple<int , int , int >> Evaluation::evaluation(procon::NeoExpa
         return point;
     };
 
+    //角の状態を返す
+    auto angle_status = [&frame , &polygon](int frame_index , int polygon_index){
+        double frame_angle = frame.getSideAngle().at(frame_index);
+        double polygon_angle = polygon.getSideAngle().at(polygon_index);
+        //フレームとポリゴンの角がちょうどあっているとき
+        if(frame_angle == polygon_angle) return 1;
+        //角に隙間があるとき
+        else if(frame_angle > polygon_angle) return 0;
+        //ポリゴンの角がフレームの角より大きくてありえんとき
+        else if(frame_angle < polygon_angle) return -1;
+
+    };
+
     //それぞれ評価値、フレームのインデックス、ポリゴンのインデックス
     int evaluation , frame_index , polygon_index;
     std::vector<std::tuple<int , int , int>> vector;
