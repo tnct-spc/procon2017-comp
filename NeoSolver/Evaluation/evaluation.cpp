@@ -6,8 +6,9 @@ Evaluation::Evaluation()
 
 }
 
+typedef std::tuple<int , int , int , int ,int> my_tuple;
 
-std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
+std::vector<my_tuple> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {    
     //NEPの要素数をマイナス1するだけのらむだ
     auto minus_one = [](procon::NeoExpandedPolygon nep , int index){
@@ -46,7 +47,6 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
         int polygon_side_index2 = polygon_point_index;
 
         //それぞれ評価値 , frame_side_index , polygon_side_index , frame_point_index , polygon_point_index
-        typedef std::tuple<int , int , int , int , int> my_tuple;
         std::vector<my_tuple> vector;
         vector.push_back(
                     my_tuple(
@@ -69,7 +69,6 @@ std::vector<std::tuple<int , int , int , int , int>> Evaluation::evaluation(proc
         return vector;
     };
 
-    typedef std::tuple<int , int , int , int ,int> my_tuple;
     int frame_point_index , polygon_point_index;
     std::vector<my_tuple> vector;
     for(frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
