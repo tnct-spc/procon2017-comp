@@ -77,18 +77,18 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
         int polygon_side_index = minus_one(polygon , polygon_point_index);
 
         int length_evaluation;
+        double evaluation;
         if(angle_evaluation == -1){
-            //ありえんときの辺の長さの評価
-            length_evaluation = -1;
+            //ありえんときの評価は問答無用で-1
+            evaluation = -1;
         }else{
             //角がぴったりだったときの辺の長さの評価
             length_evaluation =
                     length(frame_side_index , polygon_side_index)
                     +
                     length(frame_point_index , polygon_point_index);
+                    evaluation = angle_evaluation * angle_weight + length_evaluation * length_weight;
         }
-
-        double evaluation = angle_evaluation * angle_weight + length_evaluation * length_weight;
 
         Connect connect;
         connect.frame_side_index = frame_side_index;
