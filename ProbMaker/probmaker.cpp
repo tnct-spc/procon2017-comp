@@ -150,7 +150,7 @@ void ProbMaker::angulated_graphic(){
     polygon_i sample_frame;//   テストで枠を生成
     sample_frame.outer().push_back(point_i(12,0));
     sample_frame.outer().push_back(point_i(80,0));
-    sample_frame.outer().push_back(point_i(101,20));
+    sample_frame.outer().push_back(point_i(101,21));
     sample_frame.outer().push_back(point_i(101,65));
     sample_frame.outer().push_back(point_i(13,65));
     sample_frame.outer().push_back(point_i(0,52));
@@ -185,12 +185,79 @@ void ProbMaker::angulated_graphic(){
     polygon_i poly;//polygonを宣言
     poly.outer().push_back(point_i(point_x,point_y));
 
-    auto checkClossLine = [&]{
-        polygon_i polygon = poly;
-        polygon.outer().push_back(point_i(point_x,point_y));
-        return bg::intersects(polygon);
-        //return false;//問題がなかったらfalseを返す
+
+    auto checkClossLine = [&]{//今回はframeのみを対象としたプログラムを書く(汎用性なし)      実際は二回目以降の処理は既にピースが置かれている部分を切り落とすような枠を生成する
+        int begin_line = -1;//変数名のせいでわかりづらいけど枠やピースの交点の線の番号を表している
+        int end_line = -1;
+        point_i polygon_begin = poly.outer().at(0);
+        point_i polygon_end = poly.outer().at(bg::num_points(poly)-1);//polygonの始点と終点(他の枠やピースと繋がってる部分)
+        for(unsigned int linenum=0;linenum<bg::num_points(frame)-1;linenum++){
+
+            bg::model::linestring<point_i> edge_line{frame.outer().at(linenum),frame.outer().at(linenum+1)};
+            if(bg::intersects(polygon_begin,edge_line))begin_line = linenum;//交点を見つけたら番号を記録
+            if(bg::intersects(polygon_end,edge_line))end_line = linenum;
+        }
+        std::cout << "closspoint1 : " << begin_line << "  closspoint2 : " << end_line << std::endl;
+        polygon_i clockwise_poly = poly;
+        polygon_i not_clockwise_poly = poly;
+        if(begin_line == end_line){//同じ線上にbeginとendがある場合
+            clockwise_poly.outer().push_back(poly.outer().at(0));
+
+            poly.outer().push_back(frame.outer().at(end_line+1));
+            if(bg::intersects(poly)){//bの方が時計回り方向にいたのなら
+
+                for(int point_num = end_line;point_num > -1;point_num--){//すごい頭の悪い書き方してる
+                    not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                }
+                for(int point_num = bg::num_points(frame) - 1;point_num > begin_line;point_num--){
+                    not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                }
+                not_clockwise_poly.outer().push_back(poly.outer().at(0));
+
+            }else{
+                for(int point_num=end_line + 1;point_num<bg::num_points(frame);point_num++){
+                    not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                }
+                for(int point_num = 0;point_num < begin_line + 1;point_num++){
+                    not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                }
+                not_clockwise_poly.outer().push_back(poly.outer().at(0));
+
+            }
+            poly.outer().pop_back();
+        }else if(begin_line > end_line){
+            for(int point_num = end_line + 1;point_num < begin_line + 1;point_num++){
+                clockwise_poly.outer().push_back(frame.outer().at(point_num));
+            }
+            clockwise_poly.outer().push_back(poly.outer().at(0));
+
+            for(int point_num = end_line;point_num > -1;point_num--){
+                not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+            }
+            for(int point_num = bg::num_points(frame)-1;point_num > begin_line;point_num--){
+                not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+            }
+            not_clockwise_poly.outer().push_back(poly.outer().at(0));
+
+        }else{
+            for(int point_num=end_line + 1;point_num<bg::num_points(frame);point_num++){
+                clockwise_poly.outer().push_back(frame.outer().at(point_num));
+            }
+            for(int point_num = 0;point_num < begin_line + 1;point_num++){
+                clockwise_poly.outer().push_back(frame.outer().at(point_num));
+            }
+            clockwise_poly.outer().push_back(poly.outer().at(0));
+
+            for(int point_num = end_line;point_num > begin_line;point_num--){
+                not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+            }
+            not_clockwise_poly.outer().push_back(poly.outer().at(0));
+
+        }
+        if(bg::area(clockwise_poly) < bg::area(not_clockwise_poly))poly = clockwise_poly;
+        else poly = not_clockwise_poly;
     };
+
 
     bool x_or_y = true;//次にx軸方向へ伸ばすかy軸方向に伸ばすかを記録する trueならy軸方向、falseならx軸方向に伸ばす
     //次はx座標に正の方向へ頂点を移動させるサンプルを作ってみる
@@ -209,14 +276,14 @@ void ProbMaker::angulated_graphic(){
                     if(!x_or_y) ++point_x;
                     else  ++point_y;
 
-                    if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
-                        if(bg::num_points(poly) > 1){
+                    if(checkIntersects(point_i(point_x , point_y)) || bg::intersects(poly,point_i(point_x,point_y))){//これで接触した部分の座標がわかる
+                        if(bg::num_points(poly) > 1 && !bg::intersects(poly,point_i(point_x,point_y))){
                             //polygonを参照渡ししたら補完してくれるプログラムを書く
                             flag = true;
                         }else{
                             point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
-                            if(!x_or_y) --point_x;
-                            else  --point_y;
+                            if(!x_or_y) point_x -= extend_;
+                            else point_y -= extend_;
                         }
                         break;//他の図形と接触したらそこで止める
                     }
@@ -231,14 +298,14 @@ void ProbMaker::angulated_graphic(){
                 for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
                     if(!x_or_y) --point_x;
                     else  --point_y;
-                    if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
-                        if(bg::num_points(poly) > 1){
+                    if(checkIntersects(point_i(point_x , point_y)) || bg::intersects(poly,point_i(point_x,point_y))){//これで接触した部分の座標がわかる
+                        if(bg::num_points(poly) > 1 && !bg::intersects(poly,point_i(point_x,point_y))){
                             //polygonを参照渡ししたら補完してくれるプログラムを書く
                             flag = true;
                         }else{
                             point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
-                            if(!x_or_y) ++point_x;
-                            else  ++point_y;
+                            if(!x_or_y) point_x += extend_;
+                            else  point_y += extend_;
                         }
                         break;//他の図形と接触したらそこで止める
                     }
@@ -249,15 +316,14 @@ void ProbMaker::angulated_graphic(){
             poly.outer().push_back(point_i(point_x , point_y)); //頂点を確定させる
             x_or_y ^= 1;//次の実行時に向きを変えるようにする(xに進めるかyに進めるかを決める)
         }
-        if(bg::intersects(poly)){ // 線の交差で実現不可能な図形になっていないかの確認 　無限ループが発生する事があるので改善したい
-           x_or_y ^= 1;
-           poly.outer().pop_back();
-        }
+
     }
 
     //poly.outer().push_back(point_i(poly.outer().at(1).x()+3,poly.outer().at(1).y()));//テスト用なので後で消します
 
-    poly.outer().push_back(poly.outer().at(0));//最後に図形を閉じて表示
+    checkClossLine();
+
+    //poly.outer().push_back(poly.outer().at(0));//最後に図形を閉じて表示
     polygon_vec.push_back(poly);//色々登録した後に中身をリセットして終了
     print_polygons.push_back(poly);
     poly.clear();
