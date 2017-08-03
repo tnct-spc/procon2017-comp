@@ -102,16 +102,15 @@ std::vector<my_tuple> Evaluation::evaluation(procon::NeoExpandedPolygon const& f
     std::vector<my_tuple> vector;
     for(frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
-            if(angle_status(frame_point_index , polygon_point_index) == 1){
-                //フレームとポリゴンの角がちょうどあっているとき
-                vector.push_back(default_evaluation(1 , frame_point_index , polygon_point_index));
-            }else if(angle_status(frame_point_index , polygon_point_index) == 0){
+            int angle_evaluation = angle_status(frame_point_index , polygon_point_index);
+            if (angle_evaluation == 0){
                 //角に隙間があるとき
                 std::vector<my_tuple> v = gap_evaluation(frame_point_index , polygon_point_index);
                 vector.insert(vector.end() , v.begin() , v.end());
-            }else if(angle_status(frame_point_index , polygon_point_index) == -1){
+            } else {
+                //フレームとポリゴンの角がちょうどあっているとき
                 //ポリゴンの角がフレームの角より大きくてありえんとき
-                vector.push_back(default_evaluation(-1 , frame_point_index , polygon_point_index));
+                vector.push_back(default_evaluation(angle_evaluation , frame_point_index , polygon_point_index));
             }
         }
     }
