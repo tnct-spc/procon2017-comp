@@ -184,7 +184,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //ピースIdを描画
     auto drawPieceId = [&](int pnum){
-        painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
+        painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setBackground(QBrush(QColor(list[pnum])));
         painter.setPen(QPen(QBrush(Qt::white), 0.3));
@@ -243,11 +243,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     drawFrame();
     drawDownBackground();
+
     for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
-        drawAfterPiece(piece_num);
-    }
-    for(unsigned int piece_num =0; piece_num < field.getPieces().size(); ++piece_num){
-        drawPieceId(piece_num);
+        drawBeforePiece(piece_num);
     }
 
     if(paintif){
@@ -256,30 +254,36 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             red_id = point_id;
             drawBeforePiece(point_id);
             drawRedProcessingLine();
+            drawPieceId(point_id);
             point_id++;
             blue_id = point_id;
             drawBeforePiece(point_id);
             drawBlueProcessingLine();
-
+            drawPieceId(point_id);
         }
+
         if(point_id != -1){
             if(selecter){
                 red_id = point_id;
                 for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                    drawBeforePiece(piecenumber);
+                    drawAfterPiece(piecenumber);
+                    drawPieceId(piecenumber);
                 }
                 for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                    drawBeforePiece(piecenumber);
+                    drawAfterPiece(piecenumber);
+                    drawPieceId(piecenumber);
                 }
                 drawRedProcessingLine();
                 drawBlueProcessingLine();
             }else{
                 blue_id = point_id;
                 for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                    drawBeforePiece(piecenumber);
+                    drawAfterPiece(piecenumber);
+                    drawPieceId(piecenumber);
                 }
                 for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                    drawBeforePiece(piecenumber);
+                    drawAfterPiece(piecenumber);
+                    drawPieceId(piecenumber);
                 }
                 drawBlueProcessingLine();
                 drawRedProcessingLine();
