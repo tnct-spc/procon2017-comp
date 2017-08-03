@@ -1,4 +1,6 @@
 #include "polygonconnector.h"
+#include "precompile.h"
+#include <boost/geometry/algorithms/union.hpp>
 
 PolygonConnector::PolygonConnector()
 {
@@ -13,25 +15,29 @@ std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> P
     if(connecter.frame_point_index == connecter.frame_side_index) {
         frame_index2 = (frame_index1 != frame.getSize() - 1) ? frame_index1 + 1 : 0;
         piece_index2 = (piece_index1 != piece.getSize() - 1) ? piece_index1 + 1 : 0;
-    } else {f
+    } else {
         frame_index2 = (frame_index1 != 0) ? frame_index1 - 1 : frame.getSize() - 1;
         piece_index2 = (piece_index1 != 0) ? piece_index1 - 1 : piece.getSize() - 1;
     }
 
-    polygon_i frame_polygon = frame.getPolygon(), piece_polygon = piece.getPolygon(), union_polygon;
-    std::vector<polygon_i> frame_out_polygons;
+    std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> out_empty;
+    polygon_i frame_polygon = frame.getPolygon(), piece_polygon = piece.getPolygon();
+    std::vector<polygon_i> frame_out_polygons, union_polygons;
     std::vector<point_i> frame_points = frame_polygon.outer();
     point_i frame_point1 = frame_points.at(frame_index1), frame_point2 = frame_points.at(frame_index2);
     complex_d frame_complex(static_cast<double> (frame_point2.x() - frame_point1.x()), static_cast<double> (frame_point2.y() - frame_point1.y()));
 
     polygon_i piece_out_polygon = (this -> rotate(piece_polygon, frame_complex, piece_index1, piece_index2));
     std::vector<point_i> piece_out_points = piece_out_polygon.outer();
+    if(piece_out_points.empty()) return out_empty;
     point_i piece_out_point1 = piece_out_points.at(piece_index1);
 
     procon::NeoExpandedPolygon piece_out;
     piece_out.resetPolygonForce(piece_out_polygon);
     piece_out.translatePolygon(piece_out_point1.x(), piece_out_point1.y());
-    bg::union_(frame_polygon, piece_out_polygon, union_polygon);
+    bg::union_(frame_polygon, piece_out_polygon, union_polygons);
+    if(union_polygons.size() != 1) return out_empty;
+    polygon_i union_polygon = union_polygons.at(0);
 
     if(bg::equals(frame_polygon, union_polygon)) {
         bg::difference(frame_polygon, piece_out_polygon, frame_out_polygons);
@@ -46,7 +52,7 @@ std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> P
         std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> out = std::make_pair(frames_out, piece_out);
         return out;
     }
-    return NULL;
+    return out_empty;
 }
 
 polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, int first_index, int second_index)
@@ -55,7 +61,7 @@ polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, 
 
     int point = 0, a, ap, b, bp, n;
     std::vector<complex_d> poss_anglesp;
-    polygon_i polygon;
+    polygon_i polygon, polygon_empty;
     std::vector<point_i> points, pointsp, points_true;
     std::vector<std::vector<point_i> > points_possiesp;
 
@@ -146,7 +152,7 @@ polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, 
         points_possies.clear();
     };
 
-    auto check_return = [](std::vector<point_i> points)
+    auto check_return = [&first_index, &second_index, &after_angle](std::vector<point_i> points)
     {
         point_i first_point = points.at(first_index), second_point = points.at(second_index);
         complex_d before_angle(static_cast<double> (second_point.x() - first_point.x()), static_cast<double> (second_point.y() - first_point.y()));
@@ -212,5 +218,5 @@ polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, 
         }
     }
 
-    return NULL;
+    return polygon_empty;
 }

@@ -29,6 +29,7 @@ CONFIG   += precompile_header
 CONFIG += c++14
 
 LIBS += -L/usr/lib `pkg-config --libs opencv`
+LIBS += -lboost_system -lboost_thread
 
 SOURCES += neosolver.cpp \
     Algorithm/algorithmwrapper.cpp \

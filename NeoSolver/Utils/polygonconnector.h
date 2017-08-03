@@ -24,8 +24,8 @@ class PolygonConnector
 {
 public:
     PolygonConnector();
-    std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> PolygonConnector::connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter);
-    polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, int first_index, int second_index);
+    std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter);
+    polygon_i rotate(polygon_i polygon_in, complex_d after_angle, int first_index, int second_index);
 };
 
 #endif // POLYGONCONNECTOR_H
