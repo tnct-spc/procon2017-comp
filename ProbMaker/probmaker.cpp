@@ -120,20 +120,112 @@ int ProbMaker::retRnd(int num){
 
 void ProbMaker::angulated_graphic(){
 
+    //polygon_i first_rect;
+    /*
+    auto checkCanPlace = [&](polygon_i polygon){//polygonが他と被らずに投入できるか確認
+        polygon_i inner_frame;
+        inner_frame.outer().push_back(point_i(0,0));
+        inner_frame.outer().push_back(point_i(101,0));
+        inner_frame.outer().push_back(point_i(101,65));
+        inner_frame.outer().push_back(point_i(0,65));
+        inner_frame.outer().push_back(point_i(0,0));
+        inner_frame.inners().push_back(polygon_i::ring_type());
+        for(auto point : frame.outer()){
+            inner_frame.inners().back().push_back(point);
+        }
+        //if(!bg::within(polygon,frame))return false;//frame内にないならfalseを返す
+        if(bg::intersects(polygon,inner_frame))return false;//接触してるならfalseを返す　　　　　　　　この辺りがかなり酷い事になってます
+        return true;//問題がないならtrueを返す
+    };*/
+
+    std::vector<polygon_i> polygon_vec;//autoでfor each文を使うためにframeとpieceを格納する
+
+    auto checkIntersects = [&](point_i p1){//for eachで検査するプログラム
+        for(auto poly : polygon_vec){
+            if(bg::intersects( p1 , poly))return true; //交差しているならtrueを返す
+        }
+        return false;//問題がなかったらfalseを返す
+    };
+
     polygon_i sample_frame;//   テストで枠を生成
     sample_frame.outer().push_back(point_i(12,0));
     sample_frame.outer().push_back(point_i(80,0));
     sample_frame.outer().push_back(point_i(101,20));
     sample_frame.outer().push_back(point_i(101,65));
-    sample_frame.outer().push_back(point_i(20,65));
-    sample_frame.outer().push_back(point_i(20,52));
+    sample_frame.outer().push_back(point_i(13,65));
+    sample_frame.outer().push_back(point_i(0,52));
     sample_frame.outer().push_back(point_i(0,12));
     sample_frame.outer().push_back(point_i(12,0));
     frame = sample_frame;
-    print_polygons.push_back(sample_frame);
 
+    polygon_i inner_frame;//実際と同じような穴の空いた枠を生成する
+    inner_frame.outer().push_back(point_i(0,0));
+    inner_frame.outer().push_back(point_i(101,0));
+    inner_frame.outer().push_back(point_i(101,65));
+    inner_frame.outer().push_back(point_i(0,65));
+    inner_frame.outer().push_back(point_i(0,0));
+    inner_frame.inners().push_back(polygon_i::ring_type());
+    for(auto point : frame.outer()){
+        inner_frame.inners().back().push_back(point);
+    }
+    polygon_vec.push_back(inner_frame);
 
+    // まずは一回テストで生成するプログラムを書く
+    // 現時点では二ピース目以降にも使えるような汎用性は求めないことにする
+
+    //一点目にはframe上の点をとりあえず使う事にする
+    int point_y;
+    int point_x = 1 + retRnd(99);//ランダムでx座標を出す
+    for(int closspointy=0;closspointy<66;closspointy++){//縦に引かれた線と枠の線の交点を出す
+        if( bg::intersects(point_i(point_x,closspointy), frame)){
+            point_y = closspointy; //交点のy座標を記憶
+            break;
+        }
+    }
+    polygon_i poly;//polygonを宣言
+    poly.outer().push_back(point_i(point_x,point_y));
+
+    bool mode = true;//次にx軸方向へ伸ばすかy軸方向に伸ばすかを記録する trueならy軸方向、falseならx軸方向に伸ばす
+
+    bool flag = false;
+    for(int tes = 0; tes<2;tes++){//他の枠やピース、自分の線とぶつかったら終了するようにする
+
+        int extend = retRnd((65 - point_y ) / 3);//とりあえず1/3を上限に線を伸ばす
+
+        for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
+
+            if(checkIntersects(point_i(point_x , point_y + extend_))){//これで接触した部分の座標がわかる
+
+                extend = extend_;
+                flag = true;
+                break;//他の図形と接触したらそこで止める
+            }
+        }
+        poly.outer().push_back(point_i(point_x,point_y+extend));
+        mode != mode;//次の実行時に向きを変えるようにする(modeの中身を反転する)
+        if(flag)break;//実際はtesが入ってるfor文をwhile(!flag)にして回す
+    }
+
+    //poly.outer().push_back(point_i(poly.outer().at(1).x()+3,poly.outer().at(1).y()));//テスト用なので後で消します
+    poly.outer().push_back(poly.outer().at(0));//最後に図形を閉じて表示
+    polygon_vec.push_back(poly);//色々登録した後に中身をリセットして終了
+    print_polygons.push_back(poly);
+    poly.clear();
+    /*
+    do{
+    //とりあえず6*6の正方形を作る
+    point_i rect = {retRnd(94),retRnd(58)};
+    first_rect.clear();
+    first_rect.outer().push_back(rect);
+    first_rect.outer().push_back(point_i(rect.x()+6,rect.y()));
+    first_rect.outer().push_back(point_i(rect.x()+6,rect.y()+6));
+    first_rect.outer().push_back(point_i(rect.x(),rect.y()+6));
+    first_rect.outer().push_back(rect);
+    }while(!checkCanPlace(first_rect));
+    print_polygons.push_back(first_rect);*/
 }
+
+
 
 void ProbMaker::delaunay_triangulation()
 {
