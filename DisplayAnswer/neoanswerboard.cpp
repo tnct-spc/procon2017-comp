@@ -227,7 +227,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                     :left_right_margin/6);
         if(window_width < evalution_size * 6)evalution_size = window_width / 6;
         painter.setFont(QFont("Deciratuve",evalution_size,QFont::Bold));
-        QPointF evalution_point = {grid_size , evalution_size * 2};
+        QPointF evalution_point;
+        evalution_point.setX(grid_size);
+        evalution_point.setY(evalution_size * 2);
         int jointed_piece_total = 0;
         std::vector<procon::NeoExpandedPolygon> frame__;
         frame__ = field.getFrame();
@@ -241,10 +243,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     drawFrame();
     drawDownBackground();
-    for(int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
+    for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
         drawAfterPiece(piece_num);
     }
-    for(int piece_num =0; piece_num < field.getPieces().size(); ++piece_num){
+    for(unsigned int piece_num =0; piece_num < field.getPieces().size(); ++piece_num){
         drawPieceId(piece_num);
     }
 
@@ -334,7 +336,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         std::cout << piece.getId() << std::endl;
     }
 }
-
+/*
 void NeoAnswerBoard::firstField(){//初期状態でのfieldを設定(実際は使わない)
     procon::NeoField inpfield;
     procon::NeoExpandedPolygon polygon;
@@ -378,4 +380,4 @@ void NeoAnswerBoard::firstField(){//初期状態でのfieldを設定(実際は�
     inpfield.setPiece(polygon);
 
     setField(inpfield);
-};
+};*/
