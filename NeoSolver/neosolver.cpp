@@ -22,8 +22,6 @@ void NeoSolver::run(procon::NeoField field, int algorithm_number)
     Algorithms.at(algorithm_number)->init();
     Algorithms.at(algorithm_number)->run(field);
 
-
-
     std::cout << "neosolver " << std::endl;
 
     return;

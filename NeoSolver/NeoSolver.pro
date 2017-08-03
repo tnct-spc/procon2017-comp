@@ -34,12 +34,14 @@ LIBS += -lboost_system -lboost_thread
 SOURCES += neosolver.cpp \
     Algorithm/algorithmwrapper.cpp \
     Algorithm/testalgortithm.cpp \
+    Evaluation/evaluation.cpp \
     Utils/polygonconnector.cpp
 
 HEADERS += neosolver.h\
-        neosolver_global.h \
+    neosolver_global.h \
     Algorithm/algorithmwrapper.h \
     Algorithm/testalgortithm.h \
+    Evaluation/evaluation.h \
     Utils/polygonconnector.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon

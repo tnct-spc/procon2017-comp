@@ -2,7 +2,7 @@
 
 #include "polygonviewer.h"
 #include "Utils/polygonconnector.h"
-#include "Evaluation/searchsamelength.h"
+//#include "Evaluation/searchsamelength.h"
 #include "utilities.h"
 
 testSearchSameLength::testSearchSameLength()
@@ -10,7 +10,7 @@ testSearchSameLength::testSearchSameLength()
 }
 bool testSearchSameLength::run(){
     //1
-    {
+//    {
 //        procon::ExpandedPolygon polygon1(0);
 //        procon::ExpandedPolygon polygon2(1);
 //        procon::ExpandedPolygon result;
