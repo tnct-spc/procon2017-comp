@@ -8,10 +8,19 @@ PolygonConnector::PolygonConnector()
 }
 
 std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> PolygonConnector::connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter)
+//フレームにピースをはめる関数
+//回転関数により、ピースを原点を中心に回転させたとき、全ての点が整数値の座標を持つようなピースを抽出する。
+//ピースとフレームの重なるべき辺において、接すべき点からもう一方の点への角度を複素数平面上で考え、
+//抽出されたピースの角度とはめるフレームの角度が合致しているか、調べる。
+//角度が合致していた場合、ピースがフレームに重なるように、ピースを移動する。
+//ピースがフレームからはみ出してないか調べるため、ピースとフレームを足し合わせたものと、元々のフレームが同じ形かを調べる。
+//はみ出していなければ、フレームからピースを引いたものが、フレームにピースをはめた後のフレームとなる。
 {
-    int frame_index1 = connecter.frame_point_index, piece_index1 = connecter.polygon_point_index;
-    int frame_index2, piece_index2;
+    //ピースとフレームの重なるべき辺において、接すべき点からもう一方の点への角度を複素数平面上で考える
+    int frame_index1 = connecter.frame_point_index; //フレームの接すべき点
+    int piece_index1 = connecter.polygon_point_index; //ピースの接すべき点
 
+    int frame_index2, piece_index2;
     if(connecter.frame_point_index == connecter.frame_side_index) {
         frame_index2 = (frame_index1 != frame.getSize() - 1) ? frame_index1 + 1 : 0;
         piece_index2 = (piece_index1 != piece.getSize() - 1) ? piece_index1 + 1 : 0;
@@ -21,10 +30,12 @@ std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> P
     }
 
     std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> out_empty;
-    polygon_i frame_polygon = frame.getPolygon(), piece_polygon = piece.getPolygon();
+    polygon_i frame_polygon = frame.getPolygon();
+    polygon_i piece_polygon = piece.getPolygon();
     std::vector<polygon_i> frame_out_polygons, union_polygons;
     std::vector<point_i> frame_points = frame_polygon.outer();
-    point_i frame_point1 = frame_points.at(frame_index1), frame_point2 = frame_points.at(frame_index2);
+    point_i frame_point1 = frame_points.at(frame_index1);
+    point_i frame_point2 = frame_points.at(frame_index2);
     complex_d frame_complex(static_cast<double> (frame_point2.x() - frame_point1.x()), static_cast<double> (frame_point2.y() - frame_point1.y()));
 
     polygon_i piece_out_polygon = (this -> rotate(piece_polygon, frame_complex, piece_index1, piece_index2));
