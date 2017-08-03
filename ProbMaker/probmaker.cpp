@@ -185,6 +185,13 @@ void ProbMaker::angulated_graphic(){
     polygon_i poly;//polygonを宣言
     poly.outer().push_back(point_i(point_x,point_y));
 
+    auto checkClossLine = [&]{
+        polygon_i polygon = poly;
+        polygon.outer().push_back(point_i(point_x,point_y));
+        return bg::intersects(polygon);
+        //return false;//問題がなかったらfalseを返す
+    };
+
     bool x_or_y = true;//次にx軸方向へ伸ばすかy軸方向に伸ばすかを記録する trueならy軸方向、falseならx軸方向に伸ばす
     //次はx座標に正の方向へ頂点を移動させるサンプルを作ってみる
 
@@ -201,9 +208,12 @@ void ProbMaker::angulated_graphic(){
                 for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
                     if(!x_or_y) ++point_x;
                     else  ++point_y;
+
                     if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
-                        if(bg::num_points(poly) > 1)flag = true;
-                        else{
+                        if(bg::num_points(poly) > 1){
+                            //polygonを参照渡ししたら補完してくれるプログラムを書く
+                            flag = true;
+                        }else{
                             point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
                             if(!x_or_y) --point_x;
                             else  --point_y;
@@ -222,8 +232,10 @@ void ProbMaker::angulated_graphic(){
                     if(!x_or_y) --point_x;
                     else  --point_y;
                     if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
-                        if(bg::num_points(poly) > 1) flag = true;
-                        else{
+                        if(bg::num_points(poly) > 1){
+                            //polygonを参照渡ししたら補完してくれるプログラムを書く
+                            flag = true;
+                        }else{
                             point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
                             if(!x_or_y) ++point_x;
                             else  ++point_y;
@@ -233,9 +245,14 @@ void ProbMaker::angulated_graphic(){
                 }
             }else point_pushback = false; //端だったならここの処理を行う
         }
-
-        if(point_pushback) poly.outer().push_back(point_i(point_x , point_y)); //頂点を確定させる
-        x_or_y ^= 1;//次の実行時に向きを変えるようにする(xに進めるかyに進めるかを決める)
+        if(point_pushback){
+            poly.outer().push_back(point_i(point_x , point_y)); //頂点を確定させる
+            x_or_y ^= 1;//次の実行時に向きを変えるようにする(xに進めるかyに進めるかを決める)
+        }
+        if(bg::intersects(poly)){ // 線の交差で実現不可能な図形になっていないかの確認 　無限ループが発生する事があるので改善したい
+           x_or_y ^= 1;
+           poly.outer().pop_back();
+        }
     }
 
     //poly.outer().push_back(point_i(poly.outer().at(1).x()+3,poly.outer().at(1).y()));//テスト用なので後で消します
