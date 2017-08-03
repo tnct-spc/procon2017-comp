@@ -23,13 +23,17 @@ SOURCES += main.cpp\
     testjoinpolygon.cpp \
     testerwraper.cpp \
     testsearchsamelength.cpp \
-    testneoexpandedpolygon.cpp
+    testneoexpandedpolygon.cpp \
+    testalgorithmwrapper.cpp \
+    testevaluation.cpp
 
 HEADERS += testdisplayanswer.h\
     testjoinpolygon.h \
     testerwraper.h \
     testsearchsamelength.h \
-    testneoexpandedpolygon.h
+    testneoexpandedpolygon.h \
+    testalgorithmwrapper.h \
+    testevaluation.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
@@ -68,3 +72,10 @@ else:unix: LIBS += -L$$OUT_PWD/../ImageRecognition/ -lImageRecognition
 
 INCLUDEPATH += $$PWD/../ImageRecognition
 DEPENDPATH += $$PWD/../ImageRecognition
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/release/ -lNeoSolver
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/debug/ -lNeoSolver
+else:unix: LIBS += -L$$OUT_PWD/../NeoSolver/ -lNeoSolver
+
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver
