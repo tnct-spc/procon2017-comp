@@ -87,7 +87,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
                     length(frame_side_index , polygon_side_index)
                     +
                     length(frame_point_index , polygon_point_index);
-                    evaluation = angle_evaluation * angle_weight + length_evaluation * length_weight;
+            evaluation = angle_evaluation * angle_weight + length_evaluation * length_weight;
         }
 
         Connect connect;
