@@ -185,77 +185,94 @@ void ProbMaker::angulated_graphic(){
     polygon_i poly;//polygonを宣言
     poly.outer().push_back(point_i(point_x,point_y));
 
-
+    polygon_i check_frame = frame;
     auto checkClossLine = [&]{//今回はframeのみを対象としたプログラムを書く(汎用性なし)      実際は二回目以降の処理は既にピースが置かれている部分を切り落とすような枠を生成する
         int begin_line = -1;//変数名のせいでわかりづらいけど枠やピースの交点の線の番号を表している
         int end_line = -1;
         point_i polygon_begin = poly.outer().at(0);
         point_i polygon_end = poly.outer().at(bg::num_points(poly)-1);//polygonの始点と終点(他の枠やピースと繋がってる部分)
-        for(unsigned int linenum=0;linenum<bg::num_points(frame)-1;linenum++){
+        for(unsigned int linenum=0;linenum<bg::num_points(check_frame)-1;linenum++){
 
-            bg::model::linestring<point_i> edge_line{frame.outer().at(linenum),frame.outer().at(linenum+1)};
+            bg::model::linestring<point_i> edge_line{check_frame.outer().at(linenum),check_frame.outer().at(linenum+1)};
             if(bg::intersects(polygon_begin,edge_line))begin_line = linenum;//交点を見つけたら番号を記録
             if(bg::intersects(polygon_end,edge_line))end_line = linenum;
         }
         std::cout << "closspoint1 : " << begin_line << "  closspoint2 : " << end_line << std::endl;
-        polygon_i clockwise_poly = poly;
-        polygon_i not_clockwise_poly = poly;
+        polygon_i pattern_one = poly;
+        polygon_i pattern_two = poly;
         if(begin_line == end_line){//同じ線上にbeginとendがある場合
-            clockwise_poly.outer().push_back(poly.outer().at(0));
+            pattern_one.outer().push_back(poly.outer().at(0));
 
-            poly.outer().push_back(frame.outer().at(end_line+1));
-            if(bg::intersects(poly)){//bの方が時計回り方向にいたのなら
+            poly.outer().push_back(check_frame.outer().at(end_line+1));
+            if(bg::intersects(poly)){
 
                 for(int point_num = end_line;point_num > -1;point_num--){//すごい頭の悪い書き方してる
-                    not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                    pattern_two.outer().push_back(check_frame.outer().at(point_num));
                 }
-                for(int point_num = bg::num_points(frame) - 1;point_num > begin_line;point_num--){
-                    not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                for(int point_num = bg::num_points(check_frame) - 1;point_num > begin_line;point_num--){
+                    pattern_two.outer().push_back(check_frame.outer().at(point_num));
                 }
-                not_clockwise_poly.outer().push_back(poly.outer().at(0));
+                pattern_two.outer().push_back(poly.outer().at(0));
 
             }else{
-                for(int point_num=end_line + 1;point_num<bg::num_points(frame);point_num++){
-                    not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                for(int point_num=end_line + 1;point_num<bg::num_points(check_frame);point_num++){
+                    pattern_two.outer().push_back(check_frame.outer().at(point_num));
                 }
                 for(int point_num = 0;point_num < begin_line + 1;point_num++){
-                    not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                    pattern_two.outer().push_back(check_frame.outer().at(point_num));
                 }
-                not_clockwise_poly.outer().push_back(poly.outer().at(0));
+                pattern_two.outer().push_back(poly.outer().at(0));
 
             }
             poly.outer().pop_back();
         }else if(begin_line > end_line){
             for(int point_num = end_line + 1;point_num < begin_line + 1;point_num++){
-                clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                pattern_one.outer().push_back(check_frame.outer().at(point_num));
             }
-            clockwise_poly.outer().push_back(poly.outer().at(0));
+            pattern_one.outer().push_back(poly.outer().at(0));
 
             for(int point_num = end_line;point_num > -1;point_num--){
-                not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                pattern_two.outer().push_back(check_frame.outer().at(point_num));
             }
-            for(int point_num = bg::num_points(frame)-1;point_num > begin_line;point_num--){
-                not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+            for(int point_num = bg::num_points(check_frame)-1;point_num > begin_line;point_num--){
+                pattern_two.outer().push_back(check_frame.outer().at(point_num));
             }
-            not_clockwise_poly.outer().push_back(poly.outer().at(0));
+            pattern_two.outer().push_back(poly.outer().at(0));
 
         }else{
-            for(int point_num=end_line + 1;point_num<bg::num_points(frame);point_num++){
-                clockwise_poly.outer().push_back(frame.outer().at(point_num));
+            for(int point_num=end_line + 1;point_num<bg::num_points(check_frame);point_num++){
+                pattern_one.outer().push_back(check_frame.outer().at(point_num));
             }
             for(int point_num = 0;point_num < begin_line + 1;point_num++){
-                clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                pattern_one.outer().push_back(check_frame.outer().at(point_num));
             }
-            clockwise_poly.outer().push_back(poly.outer().at(0));
+            pattern_one.outer().push_back(poly.outer().at(0));
 
             for(int point_num = end_line;point_num > begin_line;point_num--){
-                not_clockwise_poly.outer().push_back(frame.outer().at(point_num));
+                pattern_two.outer().push_back(check_frame.outer().at(point_num));
             }
-            not_clockwise_poly.outer().push_back(poly.outer().at(0));
+            pattern_two.outer().push_back(poly.outer().at(0));
 
         }
-        if(bg::area(clockwise_poly) < bg::area(not_clockwise_poly))poly = clockwise_poly;
-        else poly = not_clockwise_poly;
+        poly = pattern_one;
+        bg::correct(pattern_one);//頂点の順番がおかしかった場合は修正
+        bg::correct(pattern_two);
+        if(bg::area(pattern_one) < bg::area(pattern_two)) poly = pattern_one;//polyに結果を代入する
+        else poly = pattern_two;
+        //ここからcheck_frameの加工
+        //intersectionで重複部分を取り出す
+        //differenceで異なる部分(重複していない部分)を取り出す
+        //それをcheck_frameに格納する
+        std::vector<polygon_i> intersection(1);
+        std::vector<polygon_i> differences(1);
+        bg::intersection(check_frame,poly,intersection);
+        bg::difference(check_frame,intersection[0],differences);
+        check_frame.clear();
+        for(int count=0;count<differences.size();count++){
+            std::vector<polygon_i> polygon(1);
+            bg::union_(check_frame,differences[count],polygon);
+            check_frame = polygon[0];
+        }
     };
 
 
