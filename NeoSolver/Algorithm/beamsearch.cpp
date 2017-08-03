@@ -3,18 +3,8 @@
 #include "neopolygonviewer.h"
 #include "polygonviewer.h"
 
+//もしデバックモードにしたければ下をコメントアウト
 #define DEBUG_MODE
-
-namespace boost {
-    namespace geometry {
-        namespace math {
-                inline bool equals(double const& a,double const& b){
-                    std::cout << "yaeehehhh" << std::endl;
-                    return a == b;
-                }
-            }
-        }
-    }
 
 BeamSearch::BeamSearch()
 {
