@@ -63,7 +63,7 @@ bool TestEvaluation::run()
     std::vector<mytuple> vector;
 
     Evaluation *e = new Evaluation();
-    vector = e->evaluation(frames.at(0) , polygons.at(0));
+    vector = e->evaluation(frames.at(1) , polygons.at(6));
 
     int evaluation , field_side_index , polygon_side_index , field_point_index , polygon_point_index;
     for(mytuple i : vector){
@@ -72,12 +72,14 @@ bool TestEvaluation::run()
         polygon_side_index = std::get<2>(i);
         field_point_index = std::get<3>(i);
         polygon_point_index = std::get<4>(i);
-        std::cout << "evaluation = " << evaluation
-                  << " , field_side_index = " << field_side_index
-                  << " , polygon_side_index = " << polygon_side_index
-                  << " , field_point_index = " << field_point_index
-                  << " , polygon_point_index = " << polygon_point_index
-                  << std::endl;
+        if(polygon_point_index != 2){
+            std::cout << "evaluation = " << evaluation
+                      << " , field_side_index = " << field_side_index
+                      << " , polygon_side_index = " << polygon_side_index
+                      << " , field_point_index = " << field_point_index
+                      << " , polygon_point_index = " << polygon_point_index
+                      << std::endl;
+        }
     }
 
     return true;
