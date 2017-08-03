@@ -13,8 +13,12 @@
 #include <random>
 #include <vector>
 #include <string>
+#include <QStringList>
+#include <QVector>
+#include <QList>
 #include "neofield.h"
 #include "neoexpandedpolygon.h"
+#include <math.h>
 
 namespace Ui {
 class NeoAnswerBoard;
@@ -28,18 +32,23 @@ public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
-
+    void setSingleMode(bool inp);
 private:
     Ui::NeoAnswerBoard *ui;
+    QPointF getPiecePosition(point_i point);
+    void setField();
     QPointF getPosition(point_i point);
-    std::vector<cv::Vec3b> colors;
-    void setRandomColors(int threshold);
+    QVector<QString> list;
     void firstField();
     int left_right_margin;
     int grid_size;
     int top_bottom_margin;
+    int down_up_y;
     procon::NeoField field;
-    point_i center;
+
+    // Only field mode
+    bool single_mode = false;
+
 
 protected:
     void beforePolygon();

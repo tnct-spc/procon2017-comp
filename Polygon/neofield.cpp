@@ -11,7 +11,7 @@ procon::NeoField::NeoField()
 
 /*---------------------public--------------------------*/
 //setter
-void procon::NeoField::setFrame(NeoExpandedPolygon const& frame)
+void procon::NeoField::setFrame(std::vector<procon::NeoExpandedPolygon> const& frame)
 {
     field_frame = frame;
 }
@@ -33,7 +33,7 @@ void procon::NeoField::setPiece(procon::NeoExpandedPolygon piece, int n, double 
     field_pieces.at(n) = piece;
 }
 
-void procon::NeoField::setElementaryFrame(procon::NeoExpandedPolygon const& frame)
+void procon::NeoField::setElementaryFrame(std::vector<procon::NeoExpandedPolygon> const& frame)
 {
     elementary_frame = frame;
 }
@@ -75,13 +75,13 @@ procon::NeoExpandedPolygon const& procon::NeoField::getPiece(const int &n) const
     return field_pieces.at(n);
 }
 
-procon::NeoExpandedPolygon const& procon::NeoField::getFrame() const
+std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getFrame() const
 {
     return field_frame;
 }
 
 
-procon::NeoExpandedPolygon const& procon::NeoField::getElementaryFrame() const
+std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryFrame() const
 {
     return elementary_frame;
 }
@@ -142,19 +142,26 @@ void procon::NeoField::removePiece(int n)
 //is_
 bool procon::NeoField::isPuttable(procon::NeoExpandedPolygon polygon)
 {
-    for (auto inner_ring : field_frame.getPolygon().inners()){
-        if(!boost::geometry::within(polygon.getPolygon(),inner_ring)) return false;
-    }
-    //if(!boost::geometry::within(polygon.getPolygon(), field_frame.getPolygon())) return false;
-    for(auto p : field_pieces){
-        if(!boost::geometry::disjoint(polygon.getPolygon(), p.getPolygon())) return false;
-    }
+//    for (auto inner_ring : field_frame.getPolygon().inners()){
+//        if(!boost::geometry::within(polygon.getPolygon(),inner_ring)) return false;
+//    }
+//    //if(!boost::geometry::within(polygon.getPolygon(), field_frame.getPolygon())) return false;
+//    for(auto p : field_pieces){
+//        if(!boost::geometry::disjoint(polygon.getPolygon(), p.getPolygon())) return false;
+//    }
+//    return true;
+//    for(auto ex_polygon : field_frame){
+//        ex_polygon
+//    }
+//    TODO: isPuttable判定を実装
     return true;
 }
 
 void procon::NeoField::printFrame()
 {
-    std::cout << bg::dsv(elementary_frame.getPolygon()) << std::endl;
+    for(auto p : elementary_frame){
+        std::cout << bg::dsv(p.getPolygon()) << std::endl;
+    }
 }
 
 void procon::NeoField::printPiece()
@@ -201,37 +208,9 @@ void procon::NeoField::calcMinAngleSide()
     min_side = min_sidee;
 }
 
-bool procon::NeoField::operator || (NeoField & field) {
-    if (this->piece_id != field.piece_id) return false;
-
-    //ソート（これによって比較が可能に)
-    this->field_frame.sortJointedPieces();
-    field.field_frame.sortJointedPieces();
-
-    for (unsigned int i = 0;i < this->getFrame().getJointedPieces().size();i++) {
-
-        //slope check
-        {
-            double const& slope_a = this->getFrame().getJointedPieces().at(i).getSideSlope().at(0);
-            double const& slope_b = field.getFrame().getJointedPieces().at(i).getSideSlope().at(0);
-            constexpr double threshold = 3.141592653589 / 180;
-            if (!Utilities::nearlyEqual(slope_a,slope_b,threshold)) return false;
-        }
-        //coord test
-        {
-            point_i const& coord_a = this->getFrame().getJointedPieces().at(i).getPolygon().outer().at(0);
-            point_i const& coord_b = field.getFrame().getJointedPieces().at(i).getPolygon().outer().at(0);
-            constexpr double threshold = 0.5;
-            if (!Utilities::nearlyEqual(coord_a.x(),coord_b.x(),threshold)) return false;
-            if (!Utilities::nearlyEqual(coord_a.y(),coord_b.y(),threshold)) return false;
-        }
-    }
-    return true;
-}
-
 void procon::NeoField::calcFieldID()
 {
-    for (auto & piece : field_frame.getJointedPieces()) {
-         piece_id.set(piece.getId());
-    }
+//    for (auto & piece : field_frame.getJointedPieces()) {
+//         piece_id.set(piece.getId());
+//    }
 }
