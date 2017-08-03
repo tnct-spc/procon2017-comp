@@ -7,7 +7,7 @@ class Evaluation
 {
 public:
     Evaluation();
-    std::vector<std::pair<double , Connect>> evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon);
+    static std::vector<std::pair<double , Connect>> evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon);
 };
 
 #endif // EVALUATION_H
