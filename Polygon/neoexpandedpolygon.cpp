@@ -12,6 +12,7 @@ procon::NeoExpandedPolygon::NeoExpandedPolygon(int id_)
     side_angle.reserve(32);
     polygon.outer().reserve(32);
 }
+
 procon::NeoExpandedPolygon::NeoExpandedPolygon(std::vector<int> multi_ids_)
     : size(0),id(-1)
 {

@@ -27,8 +27,6 @@ Kunugida::Kunugida(QWidget *parent) :
     board = std::make_shared<NeoAnswerBoard>();
     board->show();
 
-    dock_board = std::make_shared<NeoAnswerDock>();
-    dock_board->show();
 }
 
 Kunugida::~Kunugida()
@@ -56,17 +54,18 @@ void Kunugida::run()
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
 
-        for(auto piece : pieces_){
-            procon::NeoExpandedPolygon buf;
+        int id = 0;
+        for(auto& piece : pieces_){
+            procon::NeoExpandedPolygon buf(id);
             buf.resetPolygonForce(piece);
             pieces.push_back(buf);
+            ++id;
         }
         frame.resetPolygonForce(frame_);
         std::vector<procon::NeoExpandedPolygon> vec_frame;
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
-        board->update();
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -110,7 +109,6 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setField(field);
-   this->dock_board->addAnswer(field);
 }
 
 void Kunugida::finishedProcess()

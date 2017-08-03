@@ -1,4 +1,4 @@
-#include "neoanswerboard.h":
+#include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
@@ -6,7 +6,6 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     ui(new Ui::NeoAnswerBoard)
 {
     ui->setupUi(this);
-    //firstField();
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()
@@ -103,14 +102,14 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
 
-    //draw background
+    //背景を描画
     painter.setBrush(QBrush(QColor(up_back_ground_color)));
     painter.drawRect(QRect(0,0,window_width,splitedheight));
     painter.setBrush(QBrush(QColor(down_back_ground_color)));
     painter.drawRect(QRect(0, splitedheight, window_width, window_height));
 
 
-    //draw grid
+    //グリッドを描画
     auto drawGrid = [&]{
         painter.setPen(QPen(QBrush(Qt::black),0.1));
         for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
@@ -123,7 +122,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     };
 
-    //draw frame
+    //上画面フレームを描画
     auto drawFrame = [&]{
         painter.setBrush(QBrush(QColor(236,182,138, 200))); //frame color
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
@@ -136,11 +135,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 //        painter.setBrush(QBrush(QColor(up_back_ground_color)));
 //        painter.drawPolygon(points,pcount);
 
-        std::vector<procon::NeoExpandedPolygon> frame__;
-        frame__ = field.getFrame();
-        for(auto frame_ : frame__ ){
+        for(auto& frame : field.getFrame() ){
             std::vector<QPointF> frame_points;
-            for(auto point : frame_.getPolygon().outer()){
+            for(auto point : frame.getPolygon().outer()){
                 frame_points.push_back(getPosition(point));
             }
             painter.setBrush(QBrush(QColor(up_back_ground_color)));
@@ -150,21 +147,21 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //処理後ピースを描画
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            painter.setBrush(QBrush(QColor(list[pnum])));
-//            int pcount = field.getPiece(pnum).getSize();
-//            QPointF points[pcount];
-//            for(int tes = 0;tes < pcount; tes++){
-//                points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
-//            }
-//            painter.drawPolygon(points,pcount);
-            std::vector<QPointF> points;
-            for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
-                points.push_back(getPosition(point));
-            }
-            painter.drawPolygon(&points.front(),points.size());
+                painter.setBrush(QBrush(QColor(list[pnum])));
+//              int pcount = field.getPiece(pnum).getSize();
+//              QPointF points[pcount];
+//              for(int tes = 0;tes < pcount; tes++){
+//                  points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+//              }
+//              painter.drawPolygon(points,pcount);
+                std::vector<QPointF> points;
+                for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
+                    points.push_back(getPosition(point));
+                }
+                painter.drawPolygon(&points.front(),points.size());
     };
 
-    //draw down backdround
+    //下画面フレームを描画
     auto drawDownBackground = [&]{
         painter.setBrush(QBrush(QColor(Qt::white)));
         painter.drawRect(QRect(left_right_margin,
@@ -179,39 +176,48 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(list[pnum])));
         int pcount = field.getPiece(pnum).getSize();
         QPointF points[pcount];
-        for(int tes = 0; tes < pcount; tes++){
-            points[tes] = getPiecePosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+        for(int locate = 0; locate < pcount; locate++){
+            points[locate] = getPiecePosition(field.getPiece(pnum).getPolygon().outer().at(locate));
         }
         painter.drawPolygon(points,pcount);
     };
 
-    //処理ピースの可視化
+    //ピースIdを描画
     auto drawPieceId = [&](int pnum){
-        //draw piece id
         painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setBackground(QBrush(QColor(list[pnum])));
         painter.setPen(QPen(QBrush(Qt::white), 0.3));
-        //centroidで中心にidを描画
         point_i center;
         boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
         QPointF piececenter = getPosition(center);
         piececenter.setX(piececenter.x() - grid_size);
         piececenter.setY(piececenter.y() + grid_size);
-        painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));// draw
+        painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
     };
 
-    auto drawProcessingLine = [&](int pnum){
+    //青処理線を描画
+    auto drawBlueProcessingLine = [&](){
         point_i center;
-        boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
-        QPointF afterpiececenter = getPosition(center);
-        QPointF beforepiececenter = getPiecePosition(center);
-        painter.setPen(QPen(QBrush(Qt::yellow), 0.5));
-        painter.drawLine(afterpiececenter, beforepiececenter);
+        boost::geometry::centroid(polygon_list[blue_id], center);
+        QPointF aftercentroid = getPosition(center);
+        QPointF beforecentroid = getPiecePosition(center);
+        painter.setPen(QPen(QBrush(Qt::blue), 2.0));
+        painter.drawLine(aftercentroid, beforecentroid);
     };
 
+    //赤処理線を描画
+    auto drawRedProcessingLine = [&](){
+        point_i center;
+        boost::geometry::centroid(polygon_list[red_id], center);
+        QPointF aftercentroid = getPosition(center);
+        QPointF beforecentroid = getPiecePosition(center);
+        painter.setPen(QPen(QBrush(Qt::red), 2.0));
+        painter.drawLine(aftercentroid, beforecentroid);
+    };
+
+    //評価値を描画
     auto drawEvalution = [&]{
-        //draw evalution
         painter.setBackgroundMode(Qt::TransparentMode);
         QColor evalution_color = {255,0,255};
         painter.setPen(QPen(QBrush(evalution_color),10));
@@ -235,17 +241,72 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     drawFrame();
     drawDownBackground();
-    for(int piece_num = 0; piece_num < field.getPieces().size(); piece_num++){
-            drawAfterPiece(piece_num);
-            drawBeforePiece(piece_num);
+    for(int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
+        drawAfterPiece(piece_num);
     }
-    for(int piece_num =0; piece_num < field.getPieces().size();piece_num++){
-        if(single_mode==false)drawProcessingLine(piece_num);
+    for(int piece_num =0; piece_num < field.getPieces().size(); ++piece_num){
         drawPieceId(piece_num);
     }
+
+    if(paintif){
+        if(point_id == -1){
+            point_id++;
+            red_id = point_id;
+            drawBeforePiece(point_id);
+            drawRedProcessingLine();
+            point_id++;
+            blue_id = point_id;
+            drawBeforePiece(point_id);
+            drawBlueProcessingLine();
+
+        }
+        if(point_id != -1){
+            if(selecter){
+                red_id = point_id;
+                for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                    drawBeforePiece(piecenumber);
+                }
+                for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                    drawBeforePiece(piecenumber);
+                }
+                drawRedProcessingLine();
+                drawBlueProcessingLine();
+            }else{
+                blue_id = point_id;
+                for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                    drawBeforePiece(piecenumber);
+                }
+                for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                    drawBeforePiece(piecenumber);
+                }
+                drawBlueProcessingLine();
+                drawRedProcessingLine();
+            }
+        }
+        paintif = false;
+    }
+
     drawEvalution();
     drawGrid();
 }
+
+void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
+{
+    int hoge = field.getPieces().size();
+    if(point_id < hoge - 1){
+        paintif = true;
+        if(event->key() == Qt::Key_A){
+            selecter = true;
+            point_id++;
+        }
+        if(event->key() == Qt::Key_L){
+            selecter = false;
+            point_id++;
+        }
+        this->update();
+    }
+}
+
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
     int pointx = point.x() + frame_margin/2;
     int pointy = point.y() + frame_margin/2;
@@ -260,6 +321,18 @@ QPointF NeoAnswerBoard::getPiecePosition(point_i point){//point_iを下画面の
 
 void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     field=input_field;
+    paintif = true;
+    this->update();
+
+    polygon_list.clear();
+    std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
+    std::sort(pieces.begin(), pieces.end(), [](const procon::NeoExpandedPolygon& a, const procon::NeoExpandedPolygon& b)->bool{
+        return a.getId() < b.getId();
+    });
+    for(auto piece : pieces){
+        if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
+        std::cout << piece.getId() << std::endl;
+    }
 }
 
 void NeoAnswerBoard::firstField(){//初期状態でのfieldを設定(実際は使わない)
