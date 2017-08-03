@@ -5,23 +5,33 @@
 #include "Utils/polygonconnector.h"
 #include "Evaluation/evaluation.h"
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 //もしデバックモードにしたければ下をコメントアウト
 #define DEBUG_MODE
+
+std::condition_variable cond;
 
 BeamSearch::BeamSearch()
 {
     logger = spdlog::get("beamsearch");
 }
 
-void BeamSearch::makeNextState(std::vector<procon::NeoField> field)
+void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
 
+#ifdef DEBUG_MODE
+    std::sort(evaluations.begin(),evaluations.end(),[](Evaluate l,Evaluate r){
+        return l.score > r.score;
+    });
+
+#elif
+#endif
 }
 
-void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> evaluations)
+void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
-
-
     //frameがstd::vector<NeoExPolygon>なのでそれぞれに対して、評価関数を回す
     auto evaluateWrapper = [&](procon::NeoField const& field,int const& piece_index){
         int frame_index = 0;
