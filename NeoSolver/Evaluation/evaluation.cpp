@@ -7,10 +7,10 @@ Evaluation::Evaluation()
 
 }
 
-std::vector<std::pair<int , Connect>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
+std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {    
-    double const angle_weight = 1;
-    double const length_weight = 1;
+    double const angle_weight = 0.9;
+    double const length_weight = 1.1;
 
     //NEPの要素数をマイナス1するだけのらむだ
     auto minus_one = [](procon::NeoExpandedPolygon nep , int index){
@@ -50,23 +50,23 @@ std::vector<std::pair<int , Connect>> Evaluation::evaluation(procon::NeoExpanded
         int polygon_side_index2 = polygon_point_index;
 
         //それぞれ評価値 , frame_side_index , polygon_side_index , frame_point_index , polygon_point_index
-        std::vector<std::pair<int , Connect>> vector;
-        int evaluation = length(frame_side_index1 , polygon_side_index1) * length_weight;
+        std::vector<std::pair<double , Connect>> vector;
+        double evaluation = length(frame_side_index1 , polygon_side_index1) * length_weight;
         Connect connect;
         connect.frame_side_index = frame_side_index1;
         connect.polygon_side_index = polygon_side_index1;
         connect.frame_point_index = frame_point_index;
         connect.polygon_point_index = polygon_point_index;
 
-        vector.push_back(std::pair<int , Connect>(evaluation , connect)) * length_weight;
+        vector.push_back(std::pair<double , Connect>(evaluation , connect));
 
-        evaluation = length(frame_side_index2 , polygon_side_index2);
+        evaluation = length(frame_side_index2 , polygon_side_index2) * length_weight;
         connect.frame_side_index = frame_side_index2;
         connect.polygon_side_index = polygon_side_index2;
         connect.frame_point_index = frame_point_index;
         connect.polygon_point_index = polygon_point_index;
 
-        vector.push_back(std::pair<int , Connect>(evaluation , connect));
+        vector.push_back(std::pair<double , Connect>(evaluation , connect));
         return vector;
     };
 
@@ -88,7 +88,7 @@ std::vector<std::pair<int , Connect>> Evaluation::evaluation(procon::NeoExpanded
                     length(frame_point_index , polygon_point_index);
         }
 
-        int evaluation = angle_evaluation *angle_weight + length_evaluation * length_weight;
+        double evaluation = angle_evaluation * angle_weight + length_evaluation * length_weight;
 
         Connect connect;
         connect.frame_side_index = frame_side_index;
@@ -96,17 +96,17 @@ std::vector<std::pair<int , Connect>> Evaluation::evaluation(procon::NeoExpanded
         connect.frame_point_index = frame_point_index;
         connect.polygon_point_index = polygon_point_index;
 
-        return std::pair<int , Connect>(evaluation , connect);
+        return std::pair<double , Connect>(evaluation , connect);
     };
 
     int frame_point_index , polygon_point_index;
-    std::vector<std::pair<int , Connect>> vector;
+    std::vector<std::pair<double , Connect>> vector;
     for(frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
             int angle_evaluation = angle_status(frame_point_index , polygon_point_index);
             if (angle_evaluation == 0){
                 //角に隙間があるとき
-                std::vector<std::pair<int , Connect>> v = gap_evaluation(frame_point_index , polygon_point_index);
+                std::vector<std::pair<double , Connect>> v = gap_evaluation(frame_point_index , polygon_point_index);
                 vector.insert(vector.end() , v.begin() , v.end());
             } else {
                 //フレームとポリゴンの角がちょうどあっているとき

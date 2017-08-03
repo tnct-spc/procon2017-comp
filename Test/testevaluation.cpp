@@ -60,13 +60,14 @@ bool TestEvaluation::run()
     nep.resetPolygonForce(boost_polygon);
     polygons.push_back(nep);
 
-    std::vector<std::pair<int , Connect>> vector;
+    std::vector<std::pair<double , Connect>> vector;
 
     Evaluation e;
     vector = e.evaluation(frames.at(0),polygons.at(6));
 
-    int evaluation , field_side_index , polygon_side_index , field_point_index , polygon_point_index;
-    for(std::pair<int , Connect> i : vector){
+    double evaluation;
+    int field_side_index , polygon_side_index , field_point_index , polygon_point_index;
+    for(std::pair<double , Connect> i : vector){
         evaluation = i.first;
         Connect connect = i.second;
         field_side_index = connect.frame_side_index;
