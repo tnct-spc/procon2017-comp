@@ -3,7 +3,17 @@
 
 #include "algorithmwrapper.h"
 #include "spdlog/spdlog.h"
+#include "Utils/polygonconnector.h"
+#include "Evaluation/evaluation.h"
 
+class Evaluate {
+public:
+    double score = -1;
+    Connect connection;
+    int frame_index = -1;
+    int piece_index = -1;
+    bool is_inversed = false;
+};
 
 class LightField
 {
