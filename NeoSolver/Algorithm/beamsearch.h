@@ -22,6 +22,8 @@ public:
 
 private:
     std::shared_ptr<spdlog::logger> logger;
+
+    unsigned int processor_num = 0;
 };
 
 #endif // BEAMSEARCH_H

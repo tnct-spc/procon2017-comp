@@ -15,6 +15,10 @@ int main(int argc, char *argv[])
         //configre loggers
     }
 
+    unsigned int i = 100;
+
+    std::cout << (-1 < i) << std::endl;
+
     QApplication a(argc, argv);
     Kunugida w;
     w.show();
