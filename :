@@ -1,0 +1,40 @@
+Merge branch 'feature/setpiecetoframe' into feature/Evaluation
+
+# Conflicts:
+#	NeoSolver/NeoSolver.pro
+#
+# It looks like you may be committing a merge.
+# If this is not correct, please remove the file
+#	.git/MERGE_HEAD
+# and try again.
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch feature/Evaluation
+# Your branch is up-to-date with 'origin/feature/Evaluation'.
+#
+# All conflicts fixed but you are still merging.
+#
+# Changes to be committed:
+#	modified:   DisplayAnswer/DisplayAnswer.pro
+#	modified:   DisplayAnswer/neoanswerboard.cpp
+#	modified:   DisplayAnswer/neoanswerboard.h
+#	modified:   DisplayAnswer/neoanswerboard.ui
+#	new file:   DisplayAnswer/neoanswerboard_test.cpp
+#	new file:   DisplayAnswer/neoanswerdock.cpp
+#	new file:   DisplayAnswer/neoanswerdock.h
+#	new file:   DisplayAnswer/neoanswerdock.ui
+#	modified:   Kunugida/kunugida.cpp
+#	modified:   Kunugida/kunugida.h
+#	modified:   NeoSolver/NeoSolver.pro
+#	new file:   NeoSolver/Utils/polygonconnector.cpp
+#	new file:   NeoSolver/Utils/polygonconnector.h
+#	modified:   Polygon/neofield.cpp
+#	modified:   Polygon/neofield.h
+#	modified:   ProbMaker/probmaker.cpp
+#	deleted:    QRcode/.DS_Store
+#	deleted:    QRcode/._.DS_Store
+#	new file:   sample/sample_frame_3.png
+#	new file:   sample/sample_pieces_3.png
+#

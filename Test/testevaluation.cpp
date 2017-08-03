@@ -1,6 +1,7 @@
 #include "testevaluation.h"
 #include "neoexpandedpolygon.h"
 #include "Evaluation/evaluation.h"
+#include "Utils/polygonconnector.h"
 
 TestEvaluation::TestEvaluation()
 {
@@ -59,19 +60,20 @@ bool TestEvaluation::run()
     nep.resetPolygonForce(boost_polygon);
     polygons.push_back(nep);
 
-    typedef std::tuple<int , int , int , int ,int> mytuple;
-    std::vector<mytuple> vector;
+    std::vector<std::pair<int , Connect>> vector;
 
-    Evaluation *e = new Evaluation();
-    vector = e->evaluation(frames.at(1) , polygons.at(6));
+    Evaluation e;
+    vector = e.evaluation(frames.at(0),polygons.at(6));
 
     int evaluation , field_side_index , polygon_side_index , field_point_index , polygon_point_index;
-    for(mytuple i : vector){
-        evaluation = std::get<0>(i);
-        field_side_index = std::get<1>(i);
-        polygon_side_index = std::get<2>(i);
-        field_point_index = std::get<3>(i);
-        polygon_point_index = std::get<4>(i);
+    for(std::pair<int , Connect> i : vector){
+        evaluation = i.first;
+        Connect connect = i.second;
+        field_side_index = connect.frame_side_index;
+        polygon_side_index = connect.polygon_side_index;
+        field_point_index = connect.frame_point_index;
+        polygon_point_index = connect.polygon_point_index;
+
         if(polygon_point_index != 2){
             std::cout << "evaluation = " << evaluation
                       << " , field_side_index = " << field_side_index
