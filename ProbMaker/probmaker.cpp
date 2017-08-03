@@ -189,50 +189,53 @@ void ProbMaker::angulated_graphic(){
     //次はx座標に正の方向へ頂点を移動させるサンプルを作ってみる
 
     bool flag = false;
-    for(int tes = 0; tes<20;tes++){//他の枠やピース、自分の線とぶつかったら終了するようにする
+    while(!flag){//他の枠やピース、自分の線とぶつかったら終了するようにする
         bool add_or_subt = retRnd(2);//retRnd(2); // retRnd(2); //trueなら数値を加算、falseなら減算(原点方向へ移動)させる
         bool point_pushback = true; // 頂点をpush_backするか決める変数　これがfalseなら点をpush_backせずやり直す
         if(add_or_subt){
-            if(point_x == 101 || point_y == 65){
-                point_pushback = false;
-                break;//端まで進んでいるならbreak(やり直し)
-            }
-            int extend = (x_or_y
-                         ? retRnd(15) + 6
-                         : retRnd(20) + 6
-                         );//とりあえず1/3を上限に線を伸ばす
-            for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
-                if(!x_or_y) ++point_x;
-                else  ++point_y;
-                if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
-                    if(bg::num_points(poly) > 1)flag = true;
-                    else point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
-                    break;//他の図形と接触したらそこで止める
+            if(point_x != 101 && point_y != 65){
+                int extend = (x_or_y
+                            ? retRnd(15) + 6
+                            : retRnd(20) + 6
+                            );//とりあえず1/3を上限に線を伸ばす
+                for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
+                    if(!x_or_y) ++point_x;
+                    else  ++point_y;
+                    if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
+                        if(bg::num_points(poly) > 1)flag = true;
+                        else{
+                            point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
+                            if(!x_or_y) --point_x;
+                            else  --point_y;
+                        }
+                        break;//他の図形と接触したらそこで止める
+                    }
                 }
-            }
+            }else point_pushback = false; //端だったならここの処理を行う
         }else{
-            if(point_x==0 || point_y==0){//point_x(y)が0ならば
-                point_pushback = false;
-                break;//端まで進んでいるならbreak(やり直し)
-            }
-            int extend = (x_or_y
-                         ? retRnd(15) + 6
-                         : retRnd(20) + 6
+            if(point_x != 0 && point_y != 0){//point_x(y)が両方0でなければ
+                int extend = (x_or_y
+                             ? retRnd(15) + 6
+                             : retRnd(20) + 6
                          );//とりあえず1/3を上限に線を伸ばす
-            for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
-                if(!x_or_y) --point_x;
-                else  --point_y;
-                if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
-                    if(bg::num_points(poly) > 1) flag = true;
-                    else point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
-                    break;//他の図形と接触したらそこで止める
+                for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
+                    if(!x_or_y) --point_x;
+                    else  --point_y;
+                    if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
+                        if(bg::num_points(poly) > 1) flag = true;
+                        else{
+                            point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
+                            if(!x_or_y) ++point_x;
+                            else  ++point_y;
+                        }
+                        break;//他の図形と接触したらそこで止める
+                    }
                 }
-            }
+            }else point_pushback = false; //端だったならここの処理を行う
         }
 
         if(point_pushback) poly.outer().push_back(point_i(point_x , point_y)); //頂点を確定させる
         x_or_y ^= 1;//次の実行時に向きを変えるようにする(xに進めるかyに進めるかを決める)
-        if(flag)break;//実際はtesが入ってるfor文をwhile(!flag)にして回す
     }
 
     //poly.outer().push_back(point_i(poly.outer().at(1).x()+3,poly.outer().at(1).y()));//テスト用なので後で消します
