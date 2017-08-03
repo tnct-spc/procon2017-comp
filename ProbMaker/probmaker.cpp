@@ -185,28 +185,58 @@ void ProbMaker::angulated_graphic(){
     polygon_i poly;//polygonを宣言
     poly.outer().push_back(point_i(point_x,point_y));
 
-    bool mode = true;//次にx軸方向へ伸ばすかy軸方向に伸ばすかを記録する trueならy軸方向、falseならx軸方向に伸ばす
+    bool x_or_y = true;//次にx軸方向へ伸ばすかy軸方向に伸ばすかを記録する trueならy軸方向、falseならx軸方向に伸ばす
+    //次はx座標に正の方向へ頂点を移動させるサンプルを作ってみる
 
     bool flag = false;
-    for(int tes = 0; tes<2;tes++){//他の枠やピース、自分の線とぶつかったら終了するようにする
-
-        int extend = retRnd((65 - point_y ) / 3);//とりあえず1/3を上限に線を伸ばす
-
-        for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
-
-            if(checkIntersects(point_i(point_x , point_y + extend_))){//これで接触した部分の座標がわかる
-
-                extend = extend_;
-                flag = true;
-                break;//他の図形と接触したらそこで止める
+    for(int tes = 0; tes<20;tes++){//他の枠やピース、自分の線とぶつかったら終了するようにする
+        bool add_or_subt = retRnd(2);//retRnd(2); // retRnd(2); //trueなら数値を加算、falseなら減算(原点方向へ移動)させる
+        bool point_pushback = true; // 頂点をpush_backするか決める変数　これがfalseなら点をpush_backせずやり直す
+        if(add_or_subt){
+            if(point_x == 101 || point_y == 65){
+                point_pushback = false;
+                break;//端まで進んでいるならbreak(やり直し)
+            }
+            int extend = (x_or_y
+                         ? retRnd(15) + 6
+                         : retRnd(20) + 6
+                         );//とりあえず1/3を上限に線を伸ばす
+            for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
+                if(!x_or_y) ++point_x;
+                else  ++point_y;
+                if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
+                    if(bg::num_points(poly) > 1)flag = true;
+                    else point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
+                    break;//他の図形と接触したらそこで止める
+                }
+            }
+        }else{
+            if(point_x==0 || point_y==0){//point_x(y)が0ならば
+                point_pushback = false;
+                break;//端まで進んでいるならbreak(やり直し)
+            }
+            int extend = (x_or_y
+                         ? retRnd(15) + 6
+                         : retRnd(20) + 6
+                         );//とりあえず1/3を上限に線を伸ばす
+            for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
+                if(!x_or_y) --point_x;
+                else  --point_y;
+                if(checkIntersects(point_i(point_x , point_y))){//これで接触した部分の座標がわかる
+                    if(bg::num_points(poly) > 1) flag = true;
+                    else point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
+                    break;//他の図形と接触したらそこで止める
+                }
             }
         }
-        poly.outer().push_back(point_i(point_x,point_y+extend));
-        mode != mode;//次の実行時に向きを変えるようにする(modeの中身を反転する)
+
+        if(point_pushback) poly.outer().push_back(point_i(point_x , point_y)); //頂点を確定させる
+        x_or_y ^= 1;//次の実行時に向きを変えるようにする(xに進めるかyに進めるかを決める)
         if(flag)break;//実際はtesが入ってるfor文をwhile(!flag)にして回す
     }
 
     //poly.outer().push_back(point_i(poly.outer().at(1).x()+3,poly.outer().at(1).y()));//テスト用なので後で消します
+
     poly.outer().push_back(poly.outer().at(0));//最後に図形を閉じて表示
     polygon_vec.push_back(poly);//色々登録した後に中身をリセットして終了
     print_polygons.push_back(poly);
