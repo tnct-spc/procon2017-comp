@@ -71,8 +71,10 @@ void BeamSearch::init()
 
 void BeamSearch::run(procon::NeoField field)
 {
-    std::cout << "called beamsearch" << std::endl;
-    boost::geometry::equals(point_t(2.0,2.0),point_t(2.0,2.0));
-    boost::geometry::math::equals(1.0,2.0);
+    logger->info("beamsearch run");
+
+    for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
+
+    }
 
 }
