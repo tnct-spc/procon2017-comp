@@ -31,6 +31,7 @@ public:
     void run(procon::NeoField field) override;
     void makeNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
     void evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
+    bool checkCanPrune(procon::NeoField const& field);
 
 private:
     std::shared_ptr<spdlog::logger> logger;

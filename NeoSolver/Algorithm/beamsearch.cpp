@@ -30,6 +30,11 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 #endif
 }
 
+bool BeamSearch::checkCanPrune(const procon::NeoField &field)
+{
+    return false;
+}
+
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
     //frameがstd::vector<NeoExPolygon>なのでそれぞれに対して、評価関数を回す
