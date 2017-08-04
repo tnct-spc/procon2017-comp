@@ -45,7 +45,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
 
     std::pair<polygon_i, bool> rotate_out = (rotate(piece_polygon, frame_angle, piece_index1, piece_index2));
     if(!rotate_out.second) return out_empty;
-    else std::cout << "rotate is true!" << std::endl; ////
+    //else std::cout << "rotate is true!" << std::endl;
     polygon_i piece_out_polygon = rotate_out.first;
     std::vector<point_i> piece_out_points = piece_out_polygon.outer();
     point_i piece_out_point1 = piece_out_points.at(piece_index1);
@@ -55,26 +55,25 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
     piece_out.translatePolygon(frame_point1.x() - piece_out_point1.x(), frame_point1.y() - piece_out_point1.y());
     piece_out_polygon = piece_out.getPolygon();
     bg::union_(frame_polygon, piece_out_polygon, union_polygons);
-    //if(union_polygons.size() != 1) return out_empty;
-    if(union_polygons.size() != 1) { ////
-        auto out = [](polygon_i poly, std::string name)
-        {
-            std::cout << name << " -> ";
+    if(union_polygons.size() != 1) {
+//        auto out = [](polygon_i poly, std::string name)
+//        {
+//            std::cout << name << " -> ";
 
-            for(point_i point : poly.outer()) {
-                std::cout << "(" << point.x() << ", " << point.y() << "), ";
-            }
+//            for(point_i point : poly.outer()) {
+//                std::cout << "(" << point.x() << ", " << point.y() << "), ";
+//            }
 
-            std::cout << std::endl << std::endl;
-        };
-        out(union_polygons.at(0), "union1");
-        out(union_polygons.at(1), "union2");
+//            std::cout << std::endl << std::endl;
+//        };
+//        out(union_polygons.at(0), "union1");
+//        out(union_polygons.at(1), "union2");
         return out_empty;
-    } else std::cout << "union_polygon is one!" << std::endl; ////
+    } //else std::cout << "union_polygon is one!" << std::endl;
     polygon_i union_polygon = union_polygons.at(0);
 
     if(bg::equals(frame_polygon, union_polygon)) {
-        std::cout << "equals is true!" << std::endl; ////
+        //std::cout << "equals is true!" << std::endl;
         bg::difference(frame_polygon, piece_out_polygon, frame_out_polygons);
         std::vector<procon::NeoExpandedPolygon> frames_out;
 
