@@ -8,6 +8,14 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <boost/geometry.hpp>
+#include <boost/geometry/multi/multi.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/multi/geometries/multi_polygon.hpp>
+#include <boost/geometry/io/wkt/wkt.hpp>
+#include <boost/geometry/multi/io/wkt/wkt.hpp>
+
 //もしデバックモードにしたければ下をコメントアウト
 #define DEBUG_MODE
 
@@ -32,7 +40,16 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
 bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 {
-    return false;
+    //OKならfalseを返す
+    int piecesize = field.getPiece.getSize();
+    int fieldsize ;
+    bg::num_points(field.getFrame(), fieldsize);
+    QVector<double>
+    for(int a = 0; a < piecesize; ++piecesize){
+        double field_angle = field.getSideAngle().at(fieldsize);
+        double piece_angle = field.getPiece().getSideAngle().at(piecesize);
+
+    }
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
