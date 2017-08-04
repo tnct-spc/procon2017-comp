@@ -293,7 +293,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     int hoge = field.getPieces().size();
     if(point_id > -1){
-        if(point_id < hoge){
+        if(point_id < hoge-1){
             paintif = true;
             if(event->key() == Qt::Key_A){
                 selecter = true;
