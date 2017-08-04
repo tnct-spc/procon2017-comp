@@ -15,7 +15,6 @@
 #include <string>
 #include <QStringList>
 #include <QVector>
-#include <QList>
 #include "neofield.h"
 #include "neoexpandedpolygon.h"
 #include <math.h>
@@ -33,13 +32,13 @@ public:
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
     void setDockMode(bool inp);
+
 private:
     int frame_margin;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
     void setField();
     QPointF getPosition(point_i point);
-    QVector<QString> list;
     void firstField();
     int left_right_margin;
     int grid_size;
@@ -50,10 +49,21 @@ private:
     // Only field mode
     bool single_mode = false;
 
+    //make id_list
+    std::vector<polygon_i> polygon_list;
+
+    //draw processingLine
+    point_i center;
+    int point_id = -1;
+    int red_id;
+    int blue_id;
+    bool selecter;//true = left, false = right
+    bool paintif;
 
 protected:
     void beforePolygon();
     void paintEvent(QPaintEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // NEOANSWERBOARD_H
