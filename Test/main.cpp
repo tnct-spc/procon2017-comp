@@ -9,6 +9,7 @@
 #include "neopolygonviewer.h"
 #include "testalgorithmwrapper.h"
 #include "testevaluation.h"
+#include "testpolygonconnector.h"
 
 int Test()
 {
@@ -21,7 +22,8 @@ int Test()
 //    TESTER.push_back(new TestJoinPolygon);
 //    TESTER.push_back(new testSearchSameLength);
 //    TESTER.push_back(new TestAlgorithmWrapper);
-    TESTER.push_back(new TestEvaluation);
+//    TESTER.push_back(new TestEvaluation);
+    TESTER.push_back(new TestPolygonConnector);
 
     for(auto tester : TESTER){
         if(!tester->run()){
@@ -36,8 +38,8 @@ int Test()
 int main(int argc, char *argv[])
 {
     std::cout<<"***START TEST***"<<std::endl;
-//    QApplication a(argc, argv);
-//    NeoPolygonViewer::getInstance();
+    QApplication a(argc, argv);
+    NeoPolygonViewer::getInstance();
 
     int error_cnt = Test();
 
@@ -46,6 +48,6 @@ int main(int argc, char *argv[])
     } else {
         std::cout << "***FAILED! "<<error_cnt<<" tests return false***" << std::endl;
     }
-    return 0;
-//    return a.exec();
+//    return 0;
+    return a.exec();
 }

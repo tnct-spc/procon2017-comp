@@ -24,6 +24,7 @@ SOURCES += main.cpp\
     testerwraper.cpp \
     testsearchsamelength.cpp \
     testneoexpandedpolygon.cpp \
+    testpolygonconnector.cpp \
     testalgorithmwrapper.cpp \
     testevaluation.cpp
 
@@ -32,6 +33,7 @@ HEADERS += testdisplayanswer.h\
     testerwraper.h \
     testsearchsamelength.h \
     testneoexpandedpolygon.h \
+    testpolygonconnector.h \
     testalgorithmwrapper.h \
     testevaluation.h
 
