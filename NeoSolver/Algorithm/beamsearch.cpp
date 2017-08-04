@@ -42,13 +42,13 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 {
     //OKならfalseを返す
     int piecesize = field.getPiece.getSize();
-    int fieldsize ;
+    int fieldsize;
     bg::num_points(field.getFrame(), fieldsize);
-    QVector<double>
+    double hoge_angle;
+    double min_angle = 360;
     for(int a = 0; a < piecesize; ++piecesize){
-        double field_angle = field.getSideAngle().at(fieldsize);
-        double piece_angle = field.getPiece().getSideAngle().at(piecesize);
-
+        hoge_angle = field.getPiece().getSideAngle().at(piecesize);
+        if(hoge_angle < min_angle) min_angle = hoge_angle;
     }
 }
 
