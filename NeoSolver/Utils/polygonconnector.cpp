@@ -42,7 +42,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
     complex_d frame_complex(static_cast<double> (frame_point2.x() - frame_point1.x()), static_cast<double> (frame_point2.y() - frame_point1.y()));
 
     std::pair<polygon_i, bool> rotate_out = (this -> rotate(piece_polygon, frame_complex, piece_index1, piece_index2));
-    if(rotate_out.second) return out_empty;
+    if(!rotate_out.second) return out_empty;
     polygon_i piece_out_polygon = rotate_out.first;
     std::vector<point_i> piece_out_points = piece_out_polygon.outer();
     point_i piece_out_point1 = piece_out_points.at(piece_index1);
