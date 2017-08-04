@@ -13,6 +13,7 @@ public:
     Connect connection;
     int frame_index = -1;
     int piece_index = -1;
+    int fields_index = -1;
     bool is_inversed = false;
 };
 

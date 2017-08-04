@@ -28,7 +28,31 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
     std::vector<procon::NeoField> next_field;
 
     auto makeNextFieldFromEvaluate = [&](Evaluate eval){
+        procon::NeoField field_buf = fields[eval.fields_index];
+        ConnectedResult connect_result = PolygonConnector::connect(fields[eval.fields_index].getFrame()[eval.frame_index]
+                ,eval.is_inversed
+                    ? fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
+                    : fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
+                ,eval.connection
+        );
 
+        if(std::get<2>(connect_result)){
+            std::array<bool,50> is_placed = field_buf.getIsPlaced();
+            is_placed[eval.piece_index] = true;
+            field_buf.setIsPlaced(is_placed);
+
+            field_buf.setPiece(std::get<1>(connect_result));
+
+            std::vector<procon::NeoExpandedPolygon> frames_buf = fields[eval.fields_index].getFrame();
+            frames_buf.erase(frames_buf.begin() + eval.frame_index);
+            for (auto frame_polygon : std::get<0>(connect_result)){
+                frames_buf.push_back(frame_polygon);
+            }
+
+            field_buf.setFrame(frames_buf);
+
+            next_field.push_back(field_buf);
+        }
     };
 
 #ifdef DEBUG_MODE
@@ -36,6 +60,16 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
         return l.score > r.score;
     });
 
+    for(auto const& eval : evaluations){
+        makeNextFieldFromEvaluate(eval);
+
+        //ビーム幅を超えたらああああ終わりです。
+        if(next_field.size() == 100){
+            break;
+        }
+    }
+    fields.clear();
+    std::copy(next_field.begin(),next_field.end(),std::back_inserter(fields));
 #elif
 #endif
 }
