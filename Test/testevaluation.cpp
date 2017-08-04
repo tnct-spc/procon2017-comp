@@ -63,7 +63,7 @@ bool TestEvaluation::run()
     std::vector<std::pair<double , Connect>> vector;
 
     Evaluation e;
-    vector = e.evaluation(frames.at(0),polygons.at(0));
+    vector = e.evaluation(frames.at(1),polygons.at(5));
 
     double evaluation;
     int field_side_index , polygon_side_index , field_point_index , polygon_point_index;
