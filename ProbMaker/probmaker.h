@@ -27,6 +27,11 @@ private:
     std::vector<polygon_i> print_polygons;
     int retRnd(int pnum);
     polygon_i frame;
+    int makecoordinate_x(int x);
+    int makecoordinate_y(int y);
+    void frame_generate(polygon_i ex,int a,int b);
+
+    int polygon_size = 5000;
 
 private slots:
     void step();

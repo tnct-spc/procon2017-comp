@@ -117,9 +117,143 @@ int ProbMaker::retRnd(int num){
     std::cout << rnd(mt) << std::endl;
     return rnd(mt);
 }
+int ProbMaker::makecoordinate_x(int start_x){
+    int coordinate_x = retRnd(25) + start_x;
+    return coordinate_x;
+}
+int ProbMaker::makecoordinate_y(int start_y){
+    int coordinate_y = retRnd(16) + start_y;
+    return coordinate_y;
+}
 
 void ProbMaker::angulated_graphic(){
+    polygon_i real_frame;     //本物の枠
 
+   do{
+
+    bg::clear(real_frame);
+
+    int firstcoordinate_x = makecoordinate_x(0);
+    int firstcoordinate_y = makecoordinate_y(0);
+    real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y));
+
+    real_frame.outer().push_back(point_i(makecoordinate_x(0),makecoordinate_y(16)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(0),makecoordinate_y(32)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(0),makecoordinate_y(48)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(25),makecoordinate_y(48)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(50),makecoordinate_y(48)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(75),makecoordinate_y(48)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(75),makecoordinate_y(32)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(75),makecoordinate_y(16)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(75),makecoordinate_y(0)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(50),makecoordinate_y(0)));
+    real_frame.outer().push_back(point_i(makecoordinate_x(25),makecoordinate_y(0)));
+
+    real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y));
+
+    }while(bg::area(real_frame) < polygon_size);   //polygon_sizeはへッダファイルにて変更可
+
+    std::cout << "このポリゴンの面積は" << bg::area(real_frame) << std::endl;
+
+    /*int center_x = 50; //中心点のx座標
+    int center_y = 32; //中心点のy座標
+    int TopLeft = 4;     //中心点から見て左上の頂点の数
+    int TLvertex_x,TLvertex_y;   //中心点から見て左上の頂点の座標
+    int TLcheck_x = center_x,TLcheck_y = 0; //しっかりと反時計回りに入力されているか判定する
+    int firstcoordinate_x,firstcoordinate_y;//最後にpolygon_iに最初の頂点の座標を投入為の変数
+    int verticalspace = 10;
+    int horizontalspace = 20;
+
+    for(int  TL = 1;TL < TopLeft;TL++){   //中心点から見て左上
+        do{
+        if(TL == 1){
+            TLvertex_x = retRnd(25) + 25;
+        }else{
+        TLvertex_x = retRnd(20);
+        }
+        if(TLvertex_x > horizontalspace){
+            TLvertex_y = retRnd(verticalspace);
+        }else{
+            TLvertex_y = retRnd(center_y);
+            }
+        }while(TLvertex_x < TLcheck_x && TLvertex_y > TLcheck_y); //反時計回りに入力されているかの判定、中心点から見てどこにあたるかで処理が違う true
+        real_frame.outer().push_back(point_i(TLvertex_x,TLvertex_y));
+        TLcheck_x = TLvertex_x;
+        TLcheck_y = TLvertex_y;
+        if(TL == 1){
+            firstcoordinate_x = TLvertex_x;  //最初の象限の最初のピースだから
+            firstcoordinate_y = TLvertex_y;
+        }
+    }
+   int BottomLeft = retRnd(4)+1;   //中心点から見て左下
+    int BLvertex_x,BLvertex_y;
+    int BLcheck_x = 0,BLcheck_y = 0;
+    for(int BL = 1;BL < BottomLeft;BL++){
+        do{
+        BLvertex_x = retRnd(center_x);
+        if(BLvertex_x > 20){
+            BLvertex_y = retRnd(13) + 51;
+        }else{
+            BLvertex_y = retRnd(65-center_y) +center_y;
+        }
+        }while(!(BLvertex_x <= BLcheck_x || BLvertex_y <= BLcheck_y));
+        real_frame.outer().push_back(point_i(BLvertex_x,BLvertex_y));
+        BLcheck_x = BLvertex_x;
+        BLcheck_y = BLvertex_y;
+    }
+    int BottomRight = retRnd(4)+1; //中心点から見て右下
+    int BRvertex_x,BRvertex_y;
+    int BRcheck_x = 0,BRcheck_y = 100;
+    for(int BR = 1;BR < BottomRight;BR++){
+        do{
+        BRcheck_x = retRnd(100-center_x)+center_x;
+        if(BRvertex_x < 80){
+            BRvertex_y = retRnd(13) + 51;
+        }else{
+            BRvertex_y = retRnd(65 - center_y) + center_y;
+            }
+        }while(!(BRvertex_x < BRcheck_x || BRvertex_y >  BRcheck_y));
+        real_frame.outer().push_back(point_i(BRvertex_x,BRvertex_y));
+        BRcheck_x = BRvertex_x;
+        BRcheck_y = BRvertex_y;
+    }
+    int TopRight = retRnd(4)+1;    //中心点から見て右上
+    int TRvertex_x,TRvertex_y;
+    int TRcheck_x = 150,TRcheck_y = 150;
+    for(int TR = 1;TR < TopRight;TR++){
+        do{
+            TRvertex_x = retRnd(100-center_x)+center_x;
+            if(TRvertex_x < 80){
+                TRvertex_y = retRnd(13);
+            }else{
+                TRvertex_y = retRnd(center_y);
+            }
+        }while(!(TRvertex_x > TRcheck_x || TRvertex_y > TRcheck_y));
+        real_frame.outer().push_back(point_i(TRvertex_x,TRvertex_y));
+        TRcheck_x = TRvertex_x;
+        TRcheck_y = TRvertex_y;
+    }*/
+
+    polygon_i vertical;
+    vertical.outer().push_back(point_i(50,0));
+    vertical.outer().push_back(point_i(51,0));
+    vertical.outer().push_back(point_i(51,64));
+    vertical.outer().push_back(point_i(50,64));
+    vertical.outer().push_back(point_i(50,0));
+
+    polygon_i horizontal;
+    horizontal.outer().push_back(point_i(0,32));
+    horizontal.outer().push_back(point_i(0,33));
+    horizontal.outer().push_back(point_i(100,33));
+    horizontal.outer().push_back(point_i(100,32));
+    horizontal.outer().push_back(point_i(0,32));
+
+
+    //real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y)); //最初のpoint_iを入力することによってピース全体のouterに終末を
+
+    print_polygons.push_back(real_frame);
+    print_polygons.push_back(vertical);
+    print_polygons.push_back(horizontal);
     polygon_i sample_frame;//   テストで枠を生成
     sample_frame.outer().push_back(point_i(12,0));
     sample_frame.outer().push_back(point_i(80,0));
@@ -130,11 +264,9 @@ void ProbMaker::angulated_graphic(){
     sample_frame.outer().push_back(point_i(0,12));
     sample_frame.outer().push_back(point_i(12,0));
     frame = sample_frame;
-    print_polygons.push_back(sample_frame);
-
+    //print_polygons.push_back(sample_frame);
 
 }
-
 void ProbMaker::delaunay_triangulation()
 {
 
