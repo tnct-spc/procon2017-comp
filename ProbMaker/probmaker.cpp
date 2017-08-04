@@ -103,6 +103,7 @@ ProbMaker::ProbMaker(QWidget *parent) :
 //    delaunay_triangulation();
 //    GA();
     angulated_graphic();
+    resize();
 }
 
 ProbMaker::~ProbMaker()
@@ -114,7 +115,6 @@ int ProbMaker::retRnd(int num){
     std::random_device rand;
     std::mt19937 mt(rand());
     std::uniform_int_distribution<int> rnd(0,num-1);//randomを返すだけ
-    std::cout << rnd(mt) << std::endl;
     return rnd(mt);
 }
 
@@ -148,6 +148,7 @@ void ProbMaker::angulated_graphic(){
     sample_frame.outer().push_back(point_i(0,52));
     sample_frame.outer().push_back(point_i(0,12));
     sample_frame.outer().push_back(point_i(12,0));
+    bg::correct(sample_frame);
     frame = sample_frame;
 
     polygon_i inner_frame;
@@ -164,7 +165,6 @@ void ProbMaker::angulated_graphic(){
     for(auto point : check_frame.outer()){
         inner_frame.inners().back().push_back(point);
     }
-    bg::correct(inner_frame);
     };
 
 
@@ -266,11 +266,13 @@ void ProbMaker::angulated_graphic(){
             check_frame = polygon[0];
         }
         std::cout << " check_frame = " << bg::dsv(check_frame) << std::endl;
+
+
     };
 
-//    setInnerFrame();// 初期状態のFrameをInnerFrameに投入
-    for(int count = 0;count < 3;count++){
-    setInnerFrame();// frameをinnerframeに投入
+    setInnerFrame();// 初期状態のFrameをInnerFrameに投入
+    for(int count = 0;count < 150;count++){
+
     bool flag = false;
     int point_y,point_x;
     while(!flag){
@@ -291,9 +293,12 @@ void ProbMaker::angulated_graphic(){
     //次はx座標に正の方向へ頂点を移動させるサンプルを作ってみる
 
     flag = false;//flag変数を使いまわしてるけど特に意味はないです
+    bool point_pushback;
+    int cou=0;
     while(!flag){//他の枠やピース、自分の線とぶつかったら終了するようにする
+        cou++;
         bool add_or_subt = retRnd(2);//retRnd(2); // retRnd(2); //trueなら数値を加算、falseなら減算(原点方向へ移動)させる
-        bool point_pushback = true; // 頂点をpush_backするか決める変数　これがfalseなら点をpush_backせずやり直す
+        point_pushback = true; // 頂点をpush_backするか決める変数　これがfalseなら点をpush_backせずやり直す
         if(add_or_subt){
             if(point_x != 101 && point_y != 65){
                 int extend = (x_or_y
@@ -311,6 +316,7 @@ void ProbMaker::angulated_graphic(){
                             point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
                             if(!x_or_y) point_x -= extend_;
                             else point_y -= extend_;
+                            if(cou>100)flag = true;//無限ループ防止のアレ
                         }
                         break;//他の図形と接触したらそこで止める
                     }
@@ -332,6 +338,7 @@ void ProbMaker::angulated_graphic(){
                             point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
                             if(!x_or_y) point_x += extend_;
                             else  point_y += extend_;
+                            if(cou>100)flag = true;//無限ループ防止のアレ
                         }
                         break;//他の図形と接触したらそこで止める
                     }
@@ -344,17 +351,35 @@ void ProbMaker::angulated_graphic(){
         }
 
     }
+
+    if(point_pushback){
     checkClossLine();//ここでpolygonの始点と終点を補完する
     print_polygons.push_back(poly);
+    setInnerFrame();// frameをinnerframeに投入
+    }
+
     poly.clear();
+    if(bg::area(check_frame) < 700){
+        //枠の残り部分をそのままピースとして出力する
+        print_polygons.push_back(check_frame);
+        break;//ピースを作成するループから抜け出す
+    }
 
     }
 
-    for(auto polygon : print_polygons){
+    for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
         std::cout << "polygon = " << bg::dsv(polygon) << std::endl;
+        std::cout << "area = " << bg::area(polygon) << std::endl << std::endl;
     }
+    std::cout << "piece area = " << bg::area(frame) << std::endl;
+    std::cout << "piece count = " << print_polygons.size() << std::endl;
+    std::cout << "piece area average = " << bg::area(frame) / print_polygons.size() << std::endl;
+
 }
 
+void ProbMaker::resize(){
+
+}
 
 
 void ProbMaker::delaunay_triangulation()

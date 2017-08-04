@@ -18,6 +18,7 @@ public:
     void delaunay_triangulation();
     void GA();
     void angulated_graphic();
+    void resize();
     std::vector<polygon_i> getPieces();
     polygon_i getFrame();
 
