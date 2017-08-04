@@ -39,22 +39,42 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
     std::vector<point_i> frame_points = frame_polygon.outer();
     point_i frame_point1 = frame_points.at(frame_index1);
     point_i frame_point2 = frame_points.at(frame_index2);
-    complex_d frame_complex(static_cast<double> (frame_point2.x() - frame_point1.x()), static_cast<double> (frame_point2.y() - frame_point1.y()));
+    int x2 = frame_point2.x() - frame_point1.x();
+    int y2 = frame_point2.y() - frame_point1.y();
+    point_i frame_angle(x2, y2);
 
-    std::pair<polygon_i, bool> rotate_out = (this -> rotate(piece_polygon, frame_complex, piece_index1, piece_index2));
+    std::pair<polygon_i, bool> rotate_out = (rotate(piece_polygon, frame_angle, piece_index1, piece_index2));
     if(!rotate_out.second) return out_empty;
+    else std::cout << "rotate is true!" << std::endl; ////
     polygon_i piece_out_polygon = rotate_out.first;
     std::vector<point_i> piece_out_points = piece_out_polygon.outer();
     point_i piece_out_point1 = piece_out_points.at(piece_index1);
 
     procon::NeoExpandedPolygon piece_out;
     piece_out.resetPolygonForce(piece_out_polygon);
-    piece_out.translatePolygon(piece_out_point1.x(), piece_out_point1.y());
+    piece_out.translatePolygon(frame_point1.x() - piece_out_point1.x(), frame_point1.y() - piece_out_point1.y());
+    piece_out_polygon = piece_out.getPolygon();
     bg::union_(frame_polygon, piece_out_polygon, union_polygons);
-    if(union_polygons.size() != 1) return out_empty;
+    //if(union_polygons.size() != 1) return out_empty;
+    if(union_polygons.size() != 1) { ////
+        auto out = [](polygon_i poly, std::string name)
+        {
+            std::cout << name << " -> ";
+
+            for(point_i point : poly.outer()) {
+                std::cout << "(" << point.x() << ", " << point.y() << "), ";
+            }
+
+            std::cout << std::endl << std::endl;
+        };
+        out(union_polygons.at(0), "union1");
+        out(union_polygons.at(1), "union2");
+        return out_empty;
+    } else std::cout << "union_polygon is one!" << std::endl; ////
     polygon_i union_polygon = union_polygons.at(0);
 
     if(bg::equals(frame_polygon, union_polygon)) {
+        std::cout << "equals is true!" << std::endl; ////
         bg::difference(frame_polygon, piece_out_polygon, frame_out_polygons);
         std::vector<procon::NeoExpandedPolygon> frames_out;
 
@@ -70,7 +90,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
     return out_empty;
 }
 
-std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, int first_index, int second_index)
+std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, point_i after_angle, int first_index, int second_index)
 {
     // p = past, poss = possibility
 
@@ -170,8 +190,17 @@ std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, comple
     auto check_return = [&first_index, &second_index, &after_angle, &polygon](std::vector<point_i> points)
     {
         point_i first_point = points.at(first_index), second_point = points.at(second_index);
-        complex_d before_angle(static_cast<double> (second_point.x() - first_point.x()), static_cast<double> (second_point.y() - first_point.y()));
-        if(before_angle == after_angle) {
+        double x1 = second_point.x() - first_point.x();
+        double y1 = second_point.y() - first_point.y();
+        double x2 = after_angle.x();
+        double y2 = after_angle.y();
+        if((y1 == 0) && (y2 == 0)) {
+            for(point_i point : points) {
+                std::vector<point_i> &outer = polygon.outer();
+                outer.push_back(point);
+            }
+            return true;
+        } else if((x1 / y1 == x2 / y2) && (std::signbit(x1) == std::signbit(x2)) && (std::signbit(y1) == std::signbit(y2))) {
             for(point_i point : points) {
                 std::vector<point_i> &outer = polygon.outer();
                 outer.push_back(point);
@@ -199,6 +228,7 @@ std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, comple
             std::pair<polygon_i, bool> out = std::make_pair(polygon, true);
             return out;
         }
+        points_true.clear();
     }
 
     for(point_i polygon_point : polygon_in.outer()) { //回転司令塔

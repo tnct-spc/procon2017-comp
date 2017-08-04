@@ -22,11 +22,11 @@ bool TestPolygonConnector::run()
 
 
     for(int i = 0; i < polygon_frames.size(); ++i) {
-        std::cout << std::endl << std::endl << "--frame---------------------------<< " << i << " >>---------------------------" << std::endl << std::endl;
+        std::cout << std::endl << "frame---------------------------<< " << i << " >>---------------------------" << std::endl << std::endl;
         polygon_i polygon_frame = polygon_frames.at(i);
 
         for(int j = 0; j < polygon_pieces.size(); ++j) {
-            std::cout << std::endl << "--piece---------------------------<< " << j << " >>---------------------------" << std::endl << std::endl;
+            std::cout << "piece---------------------------<< " << j << " >>---------------------------" << std::endl << std::endl;
             polygon_i polygon_piece = polygon_pieces.at(j);
 
             frame.resetPolygonForce(polygon_frame);
@@ -37,15 +37,15 @@ bool TestPolygonConnector::run()
                     frame_side = 5;
                     piece_side = 0;
                     piece_point = 0;
-                } else if(i == 1) {
+                } else if(j == 1) {
                     frame_side = 4;
                     piece_side = 0;
                     piece_point = 1;
-                } else if(i == 2) {
+                } else if(j == 2) {
                     frame_side = 4;
                     piece_side = 1;
                     piece_point = 2;
-                } else if(i == 3) {
+                } else if(j == 3) {
                     frame_side = 4;
                     piece_side = 4;
                     piece_point = 5;

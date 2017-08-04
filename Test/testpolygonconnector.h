@@ -3,6 +3,7 @@
 
 #include "testerwraper.h"
 #include "Utils/polygonconnector.h"
+#include "neopolygonviewer.h"
 
 class TestPolygonConnector : public TesterWraper
 {
