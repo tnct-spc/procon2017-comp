@@ -9,7 +9,7 @@ Evaluation::Evaluation()
 
 std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {
-    auto calculation_nep = [](procon::NeoExpandedPolygon nep , int index , int cal){
+    auto calculation_nep = [](const procon::NeoExpandedPolygon &nep , int index , int cal){
         index = index % nep.getSize();
         index = index + cal;
         if(index < 0){
@@ -20,7 +20,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
         return index;
     };
 
-    auto check_is_there = [](std::vector<std::pair<int , int>> vector , int frame_point_index , int polygon_point_index){
+    auto check_is_there = [](const std::vector<std::pair<int , int>> &vector , int frame_point_index , int polygon_point_index){
         for(std::pair<int , int> i :vector){
             if((i.first == frame_point_index) && (i.second == polygon_point_index)) return true;
         }
