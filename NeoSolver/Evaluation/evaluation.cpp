@@ -10,13 +10,11 @@ Evaluation::Evaluation()
 std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {
     auto calculation_nep = [](const procon::NeoExpandedPolygon &nep , int index , int cal){
-        index = index % nep.getSize();
         index = index + cal;
+        index = index % nep.getSize();
         if(index < 0){
-            index = index % nep.getSize();
             index = nep.getSize() + index;
         }
-        if(index >= nep.getSize()) index = index % nep.getSize();
         return index;
     };
 
