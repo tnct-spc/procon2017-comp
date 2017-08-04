@@ -48,7 +48,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
     //frameがstd::vector<NeoExPolygon>なのでそれぞれに対して、評価関数を回す
-    auto evaluateWrapper = [&](procon::NeoField const& field,int const& piece_index){
+    auto evaluateWrapper = [&](procon::NeoField const& field,int const& piece_index,int const& fields_index){
         int frame_index = 0;
         for(const auto& f : field.getFrame()){
             //inverseしていない方のpiece評価
@@ -62,6 +62,7 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
             for(const auto& e : evaluate){
                 ev_buf.score = e.first;
                 ev_buf.connection = e.second;
+                ev_buf.fields_index = fields_index;
                 ev_buf.frame_index = frame_index;
                 ev_buf.piece_index = piece_index;
                 ev_buf.is_inversed = false;
@@ -71,6 +72,7 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
             for(const auto& e : evaluate_inversed){
                 ev_buf.score = e.first;
                 ev_buf.connection = e.second;
+                ev_buf.fields_index = fields_index;
                 ev_buf.frame_index = frame_index;
                 ev_buf.piece_index = piece_index;
                 ev_buf.is_inversed = true;
@@ -81,18 +83,20 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
         }
     };
 
-    auto evaluateNextState = [&](procon::NeoField const& field){
+    auto evaluateNextState = [&](procon::NeoField const& field,int const& fields_index){
         for (int piece_index = 0; piece_index < field.getElementaryPieces().size(); ++piece_index) {
             //すでに置いてあったら評価しません
             if(field.getIsPlaced().at(piece_index)) continue;
 
-            evaluateWrapper(field,piece_index);
+            evaluateWrapper(field,piece_index,fields_index);
         }
     };
 
 #ifdef DEBUG_MODE
+    int field_index = 0;
     for(auto const& f : fields){
-        evaluateNextState(f);
+        evaluateNextState(f,field_index);
+        ++field_index;
     }
 #else
 
