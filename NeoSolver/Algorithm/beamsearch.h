@@ -5,6 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "Utils/polygonconnector.h"
 #include "Evaluation/evaluation.h"
+#include "neoanswerdock.h"
 
 class Evaluate {
 public:
@@ -35,7 +36,7 @@ public:
 
 private:
     std::shared_ptr<spdlog::logger> logger;
-
+    std::shared_ptr<NeoAnswerDock> dock;
     unsigned int processor_num = 0;
 };
 

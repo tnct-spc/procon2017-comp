@@ -11,11 +11,16 @@
 //もしデバックモードにしたければ下をコメントアウト
 #define DEBUG_MODE
 
-std::condition_variable cond;
+//std::condition_variable cond;
+
+//PolygonConnector用の
+typedef std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> ConnectedResult;
 
 BeamSearch::BeamSearch()
 {
     logger = spdlog::get("beamsearch");
+    dock = std::make_shared<NeoAnswerDock>();
+    dock->show();
 }
 
 void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
