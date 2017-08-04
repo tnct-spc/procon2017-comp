@@ -127,13 +127,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBrush(QBrush(QColor(236,182,138, 200))); //frame color
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
-//        int pcount = field.getFrame().getSize();
-//        QPointF points[pcount];
-//        for(int tes = 0;tes < pcount; tes++){
-//            points[tes] = getPosition(field.getFrame().getPolygon().outer().at(tes));
-//        }
-//        painter.setBrush(QBrush(QColor(up_back_ground_color)));
-//        painter.drawPolygon(points,pcount);
+
 
         for(auto& frame : field.getFrame() ){
             std::vector<QPointF> frame_points;
@@ -261,8 +255,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             drawBlueProcessingLine();
             drawPieceId(point_id);
         }
-
-        if(point_id != -1){
+        if(point_id > -1){
             if(selecter){
                 red_id = point_id;
                 for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
@@ -299,17 +292,27 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     int hoge = field.getPieces().size();
-    if(point_id < hoge - 1){
-        paintif = true;
-        if(event->key() == Qt::Key_A){
-            selecter = true;
-            point_id++;
+    if(point_id > -1){
+        if(point_id < hoge){
+            paintif = true;
+            if(event->key() == Qt::Key_A){
+                selecter = true;
+                point_id++;
+            }
+            if(event->key() == Qt::Key_S){
+                selecter = true;
+                point_id--;
+            }
+            if(event->key() == Qt::Key_L){
+                selecter = false;
+                point_id++;
+            }
+            if(event->key() == Qt::Key_K){
+                selecter = false;
+                point_id--;
+            }
+            this->update();
         }
-        if(event->key() == Qt::Key_L){
-            selecter = false;
-            point_id++;
-        }
-        this->update();
     }
 }
 
@@ -340,48 +343,3 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         std::cout << piece.getId() << std::endl;
     }
 }
-/*
-void NeoAnswerBoard::firstField(){//初期状態でのfieldを設定(実際は使わない)
-    procon::NeoField inpfield;
-    procon::NeoExpandedPolygon polygon;
-    procon::NeoExpandedPolygon poly0;
-    procon::NeoExpandedPolygon poly1;
-    procon::NeoExpandedPolygon poly2;
-    std::vector<polygon_i> piecepolygon(3);
-    polygon_i framepolygon;
-
-    framepolygon.outer().push_back(point_i(5,5));
-    framepolygon.outer().push_back(point_i(85,7));
-    framepolygon.outer().push_back(point_i(75,48));
-    framepolygon.outer().push_back(point_i(18,57));
-    framepolygon.outer().push_back(point_i(5,5));
-    polygon.resetPolygonForce(framepolygon);
-    std::vector<procon::NeoExpandedPolygon> polygonvec;
-    polygonvec.push_back(polygon);
-    inpfield.setFrame(polygonvec);
-
-    piecepolygon[0].outer().push_back(point_i(5,5));
-    piecepolygon[0].outer().push_back(point_i(45,6));
-    piecepolygon[0].outer().push_back(point_i(25,15));
-    piecepolygon[0].outer().push_back(point_i(5,5));
-    polygon.resetPolygonForce(piecepolygon[0]);
-    inpfield.setPiece(polygon);
-
-    piecepolygon[1].outer().push_back(point_i(45,6));
-    piecepolygon[1].outer().push_back(point_i(65,36));
-    piecepolygon[1].outer().push_back(point_i(45,35));
-    piecepolygon[1].outer().push_back(point_i(45,6));
-    polygon.resetPolygonForce(piecepolygon[1]);
-    inpfield.setPiece(polygon);
-
-    piecepolygon[2].outer().push_back(point_i(12,32));
-    piecepolygon[2].outer().push_back(point_i(15,21));
-    piecepolygon[2].outer().push_back(point_i(35,23));
-    piecepolygon[2].outer().push_back(point_i(44,35));
-    piecepolygon[2].outer().push_back(point_i(32,45));
-    piecepolygon[2].outer().push_back(point_i(12,32));
-    polygon.resetPolygonForce(piecepolygon[2]);
-    inpfield.setPiece(polygon);
-
-    setField(inpfield);
-};*/
