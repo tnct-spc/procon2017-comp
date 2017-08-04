@@ -138,14 +138,6 @@ void ProbMaker::angulated_graphic(){
         return true;//問題がないならtrueを返す
     };*/
 
-    std::vector<polygon_i> polygon_vec;//autoでfor each文を使うためにframeとpieceを格納する
-
-    auto checkIntersects = [&](point_i p1){//for eachで検査するプログラム
-        for(auto poly : polygon_vec){
-            if(bg::intersects( p1 , poly))return true; //交差しているならtrueを返す
-        }
-        return false;//問題がなかったらfalseを返す
-    };
 
     polygon_i sample_frame;//   テストで枠を生成
     sample_frame.outer().push_back(point_i(12,0));
@@ -158,128 +150,147 @@ void ProbMaker::angulated_graphic(){
     sample_frame.outer().push_back(point_i(12,0));
     frame = sample_frame;
 
-    polygon_i inner_frame;//実際と同じような穴の空いた枠を生成する
+    polygon_i inner_frame;
+    polygon_i check_frame = frame;//すでにはめられたピースも含むpolygonを生成する
+
+    auto setInnerFrame = [&]{
+    inner_frame.clear(); //中身をリセットしてからcheck_frameのデータを取得する
     inner_frame.outer().push_back(point_i(0,0));
     inner_frame.outer().push_back(point_i(101,0));
     inner_frame.outer().push_back(point_i(101,65));
     inner_frame.outer().push_back(point_i(0,65));
     inner_frame.outer().push_back(point_i(0,0));
     inner_frame.inners().push_back(polygon_i::ring_type());
-    for(auto point : frame.outer()){
+    for(auto point : check_frame.outer()){
         inner_frame.inners().back().push_back(point);
     }
-    polygon_vec.push_back(inner_frame);
+    bg::correct(inner_frame);
+    };
 
-    // まずは一回テストで生成するプログラムを書く
-    // 現時点では二ピース目以降にも使えるような汎用性は求めないことにする
 
-    //一点目にはframe上の点をとりあえず使う事にする
-    int point_y;
-    int point_x = 1 + retRnd(99);//ランダムでx座標を出す
-    for(int closspointy=0;closspointy<66;closspointy++){//縦に引かれた線と枠の線の交点を出す
-        if( bg::intersects(point_i(point_x,closspointy), frame)){
-            point_y = closspointy; //交点のy座標を記憶
-            break;
-        }
-    }
-    polygon_i poly;//polygonを宣言
-    poly.outer().push_back(point_i(point_x,point_y));
+     polygon_i poly;//polygonを宣言
 
-    polygon_i check_frame = frame;
-    auto checkClossLine = [&]{//今回はframeのみを対象としたプログラムを書く(汎用性なし)      実際は二回目以降の処理は既にピースが置かれている部分を切り落とすような枠を生成する
-        int begin_line = -1;//変数名のせいでわかりづらいけど枠やピースの交点の線の番号を表している
-        int end_line = -1;
-        point_i polygon_begin = poly.outer().at(0);
-        point_i polygon_end = poly.outer().at(bg::num_points(poly)-1);//polygonの始点と終点(他の枠やピースと繋がってる部分)
-        for(unsigned int linenum=0;linenum<bg::num_points(check_frame)-1;linenum++){
+     auto checkClossLine = [&]{
+         int begin_line = -1;//変数名のせいでわかりづらいけど枠やピースの交点の線の番号を表している
+         int end_line = -1;
+         point_i polygon_begin = poly.outer().at(0);
+         point_i polygon_end = poly.outer().at(bg::num_points(poly)-1);//polygonの始点と終点(他の枠やピースと繋がってる部分)
+         for(unsigned int linenum=0;linenum<bg::num_points(check_frame)-1;linenum++){
 
-            bg::model::linestring<point_i> edge_line{check_frame.outer().at(linenum),check_frame.outer().at(linenum+1)};
-            if(bg::intersects(polygon_begin,edge_line))begin_line = linenum;//交点を見つけたら番号を記録
-            if(bg::intersects(polygon_end,edge_line))end_line = linenum;
-        }
-        std::cout << "closspoint1 : " << begin_line << "  closspoint2 : " << end_line << std::endl;
-        polygon_i pattern_one = poly;
-        polygon_i pattern_two = poly;
-        if(begin_line == end_line){//同じ線上にbeginとendがある場合
-            pattern_one.outer().push_back(poly.outer().at(0));
+             bg::model::linestring<point_i> edge_line{check_frame.outer().at(linenum),check_frame.outer().at(linenum+1)};
+             if(bg::intersects(polygon_begin,edge_line))begin_line = linenum;//交点を見つけたら番号を記録
+             if(bg::intersects(polygon_end,edge_line))end_line = linenum;
+         }
+         std::cout << "closspoint1 : " << begin_line << "  closspoint2 : " << end_line << std::endl;
+         polygon_i pattern_one = poly;
+         polygon_i pattern_two = poly;
+         if(begin_line == end_line){//同じ線上にbeginとendがある場合
+             pattern_one.outer().push_back(poly.outer().at(0));
 
-            poly.outer().push_back(check_frame.outer().at(end_line+1));
-            if(bg::intersects(poly)){
+             poly.outer().push_back(check_frame.outer().at(end_line+1));
+             if(bg::intersects(poly)){
 
-                for(int point_num = end_line;point_num > -1;point_num--){//すごい頭の悪い書き方してる
-                    pattern_two.outer().push_back(check_frame.outer().at(point_num));
-                }
-                for(int point_num = bg::num_points(check_frame) - 1;point_num > begin_line;point_num--){
-                    pattern_two.outer().push_back(check_frame.outer().at(point_num));
-                }
-                pattern_two.outer().push_back(poly.outer().at(0));
+                 for(int point_num = end_line;point_num > -1;point_num--){//すごい頭の悪い書き方してる
+                     pattern_two.outer().push_back(check_frame.outer().at(point_num));
+                 }
+                 for(int point_num = bg::num_points(check_frame) - 1;point_num > begin_line;point_num--){
+                     pattern_two.outer().push_back(check_frame.outer().at(point_num));
+                 }
+                 pattern_two.outer().push_back(poly.outer().at(0));
 
-            }else{
-                for(int point_num=end_line + 1;point_num<bg::num_points(check_frame);point_num++){
-                    pattern_two.outer().push_back(check_frame.outer().at(point_num));
-                }
-                for(int point_num = 0;point_num < begin_line + 1;point_num++){
-                    pattern_two.outer().push_back(check_frame.outer().at(point_num));
-                }
-                pattern_two.outer().push_back(poly.outer().at(0));
+             }else{
+                 for(int point_num=end_line + 1;point_num<bg::num_points(check_frame);point_num++){
+                     pattern_two.outer().push_back(check_frame.outer().at(point_num));
+                 }
+                 for(int point_num = 0;point_num < begin_line + 1;point_num++){
+                     pattern_two.outer().push_back(check_frame.outer().at(point_num));
+                 }
+                 pattern_two.outer().push_back(poly.outer().at(0));
 
-            }
-            poly.outer().pop_back();
-        }else if(begin_line > end_line){
-            for(int point_num = end_line + 1;point_num < begin_line + 1;point_num++){
-                pattern_one.outer().push_back(check_frame.outer().at(point_num));
-            }
-            pattern_one.outer().push_back(poly.outer().at(0));
+             }
+             poly.outer().pop_back();
+         }else if(begin_line > end_line){
+             for(int point_num = end_line + 1;point_num < begin_line + 1;point_num++){
+                 pattern_one.outer().push_back(check_frame.outer().at(point_num));
+             }
+             pattern_one.outer().push_back(poly.outer().at(0));
 
-            for(int point_num = end_line;point_num > -1;point_num--){
-                pattern_two.outer().push_back(check_frame.outer().at(point_num));
-            }
-            for(int point_num = bg::num_points(check_frame)-1;point_num > begin_line;point_num--){
-                pattern_two.outer().push_back(check_frame.outer().at(point_num));
-            }
-            pattern_two.outer().push_back(poly.outer().at(0));
+             for(int point_num = end_line;point_num > -1;point_num--){
+                 pattern_two.outer().push_back(check_frame.outer().at(point_num));
+             }
+             for(int point_num = bg::num_points(check_frame)-1;point_num > begin_line;point_num--){
+                 pattern_two.outer().push_back(check_frame.outer().at(point_num));
+             }
+             pattern_two.outer().push_back(poly.outer().at(0));
 
-        }else{
-            for(int point_num=end_line + 1;point_num<bg::num_points(check_frame);point_num++){
-                pattern_one.outer().push_back(check_frame.outer().at(point_num));
-            }
-            for(int point_num = 0;point_num < begin_line + 1;point_num++){
-                pattern_one.outer().push_back(check_frame.outer().at(point_num));
-            }
-            pattern_one.outer().push_back(poly.outer().at(0));
+         }else{
+             for(int point_num=end_line + 1;point_num<bg::num_points(check_frame);point_num++){
+                 pattern_one.outer().push_back(check_frame.outer().at(point_num));
+             }
+             for(int point_num = 0;point_num < begin_line + 1;point_num++){
+                 pattern_one.outer().push_back(check_frame.outer().at(point_num));
+             }
+             pattern_one.outer().push_back(poly.outer().at(0));
 
-            for(int point_num = end_line;point_num > begin_line;point_num--){
-                pattern_two.outer().push_back(check_frame.outer().at(point_num));
-            }
-            pattern_two.outer().push_back(poly.outer().at(0));
+             for(int point_num = end_line;point_num > begin_line;point_num--){
+                 pattern_two.outer().push_back(check_frame.outer().at(point_num));
+             }
+             pattern_two.outer().push_back(poly.outer().at(0));
 
-        }
-        poly = pattern_one;
-        bg::correct(pattern_one);//頂点の順番がおかしかった場合は修正
-        bg::correct(pattern_two);
-        if(bg::area(pattern_one) < bg::area(pattern_two)) poly = pattern_one;//polyに結果を代入する
-        else poly = pattern_two;
-        //ここからcheck_frameの加工
-        //intersectionで重複部分を取り出す
-        //differenceで異なる部分(重複していない部分)を取り出す
-        //それをcheck_frameに格納する
-        std::vector<polygon_i> intersection(1);
-        std::vector<polygon_i> differences(1);
-        bg::intersection(check_frame,poly,intersection);
-        bg::difference(check_frame,intersection[0],differences);
+         }
+         poly = pattern_one;
+         bg::unique(pattern_one);
+         bg::unique(pattern_two);
+         bg::correct(pattern_one);//頂点の順番がおかしかった場合は修正
+         bg::correct(pattern_two);
+         if(bg::area(pattern_one) < bg::area(pattern_two)) poly = pattern_one;//polyに結果を代入する
+         else poly = pattern_two;
+         //ここからcheck_frameの加工
+         //intersectionで重複部分を取り出す
+         //differenceで異なる部分(重複していない部分)を取り出す
+         //それをcheck_frameに格納する
+        bg::correct(check_frame);
+
+        std::cout << " poly = " << bg::dsv(poly) << std::endl;
+        std::cout << "check_frame = " << bg::dsv(check_frame) << std::endl;
+        std::cout << "inner_frame = " << bg::dsv(inner_frame) << std::endl;
+
+        std::vector<polygon_i> differences;
+        bg::difference(check_frame,poly,differences);
+        std::cout << "difference_size = " << differences.size() << std::endl;
         check_frame.clear();
         for(int count=0;count<differences.size();count++){
-            std::vector<polygon_i> polygon(1);
+            std::vector<polygon_i> polygon;
+            std::cout << " difference = " << bg::dsv(differences[count]) << std::endl;
             bg::union_(check_frame,differences[count],polygon);
             check_frame = polygon[0];
         }
+        std::cout << " check_frame = " << bg::dsv(check_frame) << std::endl;
     };
+
+//    setInnerFrame();// 初期状態のFrameをInnerFrameに投入
+    for(int count = 0;count < 3;count++){
+    setInnerFrame();// frameをinnerframeに投入
+    bool flag = false;
+    int point_y,point_x;
+    while(!flag){
+    point_x = 1 + retRnd(99);//ランダムでx座標を出す
+    for(int closspointy=0;closspointy<66;closspointy++){//縦に引かれた線と枠の線の交点を出す
+        if( bg::intersects(point_i(point_x,closspointy), check_frame)){
+            if(!bg::within(point_i(point_x,closspointy + 1) , check_frame))break;//記憶せずにもう一度
+            point_y = closspointy; //交点のy座標を記憶
+            flag = true;
+            break;
+        }
+    }
+    }
+    poly.outer().push_back(point_i(point_x,point_y));
 
 
     bool x_or_y = true;//次にx軸方向へ伸ばすかy軸方向に伸ばすかを記録する trueならy軸方向、falseならx軸方向に伸ばす
     //次はx座標に正の方向へ頂点を移動させるサンプルを作ってみる
 
-    bool flag = false;
+    flag = false;//flag変数を使いまわしてるけど特に意味はないです
     while(!flag){//他の枠やピース、自分の線とぶつかったら終了するようにする
         bool add_or_subt = retRnd(2);//retRnd(2); // retRnd(2); //trueなら数値を加算、falseなら減算(原点方向へ移動)させる
         bool point_pushback = true; // 頂点をpush_backするか決める変数　これがfalseなら点をpush_backせずやり直す
@@ -293,9 +304,8 @@ void ProbMaker::angulated_graphic(){
                     if(!x_or_y) ++point_x;
                     else  ++point_y;
 
-                    if(checkIntersects(point_i(point_x , point_y)) || bg::intersects(poly,point_i(point_x,point_y))){//これで接触した部分の座標がわかる
+                    if(bg::intersects( point_i(point_x,point_y), inner_frame) || bg::intersects(poly,point_i(point_x,point_y))){//これで接触した部分の座標がわかる
                         if(bg::num_points(poly) > 1 && !bg::intersects(poly,point_i(point_x,point_y))){
-                            //polygonを参照渡ししたら補完してくれるプログラムを書く
                             flag = true;
                         }else{
                             point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
@@ -315,9 +325,8 @@ void ProbMaker::angulated_graphic(){
                 for(int extend_=1;extend_<extend + 1;extend_++){//図形と接触するかを確認するためのループ
                     if(!x_or_y) --point_x;
                     else  --point_y;
-                    if(checkIntersects(point_i(point_x , point_y)) || bg::intersects(poly,point_i(point_x,point_y))){//これで接触した部分の座標がわかる
+                    if(bg::intersects( point_i(point_x,point_y), inner_frame) || bg::intersects(poly,point_i(point_x,point_y))){//これで接触した部分の座標がわかる
                         if(bg::num_points(poly) > 1 && !bg::intersects(poly,point_i(point_x,point_y))){
-                            //polygonを参照渡ししたら補完してくれるプログラムを書く
                             flag = true;
                         }else{
                             point_pushback = false;//始点の直後で失敗したらpush_backせずにやり直す
@@ -335,27 +344,15 @@ void ProbMaker::angulated_graphic(){
         }
 
     }
-
-    //poly.outer().push_back(point_i(poly.outer().at(1).x()+3,poly.outer().at(1).y()));//テスト用なので後で消します
-
-    checkClossLine();
-
-    //poly.outer().push_back(poly.outer().at(0));//最後に図形を閉じて表示
-    polygon_vec.push_back(poly);//色々登録した後に中身をリセットして終了
+    checkClossLine();//ここでpolygonの始点と終点を補完する
     print_polygons.push_back(poly);
     poly.clear();
-    /*
-    do{
-    //とりあえず6*6の正方形を作る
-    point_i rect = {retRnd(94),retRnd(58)};
-    first_rect.clear();
-    first_rect.outer().push_back(rect);
-    first_rect.outer().push_back(point_i(rect.x()+6,rect.y()));
-    first_rect.outer().push_back(point_i(rect.x()+6,rect.y()+6));
-    first_rect.outer().push_back(point_i(rect.x(),rect.y()+6));
-    first_rect.outer().push_back(rect);
-    }while(!checkCanPlace(first_rect));
-    print_polygons.push_back(first_rect);*/
+
+    }
+
+    for(auto polygon : print_polygons){
+        std::cout << "polygon = " << bg::dsv(polygon) << std::endl;
+    }
 }
 
 

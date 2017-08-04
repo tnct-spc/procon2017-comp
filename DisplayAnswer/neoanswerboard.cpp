@@ -108,7 +108,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 255)));
+            painter.setBrush(QBrush(QColor(colors[pnum][0],colors[pnum][1],colors[pnum][2], 128)));
             int pcount = field.getPiece(pnum).getSize();
             QPointF points[pcount];
             for(int tes = 0;tes < pcount; tes++){
