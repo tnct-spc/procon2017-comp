@@ -48,6 +48,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
     };
 
     std::vector<std::pair<double , Connect>> vector;
+    //すでに通ったことのあるところのchecker
     std::vector<std::pair<int , int>> passed_checker;
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
@@ -58,6 +59,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
 
             //辺が同じだったとき
             if(length_agreement && (angle_agreement == 0)){
+                //辺に沿って角の大きさや辺の長さが合わなくなるまでカウント
                 int trigger_count = 0;
                 do{
                     trigger_count++;
@@ -69,8 +71,10 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
                     passed_checker.push_back(std::pair<int, int>(calculated_frame_index , calculated_polygon_index));
                 }while(angle_agreement && length_agreement);
 
+                //行き着いた先がありえない角だったら排除
                 if(angle_agreement != -1){
                     double evaluation;
+                    //行き着いた先の角がぴったりだったら気持ちだけ(0.5)足してあげる
                     if(angle_agreement == 1){
                         evaluation = std::pow(trigger_count + 0.5 , 2.0);
                     }else{
