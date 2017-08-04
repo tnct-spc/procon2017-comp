@@ -20,6 +20,11 @@ BeamSearch::BeamSearch()
 
 void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
+    std::vector<procon::NeoField> next_field;
+
+    auto makeNextFieldFromEvaluate = [&](Evaluate eval){
+
+    };
 
 #ifdef DEBUG_MODE
     std::sort(evaluations.begin(),evaluations.end(),[](Evaluate l,Evaluate r){
