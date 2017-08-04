@@ -20,6 +20,12 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
         return index;
     };
 
+    auto check_is_there = [](std::vector<std::pair<int , int>> vector , int frame_point_index , int polygon_point_index){
+        for(std::pair<int , int> i :vector){
+            if((i.first == frame_point_index) && (i.second == polygon_point_index)) return true;
+        }
+    };
+
     //角の状態を返す
     auto angle_status = [&frame , &polygon](int frame_point_index , int polygon_point_index){
         double frame_angle = frame.getSideAngle().at(frame_point_index);
@@ -42,18 +48,22 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
     };
 
     std::vector<std::pair<double , Connect>> vector;
+    std::vector<std::pair<int , int>> checker;
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
 
             bool length_agreement = length_status(frame_point_index , polygon_point_index);
+            bool check_bool = check_is_there(checker , frame_point_index , polygon_point_index);
             int angle_agreement = angle_status(frame_point_index , polygon_point_index);
             //辺が同じだったとき
             if(length_agreement && (angle_agreement == 0)){
                 int trigger_count = 1;
                 angle_agreement = angle_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
                 length_agreement = length_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
+                checker.push_back(std::pair<int, int>(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count)));
                 while(angle_agreement && length_agreement){
                     trigger_count++;
+                    checker.push_back(std::pair<int, int>(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count)));
                     angle_agreement = angle_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
                     length_agreement = length_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
                 }
@@ -72,7 +82,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
                     vector.push_back(std::pair<double , Connect>(evaluation , connect));
                 }
             //角が同じだったとき
-            }else if((!length_agreement) && (angle_agreement == 1)){
+            }else if((!check_bool) && (angle_agreement == 1)){
                 double evaluation = 1;
                 Connect connect;
                 connect.frame_side_index = calculation_nep(frame , frame_point_index , -1);
