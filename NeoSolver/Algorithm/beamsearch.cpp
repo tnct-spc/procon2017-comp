@@ -151,8 +151,17 @@ void BeamSearch::run(procon::NeoField field)
 {
     logger->info("beamsearch run");
 
+    std::vector<procon::NeoField> state;
+    state.push_back(field);
+
     for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
+        std::vector<Evaluate> ev;
+        evaluateNextState(state,ev);
+        makeNextState(state,ev);
 
+        for(auto const& _field : state){
+            dock->addAnswer(_field);
+        }
+        break;
     }
-
 }
