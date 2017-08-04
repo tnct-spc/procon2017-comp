@@ -42,8 +42,8 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
     };
 
     std::vector<std::pair<double , Connect>> vector;
-    for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
-        for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
+    for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
+        for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
 
             bool length_agreement = length_status(frame_point_index , polygon_point_index);
             int angle_agreement = angle_status(frame_point_index , polygon_point_index);
@@ -57,13 +57,20 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
                     angle_agreement = angle_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
                     length_agreement = length_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
                 }
-                double evaluation = std::pow(trigger_count , 2.0);
-                Connect connect;
-                connect.frame_side_index = frame_point_index;
-                connect.polygon_side_index = polygon_point_index;
-                connect.frame_point_index = frame_point_index;
-                connect.polygon_point_index = polygon_point_index;
-                vector.push_back(std::pair<double , Connect>(evaluation , connect));
+                if(angle_agreement != -1){
+                    double evaluation;
+                    if(angle_agreement == 1){
+                        evaluation = std::pow(trigger_count + 0.5 , 2.0);
+                    }else{
+                        evaluation = std::pow(trigger_count , 2.0);
+                    }
+                    Connect connect;
+                    connect.frame_side_index = frame_point_index;
+                    connect.polygon_side_index = polygon_point_index;
+                    connect.frame_point_index = frame_point_index;
+                    connect.polygon_point_index = polygon_point_index;
+                    vector.push_back(std::pair<double , Connect>(evaluation , connect));
+                }
             //角が同じだったとき
             }else if((!length_agreement) && (angle_agreement == 1)){
                 double evaluation = 1;
