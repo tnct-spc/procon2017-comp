@@ -7,7 +7,7 @@ PolygonConnector::PolygonConnector()
 
 }
 
-std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> PolygonConnector::connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter)
+std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> PolygonConnector::connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter)
 //フレームにピースをはめる関数
 //回転関数により、ピースを原点を中心に回転させたとき、全ての点が整数値の座標を持つようなピースを抽出する。
 //ピースとフレームの重なるべき辺において、接すべき点からもう一方の点への角度を複素数平面上で考え、
@@ -15,6 +15,7 @@ std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> P
 //角度が合致していた場合、ピースがフレームに重なるように、ピースを移動する。
 //ピースがフレームからはみ出してないか調べるため、ピースとフレームを足し合わせたものと、元々のフレームが同じ形かを調べる。
 //はみ出していなければ、フレームからピースを引いたものが、フレームにピースをはめた後のフレームとなる。
+
 {
     //ピースとフレームの重なるべき辺において、接すべき点からもう一方の点への角度を複素数平面上で考える
     int frame_index1 = connecter.frame_point_index; //フレームの接すべき点
@@ -29,7 +30,9 @@ std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> P
         piece_index2 = (piece_index1 != 0) ? piece_index1 - 1 : piece.getSize() - 1;
     }
 
-    std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> out_empty;
+    std::vector<procon::NeoExpandedPolygon> empty1;
+    procon::NeoExpandedPolygon empty2;
+    std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> out_empty = std::make_tuple(empty1, empty2, false);
     polygon_i frame_polygon = frame.getPolygon();
     polygon_i piece_polygon = piece.getPolygon();
     std::vector<polygon_i> frame_out_polygons, union_polygons;
@@ -38,9 +41,10 @@ std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> P
     point_i frame_point2 = frame_points.at(frame_index2);
     complex_d frame_complex(static_cast<double> (frame_point2.x() - frame_point1.x()), static_cast<double> (frame_point2.y() - frame_point1.y()));
 
-    polygon_i piece_out_polygon = (this -> rotate(piece_polygon, frame_complex, piece_index1, piece_index2));
+    std::pair<polygon_i, bool> rotate_out = (this -> rotate(piece_polygon, frame_complex, piece_index1, piece_index2));
+    if(rotate_out.second) return out_empty;
+    polygon_i piece_out_polygon = rotate_out.first;
     std::vector<point_i> piece_out_points = piece_out_polygon.outer();
-    if(piece_out_points.empty()) return out_empty;
     point_i piece_out_point1 = piece_out_points.at(piece_index1);
 
     procon::NeoExpandedPolygon piece_out;
@@ -60,19 +64,19 @@ std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> P
             frames_out.push_back(frame_out);
         }
 
-        std::pair<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon> out = std::make_pair(frames_out, piece_out);
+        std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> out = std::make_tuple(frames_out, piece_out, true);
         return out;
     }
     return out_empty;
 }
 
-polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, int first_index, int second_index)
+std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, int first_index, int second_index)
 {
     // p = past, poss = possibility
 
     int point = 0, a, ap, b, bp, n;
     std::vector<complex_d> poss_anglesp;
-    polygon_i polygon, polygon_empty;
+    polygon_i polygon;
     std::vector<point_i> points, pointsp, points_true;
     std::vector<std::vector<point_i> > points_possiesp;
 
@@ -163,11 +167,17 @@ polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, 
         points_possies.clear();
     };
 
-    auto check_return = [&first_index, &second_index, &after_angle](std::vector<point_i> points)
+    auto check_return = [&first_index, &second_index, &after_angle, &polygon](std::vector<point_i> points)
     {
         point_i first_point = points.at(first_index), second_point = points.at(second_index);
         complex_d before_angle(static_cast<double> (second_point.x() - first_point.x()), static_cast<double> (second_point.y() - first_point.y()));
-        return (before_angle == after_angle) ? true : false;
+        if(before_angle == after_angle) {
+            for(point_i point : points) {
+                std::vector<point_i> &outer = polygon.outer();
+                outer.push_back(point);
+            }
+            return true;
+        } else return false;
     };
 
     for(int z = 1; z < 4; ++z) { // 絶対にグリッドに乗る3つ（初期polygonはいらない）
@@ -186,11 +196,8 @@ polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, 
         }
 
         if(check_return(points_true)) {
-            for(point_i point : points_true) {
-                std::vector<point_i> &outer = polygon.outer();
-                outer.push_back(point);
-            }
-            return polygon;
+            std::pair<polygon_i, bool> out = std::make_pair(polygon, true);
+            return out;
         }
     }
 
@@ -221,13 +228,11 @@ polygon_i PolygonConnector::rotate(polygon_i polygon_in, complex_d after_angle, 
 
     for(std::vector<point_i> points_possp : points_possiesp) {
         if(check_return(points_possp)) {
-            for(point_i point : points_possp) {
-                std::vector<point_i> &outer = polygon.outer();
-                outer.push_back(point);
-            }
-            return polygon;
+            std::pair<polygon_i, bool> out = std::make_pair(polygon, true);
+            return out;
         }
     }
 
-    return polygon_empty;
+    std::pair<polygon_i, bool> out = std::make_pair(polygon, false);
+    return out;
 }
