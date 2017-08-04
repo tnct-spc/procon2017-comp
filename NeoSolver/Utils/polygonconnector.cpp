@@ -10,14 +10,14 @@ PolygonConnector::PolygonConnector()
 std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> PolygonConnector::connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter)
 //フレームにピースをはめる関数
 //回転関数により、ピースを原点を中心に回転させたとき、全ての点が整数値の座標を持つようなピースを抽出する。
-//ピースとフレームの重なるべき辺において、接すべき点からもう一方の点への角度を複素数平面上で考え、
+//ピースとフレームの重なるべき辺において、接すべき点からもう一方の点への角度を考え、
 //抽出されたピースの角度とはめるフレームの角度が合致しているか、調べる。
 //角度が合致していた場合、ピースがフレームに重なるように、ピースを移動する。
 //ピースがフレームからはみ出してないか調べるため、ピースとフレームを足し合わせたものと、元々のフレームが同じ形かを調べる。
 //はみ出していなければ、フレームからピースを引いたものが、フレームにピースをはめた後のフレームとなる。
 
 {
-    //ピースとフレームの重なるべき辺において、接すべき点からもう一方の点への角度を複素数平面上で考える
+    //ピースとフレームの重なるべき辺において、接すべき点からもう一方の点への角度を考える
     int frame_index1 = connecter.frame_point_index; //フレームの接すべき点
     int piece_index1 = connecter.polygon_point_index; //ピースの接すべき点
 
@@ -194,7 +194,7 @@ std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, point_
         double y1 = second_point.y() - first_point.y();
         double x2 = after_angle.x();
         double y2 = after_angle.y();
-        if((y1 == 0) && (y2 == 0)) {
+        if(((y1 == 0) && (y2 == 0)) && (std::signbit(x1) == std::signbit(x2))) {
             for(point_i point : points) {
                 std::vector<point_i> &outer = polygon.outer();
                 outer.push_back(point);
