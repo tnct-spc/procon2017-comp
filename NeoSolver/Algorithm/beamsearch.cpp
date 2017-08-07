@@ -86,8 +86,9 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field, int n)
 {
     //OKならfalseを返す
     int piecesize;
-    int fieldsize;
-    //bg::num_points(field.getFrame(), fieldsize);
+    int fieldsize = field.getSize();
+    field.getSideAngle().at();
+    field.getIsPlaced();
     double hoge_angle;
     double min_angle = 360;
     for(auto const &p : field.getPieces()){
