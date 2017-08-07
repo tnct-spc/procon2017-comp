@@ -335,16 +335,15 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     field=input_field;
     if( !field.getPieces().empty() ){
         paintif = true;
+        polygon_list.clear();
+        std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
+        std::sort(pieces.begin(), pieces.end(), [](const procon::NeoExpandedPolygon& a, const procon::NeoExpandedPolygon& b)->bool{
+            return a.getId() < b.getId();
+        });
+        for(auto piece : pieces){
+            if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
+            std::cout << piece.getId() << std::endl;
+        }
         this->update();
-    }
-
-    polygon_list.clear();
-    std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
-    std::sort(pieces.begin(), pieces.end(), [](const procon::NeoExpandedPolygon& a, const procon::NeoExpandedPolygon& b)->bool{
-        return a.getId() < b.getId();
-    });
-    for(auto piece : pieces){
-        if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
-        std::cout << piece.getId() << std::endl;
     }
 }
