@@ -150,6 +150,7 @@ void BeamSearch::init()
 void BeamSearch::run(procon::NeoField field)
 {
     logger->info("beamsearch run");
+    dock->addAnswer(field);
 
     std::vector<procon::NeoField> state;
     state.push_back(field);
