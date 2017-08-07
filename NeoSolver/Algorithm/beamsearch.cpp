@@ -18,7 +18,7 @@ typedef std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedP
 
 BeamSearch::BeamSearch()
 {
-    logger = spdlog::get("beamsearch");
+    logger = spdlog::get("BeamSearch");
     dock = std::make_shared<NeoAnswerDock>();
     dock->show();
 }
