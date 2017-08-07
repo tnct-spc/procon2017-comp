@@ -34,10 +34,12 @@ public:
     void makeNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
     void evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
     bool checkCanPrune(procon::NeoField const& field);
+    std::vector<procon::NeoField> debug_field;
 
 private:
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;
+    std::shared_ptr<NeoAnswerDock> neo;
     unsigned int processor_num = 0;
 };
 

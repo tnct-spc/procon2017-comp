@@ -53,6 +53,14 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
             field_buf.setFrame(frames_buf);
 
             next_field.push_back(field_buf);
+        }else{
+            std::array<bool,50> is_placed = field_buf.getIsPlaced();
+            is_placed[eval.piece_index] = true;
+            field_buf.setIsPlaced(is_placed);
+
+            field_buf.setPiece(std::get<1>(connect_result));
+
+            debug_field.push_back(field_buf);
         }
     };
 
@@ -166,5 +174,11 @@ void BeamSearch::run(procon::NeoField field)
             dock->addAnswer(_field);
         }
         break;
+    }
+
+    neo = std::make_shared<NeoAnswerDock>();
+    neo->show();
+    for(const auto& f : this->debug_field){
+        neo->addAnswer(f);
     }
 }
