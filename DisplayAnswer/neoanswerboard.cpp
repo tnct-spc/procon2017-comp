@@ -245,7 +245,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     if(paintif){
         if(point_id == -1){
             point_id++;
-            red_id = point_id;   //stoped here  : SIGABRT
+            red_id = point_id;
             drawBeforePiece(point_id);
             drawRedProcessingLine();
             drawPieceId(point_id);
@@ -292,27 +292,29 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
-    int hoge = field.getPieces().size();
-    if(point_id > -1){
-        if(point_id < hoge-1){
-            paintif = true;
-            if(event->key() == Qt::Key_A){
-                selecter = true;
-                point_id++;
+    if( !field.getPieces().empty() ){
+        int hoge = field.getPieces().size();
+        if(point_id > -1){
+            if(point_id < hoge-1){
+                paintif = true;
+                if(event->key() == Qt::Key_A){
+                    selecter = true;
+                    point_id++;
+                }
+                if(event->key() == Qt::Key_S){
+                    selecter = true;
+                    point_id--;
+                }
+                if(event->key() == Qt::Key_L){
+                    selecter = false;
+                    point_id++;
+                }
+                if(event->key() == Qt::Key_K){
+                    selecter = false;
+                    point_id--;
+                }
+                this->update();
             }
-            if(event->key() == Qt::Key_S){
-                selecter = true;
-                point_id--;
-            }
-            if(event->key() == Qt::Key_L){
-                selecter = false;
-                point_id++;
-            }
-            if(event->key() == Qt::Key_K){
-                selecter = false;
-                point_id--;
-            }
-            this->update();
         }
     }
 }
