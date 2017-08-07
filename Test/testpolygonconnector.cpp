@@ -19,14 +19,15 @@ bool TestPolygonConnector::run()
     Connect connecter;
     int frame_side, piece_side, frame_point, piece_point;
     PolygonConnector polygon_connector;
+    int frame_size = polygon_frames.size();
+    int piece_size = polygon_pieces.size();
 
-
-    for(int i = 0; i < polygon_frames.size(); ++i) {
-        std::cout << std::endl << "frame---------------------------<< " << i << " >>---------------------------" << std::endl << std::endl;
+    for(int i = 0; i < frame_size; ++i) {
+        std::cout << std::endl << std::endl << "frame<< " << i << " >>----------------------------------------------------------------" << std::endl;
         polygon_i polygon_frame = polygon_frames.at(i);
 
-        for(int j = 0; j < polygon_pieces.size(); ++j) {
-            std::cout << "piece---------------------------<< " << j << " >>---------------------------" << std::endl << std::endl;
+        for(int j = 0; j < piece_size; ++j) {
+            std::cout << std::endl << "    piece<< " << j << " >>------------------------------------------------------------" << std::endl;
             polygon_i polygon_piece = polygon_pieces.at(j);
 
             frame.resetPolygonForce(polygon_frame);
@@ -73,19 +74,24 @@ bool TestPolygonConnector::run()
                         std::cout << "(" << point.x() << ", " << point.y() << "), ";
                     }
 
-                    std::cout << std::endl << std::endl;
+                    std::cout << std::endl;
 
-                    NeoPolygonViewer::getInstance().displayPolygon(poly, name + "(" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + ")", false);
+                    NeoPolygonViewer::getInstance().displayPolygon(poly, name + " (" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + ")", false);
                 };
 
+                int f = 1;
                 for(procon::NeoExpandedPolygon result_frame : result_frames) {
-                    out(result_frame, "frame");
+                    std::cout << "    ";
+                    out(result_frame, "frame" + std::to_string(f));
+                    ++f;
                 }
-                std::cout << std::endl;
+
+                std::cout << std::endl << "    ";
                 out(result_piese, "piese");
+
             } else std::cout << "false" << std::endl;
-            std::cout << "end" << std::endl;
         }
     }
+    std::cout << std::endl;
     return true;
 }

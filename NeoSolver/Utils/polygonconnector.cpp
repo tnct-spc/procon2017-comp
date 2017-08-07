@@ -50,7 +50,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
     std::vector<point_i> piece_out_points = piece_out_polygon.outer();
     point_i piece_out_point1 = piece_out_points.at(piece_index1);
 
-    procon::NeoExpandedPolygon piece_out;
+    procon::NeoExpandedPolygon piece_out(piece.getId());
     piece_out.resetPolygonForce(piece_out_polygon);
     piece_out.translatePolygon(frame_point1.x() - piece_out_point1.x(), frame_point1.y() - piece_out_point1.y());
     piece_out_polygon = piece_out.getPolygon();
