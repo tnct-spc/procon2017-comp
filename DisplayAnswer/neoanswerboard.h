@@ -58,7 +58,7 @@ private:
     int red_id;
     int blue_id;
     bool selecter;//true = left, false = right
-    bool paintif;
+    bool paintif = false;
 
 protected:
     void beforePolygon();

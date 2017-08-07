@@ -245,7 +245,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     if(paintif){
         if(point_id == -1){
             point_id++;
-            red_id = point_id;
+            red_id = point_id;   //stoped here  : SIGABRT
             drawBeforePiece(point_id);
             drawRedProcessingLine();
             drawPieceId(point_id);
@@ -255,6 +255,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             drawBlueProcessingLine();
             drawPieceId(point_id);
         }
+
         if(point_id > -1){
             if(selecter){
                 red_id = point_id;
@@ -330,8 +331,10 @@ QPointF NeoAnswerBoard::getPiecePosition(point_i point){//point_iを下画面の
 
 void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     field=input_field;
-    paintif = true;
-    this->update();
+    if( !field.getPieces().empty() ){
+        paintif = true;
+        this->update();
+    }
 
     polygon_list.clear();
     std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
