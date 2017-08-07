@@ -63,7 +63,7 @@ bool TestPolygonConnector::run()
                 std::vector<procon::NeoExpandedPolygon> result_frames = std::get<0>(result);
                 procon::NeoExpandedPolygon result_piese = std::get<1>(result);
 
-                auto out = [](procon::NeoExpandedPolygon expoly, std::string name)
+                auto out = [&i, &j](procon::NeoExpandedPolygon expoly, std::string name)
                 {
                     polygon_i poly = expoly.getPolygon();
 
@@ -74,6 +74,8 @@ bool TestPolygonConnector::run()
                     }
 
                     std::cout << std::endl << std::endl;
+
+                    NeoPolygonViewer::getInstance().displayPolygon(poly, name + "(" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + ")", false);
                 };
 
                 for(procon::NeoExpandedPolygon result_frame : result_frames) {
