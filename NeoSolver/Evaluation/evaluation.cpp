@@ -8,15 +8,22 @@ Evaluation::Evaluation()
 }
 
 std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
-{    
-    double const angle_weight = 0.9;
-    double const length_weight = 1.1;
-
-    //NEPの要素数をマイナス1するだけのらむだ
-    auto minus_one = [](procon::NeoExpandedPolygon nep , int index){
-        index =index - 1;
-        if(index == -1) index = nep.getSize() - 1;
+{
+    auto calculation_nep = [](const procon::NeoExpandedPolygon &nep , int index , int cal){
+        index = index % nep.getSize();
+        index = index + cal;
+        if(index < 0){
+            index = index % nep.getSize();
+            index = nep.getSize() + index;
+        }
+        if(index >= nep.getSize()) index = index % nep.getSize();
         return index;
+    };
+
+    auto check_is_there = [](const std::vector<std::pair<int , int>> &vector , int frame_point_index , int polygon_point_index){
+        for(std::pair<int , int> i :vector){
+            if((i.first == frame_point_index) && (i.second == polygon_point_index)) return true;
+        }
     };
 
     //角の状態を返す
@@ -33,85 +40,56 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
     };
 
     //辺の状態を返す
-    auto length = [&frame , &polygon](int frame_side_index , int polygon_side_index){
+    auto length_status = [&frame , &polygon](int frame_side_index , int polygon_side_index){
         double frame_length = frame.getSideLength().at(frame_side_index);
         double polygon_length = polygon.getSideLength().at(polygon_side_index);
         if(frame_length == polygon_length) return 1;
         else return 0;
     };
 
-    //隙間があるとき評価値の集まりを返す
-    auto gap_evaluation = [&length_weight , &minus_one , &length , &frame , &polygon]
-            (int frame_point_index , int polygon_point_index){
-
-        int frame_side_index1 = minus_one(frame , frame_point_index);
-        int frame_side_index2 = frame_point_index;
-        int polygon_side_index1 = minus_one(polygon , polygon_point_index);
-        int polygon_side_index2 = polygon_point_index;
-
-        //それぞれ評価値 , frame_side_index , polygon_side_index , frame_point_index , polygon_point_index
-        std::vector<std::pair<double , Connect>> vector;
-        double evaluation = length(frame_side_index1 , polygon_side_index1) * length_weight;
-        Connect connect;
-        connect.frame_side_index = frame_side_index1;
-        connect.polygon_side_index = polygon_side_index1;
-        connect.frame_point_index = frame_point_index;
-        connect.polygon_point_index = polygon_point_index;
-
-        vector.push_back(std::pair<double , Connect>(evaluation , connect));
-
-        evaluation = length(frame_side_index2 , polygon_side_index2) * length_weight;
-        connect.frame_side_index = frame_side_index2;
-        connect.polygon_side_index = polygon_side_index2;
-        connect.frame_point_index = frame_point_index;
-        connect.polygon_point_index = polygon_point_index;
-
-        vector.push_back(std::pair<double , Connect>(evaluation , connect));
-        return vector;
-    };
-
-    //角があったときとありえんときの処理
-    auto default_evaluation = [&angle_weight , &length_weight , &minus_one , &length , &frame , &polygon]
-            (int angle_evaluation , int frame_point_index , int polygon_point_index){
-        int frame_side_index = minus_one(frame , frame_point_index);
-        int polygon_side_index = minus_one(polygon , polygon_point_index);
-
-        int length_evaluation;
-        double evaluation;
-        if(angle_evaluation == -1){
-            //ありえんときの評価は問答無用で-1
-            evaluation = -1;
-        }else{
-            //角がぴったりだったときの辺の長さの評価
-            length_evaluation =
-                    length(frame_side_index , polygon_side_index)
-                    +
-                    length(frame_point_index , polygon_point_index);
-                    evaluation = angle_evaluation * angle_weight + length_evaluation * length_weight;
-        }
-
-        Connect connect;
-        connect.frame_side_index = frame_side_index;
-        connect.polygon_side_index = polygon_side_index;
-        connect.frame_point_index = frame_point_index;
-        connect.polygon_point_index = polygon_point_index;
-
-        return std::pair<double , Connect>(evaluation , connect);
-    };
-
-    int frame_point_index , polygon_point_index;
     std::vector<std::pair<double , Connect>> vector;
-    for(frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
-        for(polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
-            int angle_evaluation = angle_status(frame_point_index , polygon_point_index);
-            if (angle_evaluation == 0){
-                //角に隙間があるとき
-                std::vector<std::pair<double , Connect>> v = gap_evaluation(frame_point_index , polygon_point_index);
-                vector.insert(vector.end() , v.begin() , v.end());
-            } else {
-                //フレームとポリゴンの角がちょうどあっているとき
-                //ポリゴンの角がフレームの角より大きくてありえんとき
-                vector.push_back(default_evaluation(angle_evaluation , frame_point_index , polygon_point_index));
+    std::vector<std::pair<int , int>> checker;
+    for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
+        for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
+
+            bool length_agreement = length_status(frame_point_index , polygon_point_index);
+            bool check_bool = check_is_there(checker , frame_point_index , polygon_point_index);
+            int angle_agreement = angle_status(frame_point_index , polygon_point_index);
+            //辺が同じだったとき
+            if(length_agreement && (angle_agreement == 0)){
+                int trigger_count = 1;
+                angle_agreement = angle_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
+                length_agreement = length_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
+                checker.push_back(std::pair<int, int>(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count)));
+                while(angle_agreement && length_agreement){
+                    trigger_count++;
+                    checker.push_back(std::pair<int, int>(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count)));
+                    angle_agreement = angle_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
+                    length_agreement = length_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
+                }
+                if(angle_agreement != -1){
+                    double evaluation;
+                    if(angle_agreement == 1){
+                        evaluation = std::pow(trigger_count + 0.5 , 2.0);
+                    }else{
+                        evaluation = std::pow(trigger_count , 2.0);
+                    }
+                    Connect connect;
+                    connect.frame_side_index = frame_point_index;
+                    connect.polygon_side_index = polygon_point_index;
+                    connect.frame_point_index = frame_point_index;
+                    connect.polygon_point_index = polygon_point_index;
+                    vector.push_back(std::pair<double , Connect>(evaluation , connect));
+                }
+            //角が同じだったとき
+            }else if((!check_bool) && (angle_agreement == 1)){
+                double evaluation = 1;
+                Connect connect;
+                connect.frame_side_index = calculation_nep(frame , frame_point_index , -1);
+                connect.polygon_side_index = calculation_nep(polygon , polygon_point_index , -1);
+                connect.frame_point_index = frame_point_index;
+                connect.polygon_point_index = polygon_point_index;
+                vector.push_back((std::pair<double , Connect>(evaluation , connect)));
             }
         }
     }
