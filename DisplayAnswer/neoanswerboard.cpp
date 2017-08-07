@@ -249,11 +249,13 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             drawBeforePiece(point_id);
             drawRedProcessingLine();
             drawPieceId(point_id);
-            point_id++;
-            blue_id = point_id;
-            drawBeforePiece(point_id);
-            drawBlueProcessingLine();
-            drawPieceId(point_id);
+            if(field.getPiecesSize() > 2){
+                point_id++;
+                blue_id = point_id;
+                drawBeforePiece(point_id);
+                drawBlueProcessingLine();
+                drawPieceId(point_id);
+            }
         }
 
         if(point_id > -1){
