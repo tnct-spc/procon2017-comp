@@ -41,7 +41,7 @@
         <number>0</number>
        </property>
        <property name="spacing">
-        <number>4</number>
+        <number>3</number>
        </property>
       </layout>
      </item>
