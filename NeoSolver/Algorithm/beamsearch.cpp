@@ -24,19 +24,19 @@ void connect_polygon(polygon_i& frame, polygon_i& connecting_polygon,Connect con
 
 	//まずくっつくべきpolygon点を原点に持ってきて回転の中心にする
     boost::geometry::strategy::transform::translate_transformer<int,2,2> transform_connect_point_to_origin(
-    	-connecting_polygon.outer()[connection.polygon_point_num].x(),
-        -connecting_polygon.outer()[connection.polygon_point_num].y()
+        -connecting_polygon.outer()[connection.polygon_point_index].x(),
+        -connecting_polygon.outer()[connection.polygon_point_index].y()
     );
     polygon_i result;
     boost::geometry::transform(connecting_polygon,result,transform_connect_point_to_origin);
     
     std::pair<int,int> piece_vec = std::make_pair(
-    	connecting_polygon.outer()[connection.polygon_side_num + 1].x() - connecting_polygon.outer()[connection.polygon_side_num].x(),
-        connecting_polygon.outer()[connection.polygon_side_num + 1].y() - connecting_polygon.outer()[connection.polygon_side_num].y()
+        connecting_polygon.outer()[connection.polygon_side_index + 1].x() - connecting_polygon.outer()[connection.polygon_side_index].x(),
+        connecting_polygon.outer()[connection.polygon_side_index + 1].y() - connecting_polygon.outer()[connection.polygon_side_index].y()
     );
     std::pair<int,int> frame_vec = std::make_pair(
-        frame.outer()[connection.frame_side_num + 1].x() - frame.outer()[connection.frame_side_num].x(),
-        frame.outer()[connection.frame_side_num + 1].y() - frame.outer()[connection.frame_side_num].y()
+        frame.outer()[connection.frame_side_index + 1].x() - frame.outer()[connection.frame_side_index].x(),
+        frame.outer()[connection.frame_side_index + 1].y() - frame.outer()[connection.frame_side_index].y()
     );
     
     double piece_angle = std::atan2(piece_vec.first,piece_vec.second);
@@ -56,8 +56,8 @@ void connect_polygon(polygon_i& frame, polygon_i& connecting_polygon,Connect con
     NeoPolygonViewer::getInstance().displayPolygon(result2,"jjsg",false);
     
     boost::geometry::strategy::transform::translate_transformer<int,2,2> transform_to_connect_point(
-    	frame.outer()[connection.frame_point_num].x(),
-        frame.outer()[connection.frame_point_num].y()
+        frame.outer()[connection.frame_point_index].x(),
+        frame.outer()[connection.frame_point_index].y()
     );
     polygon_i result3;
     boost::geometry::transform(result2,result3);
@@ -215,6 +215,7 @@ void BeamSearch::init()
 
 void BeamSearch::run(procon::NeoField field)
 {
+    /*
     logger->info("beamsearch run");
     dock->addAnswer(field);
 
@@ -237,9 +238,7 @@ void BeamSearch::run(procon::NeoField field)
     for(const auto& f : this->debug_field){
         neo->addAnswer(f);
     }
-
-
+    */
     test();
-
 }
 
