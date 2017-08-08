@@ -52,6 +52,12 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
     std::vector<std::pair<int , int>> passed_checker;
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
+
+            int angle_agreement = angle_status(frame_point_index , polygon_point_index);
+            if (angle_agreement == -1) continue;
+            bool length_agreement = length_status(frame_point_index , polygon_point_index);
+            bool passed = is_there_element(passed_checker , frame_point_index , polygon_point_index);
+
             Connect connect1;
             connect1.frame_side_index = calculation_nep(frame , frame_point_index , -1);
             connect1.polygon_side_index = calculation_nep(polygon , polygon_point_index , -1);
@@ -64,12 +70,8 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
             connect2.frame_point_index = frame_point_index;
             connect2.polygon_point_index = polygon_point_index;
 
-            bool length_agreement = length_status(frame_point_index , polygon_point_index);
-            int angle_agreement = angle_status(frame_point_index , polygon_point_index);
-            bool passed = is_there_element(passed_checker , frame_point_index , polygon_point_index);
-
             //辺が同じだったとき
-            if(length_agreement && (angle_agreement != -1)){
+            if(length_agreement){
                 //辺に沿って角の大きさや辺の長さが合わなくなるまでカウント
                 int trigger_count = 0;
                 do{
