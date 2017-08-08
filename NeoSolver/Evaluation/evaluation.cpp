@@ -87,8 +87,8 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
                     connect.polygon_point_index = polygon_point_index;
                     vector.push_back(std::pair<double , Connect>(evaluation , connect));
                 }
-            //角が同じだったとき
             }else if((!passed) && (angle_agreement == 1)){
+                //角が同じだったとき
                 double evaluation = 1;
                 Connect connect;
                 connect.frame_side_index = calculation_nep(frame , frame_point_index , -1);
@@ -96,6 +96,20 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
                 connect.frame_point_index = frame_point_index;
                 connect.polygon_point_index = polygon_point_index;
                 vector.push_back((std::pair<double , Connect>(evaluation , connect)));
+            }else if((!passed) && (angle_agreement == 0)){
+                //角に隙間があるとき
+                Connect connect;
+                connect.frame_side_index = calculation_nep(frame , frame_point_index , -1);
+                connect.polygon_side_index = calculation_nep(polygon , polygon_point_index , -1);
+                connect.frame_point_index = frame_point_index;
+                connect.polygon_point_index = polygon_point_index;
+                vector.push_back((std::pair<double , Connect>(0 , connect)));
+
+                connect.frame_side_index = frame_point_index;
+                connect.polygon_side_index = polygon_point_index;
+                connect.frame_point_index = frame_point_index;
+                connect.polygon_point_index = polygon_point_index;
+                vector.push_back((std::pair<double , Connect>(0 , connect)));
             }
         }
     }
