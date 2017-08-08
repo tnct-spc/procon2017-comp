@@ -59,13 +59,16 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
 
             length_agreement = length_status(calculated_frame_index , calculated_polygon_index);
             angle_agreement = angle_status(calculated_frame_index , calculated_polygon_index);
+
         }while(angle_agreement && length_agreement);
 
+        double snuglle_up;
         //行き着いた先がありえない角だったら排除
-        if(angle_agreement == -1) return 0;
+        if(angle_agreement == -1) return 0.0;
         //行き着いた先の角がぴったりだったら気持ちだけ(0.5)足してあげる
-        if(angle_agreement == 1) trigger_count + 0.5;
-        return trigger_count;
+        snuglle_up = trigger_count;
+        if(angle_agreement == 1) snuglle_up = trigger_count + 0.5;
+        return snuglle_up;
     };
 
     std::vector<std::pair<double , Connect>> vector;
@@ -91,11 +94,15 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
             connect2.frame_point_index = frame_point_index;
             connect2.polygon_point_index = polygon_point_index;
 
-            int snuggle_up = 0;
+            double snuggle_up = 0;
             //辺が同じだったとき
             if(length_agreement){
                 snuggle_up = snuggle_up_counter(frame_point_index , polygon_point_index);
-                for(int i = 1; i <= snuggle_up ; i ++) passed_checker.push_back(std::pair<int , int>(frame_point_index + i , polygon_point_index + i));
+                for(int i = 1; i <= snuggle_up ; i ++){
+                    int calculated_frame_index = calculation_nep(frame , frame_point_index , i);
+                    int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , i);
+                    passed_checker.push_back(std::pair<int , int>(calculated_frame_index , calculated_polygon_index));
+                }
             }
 
             if((!passed) && (angle_agreement == 1)){
