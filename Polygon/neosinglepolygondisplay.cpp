@@ -83,6 +83,12 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     painter.setPen(QPen(QColor("#00FFFF")));
     painter.drawPolygon(&polygon_points.front(),polygon_points.size());
 
+    int point_index = 0;
+    for(const auto& point : polygon_points){
+        painter.drawText(point,QString::number(point_index));
+        ++point_index;
+    }
+
     painter.setPen(QPen(QColor("#000000")));
     for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
         int x = current_col * grid_size + left_right_margin;
