@@ -75,6 +75,9 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
+    }else if(ui->ImageRecognitonTestCheckBox->isChecked()){
+        logger->info("Selected ImageRecognition");
+        imageRecognitonTest();
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 
@@ -125,8 +128,8 @@ void Kunugida::imageRecognitonTest()
 {
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
-    cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/piece3.png", 1);
+    cv::Mat nocframe = cv::imread("/home/spc/ダウンロード/real_frame.png", 1);
+    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece1.png", 1);
 
     ImageRecognition imrec;
     procon::Field PDATA = imrec.run(nocframe, nocpieces);

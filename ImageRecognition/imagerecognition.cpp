@@ -23,56 +23,30 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
     inst->show();
     */
 
-    //cv::namedWindow("piece",cv::WINDOW_NORMAL);
-    //cv::imshow("piece",raw_pieces_image);
-
     // 二値化,前処理.
-
-    cv::Mat frame_image = preprocessingFrame(raw_frame_image);
+    //cv::Mat frame_image = preprocessingFrame(raw_frame_image); // 入れ替え可
     //std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
 
     // ピースに分割
+    std::vector<cv::Mat> frame_image = dividePiece(raw_frame_image);
     std::vector<cv::Mat> pieces_images = dividePiece(raw_pieces_image);
-    //std::vector<cv::Mat> frame_image = dividePiece(raw_frame_image);
 
     /*
     for (unsigned int i = 0; i < pieces_images.size(); i++) {
         cv::namedWindow(std::to_string(i+1));
-        cv::imshow(std::to_string(i+1),pieces_images[i]);
+        cv::imshow(std::to_string(i+3),pieces_images[i]);
     }
     */
 
-    // 線分検出
-    std::vector<std::vector<cv::Vec4f>> lines;
-    //lines.push_back(houghLine(frame_image[0]));
-    for (unsigned int i = 1; i < pieces_images.size(); i++) {
-        //lines.push_back(houghLine(pieces_images[i]));
-    }
-
+    // つなげてるだけ
     // ピースはひとつひとつの画像に分ける
     std::vector<cv::Mat> images;
-    images.push_back(frame_image);
+    for(cv::Mat& piece : frame_image) images.push_back(piece);
     for(cv::Mat& piece : pieces_images) images.push_back(piece);
 
     // 線分検出
     std::vector<std::vector<cv::Vec4f>> pieces_lines = LineDetection(images);
     //std::copy(lines.begin(), lines.end(), std::back_inserter(pieces_lines));
-
-    /*
-    cv::Vec4i pt;
-    cv::Mat line_image = raw_pieces_pic.clone();
-    int color = 100;
-    for (auto it = pieces_lines[20].begin(); it != pieces_lines[20].end(); ++it) {
-        pt = *it;
-        cv::line(line_image, cv::Point(pt[0], pt[1]), cv::Point(pt[2], pt[3]),color, 5, CV_AA);
-        color += 10;
-    }
-    */
-
-    //cv::namedWindow("Line",cv::WINDOW_NORMAL);
-    //cv::imshow("Line",line_image);
-
-    //cv::waitKey(100000);
 
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
@@ -83,6 +57,7 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
     }
 
     // fieldクラスのデータに変換
+    // 色々変更しなきゃいけないかも
     procon::Field field = makeField(polygons);
 
     return std::move(field);
@@ -580,7 +555,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
         if (frame_flag == true){
             {
-                //謎の長さtoセンチメートル
+                //謎の長さtoセンチメートル→ミリメートル
                 //scaleを頑張って測る
                 //コードが最高にキモい
                 const cv::Vec4f start_line = piece_lines.at(0);
@@ -595,7 +570,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
                     sum += calcDistance(line[0],line[1],line[2],line[3]);
                     if (line == end_line) break;    //キモい
                 }
-                scale = 30 * 4 / sum;
+                scale = (210.0 * 2 + 297.0 * 2) / sum; // まわりの実際の長さ/計算上の合計？　変更
             }
 
             std::vector<std::vector<cv::Vec4f>> rings;
@@ -612,7 +587,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
                 }
 
                 //許容幅20mm(要検証)
-                constexpr double weight_threshold = 2;
+                constexpr double weight_threshold = 20;
 
                 if (distance > weight_threshold) {
                     rings.push_back(ring);
@@ -844,7 +819,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
         for (int x = 0; x < width; x++) {
             int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
-            if ((h > 0 && h < 50) && s > 90) {
+            if ((h > 0 && h < 50) && s > 90) { // 調節
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -862,6 +837,7 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
     int width = src_image.cols;
     int height = src_image.rows;
 
+    // ぼかし（ノイズ削減）
     cv::GaussianBlur(src_image, src_image, cv::Size(5,5), 0);
 
     // 2値化
@@ -875,12 +851,12 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 
     // ノイズの除去＆分割
     std::vector<cv::Mat> pieces_images;
-    for (int i = 0; i < pieces_num; i++) {
+    for (int i = 1; i < pieces_num; i++) {
 
         int *param = stats.ptr<int>(i);
 
         // 面積の小さいものは省く
-        if (param[cv::ConnectedComponentsTypes::CC_STAT_AREA] > 10000) {
+        if (param[cv::ConnectedComponentsTypes::CC_STAT_AREA] > 10000) { // 調節
 
             // 各ピースごとに移し替える
             cv::Mat piece_image(cv::Size(width, height), CV_8UC1);
@@ -894,16 +870,10 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
                     }
                 }
             }
+
             pieces_images.push_back(piece_image);
         }
     }
-
-    /*
-    for (int i=0; i<10; i++) {
-        cv::namedWindow(std::to_string(i+1));
-        cv::imshow(std::to_string(i+1), pieces_images[i]);
-    }
-    */
 
     return pieces_images;
 }
