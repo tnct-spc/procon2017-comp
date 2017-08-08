@@ -383,7 +383,7 @@ void ProbMaker::resize(){
     bool check = true;
     while(check){
         int polygon_num = 0;
-        for(auto& polygon : print_polygons){
+        for(auto& polygon : print_polygons){//面積が800以上のピースが複数あっても一度しか処理されてないです        面積の問題が解決したらそこも直したい
 
             if(bg::area(polygon) > 800){
                 //ランダムに線を引く
@@ -393,27 +393,44 @@ void ProbMaker::resize(){
                     bool redo = false;//trueならやり直し
                     std::vector<int> point_vec;//y(x)座標を格納する
                     std::vector<int> line_vec;//接触したpolygonの辺の番号を格納する
-                    int begin_line,end_line,begin_point,end_point;
+                    int begin_line = 100;
+                    int end_line = 100;
+                    int begin_point = 100;
+                    int end_point = 100;
+
                     bool x_or_y = true;// retRnd(2);//trueならy軸方向
-                     int line =(x_or_y
-                                ? 1 + retRnd(100)
-                                : 1 + retRnd(64)
-                               );
+                    int line =(x_or_y
+                               ? 1 + retRnd(100)
+                               : 1 + retRnd(64)
+                              );
 
 
-                     if(x_or_y){
+                    if(x_or_y){
                         for(int linenum = 0;linenum < print_polygons.size() - 1;linenum++){//polygonの辺の番号
                             bg::model::linestring<point_i> edge_line{polygon.outer().at(linenum),polygon.outer().at(linenum+1)};//polygonのlinenum番目の辺
+                            bool before = false;//一つ前のy座標の地点が辺と接触していたかを記憶する関数
                             for(int y=0;y<65;++y){
-                                if(bg::intersects(edge_line, point_i(line,y) )){
-                                    if(point_vec.size()!=0){
-                                        if(point_vec[point_vec.size()-1] == y-1 && line_vec[line_vec.size()-1] == linenum){//同じ辺に連続で判定があったなら
-                                            redo = true;//ここ失敗してたらlineの乱数変えるところからやり直し
+                                bool checkline = true;
+                                for(auto line : line_vec){
+                                    if(linenum >= line -1 && linenum <= line+1 )checkline = false;
+                                }
+
+                                if(bg::intersects(edge_line, point_i(line,y)) && checkline){
+                                    if(point_vec.size()==0){
+                                        point_vec.push_back(y);
+                                        line_vec.push_back(linenum);
+                                    }else if(before == false){
+                                        bool put = true;
+                                        for(auto point : point_vec){
+                                            if(point==y)put=false;
+                                        }
+                                        if(put){
+                                            point_vec.push_back(y);
+                                            line_vec.push_back(linenum);
                                         }
                                     }
-                                    point_vec.push_back(y);
-                                    line_vec.push_back(linenum);
-                                }
+                                    before = true;
+                                }else before = false;
                             }
                         }
 
@@ -421,25 +438,13 @@ void ProbMaker::resize(){
                             redo = true;//ここ失敗してたらlineの乱数変えるところからやり直し
 
                         }
-                    if(!redo){
-                        if(point_vec.size() == 2){
-                            begin_line = line_vec[0];
-                            end_line = line_vec[1];
-                            begin_point = point_vec[0];
-                            end_point = point_vec[1];
-                        }else{
-                            for(int linenum = 0;linenum < point_vec.size() - 1;linenum++){//vectorの要素のうち隣接する二つを取り出す
-                                if(point_vec[linenum] - point_vec[linenum+1] > 2){//y座標の差が短すぎると判定ができないのでやり直しになる
-                                     bg::model::linestring<point_i> check_line{point_i(line,point_vec[linenum] + 1) , point_i(line,point_vec[linenum+1] - 1)};
-                                     if(bg::within(check_line,polygon)){//ちゃんと図形内部に線が引けるなら
-                                         begin_line = line_vec[linenum];
-                                         end_line = line_vec[linenum+1];
-                                         begin_point = point_vec[linenum];
-                                         end_point = point_vec[linenum+1];// そもそもここが呼び出されてない
-                                     }
-                                }
-                            }
-                        }
+                    if(!redo){//redoがfalseなら
+
+                        int linenum = retRnd(point_vec.size() / 2);//分割する線をランダムで指定する
+                        begin_line = line_vec[linenum * 2];
+                        end_line = line_vec[linenum * 2 + 1];
+                        begin_point = point_vec[linenum * 2];
+                        end_point = point_vec[linenum * 2 + 1];
 
 
                     //begin_lineがend_lineより大きい場合の処理を考える
@@ -448,25 +453,20 @@ void ProbMaker::resize(){
                          tes = begin_line;
                          begin_line = end_line;
                          end_line = tes;
+                         tes = begin_point;
+                         begin_point = end_point;
+                         end_line = tes;
                      }
 
-                     for(auto vec : line_vec){
-                         std::cout << "line : " << vec << std::endl;
-                     }
-                     for(auto vec : point_vec){
-                         std::cout << "point : " << vec << std::endl;
-                     }
-
-                     std::cout << line_vec.size();//ちゃんとvecにpush_backできてない
-                     std::cout << point_vec.size();
-
-                     if(polygon.outer().size() < begin_line)std::cout << "begin error" << std::endl;
-                     if(polygon.outer().size() < end_line)std::cout << "errooooooooooooorrrrrrrrrrrrrrrrrrrrrrrrrrr" << std::endl;
+                     std::cout << "linenum =" << linenum;
+                     std::cout << "pvecsize = " <<point_vec.size();
+                     std::cout << "beginline =" << begin_line;
+                     std::cout << "endline = "<< end_line;
 
                      polygon_i polygon1,polygon2;//分割先の複数のpolygonをつくる
-                     polygon1.outer().push_back(point_i(line,begin_point));
+                     polygon1.outer().push_back(point_i(line,begin_point));                 //areaが0のピースが存在する→ここの部分で正常に図形がかけてないのでは？
                      for(int pointnum=begin_line+1;pointnum<end_line+1;pointnum++){
-                        polygon1.outer().push_back(polygon.outer().at(pointnum));
+                         polygon1.outer().push_back(polygon.outer().at(pointnum));
                      }
                      polygon1.outer().push_back(point_i(line,end_point));
                      polygon1.outer().push_back(point_i(line,begin_point));
@@ -474,71 +474,35 @@ void ProbMaker::resize(){
                      polygon2.outer().push_back(point_i(line,begin_point));
                      polygon2.outer().push_back(point_i(line,end_point));
                      for(int pointnum=end_line+1;pointnum<polygon.outer().size()-1;pointnum++){
-                        polygon2.outer().push_back(polygon.outer().at(pointnum));
+                         polygon2.outer().push_back(polygon.outer().at(pointnum));
                      }
                      for(int pointnum=0;pointnum<begin_line+1;pointnum++){
-                        polygon2.outer().push_back(polygon.outer().at(pointnum));
+                         polygon2.outer().push_back(polygon.outer().at(pointnum));
                      }
                      polygon2.outer().push_back(point_i(line,begin_point));
 
-                     if(bg::area(polygon1) > 300 && bg::area(polygon2) > 300){
+                     bg::correct(polygon1);
+                     bg::correct(polygon2);
+                     std::cout << "linex : " << line << "total area : " << bg::area(polygon) << "  p1 area : " << bg::area(polygon1) << "  p2 area : " << bg::area(polygon2) << std::endl;
+                     if(bg::area(polygon1) > 300 && bg::area(polygon2) > 300){      //正常に図形が書ければここもよくなるかもしれない
                         print_polygons.erase(print_polygons.begin()+polygon_num);
-                        bg::correct(polygon1);
-                        bg::correct(polygon2);
                         print_polygons.push_back(polygon1);
                         print_polygons.push_back(polygon2);
                         flag = true;
                      }
 
-                     }
-                     /*
-                     x座標を適当に設定
-                     図形とそのy座標との交点(二つ)を求める
-                      for(lineの番号)
-                       for(y座標)
-                        lineと(ランダムで出したx,forで出したy)が接触していたらそのy座標をvectorに記憶
-                          接触していたならlineの番号もvectorに記憶
-                        記憶した座標が複数あったら問題(lineと平行になってる)なのでやり直させる
-                       ｝
-                      ｝
-                      座標を記憶したvectorの要素数が二つならその二点を線の始点、終点とする
-                      要素数が三つ以上なら
-                      for(2-3,3-4のような二点のy座標を出す){
-                       2-3なら2のように番号が少ない方のy座標+1と番号が大きい方のy座標+1でlineを出す
-                       lineがpolygonの内部にあるなら(within)その二点を線の始点、終点とする
-                      ｝
+                     }//redo
 
-                      polygon1とpolygon2を生成
-                      始点のlinenumをbegin,終点のlinenumをendとする
 
-                      polygon1.pushback(始点の座標)
-                      for(a=begin+1;a<end*1)
-                       polygon1.pushback(a)
-                      ｝
-                      polygon1.pushback(終点の座標)
-                      polygon1.pushback(始点の座標)
-
-                      polygon2.pushback(始点の座標)
-                      polygon2.pushback(終点の座標)
-                      for(b=end+1;b<polyのsize-1)
-                       polygon2.pushback(b)
-                      ｝
-                      for(b=0;b<begin+1)
-                       polygon2.pushback(b)
-                      ｝
-                      polygon2.pushback(始点の座標)
-                     */
-
-                     //まずはxを固定した縦線での分割のみ実装
-
-                }
-                }
-            }
+                }//x_or_y
+                }//flag
+            }//area>800
             ++polygon_num;
-        }
+        }//for rangeでpolygon
+
         check=false;
-        for(auto& polygon : print_polygons){
-            if(bg::area(polygon)>800)check=true;//一個でも面積が一定以上のピースがあるならcheckをtrueにしてやり直し
+        for(auto polygon : print_polygons){
+//            if(bg::area(polygon)>800)check=true;//一個でも面積が一定以上のピースがあるならcheckをtrueにしてやり直し    ここで引っかかってる気がするのん
         }
     }
 
