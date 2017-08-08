@@ -58,7 +58,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
             bool passed = is_there_element(passed_checker , frame_point_index , polygon_point_index);
 
             //辺が同じだったとき
-            if(length_agreement && (angle_agreement == 0)){
+            if(length_agreement && (angle_agreement != -1)){
                 //辺に沿って角の大きさや辺の長さが合わなくなるまでカウント
                 int trigger_count = 0;
                 do{
