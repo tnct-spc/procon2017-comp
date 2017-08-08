@@ -52,6 +52,17 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
     std::vector<std::pair<int , int>> passed_checker;
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
+            Connect connect1;
+            connect1.frame_side_index = calculation_nep(frame , frame_point_index , -1);
+            connect1.polygon_side_index = calculation_nep(polygon , polygon_point_index , -1);
+            connect1.frame_point_index = frame_point_index;
+            connect1.polygon_point_index = polygon_point_index;
+
+            Connect connect2;
+            connect2.frame_side_index = frame_point_index;
+            connect2.polygon_side_index = polygon_point_index;
+            connect2.frame_point_index = frame_point_index;
+            connect2.polygon_point_index = polygon_point_index;
 
             bool length_agreement = length_status(frame_point_index , polygon_point_index);
             int angle_agreement = angle_status(frame_point_index , polygon_point_index);
@@ -80,36 +91,15 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
                     }else{
                         evaluation = std::pow(trigger_count , 2.0);
                     }
-                    Connect connect;
-                    connect.frame_side_index = frame_point_index;
-                    connect.polygon_side_index = polygon_point_index;
-                    connect.frame_point_index = frame_point_index;
-                    connect.polygon_point_index = polygon_point_index;
-                    vector.push_back(std::pair<double , Connect>(evaluation , connect));
+                    vector.push_back(std::pair<double , Connect>(evaluation , connect2));
                 }
             }else if((!passed) && (angle_agreement == 1)){
                 //角が同じだったとき
-                double evaluation = 1;
-                Connect connect;
-                connect.frame_side_index = calculation_nep(frame , frame_point_index , -1);
-                connect.polygon_side_index = calculation_nep(polygon , polygon_point_index , -1);
-                connect.frame_point_index = frame_point_index;
-                connect.polygon_point_index = polygon_point_index;
-                vector.push_back((std::pair<double , Connect>(evaluation , connect)));
+                vector.push_back((std::pair<double , Connect>(1 , connect1)));
             }else if((!passed) && (angle_agreement == 0)){
                 //角に隙間があるとき
-                Connect connect;
-                connect.frame_side_index = calculation_nep(frame , frame_point_index , -1);
-                connect.polygon_side_index = calculation_nep(polygon , polygon_point_index , -1);
-                connect.frame_point_index = frame_point_index;
-                connect.polygon_point_index = polygon_point_index;
-                vector.push_back((std::pair<double , Connect>(0 , connect)));
-
-                connect.frame_side_index = frame_point_index;
-                connect.polygon_side_index = polygon_point_index;
-                connect.frame_point_index = frame_point_index;
-                connect.polygon_point_index = polygon_point_index;
-                vector.push_back((std::pair<double , Connect>(0 , connect)));
+                vector.push_back((std::pair<double , Connect>(0 , connect1)));
+                vector.push_back((std::pair<double , Connect>(0 , connect2)));
             }
         }
     }
