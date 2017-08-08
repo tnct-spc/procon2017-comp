@@ -47,6 +47,27 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
         else return 0;
     };
 
+    auto snuggle_up_counter = [&frame , &polygon , &calculation_nep , &angle_status , &length_status]
+            (int frame_point_index , int polygon_point_index){
+        //辺に沿って角の大きさや辺の長さが合わなくなるまでカウント
+        int length_agreement , angle_agreement;
+        int trigger_count = 0;
+        do{
+            trigger_count++;
+            int calculated_frame_index = calculation_nep(frame , frame_point_index , trigger_count);
+            int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , trigger_count);
+
+            length_agreement = length_status(calculated_frame_index , calculated_polygon_index);
+            angle_agreement = angle_status(calculated_frame_index , calculated_polygon_index);
+        }while(angle_agreement && length_agreement);
+
+        //行き着いた先がありえない角だったら排除
+        if(angle_agreement == -1) return 0;
+        //行き着いた先の角がぴったりだったら気持ちだけ(0.5)足してあげる
+        if(angle_agreement == 1) trigger_count + 0.5;
+        return trigger_count;
+    };
+
     std::vector<std::pair<double , Connect>> vector;
     //すでに通ったことのあるところのchecker
     std::vector<std::pair<int , int>> passed_checker;
@@ -70,38 +91,24 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
             connect2.frame_point_index = frame_point_index;
             connect2.polygon_point_index = polygon_point_index;
 
+            int snuggle_up = 0;
             //辺が同じだったとき
             if(length_agreement){
-                //辺に沿って角の大きさや辺の長さが合わなくなるまでカウント
-                int trigger_count = 0;
-                do{
-                    trigger_count++;
-                    int calculated_frame_index = calculation_nep(frame , frame_point_index , trigger_count);
-                    int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , trigger_count);
+                snuggle_up = snuggle_up_counter(frame_point_index , polygon_point_index);
+                for(int i = 1; i <= snuggle_up ; i ++) passed_checker.push_back(std::pair<int , int>(frame_point_index + i , polygon_point_index + i));
+            }
 
-                    length_agreement = length_status(calculated_frame_index , calculated_polygon_index);
-                    angle_agreement = angle_status(calculated_frame_index , calculated_polygon_index);
-                    passed_checker.push_back(std::pair<int, int>(calculated_frame_index , calculated_polygon_index));
-                }while(angle_agreement && length_agreement);
-
-                //行き着いた先がありえない角だったら排除
-                if(angle_agreement != -1){
-                    double evaluation;
-                    //行き着いた先の角がぴったりだったら気持ちだけ(0.5)足してあげる
-                    if(angle_agreement == 1){
-                        evaluation = std::pow(trigger_count + 0.5 , 2.0);
-                    }else{
-                        evaluation = std::pow(trigger_count , 2.0);
-                    }
-                    vector.push_back(std::pair<double , Connect>(evaluation , connect2));
-                }
-            }else if((!passed) && (angle_agreement == 1)){
+            if((!passed) && (angle_agreement == 1)){
                 //角が同じだったとき
-                vector.push_back((std::pair<double , Connect>(1 , connect1)));
-            }else if((!passed) && (angle_agreement == 0)){
+                double evaluation = 1;
+                if(snuggle_up > 0) evaluation = std::pow(snuggle_up , 2);
+                vector.push_back((std::pair<double , Connect>(evaluation , connect1)));
+            }else if(angle_agreement == 0){
                 //角に隙間があるとき
-                vector.push_back((std::pair<double , Connect>(0 , connect1)));
-                vector.push_back((std::pair<double , Connect>(0 , connect2)));
+                if(!passed) vector.push_back((std::pair<double , Connect>(0 , connect1)));
+                double evaluation = 0;
+                if(snuggle_up > 0) evaluation = std::pow(snuggle_up , 2);
+                vector.push_back((std::pair<double , Connect>(evaluation , connect2)));
             }
         }
     }
