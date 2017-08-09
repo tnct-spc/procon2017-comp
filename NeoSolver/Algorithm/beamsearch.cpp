@@ -82,18 +82,21 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 #endif
 }
 
-bool BeamSearch::checkCanPrune(const procon::NeoField &field, int n)
+bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 {
     //OKならfalseを返す
-    int piecesize;
-    int fieldsize = field.getSize();
-    field.getSideAngle().at();
-    field.getIsPlaced();
-    double hoge_angle;
-    double min_angle = 360;
-    for(auto const &p : field.getPieces()){
-        piecesize = p.getSize();
-        hoge_angle = p.getSideAngle().at(piecesize);
+    for(auto const &frame : field.getFrame()){
+        for(int angle = 0; angle < frame.getSize(); ++angle){
+
+        }
+    }
+    double hoge_piece_angle;
+    double min_piece_angle = 360;
+    for(auto const &piece : field.getPieces()){
+        for(int pieceangle = 0; pieceangle < piece.getSize(); ++pieceangle){
+            hoge_piece_angle = piece.getSideAngle().at(pieceangle);
+            if(hoge_piece_angle < min_piece_angle) min_piece_angle = hoge_piece_angle;
+        }
     }
 }
 
