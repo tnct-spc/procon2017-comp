@@ -47,6 +47,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
         else return 0;
     };
 
+    //どれだけ辺に寄り添ってきたか
     auto snuggle_up_counter = [&frame , &polygon , &calculation_nep , &angle_status , &length_status]
             (int frame_point_index , int polygon_point_index){
         //辺に沿って角の大きさや辺の長さが合わなくなるまでカウント
@@ -71,9 +72,46 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
         return snuglle_up;
     };
 
+    //同じ角度を持つものは何個あるか調べる
+    auto count_same_angle = [](const procon::NeoExpandedPolygon &polygon){
+        std::vector<std::pair<double , int>> map;
+        std::vector<double> vector = polygon.getSideAngle();
+        sort(vector.begin() , vector.end(), [](double angle1 , double angle2){ return angle1 < angle2; });
+
+        double before_angle = -1;
+        int count;
+        for(double i : vector){
+            if(i != before_angle){
+                count = 1;
+                map.push_back(std::pair<double , int>(i , count));
+            }else{
+                auto itr = map.end() - 1;
+                *itr = std::pair<double , int>(i , count);
+            }
+            count++;
+            before_angle = i;
+        }
+        return map;
+    };
+
+    //返すときに使うvector
     std::vector<std::pair<double , Connect>> vector;
     //すでに通ったことのあるところのchecker
     std::vector<std::pair<int , int>> passed_checker;
+    //同じ角度の角は何個あるか示すmap
+    std::vector<std::pair<double , int>> frame_same_angle = count_same_angle(frame);
+    std::vector<std::pair<double , int>> polygon_same_angle = count_same_angle(polygon);
+
+    //////////////////////////////////////////test
+
+    for(std::pair<double , int> i :frame_same_angle){
+        double degree = i.first * 180.0 / 3.141592653589793;
+        std::cout<< degree <<"ど"<<i.second<<"こ"<<std::endl;
+    }
+
+    ///////////////////////////////////////////test
+
+
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
 
