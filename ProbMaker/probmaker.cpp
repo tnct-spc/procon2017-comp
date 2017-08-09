@@ -133,9 +133,9 @@ void ProbMaker::angulated_graphic(){
 
     check_frame = frame;//すでにはめられたピースも含むpolygonを生成する
 
-    setInnerFrame();// 初期状態のFrameをInnerFrameに投入
+    setInnerFrame(frame);// 初期状態のFrameをInnerFrameに投入
     while(1){
-        createPiece(check_frame,true);
+        createPiece(check_frame);
         if(bg::area(check_frame) < 700 || print_polygons.size() > 48){
             //枠の残り部分をそのままピースとして出力する
             print_polygons.push_back(check_frame);
@@ -143,11 +143,11 @@ void ProbMaker::angulated_graphic(){
         }
     }
 
-    jointPiece();
+  //  jointPiece();
 
 
     //分割するなにがし
-    splitPiece();
+ //   splitPiece();
 
 
     for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
@@ -164,7 +164,8 @@ void ProbMaker::angulated_graphic(){
 void ProbMaker::splitPiece(){
     for(auto poly : print_polygons){
         if(bg::area(poly) > 800){
-            createPiece(poly,false);
+
+            createPiece(poly);
         }
     }
 
@@ -225,7 +226,7 @@ void ProbMaker::jointPiece(){
     }
 }
 
-void ProbMaker::setInnerFrame(){
+void ProbMaker::setInnerFrame(polygon_i frame){
     inner_frame.clear(); //中身をリセットしてからcheck_frameのデータを取得する
     inner_frame.outer().push_back(point_i(0,0));
     inner_frame.outer().push_back(point_i(101,0));
@@ -234,17 +235,18 @@ void ProbMaker::setInnerFrame(){
     inner_frame.outer().push_back(point_i(0,0));
     inner_frame.inners().push_back(polygon_i::ring_type());
     bg::correct(inner_frame);
-    for(auto point : check_frame.outer()){
+    for(auto point : frame.outer()){
        inner_frame.inners().back().push_back(point);
     }
 }
 
-void ProbMaker::createPiece(polygon_i argument_frame , bool isbeforepiece){//引数には枠、大きさ調整前のピースかを指定する
+void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠、大きさ調整前のピースかを指定する
     //ここから関数
     polygon_i poly;
 
     bool flag = false;
     int point_y,point_x;
+    setInnerFrame(argument_frame);
     while(!flag){
     point_x = 1 + retRnd(99);//ランダムでx座標を出す
     for(int closspointy=0;closspointy<66;closspointy++){//縦に引かれた線と枠の線の交点を出す
@@ -324,13 +326,8 @@ void ProbMaker::createPiece(polygon_i argument_frame , bool isbeforepiece){//引
     }
 
     if(point_pushback){
-        checkClossLine(poly , isbeforepiece);//ここでpolygonの始点と終点を補完する
-        if(isbeforepiece){
+            checkClossLine(poly , argument_frame);//ここでpolygonの始点と終点を補完する
             print_polygons.push_back(poly);
-            setInnerFrame();// frameをinnerframeに投入
-        }else{
-
-        }
     }
 
 }
@@ -339,14 +336,14 @@ void ProbMaker::createPiece(polygon_i argument_frame , bool isbeforepiece){//引
 
 
 
-void ProbMaker::checkClossLine(polygon_i& poly , bool change_check_frame){
+void ProbMaker::checkClossLine(polygon_i& poly , polygon_i& change_frame){//polyは渡された時点で線、change_frameはpolyに合わせて変更するpolygon
     int begin_line = -1;//変数名のせいでわかりづらいけど枠やピースの交点の線の番号を表している
     int end_line = -1;
     point_i polygon_begin = poly.outer().at(0);
     point_i polygon_end = poly.outer().at(bg::num_points(poly)-1);//polygonの始点と終点(他の枠やピースと繋がってる部分)
-    for(unsigned int linenum=0;linenum<bg::num_points(check_frame)-1;linenum++){
+    for(unsigned int linenum=0;linenum<bg::num_points(change_frame)-1;linenum++){
 
-        bg::model::linestring<point_i> edge_line{check_frame.outer().at(linenum),check_frame.outer().at(linenum+1)};
+        bg::model::linestring<point_i> edge_line{change_frame.outer().at(linenum),change_frame.outer().at(linenum+1)};
         if(bg::intersects(polygon_begin,edge_line))begin_line = linenum;//交点を見つけたら番号を記録
         if(bg::intersects(polygon_end,edge_line))end_line = linenum;
     }
@@ -356,23 +353,23 @@ void ProbMaker::checkClossLine(polygon_i& poly , bool change_check_frame){
     if(begin_line == end_line){//同じ線上にbeginとendがある場合
         pattern_one.outer().push_back(poly.outer().at(0));
 
-        poly.outer().push_back(check_frame.outer().at(end_line+1));
+        poly.outer().push_back(change_frame.outer().at(end_line+1));
         if(bg::intersects(poly)){
 
             for(int point_num = end_line;point_num > -1;point_num--){//すごい頭の悪い書き方してる
-                pattern_two.outer().push_back(check_frame.outer().at(point_num));
+                pattern_two.outer().push_back(change_frame.outer().at(point_num));
             }
-            for(int point_num = bg::num_points(check_frame) - 1;point_num > begin_line;point_num--){
-                pattern_two.outer().push_back(check_frame.outer().at(point_num));
+            for(int point_num = bg::num_points(change_frame) - 1;point_num > begin_line;point_num--){
+                pattern_two.outer().push_back(change_frame.outer().at(point_num));
             }
             pattern_two.outer().push_back(poly.outer().at(0));
 
         }else{
-            for(unsigned int point_num=end_line + 1;point_num<bg::num_points(check_frame);point_num++){
-                pattern_two.outer().push_back(check_frame.outer().at(point_num));
+            for(unsigned int point_num=end_line + 1;point_num<bg::num_points(change_frame);point_num++){
+                pattern_two.outer().push_back(change_frame.outer().at(point_num));
             }
             for(int point_num = 0;point_num < begin_line + 1;point_num++){
-                pattern_two.outer().push_back(check_frame.outer().at(point_num));
+                pattern_two.outer().push_back(change_frame.outer().at(point_num));
             }
             pattern_two.outer().push_back(poly.outer().at(0));
 
@@ -380,29 +377,29 @@ void ProbMaker::checkClossLine(polygon_i& poly , bool change_check_frame){
         poly.outer().pop_back();
     }else if(begin_line > end_line){
         for(int point_num = end_line + 1;point_num < begin_line + 1;point_num++){
-            pattern_one.outer().push_back(check_frame.outer().at(point_num));
+            pattern_one.outer().push_back(change_frame.outer().at(point_num));
         }
         pattern_one.outer().push_back(poly.outer().at(0));
 
         for(int point_num = end_line;point_num > -1;point_num--){
-            pattern_two.outer().push_back(check_frame.outer().at(point_num));
+            pattern_two.outer().push_back(change_frame.outer().at(point_num));
         }
-        for(int point_num = bg::num_points(check_frame)-1;point_num > begin_line;point_num--){
-            pattern_two.outer().push_back(check_frame.outer().at(point_num));
+        for(int point_num = bg::num_points(change_frame)-1;point_num > begin_line;point_num--){
+            pattern_two.outer().push_back(change_frame.outer().at(point_num));
         }
         pattern_two.outer().push_back(poly.outer().at(0));
 
     }else{
-        for(unsigned int point_num=end_line + 1;point_num<bg::num_points(check_frame);point_num++){
-            pattern_one.outer().push_back(check_frame.outer().at(point_num));
+        for(unsigned int point_num=end_line + 1;point_num<bg::num_points(change_frame);point_num++){
+            pattern_one.outer().push_back(change_frame.outer().at(point_num));
         }
         for(int point_num = 0;point_num < begin_line + 1;point_num++){
-            pattern_one.outer().push_back(check_frame.outer().at(point_num));
+            pattern_one.outer().push_back(change_frame.outer().at(point_num));
         }
         pattern_one.outer().push_back(poly.outer().at(0));
 
         for(int point_num = end_line;point_num > begin_line;point_num--){
-            pattern_two.outer().push_back(check_frame.outer().at(point_num));
+            pattern_two.outer().push_back(change_frame.outer().at(point_num));
         }
         pattern_two.outer().push_back(poly.outer().at(0));
 
@@ -414,31 +411,27 @@ void ProbMaker::checkClossLine(polygon_i& poly , bool change_check_frame){
     bg::correct(pattern_two);
     if(bg::area(pattern_one) < bg::area(pattern_two)) poly = pattern_one;//polyに結果を代入する
     else poly = pattern_two;
-    //ここからcheck_frameの加工
-    //intersectionで重複部分を取り出す
+    //ここからchange_frameの変更
     //differenceで異なる部分(重複していない部分)を取り出す
-    //それをcheck_frameに格納する
-   bg::correct(check_frame);
+    //それをchange_frameに格納する
+   bg::correct(change_frame);
 
    std::cout << " poly = " << bg::dsv(poly) << std::endl;
-   std::cout << "check_frame = " << bg::dsv(check_frame) << std::endl;
+   std::cout << "change_frame = " << bg::dsv(change_frame) << std::endl;
    std::cout << "inner_frame = " << bg::dsv(inner_frame) << std::endl;
 
-   if(change_check_frame){
 
     std::vector<polygon_i> differences;
-    bg::difference(check_frame,poly,differences);
+    bg::difference(change_frame,poly,differences);
     std::cout << "difference_size = " << differences.size() << std::endl;
-    check_frame.clear();
+    change_frame.clear();
     for(unsigned int count=0;count<differences.size();count++){
        std::vector<polygon_i> polygon;
        std::cout << " difference = " << bg::dsv(differences[count]) << std::endl;
-       bg::union_(check_frame,differences[count],polygon);
-       check_frame = polygon[0];
+       bg::union_(change_frame,differences[count],polygon);
+       change_frame = polygon[0];
     }
     std::cout << " check_frame = " << bg::dsv(check_frame) << std::endl;
-
-   }
 
 }
 
