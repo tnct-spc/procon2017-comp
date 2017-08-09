@@ -172,39 +172,20 @@ void ProbMaker::splitPiece(){
 
 void ProbMaker::jointPiece(){
 
-   /* bool flag = false;
-    while(!flag){//flagがtrueにならない限りループ
-        for(unsigned int poly_num=0;poly_num<print_polygons.size();++poly_num){
-            if(poly_num == print_polygons.size() - 1)flag = true;
-            if(bg::area(print_polygons[poly_num]) < 100){//面積が小さい場合
-                //隣接するpolygonを探す
-                for(unsigned int check_num=0;check_num<print_polygons.size();++check_num){
-                    if(bg::touches(print_polygons[poly_num] , print_polygons[check_num]) && poly_num!=check_num ){
-                        std::vector<polygon_i> union_poly;
-                        bg::union_(print_polygons[poly_num],print_polygons[check_num],union_poly);//結合
-
-                        if(!bg::num_interior_rings(union_poly[0]) && union_poly.size()==1){//innerが存在せず、unionが失敗してないなら
-                            print_polygons[poly_num] = union_poly[0];//結合した物を代入
-                            print_polygons.erase(print_polygons.begin() + check_num);//結合されたpolygonを削除
-                        }
-                        //innerが存在する場合は処理を行わないようにする
-                    }
-                    bg::unique(print_polygons[poly_num]);//線上の重なった点を削除(削除できてないので適当な関数を見つけて改善したい)
-                }
-                break;//forループを抜け出しまた最初から判定し始める
-            }
-        }
-    }*/
-    std::cout << "start joint mode" << std::endl;
+    std::cout << "start joint mode" << std::endl << std::endl;
     bool flag = false;
-    while(!flag){
+    while(!flag){//flagがtrueにならないっぽい
         bool check = false;
         int piece_cou = 0;//結合元のpieceの番号
         for(auto poly : print_polygons){
+            std::cout << bg::dsv(poly) << std::endl;//
+            std::cout << "area : " << bg::area(poly) << std::endl;
+
             if(check)break;
             int check_cou = 0;//結合先のpieceの番号
             for(auto check_poly : print_polygons){
-                if(bg::area(poly) < 100 && bg::touches(poly,check_poly) && piece_cou != check_cou){
+                if(bg::area(poly) < 100 && bg::intersects(poly,check_poly) && !bg::equals(poly,check_poly)){//ここのif文が真になってなさそう touchesの部分
+                    std::cout << "接触してる" << std::endl;
                     std::vector<polygon_i> union_poly;
                     bg::union_(poly,check_poly,union_poly);
                     if(!bg::num_interior_rings(union_poly[0]) && union_poly.size() == 1){
@@ -212,11 +193,12 @@ void ProbMaker::jointPiece(){
                         print_polygons.erase(print_polygons.begin() + check_cou);
                         check=true;
                         break;
-                    }
+                    }//合体事故は起こってなさそう
                 }
                 ++check_cou;
             }
             ++piece_cou;
+
         }
         flag = true;
         for(auto poly : print_polygons){
