@@ -5,6 +5,7 @@
 #include "Utils/polygonconnector.h"
 #include "Evaluation/evaluation.h"
 
+#include <math.h>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -85,7 +86,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 {
     //角について枝切りできるかできないか
-    auto about_angle = [](){
+    auto about_angle = [&field](){
         //OKならfalseを返す
         for(auto const &frame : field.getFrame()){
             for(int angle = 0; angle < frame.getSize(); ++angle){
@@ -100,12 +101,56 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                 if(hoge_piece_angle < min_piece_angle) min_piece_angle = hoge_piece_angle;
             }
         }
+        return true;
     };
     //辺について枝きりできるかできないか
-    auto about_side = [](){
+    auto about_side = [&field](){
+        //要素数の足し算、引き算
+        auto calculation_nep = [](const procon::NeoExpandedPolygon &nep , int index , int cal){
+            index = index + cal;
+            index = index % nep.getSize();
+            if(index < 0){
+                index = nep.getSize() + index;
+            }
+            return index;
+        };
 
+        //frameの辺を大きい順にならべる
+        std::vector<std::tuple<double , double , double>> frame_sides;
+        for(procon::NeoExpandedPolygon frame : field.getFrame()){
+            for(int i = 0 ;i < frame.getSize() ; i++){
+                frame_sides.push_back(std::tuple<double , double , double>(
+                                          frame.getSideLength().at(i),
+                                          frame.getSideAngle().at(i),
+                                          frame.getSideAngle().at(calculation_nep(frame,i,1))
+                                          )
+                                 );
+            }
+        }
+        sort(frame_sides.begin() , frame_sides.end() , [](auto a , auto b){ return (std::get<0>(a) > std::get<0>(b));});
+
+        //piecesの辺を小さい順にならべる
+        std::vector<std::tuple<double , double , double>> pieces_sides;
+        for(int i = 0 ; i < field.getElementaryPieces().size() ; i++){
+            if(field.getIsPlaced().at(i)) continue;
+            procon::NeoExpandedPolygon piece = field.getElementaryPieces().at(i);
+            for(int i = 0 ; i < piece.getSize() ; i++){
+                pieces_sides.push_back(std::tuple<double , double , double>(
+                                           piece.getSideLength().at(i),
+                                           piece.getSideAngle().at(i),
+                                           piece.getSideAngle().at(calculation_nep(piece,i,1))
+                                           )
+                                       );
+            }
+        }
+        sort(pieces_sides.begin() , pieces_sides.end() , [](auto a , auto b){ return (std::get<0>(a) < std::get<0>(b));});
+
+        bool size_only = std::get<0>(frame_sides.at(0)) > std::get<0>(pieces_sides.at(0));
+        bool angles = (std::get<1>(frame_sides.at(0)) > M_PI) && (std::get<2>(frame_sides.at(0)) > M_PI);
+        return size_only && angles;
     };
-    return about_angle || about_side;
+
+    return about_angle()||about_side();
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
