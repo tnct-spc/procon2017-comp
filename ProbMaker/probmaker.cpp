@@ -163,11 +163,10 @@ void ProbMaker::angulated_graphic(){
 void ProbMaker::splitPiece(){
     for(auto poly : print_polygons){
         if(bg::area(poly) > 500){
-
+            std::cout << "分割" << std::endl;
             createPiece(poly);
         }
     }
-
 }
 
 void ProbMaker::jointPiece(){
@@ -178,9 +177,6 @@ void ProbMaker::jointPiece(){
         bool check = false;
         int piece_cou = 0;//結合元のpieceの番号
         for(auto poly : print_polygons){
-            std::cout << bg::dsv(poly) << std::endl;//
-            std::cout << "area : " << bg::area(poly) << std::endl;
-
             if(check)break;
             int check_cou = 0;//結合先のpieceの番号
             for(auto check_poly : print_polygons){
@@ -193,12 +189,11 @@ void ProbMaker::jointPiece(){
                         print_polygons.erase(print_polygons.begin() + check_cou);
                         check=true;
                         break;
-                    }//合体事故は起こってなさそう
+                    }
                 }
                 ++check_cou;
             }
             ++piece_cou;
-
         }
         flag = true;
         for(auto poly : print_polygons){
@@ -328,7 +323,6 @@ void ProbMaker::checkClossLine(polygon_i& poly , polygon_i& change_frame){//poly
         if(bg::intersects(polygon_begin,edge_line))begin_line = linenum;//交点を見つけたら番号を記録
         if(bg::intersects(polygon_end,edge_line))end_line = linenum;
     }
-    std::cout << "closspoint1 : " << begin_line << "  closspoint2 : " << end_line << std::endl;
     polygon_i pattern_one = poly;
     polygon_i pattern_two = poly;
     if(begin_line == end_line){//同じ線上にbeginとendがある場合
@@ -397,22 +391,15 @@ void ProbMaker::checkClossLine(polygon_i& poly , polygon_i& change_frame){//poly
     //それをchange_frameに格納する
    bg::correct(change_frame);
 
-   std::cout << " poly = " << bg::dsv(poly) << std::endl;
-   std::cout << "change_frame = " << bg::dsv(change_frame) << std::endl;
-   std::cout << "inner_frame = " << bg::dsv(inner_frame) << std::endl;
-
 
     std::vector<polygon_i> differences;
     bg::difference(change_frame,poly,differences);
-    std::cout << "difference_size = " << differences.size() << std::endl;
     change_frame.clear();
     for(unsigned int count=0;count<differences.size();count++){
        std::vector<polygon_i> polygon;
-       std::cout << " difference = " << bg::dsv(differences[count]) << std::endl;
        bg::union_(change_frame,differences[count],polygon);
        change_frame = polygon[0];
     }
-    std::cout << " check_frame = " << bg::dsv(check_frame) << std::endl;
 
 }
 
