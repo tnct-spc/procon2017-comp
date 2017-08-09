@@ -1,5 +1,6 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
+// TODO:painteventが呼ばれるとピースが描画されなくなるバグを修正
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
