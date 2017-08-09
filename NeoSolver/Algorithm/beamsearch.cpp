@@ -84,12 +84,15 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
 bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 {
-    //OKならfalseを返す
+    double hoge_frame_angle;
+    double min_frame_angle = 360;
     for(auto const &frame : field.getFrame()){
         for(int angle = 0; angle < frame.getSize(); ++angle){
-
+            hoge_frame_angle = frame.getSideAngle().at(angle);
+            if(hoge_frame_angle < min_frame_angle) min_frame_angle = hoge_frame_angle;
         }
     }
+
     double hoge_piece_angle;
     double min_piece_angle = 360;
     for(auto const &piece : field.getPieces()){
@@ -98,6 +101,13 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             if(hoge_piece_angle < min_piece_angle) min_piece_angle = hoge_piece_angle;
         }
     }
+
+    if(min_frame_angle < min_piece_angle){
+        return true;
+    }else{
+        return false;
+    }
+
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
