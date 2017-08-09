@@ -24,9 +24,9 @@ public:
 private:
     Ui::ProbMaker *ui;
 
-    bool createPiece();
+    void createPiece(polygon_i argument_frame , bool isbeforepiece);
     void setInnerFrame();
-    void checkClossLine(polygon_i& poly);
+    void checkClossLine(polygon_i& poly , bool change_check_frame);
     void jointPiece();
     void splitPiece();
 

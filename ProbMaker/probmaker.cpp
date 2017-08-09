@@ -135,7 +135,12 @@ void ProbMaker::angulated_graphic(){
 
     setInnerFrame();// 初期状態のFrameをInnerFrameに投入
     while(1){
-        if(!createPiece())break;
+        createPiece(check_frame,true);
+        if(bg::area(check_frame) < 700 || print_polygons.size() > 48){
+            //枠の残り部分をそのままピースとして出力する
+            print_polygons.push_back(check_frame);
+            break;//ピースを作成するループから抜け出す
+        }
     }
 
     jointPiece();
@@ -157,6 +162,11 @@ void ProbMaker::angulated_graphic(){
 }
 
 void ProbMaker::splitPiece(){
+    for(auto poly : print_polygons){
+        if(bg::area(poly) > 800){
+            createPiece(poly,false);
+        }
+    }
 
 }
 
@@ -229,7 +239,7 @@ void ProbMaker::setInnerFrame(){
     }
 }
 
-bool ProbMaker::createPiece(){
+void ProbMaker::createPiece(polygon_i argument_frame , bool isbeforepiece){//引数には枠、大きさ調整前のピースかを指定する
     //ここから関数
     polygon_i poly;
 
@@ -238,8 +248,8 @@ bool ProbMaker::createPiece(){
     while(!flag){
     point_x = 1 + retRnd(99);//ランダムでx座標を出す
     for(int closspointy=0;closspointy<66;closspointy++){//縦に引かれた線と枠の線の交点を出す
-        if( bg::intersects(point_i(point_x,closspointy), check_frame)){
-            if(!bg::within(point_i(point_x,closspointy + 1) , check_frame))break;//記憶せずにもう一度
+        if( bg::intersects(point_i(point_x,closspointy), argument_frame)){
+            if(!bg::within(point_i(point_x,closspointy + 1) , argument_frame))break;//記憶せずにもう一度
             point_y = closspointy; //交点のy座標を記憶
             flag = true;
             break;
@@ -314,18 +324,14 @@ bool ProbMaker::createPiece(){
     }
 
     if(point_pushback){
-    checkClossLine(poly);//ここでpolygonの始点と終点を補完する
-    print_polygons.push_back(poly);
-    setInnerFrame();// frameをinnerframeに投入
-    }
+        checkClossLine(poly , isbeforepiece);//ここでpolygonの始点と終点を補完する
+        if(isbeforepiece){
+            print_polygons.push_back(poly);
+            setInnerFrame();// frameをinnerframeに投入
+        }else{
 
-    poly.clear();
-    if(bg::area(check_frame) < 700 || print_polygons.size() > 48){
-        //枠の残り部分をそのままピースとして出力する
-        print_polygons.push_back(check_frame);
-        return false;//ピースを作成するループから抜け出す
+        }
     }
-    return true;
 
 }
 
@@ -333,7 +339,7 @@ bool ProbMaker::createPiece(){
 
 
 
-void ProbMaker::checkClossLine(polygon_i& poly){
+void ProbMaker::checkClossLine(polygon_i& poly , bool change_check_frame){
     int begin_line = -1;//変数名のせいでわかりづらいけど枠やピースの交点の線の番号を表している
     int end_line = -1;
     point_i polygon_begin = poly.outer().at(0);
@@ -418,19 +424,21 @@ void ProbMaker::checkClossLine(polygon_i& poly){
    std::cout << "check_frame = " << bg::dsv(check_frame) << std::endl;
    std::cout << "inner_frame = " << bg::dsv(inner_frame) << std::endl;
 
-   std::vector<polygon_i> differences;
-   bg::difference(check_frame,poly,differences);
-   std::cout << "difference_size = " << differences.size() << std::endl;
-   check_frame.clear();
-   for(unsigned int count=0;count<differences.size();count++){
+   if(change_check_frame){
+
+    std::vector<polygon_i> differences;
+    bg::difference(check_frame,poly,differences);
+    std::cout << "difference_size = " << differences.size() << std::endl;
+    check_frame.clear();
+    for(unsigned int count=0;count<differences.size();count++){
        std::vector<polygon_i> polygon;
        std::cout << " difference = " << bg::dsv(differences[count]) << std::endl;
        bg::union_(check_frame,differences[count],polygon);
        check_frame = polygon[0];
+    }
+    std::cout << " check_frame = " << bg::dsv(check_frame) << std::endl;
+
    }
-   std::cout << " check_frame = " << bg::dsv(check_frame) << std::endl;
-
-
 
 }
 
