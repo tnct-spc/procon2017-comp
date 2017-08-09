@@ -365,7 +365,7 @@ void ProbMaker::resize(){
                         std::vector<polygon_i> union_poly;
                         bg::union_(print_polygons[poly_num],print_polygons[check_num],union_poly);//結合
 
-                        if(bg::num_interior_rings(union_poly[0])==0){//innerが存在しないなら
+                        if(!bg::num_interior_rings(union_poly[0]) && union_poly.size()==1){//innerが存在せず、unionが失敗してないなら
                             print_polygons[poly_num] = union_poly[0];//結合した物を代入
                             print_polygons.erase(print_polygons.begin() + check_num);//結合されたpolygonを削除
                         }
@@ -378,6 +378,7 @@ void ProbMaker::resize(){
         }
     }
 
+    /*
     //面積が800超えた場合に分割する
     flag = false;
     bool check = true;
@@ -399,23 +400,32 @@ void ProbMaker::resize(){
                     int end_point = 100;
 
                     bool x_or_y = true;// retRnd(2);//trueならy軸方向
-                    int line =(x_or_y
-                               ? 1 + retRnd(100)
-                               : 1 + retRnd(64)
-                              );
-
+                    int line;
+                    bg::model::linestring<point_i> check_line;
+                    do{
+                    line = 1 + retRnd(100);
+                    bg::clear(check_line);
+                    bg::append(check_line,point_i(line,0));
+                    bg::append(check_line,point_i(line,65));
+                    std::cout << "line : " << bg::dsv(check_line) << " rndx : " << line << std::endl;
+                    std::cout << bg::disjoint(check_line , polygon) << std::endl;
+                    }while(bg::disjoint(check_line,polygon));
 
                     if(x_or_y){
-                        for(int linenum = 0;linenum < print_polygons.size() - 1;linenum++){//polygonの辺の番号
-                            bg::model::linestring<point_i> edge_line{polygon.outer().at(linenum),polygon.outer().at(linenum+1)};//polygonのlinenum番目の辺
+
+                        for(unsigned int linenum = 0;linenum < print_polygons.size() - 1;linenum++){//polygonの辺の番号       ここのforループ内で問題が起きているのは確定的に明らか
+                            bg::model::linestring<point_i> edge_line;//polygonのlinenum番目の辺
+                            bg::append(edge_line,polygon.outer().at(linenum));
+                            bg::append(edge_line,polygon.outer().at(linenum+1));
                             bool before = false;//一つ前のy座標の地点が辺と接触していたかを記憶する関数
                             for(int y=0;y<65;++y){
                                 bool checkline = true;
                                 for(auto line : line_vec){
                                     if(linenum >= line -1 && linenum <= line+1 )checkline = false;
                                 }
+                                std::cout << bg::dsv(point_i(line,y)) << bg::dsv(edge_line) << bg::disjoint(point_i(line,y) , edge_line) << std::endl;
 
-                                if(bg::intersects(edge_line, point_i(line,y)) && checkline){
+                                if(bg::intersects(edge_line, point_i(line,y)) && checkline){//こ↑こ↓の接触判定がガバガバ
                                     if(point_vec.size()==0){
                                         point_vec.push_back(y);
                                         line_vec.push_back(linenum);
@@ -432,6 +442,31 @@ void ProbMaker::resize(){
                                     before = true;
                                 }else before = false;
                             }
+                            bg::clear(edge_line);
+                            bg::append(edge_line,polygon.outer().at(0));//始点と終点を結んでる
+                            bg::append(edge_line,polygon.outer().at(polygon.outer().size()-1));
+                            for(int y=0;y<65;++y){//ここから
+                                bool checkline = true;
+                                for(auto line : line_vec){
+                                    if(linenum >= line -1 && linenum <= line+1 )checkline = false;
+                                }
+                                std::cout << bg::dsv(point_i(line,y)) << bg::dsv(edge_line) << bg::disjoint(point_i(line,y) , edge_line) << std::endl;
+
+                                if(bg::intersects(edge_line, point_i(line,y)) && checkline){//こ↑こ↓の接触判定がガバガバ
+                                    if(before == false){
+                                        bool put = true;
+                                        for(auto point : point_vec){
+                                            if(point==y)put=false;
+                                        }
+                                        if(put){
+                                            point_vec.push_back(y);
+                                            line_vec.push_back(linenum);
+                                        }
+                                    }
+                                    before = true;
+                                }else before = false;
+                            }
+                            //ここまで
                         }
 
                         if(point_vec.size() < 2){
@@ -457,14 +492,15 @@ void ProbMaker::resize(){
                          begin_point = end_point;
                          end_line = tes;
                      }
-
-                     std::cout << "linenum =" << linenum;
-                     std::cout << "pvecsize = " <<point_vec.size();
-                     std::cout << "beginline =" << begin_line;
-                     std::cout << "endline = "<< end_line;
-
+                     std::cout << bg::dsv(polygon) << std::endl;
+                     std::cout << " linenum =" << linenum;
+                     std::cout << " pvecsize = " <<point_vec.size();
+                     std::cout << " beginline =" << begin_line;
+                     std::cout << " endline = "<< end_line;
+                     std::cout << " beginpoint = " << begin_point;
+                     std::cout << " endpoint = " << end_point;
                      polygon_i polygon1,polygon2;//分割先の複数のpolygonをつくる
-                     polygon1.outer().push_back(point_i(line,begin_point));                 //areaが0のピースが存在する→ここの部分で正常に図形がかけてないのでは？
+                     polygon1.outer().push_back(point_i(line,begin_point));                 //areaが0のピースが存在する→ここの部分で正常に図形がかけてないのでは？   ←多分接触判定の改善で解決する…はず
                      for(int pointnum=begin_line+1;pointnum<end_line+1;pointnum++){
                          polygon1.outer().push_back(polygon.outer().at(pointnum));
                      }
@@ -502,9 +538,10 @@ void ProbMaker::resize(){
 
         check=false;
         for(auto polygon : print_polygons){
-//            if(bg::area(polygon)>800)check=true;//一個でも面積が一定以上のピースがあるならcheckをtrueにしてやり直し    ここで引っかかってる気がするのん
+//            if(bg::area(polygon)>800)check=true;//一個でも面積が一定以上のピースがあるならcheckをtrueにしてやり直し    areaが0のピースが生成されてるせいで無限ループを引き起こしてる
         }
     }
+    */
 
     for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
         std::cout << "polygon = " << bg::dsv(polygon) << std::endl;
