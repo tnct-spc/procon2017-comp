@@ -76,6 +76,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                   << "#8b0000"
                   << "#8b008b"
                   << "#00ffff";
+
     //色リストをQVectorに格納
     QVector<QString> list = colorlist.toVector();
 
@@ -138,21 +139,22 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             painter.drawPolygon(&frame_points.front(),frame_points.size());
         }
     };
+
     //処理後ピースを描画
     auto drawAfterPiece = [&](int pnum){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-                painter.setBrush(QBrush(QColor(list[pnum])));
-//              int pcount = field.getPiece(pnum).getSize();
-//              QPointF points[pcount];
-//              for(int tes = 0;tes < pcount; tes++){
-//                  points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
-//              }
-//              painter.drawPolygon(points,pcount);
-                std::vector<QPointF> points;
-                for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
-                    points.push_back(getPosition(point));
-                }
-                painter.drawPolygon(&points.front(),points.size());
+            painter.setBrush(QBrush(QColor(list[pnum])));
+//          int pcount = field.getPiece(pnum).getSize();
+//          QPointF points[pcount];
+//          for(int tes = 0;tes < pcount; tes++){
+//              points[tes] = getPosition(field.getPiece(pnum).getPolygon().outer().at(tes));
+//          }
+//          painter.drawPolygon(points,pcount);
+            std::vector<QPointF> points;
+            for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
+                points.push_back(getPosition(point));
+            }
+            painter.drawPolygon(&points.front(),points.size());
     };
 
     //下画面フレームを描画
@@ -191,9 +193,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     //青処理線を描画
-    auto drawBlueProcessingLine = [&](){
+    auto drawBlueProcessingLine = [&](int pnum){
         point_i center;
-        boost::geometry::centroid(polygon_list[blue_id], center);
+        boost::geometry::centroid(polygon_list[pnum], center);
         QPointF aftercentroid = getPosition(center);
         QPointF beforecentroid = getPiecePosition(center);
         painter.setPen(QPen(QBrush(Qt::blue), 2.0));
@@ -201,9 +203,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     //赤処理線を描画
-    auto drawRedProcessingLine = [&](){
+    auto drawRedProcessingLine = [&](int pnum){
         point_i center;
-        boost::geometry::centroid(polygon_list[red_id], center);
+        boost::geometry::centroid(polygon_list[pnum], center);
         QPointF aftercentroid = getPosition(center);
         QPointF beforecentroid = getPiecePosition(center);
         painter.setPen(QPen(QBrush(Qt::red), 2.0));
@@ -243,21 +245,24 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     }
 
     if(paintif){
+
+        //初期ピース&番号&処理線を描画
         if(point_id == -1){
             point_id++;
             red_id = point_id;
             drawBeforePiece(point_id);
-            drawRedProcessingLine();
+            drawRedProcessingLine(red_id);
             drawPieceId(point_id);
             if(field.getPiecesSize() > 2){
                 point_id++;
                 blue_id = point_id;
                 drawBeforePiece(point_id);
-                drawBlueProcessingLine();
+                drawBlueProcessingLine(blue_id);
                 drawPieceId(point_id);
             }
         }
 
+        //キーに合わせてピース&番号&処理線を描画
         if(point_id > -1){
             if(selecter){
                 red_id = point_id;
@@ -269,8 +274,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                     drawAfterPiece(piecenumber);
                     drawPieceId(piecenumber);
                 }
-                drawRedProcessingLine();
-                drawBlueProcessingLine();
+                drawRedProcessingLine(red_id);
+                drawBlueProcessingLine(blue_id);
             }else{
                 blue_id = point_id;
                 for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
@@ -281,8 +286,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                     drawAfterPiece(piecenumber);
                     drawPieceId(piecenumber);
                 }
-                drawBlueProcessingLine();
-                drawRedProcessingLine();
+                drawBlueProcessingLine(blue_id);
+                drawRedProcessingLine(red_id);
             }
         }
         paintif = false;
