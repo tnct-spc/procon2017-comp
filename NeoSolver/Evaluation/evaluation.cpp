@@ -91,7 +91,12 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
             count++;
             before_angle = i;
         }
-        return map;
+        //vectorをmapに変換
+        std::map<double , int> map2;
+        for(std::pair<double , int> i : map){
+            map2.insert(i);
+        }
+        return map2;
     };
 
     //返すときに使うvector
@@ -99,18 +104,8 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
     //すでに通ったことのあるところのchecker
     std::vector<std::pair<int , int>> passed_checker;
     //同じ角度の角は何個あるか示すmap
-    std::vector<std::pair<double , int>> frame_same_angle = count_same_angle(frame);
-    std::vector<std::pair<double , int>> polygon_same_angle = count_same_angle(polygon);
-
-    //////////////////////////////////////////test
-
-    for(std::pair<double , int> i :frame_same_angle){
-        double degree = i.first * 180.0 / 3.141592653589793;
-        std::cout<< degree <<"ど"<<i.second<<"こ"<<std::endl;
-    }
-
-    ///////////////////////////////////////////test
-
+    std::map<double , int> frame_same_angle = count_same_angle(frame);
+    std::map<double , int> polygon_same_angle = count_same_angle(polygon);
 
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
@@ -146,8 +141,14 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
             if((!passed) && (angle_agreement == 1)){
                 //角が同じだったとき
                 double evaluation = 1;
+
+                //角の貴重度
+                double precious_frame_degree = frame_same_angle[frame.getSideAngle().at(frame_point_index)];
+                double precious_polygon_degree = polygon_same_angle[polygon.getSideAngle().at(polygon_point_index)];
+                double precious_degree = 1 / (precious_frame_degree * precious_polygon_degree);
+
                 if(snuggle_up > 0) evaluation = std::pow(snuggle_up , 2);
-                vector.push_back((std::pair<double , Connect>(evaluation , connect1)));
+                vector.push_back((std::pair<double , Connect>(evaluation + precious_degree, connect1)));
             }else if(angle_agreement == 0){
                 //角に隙間があるとき
                 if(!passed) vector.push_back((std::pair<double , Connect>(0 , connect1)));
