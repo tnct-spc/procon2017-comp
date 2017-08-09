@@ -46,7 +46,8 @@ void connect_polygon(polygon_i& frame, polygon_i& connecting_polygon,Connect con
     polygon_t result2_t;
     boost::geometry::strategy::transform::rotate_transformer<bg::radian,int,2,2> rotate_1(-(piece_angle - frame_angle));
     boost::geometry::strategy::transform::rotate_transformer<bg::radian,double,2,2> rotate_2(-(piece_angle - frame_angle));
-    std::cout << "hogehoge" << -(piece_angle - frame_angle);
+
+    std::cout << "hogehoge" << -(piece_angle - frame_angle) << std::endl;
     std::cout << "hogehoge" << boost::geometry::transform(result,result2,rotate_1) << std::endl;
     std::cout << "hogehoge" << boost::geometry::transform(result,result2_t,rotate_2) << std::endl;
 
@@ -74,9 +75,16 @@ void test()
     polygon_i sample_extra_rotate_polygon;
 //    polygon_i sample_answer;
     polygon_t sample_answer;
+    polygon_i sampleanswer;
     boost::geometry::exterior_ring(sample_extra_rotate_polygon) = boost::assign::list_of<point_i>(0,0)(0,5)(5,5)(5,0)(0,0);
-    boost::geometry::strategy::transform::rotate_transformer<bg::radian,double,2,2> rotate(std::atan(3/4));
+    boost::geometry::strategy::transform::rotate_transformer<bg::radian,double,2,2> rotate(std::atan2(3,4));
+    boost::geometry::strategy::transform::rotate_transformer<bg::radian,double,2,2> rotate2(std::atan2(3,4));
     boost::geometry::transform(sample_extra_rotate_polygon,sample_answer,rotate);
+    boost::geometry::transform(sample_extra_rotate_polygon,sampleanswer,rotate2);
+
+    NeoPolygonViewer::getInstance().displayPolygon(sampleanswer,"hgeoa",false);
+
+    std::cout << std::atan2(3,4) << std::endl;
 
     NeoPolygonViewer::getInstance().displayPolygon(sample_extra_rotate_polygon,"before",false);
 //    NeoPolygonViewer::getInstance().displayPolygon(sample_answer,"after",false);
