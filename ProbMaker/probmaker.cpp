@@ -143,11 +143,10 @@ void ProbMaker::angulated_graphic(){
         }
     }
 
-  //  jointPiece();
-
-
-    //分割するなにがし
- //   splitPiece();
+    //大きいのを分割
+    splitPiece();//この部分でちゃんと分割できてなさそう
+    //小さなピースの結合
+    jointPiece();//jointの部分で問題起こしてそう
 
 
     for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
@@ -163,7 +162,7 @@ void ProbMaker::angulated_graphic(){
 
 void ProbMaker::splitPiece(){
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 800){
+        if(bg::area(poly) > 500){
 
             createPiece(poly);
         }
