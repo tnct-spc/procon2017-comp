@@ -101,12 +101,15 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
 
     //返すときに使うvector
     std::vector<std::pair<double , Connect>> vector;
+
     //すでに通ったことのあるところのchecker
     std::vector<std::pair<int , int>> passed_checker;
+
     //同じ角度の角は何個あるか示すmap
     std::map<double , int> frame_same_angle = count_same_angle(frame);
     std::map<double , int> polygon_same_angle = count_same_angle(polygon);
 
+    //二重ループ開始
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
 
@@ -131,16 +134,28 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
             //辺が同じだったとき
             if(length_agreement){
                 snuggle_up = snuggle_up_counter(frame_point_index , polygon_point_index);
+                //通ってきた道のしるしづけ
                 for(int i = 1; i <= snuggle_up ; i ++){
                     int calculated_frame_index = calculation_nep(frame , frame_point_index , i);
                     int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , i);
                     passed_checker.push_back(std::pair<int , int>(calculated_frame_index , calculated_polygon_index));
                 }
+                //通ってきた道がいかに貴重だったかを確認する
+                double precious_degree = 0;
+                for(int i = 1; i <= snuggle_up ; i ++){
+                    int calculated_frame_index = calculation_nep(frame , frame_point_index , i);
+                    int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , i);
+
+                    double precious_frame_degree = frame_same_angle[frame.getSideAngle().at(calculated_frame_index)];
+                    double precious_polygon_degree = polygon_same_angle[polygon.getSideAngle().at(calculated_polygon_index)];
+                    precious_degree += 0.5 / (precious_frame_degree * precious_polygon_degree);
+                }
+                snuggle_up += precious_degree;
             }
 
             if((!passed) && (angle_agreement == 1)){
                 //角が同じだったとき
-                double evaluation = 1;
+                double evaluation = 1.5;
 
                 //角の貴重度
                 double precious_frame_degree = frame_same_angle[frame.getSideAngle().at(frame_point_index)];
