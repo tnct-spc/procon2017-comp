@@ -64,6 +64,7 @@ bool TestEvaluation::run()
 
     Evaluation e;
     vector = e.evaluation(frames.at(1),polygons.at(5));
+//    vector = e.evaluation(frames.at(0),polygons.at(0));
 
     double evaluation;
     int field_side_index , polygon_side_index , field_point_index , polygon_point_index;
@@ -76,11 +77,11 @@ bool TestEvaluation::run()
         polygon_point_index = connect.polygon_point_index;
 
         if(true){
-            std::cout << "evaluation = " << evaluation
-                      << " , field_side_index = " << field_side_index
-                      << " , polygon_side_index = " << polygon_side_index
-                      << " , field_point_index = " << field_point_index
-                      << " , polygon_point_index = " << polygon_point_index
+            std::cout << evaluation
+                      << " " << polygon_point_index
+                      << field_point_index
+                      << polygon_side_index
+                      << field_side_index
                       << std::endl;
         }
     }
