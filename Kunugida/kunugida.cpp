@@ -54,13 +54,13 @@ void Kunugida::run()
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
 
-        int id = 5;
+        int id = 1;
         for(auto& piece : pieces_){
             procon::NeoExpandedPolygon buf(id);
             buf.resetPolygonForce(piece);
             pieces.push_back(buf);
             ++id;
-            break;
+            //break;
         }
         frame.resetPolygonForce(frame_);
         std::vector<procon::NeoExpandedPolygon> vec_frame;
