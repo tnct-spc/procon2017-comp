@@ -18,16 +18,24 @@ public:
     void delaunay_triangulation();
     void GA();
     void angulated_graphic();
-    void resize();
     std::vector<polygon_i> getPieces();
     polygon_i getFrame();
 
 private:
     Ui::ProbMaker *ui;
+
+    bool createPiece();
+    void setInnerFrame();
+    void checkClossLine(polygon_i& poly);
+    void jointPiece();
+    void splitPiece();
+
     std::vector<std::pair<point_i,point_i>> lines;
     std::vector<polygon_i> print_polygons;
     int retRnd(int pnum);
     polygon_i frame;
+    polygon_i check_frame;
+    polygon_i inner_frame;
 
 private slots:
     void step();
