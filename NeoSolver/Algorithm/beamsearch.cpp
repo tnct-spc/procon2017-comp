@@ -61,6 +61,7 @@ void connect_polygon(polygon_i& frame, polygon_i& connecting_polygon,Connect con
     );
     polygon_i result3;
     boost::geometry::transform(result2,result3);
+
 }
 
 void test()
@@ -69,6 +70,22 @@ void test()
     boost::geometry::exterior_ring(sample1) = boost::assign::list_of<point_i>(0,0)(0,10)(10,10)(10,0)(0,0);
     boost::geometry::exterior_ring(sample2) = boost::assign::list_of<point_i>(15,15)(15,20)(20,15)(15,15);
     Connect con = { 1,1,1,1 };
+
+    polygon_i sample_extra_rotate_polygon;
+//    polygon_i sample_answer;
+    polygon_t sample_answer;
+    boost::geometry::exterior_ring(sample_extra_rotate_polygon) = boost::assign::list_of<point_i>(0,0)(0,5)(5,5)(5,0)(0,0);
+    boost::geometry::strategy::transform::rotate_transformer<bg::radian,double,2,2> rotate(std::atan(3/4));
+    boost::geometry::transform(sample_extra_rotate_polygon,sample_answer,rotate);
+
+    NeoPolygonViewer::getInstance().displayPolygon(sample_extra_rotate_polygon,"before",false);
+//    NeoPolygonViewer::getInstance().displayPolygon(sample_answer,"after",false);
+    procon::ExpandedPolygon po;
+    po.resetPolygonForce(sample_answer);
+    PolygonViewer::getInstance().pushPolygon(po,"hgoehoge");
+
+    std::cout << boost::geometry::dsv(sample_extra_rotate_polygon) << std::endl;
+    std::cout << boost::geometry::dsv(sample_answer) << std::endl;
 
     connect_polygon(sample1,sample2,con);
 }
@@ -136,6 +153,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
     fields.clear();
     std::copy(next_field.begin(),next_field.end(),std::back_inserter(fields));
 #elif
+
 #endif
 }
 
