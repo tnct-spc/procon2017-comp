@@ -161,11 +161,23 @@ void ProbMaker::angulated_graphic(){
 }
 
 void ProbMaker::splitPiece(){
-    for(auto poly : print_polygons){
+    std::cout << "start split mode" << std::endl;
+    bool flag = false;
+    while(!flag){
+    int cou=0;
+    for(auto& poly : print_polygons){
         if(bg::area(poly) > 500){
-            std::cout << "分割" << std::endl;
+            std::cout << "areaが500超えてるので分割" << std::endl;
+            std::cout << "分割前のピース" << bg::dsv(poly) << std::endl;
             createPiece(poly);
+            std::cout << "分割後のピース" << bg::dsv(poly) << std::endl;
         }
+        cou++;
+    }
+    flag = true;
+    for(auto poly : print_polygons){
+        if(bg::area(poly) > 500) flag = false;
+    }
     }
 }
 
@@ -302,7 +314,8 @@ void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠、大�
     }
 
     if(point_pushback){
-            checkClossLine(poly , argument_frame);//ここでpolygonの始点と終点を補完する
+            checkClossLine(poly , argument_frame);//ここでpolygonの始点と終点を補完する   ここまでは正常に進んでそうです
+            std::cout << "pushbackされるポリゴン : " << bg::dsv(poly) << std::endl;//ここマルチポリゴンになってそう
             print_polygons.push_back(poly);
     }
 
@@ -386,20 +399,16 @@ void ProbMaker::checkClossLine(polygon_i& poly , polygon_i& change_frame){//poly
     bg::correct(pattern_two);
     if(bg::area(pattern_one) < bg::area(pattern_two)) poly = pattern_one;//polyに結果を代入する
     else poly = pattern_two;
+
+    std::cout << "splited　polygon : " << bg::dsv(poly) << std::endl;
     //ここからchange_frameの変更
     //differenceで異なる部分(重複していない部分)を取り出す
     //それをchange_frameに格納する
-   bg::correct(change_frame);
-
-
+    bg::correct(change_frame);
     std::vector<polygon_i> differences;
     bg::difference(change_frame,poly,differences);
     change_frame.clear();
-    for(unsigned int count=0;count<differences.size();count++){
-       std::vector<polygon_i> polygon;
-       bg::union_(change_frame,differences[count],polygon);
-       change_frame = polygon[0];
-    }
+    change_frame = differences[0];
 
 }
 
