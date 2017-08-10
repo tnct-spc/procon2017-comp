@@ -110,13 +110,7 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setField(field);
-<<<<<<< HEAD
-=======
-   //for test~
-   this->dock_board->addAnswer(field);
-   this->dock_board->addAnswer(field);
-   //~.
->>>>>>> feature/NeoDisplayAnswer-Dock
+
 }
 
 void Kunugida::finishedProcess()

@@ -13,7 +13,7 @@ NeoAnswerBoard::~NeoAnswerBoard()
     delete ui;
 }
 
-void NeoAnswerBoard::setDockMode(bool inp){
+void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
