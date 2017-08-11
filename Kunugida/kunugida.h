@@ -27,6 +27,7 @@ private:
     std::shared_ptr<spdlog::logger> logger;
     bool is_running = false;
     std::shared_ptr<NeoAnswerBoard> board;
+    std::shared_ptr<NeoAnswerDock> dock_board;
     void finishedProcess();
     void startProcess();
 

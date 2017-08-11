@@ -25,7 +25,9 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     board = std::make_shared<NeoAnswerBoard>();
+    dock_board = std::make_shared<NeoAnswerDock>();
     board->show();
+    dock_board->show();
 
 }
 
@@ -110,7 +112,7 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setField(field);
-
+   this->dock_board->addAnswer(field);
 }
 
 void Kunugida::finishedProcess()
