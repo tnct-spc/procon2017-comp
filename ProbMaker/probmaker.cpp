@@ -163,21 +163,24 @@ void ProbMaker::angulated_graphic(){
 void ProbMaker::splitPiece(){
     std::cout << "start split mode" << std::endl;
     bool flag = false;
-    while(!flag){
+    for(int count=0;count < 100;count++){//分割できないパターンでの無限ループ防止
     int cou=0;
     for(auto& poly : print_polygons){
-        if(bg::area(poly) > 500){
+        if(bg::area(poly) > 300){
             std::cout << "areaが500超えてるので分割" << std::endl;
             std::cout << "分割前のピース" << bg::dsv(poly) << std::endl;
-            createPiece(poly);
-            std::cout << "分割後のピース" << bg::dsv(poly) << std::endl;
+            createPiece(poly);//ここが上手く実行されずに無限ループ起こしてる(一応対策済)
+            std::cout << "分割後のピース" << bg::dsv(poly) << std::endl;    //ここの表記が荒ぶる
         }
+        if(print_polygons.size() > 49)break;
         cou++;
     }
     flag = true;
+    if(print_polygons.size() > 49)break;
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 500) flag = false;
+        if(bg::area(poly) > 300) flag = false;
     }
+    if(flag)break;
     }
 }
 
@@ -315,7 +318,7 @@ void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠、大�
 
     if(point_pushback){
             checkClossLine(poly , argument_frame);//ここでpolygonの始点と終点を補完する   ここまでは正常に進んでそうです
-            std::cout << "pushbackされるポリゴン : " << bg::dsv(poly) << std::endl;//ここマルチポリゴンになってそう
+            std::cout << "pushbackされるポリゴン : " << bg::dsv(poly) << std::endl;//ここの表示も問題なさそうね
             print_polygons.push_back(poly);
     }
 
@@ -401,12 +404,15 @@ void ProbMaker::checkClossLine(polygon_i& poly , polygon_i& change_frame){//poly
     else poly = pattern_two;
 
     std::cout << "splited　polygon : " << bg::dsv(poly) << std::endl;
+    std::cout << "分割される前のポリゴン (変更前)" << bg::dsv(change_frame) << std::endl;
     //ここからchange_frameの変更
     //differenceで異なる部分(重複していない部分)を取り出す
     //それをchange_frameに格納する
     bg::correct(change_frame);
     std::vector<polygon_i> differences;
     bg::difference(change_frame,poly,differences);
+    std::cout << "異なる部分のsize" << differences.size() << std::endl;
+    std::cout << "difference(polyに代入するやつ)" << bg::dsv(differences[0]) << std::endl;
     change_frame.clear();
     change_frame = differences[0];
 
