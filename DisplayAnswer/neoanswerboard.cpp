@@ -17,6 +17,11 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
+void NeoAnswerBoard::singleMode(){
+    singleif = true;
+}
+
+
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
     const QString up_back_ground_color = "#7BAB4F";
@@ -235,67 +240,74 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     drawDownBackground();
 
-    for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
-        drawBeforePiece(piece_num);
-    }
-
-    if(paintif){
-
-        //初期ピース&番号&処理線を描画
-        if(point_id == 0){
-            if(field.getPiecesSize() >= 1){
-                drawAfterPiece(point_id);
-                drawProcessingLine(point_id, false);
-                drawPieceId(point_id);
-            }
-            if(field.getPiecesSize() >= 2){
-                ++point_id;
-                drawAfterPiece(point_id);
-                drawProcessingLine(point_id, true);
-                drawPieceId(point_id);
-            }
+    if(singleif){
+        for(unsigned int piecenumber = 0; piecenumber < field.getPieces.size(); ++piecenumber){
+            drawAfterPiece(piecenumber);
         }
 
-        //キーに合わせてピース&番号&処理線を描画
-        if(point_id > 1){
-            //青
-            if(selecter){
-                blue_id = point_id;
-                if(blue_id > red_id){
-                    for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                        drawAfterPiece(piecenumber);
-                        drawPieceId(piecenumber);
-                    }
-                }else{
-                    for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                        drawAfterPiece(piecenumber);
-                        drawPieceId(piecenumber);
-                    }
-                }
+    }else{
 
-                drawProcessingLine(blue_id, true);
-                drawProcessingLine(red_id, false);
-            //赤
-            }else{
-                red_id = point_id;
-                if(blue_id > red_id){
-                    for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                        drawAfterPiece(piecenumber);
-                        drawPieceId(piecenumber);
-                    }
-                }else{
-                    for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                        drawAfterPiece(piecenumber);
-                        drawPieceId(piecenumber);
-                    }
-                }
-                drawProcessingLine(red_id, false);
-                drawProcessingLine(blue_id, true);
-            }
+        for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
+            drawBeforePiece(piece_num);
         }
-        paintif = false;
-    }
 
+        if(paintif){
+
+            //初期ピース&番号&処理線を描画
+            if(point_id == 0){
+                if(field.getPiecesSize() >= 1){
+                    drawAfterPiece(point_id);
+                    drawProcessingLine(point_id, false);
+                    drawPieceId(point_id);
+                }
+                if(field.getPiecesSize() >= 2){
+                    ++point_id;
+                    drawAfterPiece(point_id);
+                    drawProcessingLine(point_id, true);
+                    drawPieceId(point_id);
+                }
+            }
+
+            //キーに合わせてピース&番号&処理線を描画
+            if(point_id > 1){
+                //青
+                if(selecter){
+                    blue_id = point_id;
+                    if(blue_id > red_id){
+                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                            drawAfterPiece(piecenumber);
+                            drawPieceId(piecenumber);
+                        }
+                    }else{
+                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                            drawAfterPiece(piecenumber);
+                            drawPieceId(piecenumber);
+                        }
+                    }
+
+                    drawProcessingLine(blue_id, true);
+                    drawProcessingLine(red_id, false);
+                //赤
+                }else{
+                    red_id = point_id;
+                    if(blue_id > red_id){
+                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                            drawAfterPiece(piecenumber);
+                            drawPieceId(piecenumber);
+                        }
+                 }else{
+                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                            drawAfterPiece(piecenumber);
+                            drawPieceId(piecenumber);
+                        }
+                    }
+                    drawProcessingLine(red_id, false);
+                    drawProcessingLine(blue_id, true);
+                }
+            }
+            paintif = false;
+        }
+    }
     drawEvalution();
     drawGrid();
 }
