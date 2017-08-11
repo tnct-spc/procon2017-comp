@@ -19,6 +19,7 @@ NeoAnswerDock::~NeoAnswerDock()
     delete ui;
 }
 
+//Add piece and frame
 void NeoAnswerDock::addAnswer(const procon::NeoField &field)
 {
     fields.push_back(field);

@@ -193,16 +193,18 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     auto drawProcessingLine = [&](int pnum, bool color){
-        point_i center;
-        boost::geometry::centroid(polygon_list[pnum], center);
-        QPointF aftercentroid = getPosition(center);
-        QPointF beforecentroid = getPiecePosition(center);
-        if(color){
-            painter.setPen(QPen(QBrush(Qt::blue), 2.0));
-        }else{
-            painter.setPen(QPen(QBrush(Qt::red), 2.0));
+        if(!single_mode){
+           point_i center;
+           boost::geometry::centroid(polygon_list[pnum], center);
+           QPointF aftercentroid = getPosition(center);
+           QPointF beforecentroid = getPiecePosition(center);
+           if(color){
+               painter.setPen(QPen(QBrush(Qt::blue), 2.0));
+           }else{
+               painter.setPen(QPen(QBrush(Qt::red), 2.0));
+           }
+           painter.drawLine(aftercentroid, beforecentroid);
         }
-        painter.drawLine(aftercentroid, beforecentroid);
     };
 
     //評価値を描画
