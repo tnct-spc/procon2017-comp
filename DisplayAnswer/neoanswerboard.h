@@ -32,6 +32,7 @@ public:
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
     void setSingleMode(bool inp);
+    void singleMode();
 
 private:
     int frame_margin;
@@ -48,6 +49,8 @@ private:
 
     // Only field mode
     bool single_mode = false;
+    bool singleif = false;
+    int piece_size = 1;
 
     //make id_list
     std::vector<polygon_i> polygon_list;

@@ -240,10 +240,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     drawDownBackground();
 
-    if(singleif){
-        for(unsigned int piecenumber = 0; piecenumber < field.getPieces.size(); ++piecenumber){
-            drawAfterPiece(piecenumber);
-        }
+    //TODO field.pieceが空だと落ちる
+
+    if(singleif || piece_size < field.getPieces().size()){
+
+       drawAfterPiece(piece_size);
+       ++piece_size;
 
     }else{
 
