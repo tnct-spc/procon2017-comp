@@ -105,6 +105,123 @@ ProbMaker::ProbMaker(QWidget *parent) :
     angulated_graphic();
 }
 
+//ここから中野先輩のコード
+
+bool ProbMaker::IsCongruence(polygon_i polygon1 , polygon_i polygon2){
+
+    struct Triangle{
+        int line1;
+        int line2;
+        double angle;
+        bool depression;
+    };
+    auto sumSquare=[](point_i point1 , point_i point2)
+    {
+        int x_2 = pow(point1.x() - point2.x(),2.0);
+        int y_2 = pow(point1.y() - point2.y(),2.0);
+        return x_2 + y_2;
+    };
+    auto computeAngle = [](point_i pointA , point_i pointB , point_i pointC){
+       int a1,a2,b1,b2;
+       a1=pointA.x() - pointB.x();
+       a2=pointA.y() - pointB.y();
+       b1=pointC.x() - pointB.x();
+       b2=pointC.y() - pointB.y();
+       double bunshi = a1 * b1 + a2 * b2;
+       double bunbo=sqrt(pow(a1 , 2) + pow(a2 , 2)) * sqrt(pow(b1 , 2) + pow(b2 , 2));
+       return acos(bunshi/bunbo);
+   };
+    auto isDepression = [](polygon_i polygonA,int number){
+        point_i removepoint = polygonA.outer().at(number);
+        polygonA.outer().erase(polygonA.outer().begin() + number);
+        if(number == 0){
+            polygonA.outer().erase(polygonA.outer().end() - 1);
+            polygonA.outer().push_back(polygonA.outer().at(0));
+        }
+        return !bg::disjoint(polygonA , removepoint);
+    };
+    auto getTriangles = [sumSquare , computeAngle , isDepression](polygon_i polygonA){
+        std::vector<point_i> polygonAvector = polygonA.outer();
+        int serchNumber = polygonAvector.size() - 2;
+        std::vector<Triangle> v;
+        for(int i=0 ; i <= serchNumber ; i++){
+            int a = i - 1 , b = i , c = i + 1;
+            if(a==-1) a = serchNumber;
+            v.push_back(
+                {
+                    sumSquare(polygonAvector.at(a) , polygonAvector.at(b)),
+                    sumSquare(polygonAvector.at(b) , polygonAvector.at(c)),
+                    computeAngle(polygonAvector.at(a) , polygonAvector.at(b) , polygonAvector.at(c)),
+                    isDepression(polygonA , b)
+                }
+            );
+        }
+        return v;
+    };
+    auto equalsTriangles1 = [](Triangle triangleA,Triangle triangleB){
+        bool a = triangleA.line1 == triangleB.line1;
+        bool b = triangleA.line2 == triangleB.line2;
+        bool c = triangleA.angle == triangleB.angle;
+        bool d = triangleA.depression == triangleB.depression;
+        return a && b && c && d;
+    };
+    auto equalsTriangles2=[](Triangle triangleA,Triangle triangleB){
+        bool a = triangleA.line1 == triangleB.line2;
+        bool b = triangleA.line2 == triangleB.line1;
+        bool c = triangleA.angle == triangleB.angle;
+        bool d = triangleA.depression == triangleB.depression;
+        return a && b && c && d;
+    };
+    auto isThereTriangle = [equalsTriangles1 , equalsTriangles2](Triangle triangle , std::vector<Triangle> vectorA){
+        std::vector<std::pair<int , bool>> v;
+        int size = vectorA.size();
+        for(int i = 0 ; i < size ; i++){
+            bool et1 = equalsTriangles1(triangle , vectorA.at(i));
+            bool et2 = equalsTriangles2(triangle , vectorA.at(i));
+            if(et1||et2) v.push_back(std::pair<int , bool>(i , et1));
+        }
+        return v;
+    };
+    auto equalsVector = [equalsTriangles1,equalsTriangles2](std::vector<Triangle> vectorA , std::vector<Triangle> vectorB , bool forward){
+        if(vectorA.size() != vectorB.size()) return false;
+        int size = vectorA.size();
+        for(int i = 0 ; i < size ; i++){
+            if(forward){
+                if(!equalsTriangles1(vectorA.at(i),vectorB.at(i))) return false;
+            }else{
+                if(!equalsTriangles2(vectorA.at(i),vectorB.at(size-i-1))) return false;
+            }
+        }
+        return true;
+    };
+    auto equalsTriangleVectors = [equalsTriangles1 , equalsTriangles2 , isThereTriangle , equalsVector](std::vector<Triangle> vectorA , std::vector<Triangle> vectorB){
+        if(vectorA.size() != vectorB.size()) return false;
+        std::vector<std::pair<int , bool>> v = isThereTriangle(vectorA.at(0) , vectorB);
+        for(int i=0 ; i < v.size() ; i++){
+            std::pair<int , bool> intandbool = v.at(i);
+            int a = intandbool.first;
+            bool b = intandbool.second;
+            if(!b) a++;
+            for(int j = 0 ; j < a ; j++){
+                Triangle temporary = vectorB.at(0);
+                vectorB.erase(vectorB.begin());
+                vectorB.push_back(temporary);
+            }
+            if(equalsVector(vectorA , vectorB , b)) return true;
+        }
+        return false;
+    };
+    std::vector<Triangle> v1 = getTriangles(polygon1);
+    std::vector<Triangle> v2 = getTriangles(polygon2);
+    bool answer = equalsTriangleVectors(v1 , v2);
+    return answer;
+}
+//ここまで中野先輩のコード　マージしたら消す
+
+
+
+
+
 ProbMaker::~ProbMaker()
 {
     delete ui;
@@ -143,10 +260,17 @@ void ProbMaker::angulated_graphic(){
         }
     }
 
+    int tescou=-1;
+
+    do{
     //大きいのを分割
     splitPiece();//この部分でちゃんと分割できてなさそう
     //小さなピースの結合
-    jointPiece();//jointの部分で問題起こしてそう
+    jointPiece();
+
+    tescou++;
+
+    }while(congruenceCheck());
 
 
     for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
@@ -157,20 +281,33 @@ void ProbMaker::angulated_graphic(){
     std::cout << "piece count = " << print_polygons.size() << std::endl;
     std::cout << "piece area average = " << bg::area(frame) / print_polygons.size() << std::endl;
 
+    if(tescou)std::cout << "同じ形のピースが存在したためやり直されています　回数 : " << tescou << std::endl;
+
+}
+
+bool ProbMaker::congruenceCheck(){
+
+    for(unsigned int poly_num =0;poly_num<print_polygons.size();poly_num++){//汚いけどfor eachじゃないやつでやる
+        for(unsigned int check_poly_num=poly_num+1;check_poly_num<print_polygons.size();check_poly_num++){
+            if(IsCongruence(print_polygons[poly_num] , print_polygons[check_poly_num]))return true;
+        }
+    }
+
+    return false;//問題がなければfalseを返して終了
 
 }
 
 void ProbMaker::splitPiece(){
     std::cout << "start split mode" << std::endl;
     bool flag = false;
-    for(int count=0;count < 100;count++){//分割できないパターンでの無限ループ防止
+    for(int count=0;count < 300;count++){//分割できないパターンでの無限ループ防止
     int cou=0;
     for(auto& poly : print_polygons){
-        if(bg::area(poly) > 300){
+        if(bg::area(poly) > 150){
             std::cout << "areaが500超えてるので分割" << std::endl;
             std::cout << "分割前のピース" << bg::dsv(poly) << std::endl;
             createPiece(poly);//ここが上手く実行されずに無限ループ起こしてる(一応対策済)
-            std::cout << "分割後のピース" << bg::dsv(poly) << std::endl;    //ここの表記が荒ぶる
+            std::cout << "分割後のピース" << bg::dsv(poly) << std::endl;    //ここの表記が荒ぶる   argument frameまではうまく動作していて、ここの関数に持ってくるときに失敗してるみたいZ
         }
         if(print_polygons.size() > 49)break;
         cou++;
@@ -178,7 +315,7 @@ void ProbMaker::splitPiece(){
     flag = true;
     if(print_polygons.size() > 49)break;
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 300) flag = false;
+        if(bg::area(poly) > 150) flag = false;
     }
     if(flag)break;
     }
@@ -195,7 +332,7 @@ void ProbMaker::jointPiece(){
             if(check)break;
             int check_cou = 0;//結合先のpieceの番号
             for(auto check_poly : print_polygons){
-                if(bg::area(poly) < 100 && bg::intersects(poly,check_poly) && !bg::equals(poly,check_poly)){//ここのif文が真になってなさそう touchesの部分
+                if(bg::area(poly) < 50 && bg::intersects(poly,check_poly) && !bg::equals(poly,check_poly)){//ここのif文が真になってなさそう touchesの部分
                     std::cout << "接触してる" << std::endl;
                     std::vector<polygon_i> union_poly;
                     bg::union_(poly,check_poly,union_poly);
@@ -212,7 +349,7 @@ void ProbMaker::jointPiece(){
         }
         flag = true;
         for(auto poly : print_polygons){
-            if(bg::area(poly) < 100) flag = false;// areaが一定以下のピースが存在するならもう一度繰り返す
+            if(bg::area(poly) < 50) flag = false;// areaが一定以下のピースが存在するならもう一度繰り返す
         }
     }
 }

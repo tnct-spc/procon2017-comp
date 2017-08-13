@@ -29,6 +29,9 @@ private:
     void checkClossLine(polygon_i& poly , polygon_i& change_frame);
     void jointPiece();
     void splitPiece();
+    bool congruenceCheck();
+
+    bool IsCongruence(polygon_i polygon1 , polygon_i polygon2);//中野先輩のやつ
 
     std::vector<std::pair<point_i,point_i>> lines;
     std::vector<polygon_i> print_polygons;
