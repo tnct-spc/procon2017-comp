@@ -14,11 +14,13 @@
 #include <vector>
 #include <cmath>
 #include <random>
+#include <algorithm>
 
 #include <QPainter>
 #include <QPushButton>
 #include <QKeyEvent>
 #include <QEventLoop>
+
 
 
 ProbMaker::ProbMaker(QWidget *parent) :
@@ -227,14 +229,250 @@ ProbMaker::~ProbMaker()
     delete ui;
 }
 
+
 int ProbMaker::retRnd(int num){
     std::random_device rand;
     std::mt19937 mt(rand());
     std::uniform_int_distribution<int> rnd(0,num-1);//randomを返すだけ
     return rnd(mt);
 }
+/*
+
+int ProbMaker::judge(int temporary_x, int temporary_y, int target_x, int target_y){           //マス内に入っているか判定する関数
+    if((temporary_x > target_x) && (temporary_x < target_x+25) && (temporary_y > target_y)&&(temporary_y < target_y+16)){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+
+int ProbMaker::north_judge(int interbal,int keeping_x,int keeping_y,int target_x,int target_y){  //点からみて北側に動けるか判定
+    int temporary_x = keeping_x;
+    int temporary_y = keeping_y - interbal;
+    int a = judge(temporary_x,temporary_y,target_x,target_y);
+    if(a == 1000){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+int ProbMaker::northeast_judge(int interbal,int keeping_x, int keeping_y, int target_x, int target_y){//点から見て北東側に動けるか判定
+    int temporary_x = keeping_x + interbal;
+    int temporary_y = keeping_y - interbal;
+    int a = judge(temporary_x,temporary_y,target_x,target_y);
+    if(a == 1000){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+int ProbMaker::east_judge(int interbal,int keeping_x,int keeping_y, int target_x, int target_y){//点から見て東側に動けるか
+    int temporary_x = keeping_x + interbal;
+    int temporary_y = keeping_y;
+    int a = judge(temporary_x,temporary_y,target_x,target_y);
+    if(a == 1000){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+int ProbMaker::southeast_judge(int interbal,int keeping_x,int keeping_y, int target_x, int target_y){//点から見て南東側に動けるか
+    int temporary_x = keeping_x + interbal;
+    int temporary_y = keeping_y + interbal;
+    int a = judge(temporary_x,temporary_y,target_x,target_y);
+    if(a == 1000){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+int ProbMaker::south_judge(int interbal,int keeping_x,int keeping_y, int target_x, int target_y){//点から見て南側に動けるか
+    int temporary_x = keeping_x;
+    int temporary_y = keeping_y + interbal;
+    int a = judge(temporary_x,temporary_y,target_x,target_y);
+    if(a == 1000){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+int ProbMaker::southwest_judge(int interbal,int keeping_x,int keeping_y, int target_x, int target_y){//点から見て南西側に動けるか
+    int temporary_x = keeping_x - interbal;
+    int temporary_y = keeping_y + interbal;
+    int a = judge(temporary_x,temporary_y,target_x,target_y);
+    if(a == 1000){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+int ProbMaker::west_judge(int interbal,int keeping_x,int keeping_y, int target_x, int target_y){//点から見て西側に動けるか
+    int temporary_x = keeping_x - interbal;
+    int temporary_y = keeping_y;
+    int a = judge(temporary_x,temporary_y,target_x,target_y);
+    if(a == 1000){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+int ProbMaker::northwest_judge(int interbal,int keeping_x,int keeping_y, int target_x, int target_y){//点から見て北西側に動けるか
+    int temporary_x = keeping_x - interbal;
+    int temporary_y = keeping_y - interbal;
+    int a = judge(temporary_x,temporary_y,target_x,target_y);
+    if(a == 1000){
+        return 1000;
+    }else{
+        return 0;
+    }
+}
+int ProbMaker::interbal_judge(int interbal,int keeping_x,int keeping_y,int target_x,int target_y){
+    std::vector<int> memory;
+   memory.clear();
+   int N = north_judge(interbal,keeping_x,keeping_y,target_x,target_y);
+   if(N == 1000){
+       memory.push_back(1);
+   }
+   int NE = northeast_judge(interbal,keeping_x,keeping_y,target_x,target_y);
+   if(NE == 1000){
+       memory.push_back(2);
+   }
+   int E = east_judge(interbal,keeping_x,keeping_y,target_x,target_y);
+   if(E == 1000){
+       memory.push_back(3);
+   }
+   int SE = southeast_judge(interbal,keeping_x,keeping_y,target_x,target_y);
+   if(SE == 1000){
+       memory.push_back(4);
+   }
+   int S = south_judge(interbal,keeping_x,keeping_y,target_x,target_y);
+   if(S == 1000){
+       memory.push_back(5);
+   }
+   int SW = southwest_judge(interbal,keeping_x,keeping_y,target_x,target_y);
+   if(SW == 1000){
+       memory.push_back(6);
+   }
+   int W = west_judge(interbal,keeping_x,keeping_y,target_x,target_y);
+   if(W == 1000){
+       memory.push_back(7);
+   }
+   int NW = northwest_judge(interbal,keeping_x,keeping_y,target_x,target_y);
+   if(NW == 1000){
+       memory.push_back(8);
+        }
+   //int memory_size = memory.size();
+   if((N == 1000)||(NE==1000)||(E == 1000)||(SE == 1000)||(S==1000)||(SW == 1000)||(W == 1000)||(NW == 1000)){
+       return memory[retRnd(sizeof(memory))];
+   }else{
+       return 0;
+   }
+}
+
+
+void ProbMaker::push_backer(int keeping_x,int keeping_y, int target_x, int target_y,polygon_i real_frame){
+    int decision;
+    int interval;
+    do{
+    interval = retRnd(20);
+    decision = interbal_judge(interval,keeping_x,keeping_y,target_x,target_y);
+    }while(decision == 0);
+    int coordinate_x,coordinate_y;
+    if(decision == 1){
+        coordinate_x = keeping_x;
+        coordinate_y = keeping_y - interval;
+    }
+    if(decision == 2){
+        coordinate_x = keeping_x + interval;
+        coordinate_y = keeping_y - interval;
+    }
+    if(decision == 3){
+        coordinate_x = keeping_x + interval;
+        coordinate_y = keeping_y;
+    }
+    if(decision == 4){
+        coordinate_x = keeping_x + interval;
+        coordinate_y = keeping_y + interval;
+    }
+    if(decision == 5){
+        coordinate_x = keeping_x;
+        coordinate_y = keeping_y + interval;
+    }
+    if(decision == 6){
+        coordinate_x = keeping_x - interval;
+        coordinate_y = keeping_y + interval;
+    }
+    if(decision == 7){
+        coordinate_x = keeping_x - interval;
+        coordinate_y = keeping_y;
+    }
+    if(decision == 8){
+        coordinate_x = keeping_x - interval;
+        coordinate_y = keeping_y - interval;
+    }
+    real_frame.outer().push_back(point_i(coordinate_x,coordinate_y));
+    keeping_x = coordinate_x;
+    keeping_y = coordinate_y;
+}
+
+
+int ProbMaker::coordinate_x(int direction,int interbal, int keeping_x){
+    if(direction == 1){
+        return keeping_x;
+    }
+    if(direction == 2){
+        return keeping_x + interbal;
+    }
+    if(direction == 3){
+        return keeping_x + interbal;
+    }
+    if(direction == 4){
+        return keeping_x + interbal;
+    }
+    if(direction == 5){
+        return keeping_x;
+    }
+    if(direction == 6){
+        return keeping_x - interbal;
+    }
+    if(direction == 7){
+        return keeping_x - interbal;
+    }
+    if(direction == 8){
+        return keeping_x - interbal;
+    }
+}
+int ProbMaker::coordinate_y(int direction, int interbal, int keeping_y){
+    if(direction == 1){
+        return keeping_y - interbal;
+    }
+    if(direction == 2){
+        return keeping_y - interbal;
+    }
+    if(direction == 3){
+        return keeping_y;
+    }
+    if(direction == 4){
+        return keeping_y + interbal;
+    }
+    if(direction == 5){
+        return keeping_y + interbal;
+    }
+    if(direction == 6){
+        return keeping_y + interbal;
+    }
+    if(direction == 7){
+        return keeping_y;
+    }
+    if(direction == 8){
+        return keeping_y - interbal;
+    }
+}
+*/
 
 void ProbMaker::angulated_graphic(){
+
+
 
     polygon_i sample_frame;//   テストで枠を生成
     sample_frame.outer().push_back(point_i(12,0));
@@ -247,18 +485,22 @@ void ProbMaker::angulated_graphic(){
     sample_frame.outer().push_back(point_i(12,0));
     bg::correct(sample_frame);
 
+
+
     int tescou = -1;
     bool flag;
     do{
     print_polygons.clear();
     frame = sample_frame;
 
+    createFrame();
+
     check_frame = frame;//すでにはめられたピースも含むpolygonを生成する
 
     setInnerFrame(frame);// 初期状態のFrameをInnerFrameに投入
     while(1){
         createPiece(check_frame);
-        if(bg::area(check_frame) < 700 || print_polygons.size() > 48){
+        if(bg::area(check_frame) < 500 || print_polygons.size() > 48){
             //枠の残り部分をそのままピースとして出力する
             print_polygons.push_back(check_frame);
             break;//ピースを作成するループから抜け出す
@@ -274,7 +516,7 @@ void ProbMaker::angulated_graphic(){
     tescou++;
     flag=false;
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 700)flag=true;//ここでピースの大きさの最大値を設定している
+        if(bg::area(poly) > 500)flag=true;//ここでピースの大きさの最大値を設定している
     }
     if(congruenceCheck())flag=true;
 
@@ -291,6 +533,241 @@ void ProbMaker::angulated_graphic(){
     std::cout << "piece area average = " << bg::area(frame) / print_polygons.size() << std::endl;
 
     if(tescou)std::cout << "やり直されています　回数 : " << tescou << std::endl;
+
+}
+
+
+void ProbMaker::createFrame(){
+    polygon_i real_frame;//本物の枠
+    int firstcoordinate_x,firstcoordinate_y;
+
+    std::vector<int> vertex1;
+    do{
+        bg::clear(real_frame);
+    for(int a = 0;a < 4;a++){
+         vertex1.push_back(retRnd(4));
+    }
+    int inter;
+    std::set<int> anaraiz(vertex1.begin(),vertex1.end());
+    std::cout<<"set is done"<<std::endl;
+    std::vector<int> vertex(anaraiz.begin(),anaraiz.end());
+    std::cout <<"vector is done" << std::endl;
+    int count0 = 0,count1 = 0,count2 = 0,count3 = 0;
+    std::cout << "int is done"<<std::endl;
+    int num;
+    for(int count = 0;count != vertex.size();count++){
+        num = vertex[count];
+        if(num == 0){
+            count0 = 1;
+        }
+        if(num == 1){
+            count1 = 1;
+        }
+        if(num == 2){
+            count2 = 1;
+        }
+        if(num == 3){
+            count3 = 1;
+        }
+    }
+    std::cout <<"count is done"<<std::endl;
+    inter = retRnd(32);
+    if(count0 == 1){
+        real_frame.outer().push_back(point_i(inter,0));
+        real_frame.outer().push_back(point_i(0,inter));
+        firstcoordinate_x = inter,firstcoordinate_y = 0;
+    }else{
+        real_frame.outer().push_back(point_i(0,0));
+        firstcoordinate_x = 0,firstcoordinate_y = 0;
+    }
+    inter = retRnd(32);
+    if(count1 == 1){
+        real_frame.outer().push_back(point_i(0,64-inter));
+        real_frame.outer().push_back(point_i(inter,64));
+    }else{
+        real_frame.outer().push_back(point_i(0,64));
+    }
+    inter = retRnd(32);
+    if(count2 == 1){
+        real_frame.outer().push_back(point_i(100-inter,64));
+        real_frame.outer().push_back(point_i(100,64-inter));
+    }else{
+        real_frame.outer().push_back(point_i(100,64));
+    }
+    inter = retRnd(32);
+    if(count3 == 1){
+        real_frame.outer().push_back(point_i(100,inter));
+        real_frame.outer().push_back(point_i(100-inter,0));
+    }else{
+        real_frame.outer().push_back(point_i(100,0));
+    }
+    real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y));
+}while(bg::area(real_frame) > polygon_size);
+/*
+   int interbalnumber = 50;
+   int firstcoordinate_x = retRnd(25);
+   int firstcoordinate_y = retRnd(16);
+   int keeping_x = firstcoordinate_x;
+   int keeping_y = firstcoordinate_y;
+
+   real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y));
+
+
+   std::cout << "一つ目の頂点#############################################################################################3"
+                "########################################################################################################"
+                "#######################################################################################################"
+                "######################################################################################################"
+                "##########################################################################################################"
+                "#########################################################################################################"
+                "############################################################################################333333333333" <<std::endl;
+   int box_interbal_2,box_direction_2;
+   do{
+   box_interbal_2 = retRnd(interbalnumber);
+   box_direction_2 = interbal_judge(box_interbal_2,keeping_x,keeping_y,0,16);
+   }while(box_direction_2 == 0);
+   int coordinate_x2 = coordinate_x(box_direction_2,box_interbal_2,keeping_x),coordinate_y2 = coordinate_y(box_direction_2,box_interbal_2,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x2,coordinate_y2));
+   keeping_x = coordinate_x2;
+   keeping_y = coordinate_y2;
+   std::cout <<"二つ目の頂点#################################################################################################"
+               "3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333"
+               "3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333"
+               "33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333"
+               "3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333"
+               "33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333" <<std::endl;
+   //################################################################################################################################################################3
+   int box_interbal_3,box_direction_3;
+   do{
+   box_interbal_3 = retRnd(interbalnumber);
+   box_direction_3 = interbal_judge(box_interbal_3,keeping_x,keeping_y,0,32);
+   }while(box_direction_3 == 0);
+   int coordinate_x3 = coordinate_x(box_direction_3,box_interbal_3,keeping_x),coordinate_y3 = coordinate_y(box_direction_3,box_interbal_3,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x3,coordinate_y3));
+   keeping_x = coordinate_x3;
+   keeping_y = coordinate_y3;
+   std::cout <<"三つ目の頂点###############################################################################################"<<std::endl;
+   //######################################################################################################################################################################
+   int box_interbal_4,box_direction_4;
+   do{
+       box_interbal_4 = retRnd(interbalnumber);
+       box_direction_4 = interbal_judge(box_interbal_4,keeping_x,keeping_y,0,48);
+   }while(box_direction_4 == 0);
+   int coordinate_x4 = coordinate_x(box_direction_4,box_interbal_4,keeping_x),coordinate_y4 = coordinate_y(box_direction_4,box_interbal_4,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x4,coordinate_y4));
+   keeping_x = coordinate_x4;
+   keeping_y = coordinate_y4;
+   std::cout <<"四つ目の頂点#################################################################################################" <<std::endl;
+   //################################3333333333333333333333333333333#############################################################################
+   int box_direction_5,box_interbal_5;
+   do{
+       box_interbal_5 = retRnd(interbalnumber);
+       box_direction_5 = interbal_judge(box_interbal_5,keeping_x,keeping_y,25,48);
+   }while(box_direction_5 == 0);
+   int coordinate_x5 = coordinate_x(box_direction_5,box_interbal_5,keeping_x), coordinate_y5 = coordinate_y(box_direction_5,box_interbal_5,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x5,coordinate_y5));
+   keeping_x = coordinate_x5;
+   keeping_y = coordinate_y5;
+   std::cout <<"五つ目の頂点##################################################################################################" <<std::endl;
+   //#######################################################################################################################################################
+   int box_direction_6,box_interbal_6;
+   do{
+       box_interbal_6 = retRnd(interbalnumber);
+       box_direction_6 = interbal_judge(box_interbal_6,keeping_x,keeping_y,50,48);
+   }while(box_direction_6 == 0);
+   int coordinate_x6 = coordinate_x(box_direction_6,box_interbal_6,keeping_x);
+   int coordinate_y6 = coordinate_y(box_direction_6,box_interbal_6,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x6,coordinate_y6));
+   keeping_x = coordinate_x6,keeping_y = coordinate_y6;
+   std::cout <<"六つ目の頂点###################################################################################################" <<std::endl;
+   //#######################################################################################################################################
+   int box_direction_7,box_interbal_7;
+   do{
+       box_interbal_7 = retRnd(interbalnumber);
+       box_direction_7 = interbal_judge(box_interbal_7,keeping_x,keeping_y,75,48);
+   }while(box_direction_7 == 0);
+   int coordinate_x7 = coordinate_x(box_direction_7,box_interbal_7,keeping_x),coordinate_y7 = coordinate_y(box_direction_7,box_interbal_7,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x7,coordinate_y7));
+   keeping_x = coordinate_x7,keeping_y = coordinate_y7;
+   std::cout <<"七つ目の頂点###################################################################################################" <<std::endl;
+   int box_direction_8,box_interbal_8;
+   do{
+       box_interbal_8 = retRnd(interbalnumber);
+       box_direction_8 = interbal_judge(box_interbal_8,keeping_x,keeping_y,75,32);
+   }while(box_direction_8 == 0);
+   int coordinate_x8 = coordinate_x(box_direction_8,box_interbal_8,keeping_x),coordinate_y8 = coordinate_y(box_direction_8,box_interbal_8,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x8,coordinate_y8));
+   keeping_x = coordinate_x8,keeping_y = coordinate_y8;
+   std::cout <<"八つ目の頂点#####################################################################################################"<<std::endl;
+   int box_interbal_9,box_direction_9;
+   do{
+       box_interbal_9 = retRnd(interbalnumber);
+       box_direction_9 = interbal_judge(box_interbal_9,keeping_x,keeping_y,75,16);
+   }while(box_direction_9 == 0);
+   int coordinate_x9 = coordinate_x(box_direction_9,box_interbal_9,keeping_x),coordinate_y9 = coordinate_y(box_direction_9,box_interbal_9,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x9,coordinate_y9));
+   keeping_x = coordinate_x9,keeping_y = coordinate_y9;
+   std::cout <<"九つ目のの頂点####################################################################################################" <<std::endl;
+   int box_direction_10,box_interbal_10;
+   do{
+       box_interbal_10 = retRnd(interbalnumber);
+       box_direction_10 = interbal_judge(box_interbal_10,keeping_x,keeping_y,75,0);
+   }while(box_direction_10 == 0);
+   int coordinate_x10 = coordinate_x(box_direction_10,box_interbal_10,keeping_x),coordinate_y10 = coordinate_y(box_direction_10,box_interbal_10,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x10,coordinate_y10));
+   keeping_x = coordinate_x10,keeping_y = coordinate_y10;
+   std::cout <<"十個目の頂点#####################################################################################################" <<std::endl;
+   int box_direction_11,box_interbal_11;
+   do{
+       box_interbal_11 = retRnd(interbalnumber);
+       box_direction_11 = interbal_judge(box_interbal_11,keeping_x,keeping_y,50,0);
+   }while(box_direction_11 == 0);
+   int coordinate_x11 = coordinate_x(box_direction_11,box_interbal_11,keeping_x),coordinate_y11 = coordinate_y(box_direction_11,box_interbal_11,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x11,coordinate_y11));
+   keeping_x = coordinate_x11,keeping_y = coordinate_y11;
+   std::cout <<"十一個目の頂点####################################################################################################" <<std::endl;
+   int box_direction_12,box_interbal_12;
+   do{
+       box_interbal_12 = retRnd(interbalnumber);
+       box_direction_12 = interbal_judge(box_interbal_12,keeping_x,keeping_y,25,0);
+   }while(box_direction_12 == 0);
+   int coordinate_x12 = coordinate_x(box_direction_12,box_interbal_12,keeping_x),coordinate_y12 = coordinate_y(box_direction_12,box_interbal_12,keeping_y);
+   real_frame.outer().push_back(point_i(coordinate_x12,coordinate_y12));
+   keeping_x = coordinate_x12,keeping_y = coordinate_y12;
+   std::cout <<"一二個目の頂点####################################################################################################" <<std::endl;
+*/
+   //real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y);
+    std::cout << "このポリゴンの面積は" << bg::area(real_frame) << std::endl;
+
+    polygon_i vertical;
+    vertical.outer().push_back(point_i(50,0));
+    vertical.outer().push_back(point_i(51,0));
+    vertical.outer().push_back(point_i(51,64));
+    vertical.outer().push_back(point_i(50,64));
+    vertical.outer().push_back(point_i(50,0));
+
+    polygon_i horizontal;
+    horizontal.outer().push_back(point_i(0,32));
+    horizontal.outer().push_back(point_i(0,33));
+    horizontal.outer().push_back(point_i(100,33));
+    horizontal.outer().push_back(point_i(100,32));
+    horizontal.outer().push_back(point_i(0,32));
+
+
+
+//    print_polygons.push_back(real_frame);
+//    print_polygons.push_back(vertical);
+//    print_polygons.push_back(horizontal);
+    //polygon_i sample_frame;//   テストで枠を生成
+    //sample_frame.outer().push_back(point_i(12,0));
+    //sample_frame.outer().push_back(point_i(80,0));
+    //sample_frame.outer().push_back(point_i(101,20));
+    //sample_frame.outer().push_back(point_i(101,65));
+    //sample_frame.outer().push_back(point_i(20,65));
+    //sample_frame.outer().push_back(point_i(20,52));
+    //sample_frame.outer().push_back(point_i(0,12));
+    //sample_frame.outer().push_back(point_i(12,0));
+    frame = real_frame;
+    //print_polygons.push_back(sample_frame);
 
 }
 
@@ -357,7 +834,7 @@ void ProbMaker::splitPiece(){
         if(bg::area(print_polygons[poly_num]) > 200){//ピースの大きさが一定を超えているなら
             std::cout << "areaが一定値を超えてるので分割" << std::endl;
             std::cout << "分割前のピース" << bg::dsv(print_polygons[poly_num]) << std::endl;
-                createPiece(print_polygons[poly_num]);
+                createPiece(print_polygons[poly_num]);//ここで低確率で落ちてるぞ！！！！！
         }
         if(print_polygons.size() > 49)break;//ピース数が50を超えないように調整
         cou++;
@@ -607,6 +1084,8 @@ void ProbMaker::checkClossLine(polygon_i& poly , polygon_i& change_frame){//poly
     change_frame = differences[0];
 
 }
+
+
 
 void ProbMaker::delaunay_triangulation()
 {
@@ -971,7 +1450,7 @@ void ProbMaker::step()
         
         while(true){
             new_points2.push_back(polygon.outer().at(a));
-            if(a == end_side){
+             if(a == end_side){
                 break;
             }
 
