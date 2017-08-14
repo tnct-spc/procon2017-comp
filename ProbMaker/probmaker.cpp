@@ -274,7 +274,7 @@ void ProbMaker::angulated_graphic(){
     tescou++;
     flag=false;
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 700)flag=true;
+        if(bg::area(poly) > 700)flag=true;//ここでピースの大きさの最大値を設定している
     }
     if(congruenceCheck())flag=true;
 
@@ -306,7 +306,7 @@ bool ProbMaker::congruenceCheck(){
 
 }
 
-void ProbMaker::erasePoint(){
+void ProbMaker::erasePoint(){//直線上にある(消しても問題ない)頂点を削除
 
     for(auto& poly : print_polygons){
         bool flag;
@@ -315,26 +315,22 @@ void ProbMaker::erasePoint(){
 
         flag=false;
 
-        std::vector<point_i> vec_points;
+        std::vector<point_i> vec_points;//図形の頂点をこれに格納
         for(auto point : poly.outer()){
             vec_points.push_back(point);
         }
         vec_points.push_back(poly.outer().at(1));
 
-        for(auto point : poly.outer()){
-            std::cout << bg::dsv(point) << std::endl;
-        }
-
-        for(unsigned int point_cou=0;point_cou < vec_points.size() - 2;++point_cou){//最後はend,begin,1になる
-            bg::model::linestring<point_i> check_line;
+        for(unsigned int point_cou=0;point_cou < vec_points.size() - 2;++point_cou){
+            bg::model::linestring<point_i> check_line;//二点で線を作り、それが点と接触しているかを判定する
             check_line.push_back(vec_points.at(point_cou));
             check_line.push_back(vec_points.at(point_cou + 2));
 
-            if(bg::intersects(check_line,vec_points.at(point_cou + 1))){//intersectsがちゃんと動作している事が確認できた
-                std::cout << "intersects" << bg::dsv(check_line) << bg::dsv(poly.outer().at(point_cou + 1)) << std::endl;//最後のpointを消す場合は、最後と最初のpointの両方を消さなければならない 　　これ未対処
+            if(bg::intersects(check_line,vec_points.at(point_cou + 1))){//接触判定
+                std::cout << "intersects" << bg::dsv(check_line) << bg::dsv(poly.outer().at(point_cou + 1)) << std::endl;
 
                 vec_points.erase(vec_points.begin() + point_cou + 1);
-                vec_points.erase(vec_points.begin());
+                vec_points.erase(vec_points.begin());//ここ消さないとcorrect時に削除した頂点がくっついちゃってヤバい
                 bg::clear(poly);
                 for(unsigned int point_number = 0;point_number < vec_points.size() - 1;++point_number){
                     poly.outer().push_back(vec_points.at(point_number));
@@ -358,12 +354,12 @@ void ProbMaker::splitPiece(){
     //for(auto& poly : print_polygons){
     for(unsigned int poly_num =0;poly_num<print_polygons.size();++poly_num){//for eachから変更したら問題を起こさなくなった
         //polygon_i poly = print_polygons[poly_num];
-        if(bg::area(print_polygons[poly_num]) > 200){
+        if(bg::area(print_polygons[poly_num]) > 200){//ピースの大きさが一定を超えているなら
             std::cout << "areaが一定値を超えてるので分割" << std::endl;
             std::cout << "分割前のピース" << bg::dsv(print_polygons[poly_num]) << std::endl;
                 createPiece(print_polygons[poly_num]);
         }
-        if(print_polygons.size() > 49)break;
+        if(print_polygons.size() > 49)break;//ピース数が50を超えないように調整
         cou++;
     }
     flag = true;
@@ -373,25 +369,25 @@ void ProbMaker::splitPiece(){
     }
     if(flag)break;
     }
-    std::cout << "分割できてませんよ 300回ループしてる" << std::endl;
+
 }
 
 void ProbMaker::jointPiece(){
 
     std::cout << "start joint mode" << std::endl << std::endl;
     bool flag = false;
-    while(!flag){//flagがtrueにならないっぽい
+    while(!flag){
         bool check = false;
         int piece_cou = 0;//結合元のpieceの番号
         for(auto poly : print_polygons){
             if(check)break;
             int check_cou = 0;//結合先のpieceの番号
             for(auto check_poly : print_polygons){
-                if(bg::area(poly) < 50 && bg::intersects(poly,check_poly) && !bg::equals(poly,check_poly)){
+                if(bg::area(poly) < 50 && bg::intersects(poly,check_poly) && !bg::equals(poly,check_poly)){//面積が一定以下で他のピースと隣接していたなら結合
                     std::cout << "接触してる" << std::endl;
                     std::vector<polygon_i> union_poly;
                     bg::union_(poly,check_poly,union_poly);
-                    if(!bg::num_interior_rings(union_poly[0]) && union_poly.size() == 1){
+                    if(!bg::num_interior_rings(union_poly[0]) && union_poly.size() == 1){//結合後にinnerが存在してしまうようなら結合しない
                         print_polygons[piece_cou] = union_poly[0];
                         print_polygons.erase(print_polygons.begin() + check_cou);
                         check=true;
@@ -511,7 +507,7 @@ void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指�
     if(point_pushback){
             checkClossLine(poly , argument_frame);//ここでpolygonの始点と終点を補完する   ここまでは正常に進んでそうです
             std::cout << "pushbackされるポリゴン : " << bg::dsv(poly) << std::endl;
-            std::cout << "checkClossLineした後のargument_frame : " << bg::dsv(argument_frame) << std::endl;//argument_frameも問題ない事が確定した　だから問題はargument_frame(元はpoly)を参照渡しした部分
+            std::cout << "checkClossLineした後のargument_frame : " << bg::dsv(argument_frame) << std::endl;
             print_polygons.push_back(poly);
             std::cout << "pushbackされたポリゴン : " << bg::dsv(print_polygons[print_polygons.size()-1]) << std::endl;
     }
