@@ -61,7 +61,7 @@ private:
 
     //void push_backer(int keeping_x,int keeping_y,int target_x,int target_y,polygon_i real_frame);
 
-    int polygon_size = 4750;
+    int polygon_size = 6000;
 
 private slots:
     void step();

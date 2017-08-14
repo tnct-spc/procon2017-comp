@@ -500,7 +500,7 @@ void ProbMaker::angulated_graphic(){
     setInnerFrame(frame);// 初期状態のFrameをInnerFrameに投入
     while(1){
         createPiece(check_frame);
-        if(bg::area(check_frame) < 500 || print_polygons.size() > 48){
+        if(bg::area(check_frame) < 400 || print_polygons.size() > 48){
             //枠の残り部分をそのままピースとして出力する
             print_polygons.push_back(check_frame);
             break;//ピースを作成するループから抜け出す
@@ -516,7 +516,7 @@ void ProbMaker::angulated_graphic(){
     tescou++;
     flag=false;
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 500)flag=true;//ここでピースの大きさの最大値を設定している
+        if(bg::area(poly) > 550)flag=true;//ここでピースの大きさの最大値を設定している
     }
     if(congruenceCheck())flag=true;
 
