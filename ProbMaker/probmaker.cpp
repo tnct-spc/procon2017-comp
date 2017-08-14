@@ -472,7 +472,7 @@ int ProbMaker::coordinate_y(int direction, int interbal, int keeping_y){
 
 void ProbMaker::angulated_graphic(){
 
-
+    /*
 
     polygon_i sample_frame;//   テストで枠を生成
     sample_frame.outer().push_back(point_i(12,0));
@@ -485,32 +485,31 @@ void ProbMaker::angulated_graphic(){
     sample_frame.outer().push_back(point_i(12,0));
     bg::correct(sample_frame);
 
-
+    */
 
     int tescou = -1;
     bool flag;
     do{
     print_polygons.clear();
-    frame = sample_frame;
+    //frame = sample_frame;
 
     createFrame();
 
     check_frame = frame;//すでにはめられたピースも含むpolygonを生成する
 
     setInnerFrame(frame);// 初期状態のFrameをInnerFrameに投入
-    while(1){
-        createPiece(check_frame);
-        if(bg::area(check_frame) < 400 || print_polygons.size() > 48){
-            //枠の残り部分をそのままピースとして出力する
-            print_polygons.push_back(check_frame);
-            break;//ピースを作成するループから抜け出す
-        }
-    }
+    for(int count = 0;count<200;++count){
+        createPiece(check_frame);//どうやらここでcreatePieceを無限実行してるのが不具合になってたみたい 上限を設けて不具合を回避した
+        if(bg::area(check_frame) < 400 || print_polygons.size() > 48)break;
 
-        //大きいのを分割
-        splitPiece();//この部分でちゃんと分割できてなさそう
-        //小さなピースの結合
-        jointPiece();
+    }
+    //枠の残り部分をそのままピースとして出力する
+    print_polygons.push_back(check_frame);
+
+    //大きいのを分割
+    splitPiece();//この部分でちゃんと分割できてなさそう
+    //小さなピースの結合
+    jointPiece();
 
 
     tescou++;
@@ -738,7 +737,7 @@ void ProbMaker::createFrame(){
    //real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y);
     std::cout << "このポリゴンの面積は" << bg::area(real_frame) << std::endl;
 
-    polygon_i vertical;
+   /* polygon_i vertical;
     vertical.outer().push_back(point_i(50,0));
     vertical.outer().push_back(point_i(51,0));
     vertical.outer().push_back(point_i(51,64));
@@ -750,7 +749,7 @@ void ProbMaker::createFrame(){
     horizontal.outer().push_back(point_i(0,33));
     horizontal.outer().push_back(point_i(100,33));
     horizontal.outer().push_back(point_i(100,32));
-    horizontal.outer().push_back(point_i(0,32));
+    horizontal.outer().push_back(point_i(0,32));*/
 
 
 
@@ -834,7 +833,7 @@ void ProbMaker::splitPiece(){
         if(bg::area(print_polygons[poly_num]) > 200){//ピースの大きさが一定を超えているなら
             std::cout << "areaが一定値を超えてるので分割" << std::endl;
             std::cout << "分割前のピース" << bg::dsv(print_polygons[poly_num]) << std::endl;
-                createPiece(print_polygons[poly_num]);//ここで低確率で落ちてるぞ！！！！！
+            createPiece(print_polygons[poly_num]);
         }
         if(print_polygons.size() > 49)break;//ピース数が50を超えないように調整
         cou++;
@@ -986,8 +985,9 @@ void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指�
             std::cout << "pushbackされるポリゴン : " << bg::dsv(poly) << std::endl;
             std::cout << "checkClossLineした後のargument_frame : " << bg::dsv(argument_frame) << std::endl;
             print_polygons.push_back(poly);
-            std::cout << "pushbackされたポリゴン : " << bg::dsv(print_polygons[print_polygons.size()-1]) << std::endl;
+            std::cout << "pushbackされたポリゴン : " << bg::dsv(print_polygons[print_polygons.size()-1]) << std::endl;//ここの出力を最後に実行が止まる事があります　修正事項
     }
+    std::cout << "分割終わり" << std::endl;//ここが連続で出てきてるパターンがあるみたい
 
 }
 
