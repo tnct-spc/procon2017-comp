@@ -280,6 +280,7 @@ void ProbMaker::angulated_graphic(){
 
     }while(flag);
 
+    erasePoint();
 
     for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
         std::cout << "polygon = " << bg::dsv(polygon) << std::endl;
@@ -303,6 +304,50 @@ bool ProbMaker::congruenceCheck(){
 
     return false;//問題がなければfalseを返して終了
 
+}
+
+void ProbMaker::erasePoint(){
+
+    for(auto& poly : print_polygons){
+        bool flag;
+        bg::unique(poly);
+        do{
+
+        flag=false;
+
+        std::vector<point_i> vec_points;
+        for(auto point : poly.outer()){
+            vec_points.push_back(point);
+        }
+        vec_points.push_back(poly.outer().at(1));
+
+        for(auto point : poly.outer()){
+            std::cout << bg::dsv(point) << std::endl;
+        }
+
+        for(unsigned int point_cou=0;point_cou < vec_points.size() - 2;++point_cou){//最後はend,begin,1になる
+            bg::model::linestring<point_i> check_line;
+            check_line.push_back(vec_points.at(point_cou));
+            check_line.push_back(vec_points.at(point_cou + 2));
+
+            if(bg::intersects(check_line,vec_points.at(point_cou + 1))){//intersectsがちゃんと動作している事が確認できた
+                std::cout << "intersects" << bg::dsv(check_line) << bg::dsv(poly.outer().at(point_cou + 1)) << std::endl;//最後のpointを消す場合は、最後と最初のpointの両方を消さなければならない 　　これ未対処
+
+                vec_points.erase(vec_points.begin() + point_cou + 1);
+                vec_points.erase(vec_points.begin());
+                bg::clear(poly);
+                for(unsigned int point_number = 0;point_number < vec_points.size() - 1;++point_number){
+                    poly.outer().push_back(vec_points.at(point_number));
+                }
+                flag=true;
+                break;
+            }
+        }
+
+        bg::unique(poly);
+        bg::correct(poly);
+        }while(flag);
+    }
 }
 
 void ProbMaker::splitPiece(){

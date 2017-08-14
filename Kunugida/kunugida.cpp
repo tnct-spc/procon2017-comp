@@ -46,7 +46,7 @@ void Kunugida::run()
         ProbMaker *PbMaker = new ProbMaker();
 
         //もしProbMakerの結果を表示したければ下をコメントアウト
-   //     PbMaker->show();
+        PbMaker->show();
         board->update();
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();

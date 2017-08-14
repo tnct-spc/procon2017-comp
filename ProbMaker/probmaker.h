@@ -30,6 +30,7 @@ private:
     void jointPiece();
     void splitPiece();
     bool congruenceCheck();
+    void erasePoint();
 
     bool IsCongruence(polygon_i polygon1 , polygon_i polygon2);//中野先輩のやつ
 
