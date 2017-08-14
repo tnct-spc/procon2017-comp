@@ -248,6 +248,7 @@ void ProbMaker::angulated_graphic(){
     bg::correct(sample_frame);
 
     int tescou = -1;
+    bool flag;
     do{
     print_polygons.clear();
     frame = sample_frame;
@@ -264,15 +265,20 @@ void ProbMaker::angulated_graphic(){
         }
     }
 
+        //大きいのを分割
+        splitPiece();//この部分でちゃんと分割できてなさそう
+        //小さなピースの結合
+        jointPiece();
 
-    //大きいのを分割
-    splitPiece();//この部分でちゃんと分割できてなさそう
-    //小さなピースの結合
-    jointPiece();
 
     tescou++;
+    flag=false;
+    for(auto poly : print_polygons){
+        if(bg::area(poly) > 700)flag=true;
+    }
+    if(congruenceCheck())flag=true;
 
-    }while(congruenceCheck());
+    }while(flag);
 
 
     for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
@@ -283,7 +289,7 @@ void ProbMaker::angulated_graphic(){
     std::cout << "piece count = " << print_polygons.size() << std::endl;
     std::cout << "piece area average = " << bg::area(frame) / print_polygons.size() << std::endl;
 
-    if(tescou)std::cout << "同じ形のピースが存在したためやり直されています　回数 : " << tescou << std::endl;
+    if(tescou)std::cout << "やり直されています　回数 : " << tescou << std::endl;
 
 }
 
@@ -304,11 +310,13 @@ void ProbMaker::splitPiece(){
     bool flag = false;
     for(int count=0;count < 300;count++){//分割できないパターンでの無限ループ防止
     int cou=0;
-    for(auto& poly : print_polygons){
-        if(bg::area(poly) > 150){
-            std::cout << "areaが500超えてるので分割" << std::endl;
-            std::cout << "分割前のピース" << bg::dsv(poly) << std::endl;
-            createPiece(poly);
+    //for(auto& poly : print_polygons){
+    for(unsigned int poly_num =0;poly_num<print_polygons.size();++poly_num){//for eachから変更したら問題を起こさなくなった
+        //polygon_i poly = print_polygons[poly_num];
+        if(bg::area(print_polygons[poly_num]) > 200){
+            std::cout << "areaが一定値を超えてるので分割" << std::endl;
+            std::cout << "分割前のピース" << bg::dsv(print_polygons[poly_num]) << std::endl;
+                createPiece(print_polygons[poly_num]);
         }
         if(print_polygons.size() > 49)break;
         cou++;
@@ -316,10 +324,11 @@ void ProbMaker::splitPiece(){
     flag = true;
     if(print_polygons.size() > 49)break;
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 150) flag = false;
+        if(bg::area(poly) > 200) flag = false;
     }
     if(flag)break;
     }
+    std::cout << "分割できてませんよ 300回ループしてる" << std::endl;
 }
 
 void ProbMaker::jointPiece(){
@@ -369,7 +378,7 @@ void ProbMaker::setInnerFrame(polygon_i frame){
     }
 }
 
-void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠、大きさ調整前のピースかを指定する
+void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指定する
     //ここから関数
     polygon_i poly;
 
