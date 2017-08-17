@@ -8,21 +8,6 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
 {
     raw_pieces_pic = raw_pieces_image;
 
-    /*
-    // 表示法サンプル
-    polygon_i polygon;
-    polygon.outer().push_back(point_i(3,3));
-    polygon.outer().push_back(point_i(5,3));
-    polygon.outer().push_back(point_i(4,4));
-    polygon.outer().push_back(point_i(3,3));
-
-    procon::NeoExpandedPolygon hoge;
-    hoge.setPolygon(polygon);
-
-    auto inst = NeoSinglePolygonDisplay::createInstance(hoge, "hoge");
-    inst->show();
-    */
-
     // 二値化,前処理.
     //cv::Mat frame_image = preprocessingFrame(raw_frame_image); // 入れ替え可
     //std::vector<cv::Mat> pieces_images = preprocessingPieces(raw_pieces_image);
@@ -52,7 +37,7 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
     std::vector<polygon_i> pieces;
-    for (unsigned int i=0; i<polygons.size(); i++) {
+    for (unsigned int i=1; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
     }
 
@@ -913,11 +898,10 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     grid_piece.outer().push_back(point_i(0,0));
 
     // 最初の辺の長さをグリッド基準で計算
-    double r = 216.0 / 3400.0;
     double first_x = polygon.outer().at(1).x() - polygon.outer().at(0).x();
     double first_y = polygon.outer().at(1).y() - polygon.outer().at(0).y();
-    double x_dif = first_x * r / 2.5;
-    double y_dif = first_y * r / 2.5;
+    double x_dif = first_x * scale / 2.5;
+    double y_dif = first_y * scale / 2.5;
     double len = sqrt(pow(x_dif, 2.0) + pow(y_dif, 2.0));
 
     double dif_min = 1.0;
@@ -987,18 +971,17 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     // 全ての点の座標をグリッドに変換
     for (unsigned int i=2; i<size; i++) {
-        double x = turn.outer().at(i).x() * r / 2.5;
-        double y = turn.outer().at(i).y() * r / 2.5;
+        double x = turn.outer().at(i).x() * scale / 2.5;
+        double y = turn.outer().at(i).y() * scale / 2.5;
         grid_piece.outer().push_back(point_i(round(x),round(y)));
     }
 
     procon::NeoExpandedPolygon piece;
     piece.resetPolygonForce(grid_piece);
 
-//    auto inst = NeoSinglePolygonDisplay::createInstance(piece, "Grid");
-//    inst->show();
 
-    //cv::waitKey(10000);
+
+    cv::waitKey(10000);
 
     return grid_piece;
 }
