@@ -1,6 +1,7 @@
 ﻿#include "imagerecognition.h"
 #include "threshold.h"
 #include "polygonviewer.h"
+#include "neopolygonviewer.h"
 #include "utilities.h"
 #include "neosinglepolygondisplay.h"
 
@@ -39,6 +40,7 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
     std::vector<polygon_i> pieces;
     for (unsigned int i=1; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
+        getError(pieces[i-1],i);
     }
 
     // fieldクラスのデータに変換
@@ -841,7 +843,8 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
         int *param = stats.ptr<int>(i);
 
         // 面積の小さいものは省く
-        if (param[cv::ConnectedComponentsTypes::CC_STAT_AREA] > 10000) { // 調節
+        int piece_area = param[cv::ConnectedComponentsTypes::CC_STAT_AREA];
+        if (piece_area > 10000) { // 調節
 
             // 各ピースごとに移し替える
             cv::Mat piece_image(cv::Size(width, height), CV_8UC1);
@@ -856,6 +859,7 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
                 }
             }
 
+            area.push_back(piece_area);
             pieces_images.push_back(piece_image);
         }
     }
@@ -979,9 +983,27 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     procon::NeoExpandedPolygon piece;
     piece.resetPolygonForce(grid_piece);
 
-
-
-    cv::waitKey(10000);
+    NeoPolygonViewer::getInstance().displayPolygon(grid_piece, "Grid", false);
 
     return grid_piece;
+}
+
+void ImageRecognition::getError(polygon_i p, int num)
+{
+    int size = p.outer().size();
+    double piece_area = 0;
+
+    for (int i=0; i<size-1; i++) {
+        auto point1 = p.outer().at(i);
+        auto point2 = p.outer().at(i+1);
+        piece_area += point1.x() * point2.y() - point1.y() * point2.x();
+    }
+
+    piece_area = fabs(piece_area) * 0.5 * 2.5 * 2.5;
+
+    double scan_area = area[num] * pow(scale, 2.0);
+
+    double error = scan_area - piece_area;
+
+    int a;
 }

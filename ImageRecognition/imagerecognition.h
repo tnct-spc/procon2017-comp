@@ -43,6 +43,7 @@ private:
     cv::Mat HSVDetection(cv::Mat src_image);
     std::vector<cv::Mat> dividePiece(cv::Mat src_image);
     polygon_i placeGrid(polygon_t vertex);
+    void getError(polygon_i , int num);
 
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;
@@ -50,6 +51,7 @@ private:
     std::vector<cv::Vec3b> raw_random_colors;
     double scale;
     static constexpr double cutting_allowance = 0.0;
+    std::vector<int> area;
 };
 
 #endif // IMAGERECOGNITION_H
