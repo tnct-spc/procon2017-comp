@@ -10,6 +10,7 @@
 #include "testalgorithmwrapper.h"
 #include "testevaluation.h"
 #include "testpolygonconnector.h"
+#include "testcheckcanprume.h"
 
 int Test()
 {
@@ -23,7 +24,8 @@ int Test()
 //    TESTER.push_back(new testSearchSameLength);
 //    TESTER.push_back(new TestAlgorithmWrapper);
 //    TESTER.push_back(new TestEvaluation);
-    TESTER.push_back(new TestPolygonConnector);
+//    TESTER.push_back(new TestPolygonConnector);
+    TESTER.push_back(new TestCheckCanPrume);
 
     for(auto tester : TESTER){
         if(!tester->run()){
