@@ -532,16 +532,17 @@ void ProbMaker::angulated_graphic(){
     std::cout << "piece area average = " << bg::area(frame) / print_polygons.size() << std::endl;
 
     if(tescou)std::cout << "やり直されています　回数 : " << tescou << std::endl;
-
+    std::cout << "このポリゴンの面積は" <<bg::area(real_frame)<<std::endl;
 }
 
 
-void ProbMaker::createFrame(){
-    polygon_i real_frame;//本物の枠
-    int firstcoordinate_x,firstcoordinate_y;
+void ProbMaker::createFrame(){//本物の
+    int firstcoordinate_x,firstcoordinate_y,leftline,overline,rightline,underline;
+    do{
+    leftline = retRnd(15),overline = retRnd(10),rightline = 86+retRnd(15),underline = 56+retRnd(10);
 
     std::vector<int> vertex1;
-    do{
+
         bg::clear(real_frame);
     for(int a = 0;a < 4;a++){
          vertex1.push_back(retRnd(4));
@@ -570,38 +571,38 @@ void ProbMaker::createFrame(){
         }
     }
     std::cout <<"count is done"<<std::endl;
-    inter = retRnd(32);
+    inter = retRnd(22);
     if(count0 == 1){
-        real_frame.outer().push_back(point_i(inter,0));
-        real_frame.outer().push_back(point_i(0,inter));
-        firstcoordinate_x = inter,firstcoordinate_y = 0;
+        real_frame.outer().push_back(point_i(inter+leftline,overline));
+        real_frame.outer().push_back(point_i(leftline,inter+overline));
+        firstcoordinate_x = inter + leftline,firstcoordinate_y = overline;
     }else{
-        real_frame.outer().push_back(point_i(0,0));
-        firstcoordinate_x = 0,firstcoordinate_y = 0;
+        real_frame.outer().push_back(point_i(leftline,overline));
+        firstcoordinate_x = leftline,firstcoordinate_y = overline;
     }
-    inter = retRnd(32);
+    inter = retRnd(22);
     if(count1 == 1){
-        real_frame.outer().push_back(point_i(0,64-inter));
-        real_frame.outer().push_back(point_i(inter,64));
+        real_frame.outer().push_back(point_i(leftline,underline-inter));
+        real_frame.outer().push_back(point_i(inter+leftline,underline));
     }else{
-        real_frame.outer().push_back(point_i(0,64));
+        real_frame.outer().push_back(point_i(leftline,underline));
     }
-    inter = retRnd(32);
+    inter = retRnd(22);
     if(count2 == 1){
-        real_frame.outer().push_back(point_i(100-inter,64));
-        real_frame.outer().push_back(point_i(100,64-inter));
+        real_frame.outer().push_back(point_i(rightline-inter,underline));
+        real_frame.outer().push_back(point_i(rightline,underline-inter));
     }else{
-        real_frame.outer().push_back(point_i(100,64));
+        real_frame.outer().push_back(point_i(rightline,underline));
     }
-    inter = retRnd(32);
+    inter = retRnd(22);
     if(count3 == 1){
-        real_frame.outer().push_back(point_i(100,inter));
-        real_frame.outer().push_back(point_i(100-inter,0));
+        real_frame.outer().push_back(point_i(rightline,inter+overline));
+        real_frame.outer().push_back(point_i(rightline-inter,overline));
     }else{
-        real_frame.outer().push_back(point_i(100,0));
+        real_frame.outer().push_back(point_i(rightline,overline));
     }
     real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y));
-}while(bg::area(real_frame) > polygon_size);
+}while(bg::area(real_frame) < frame_size);
 /*
    int interbalnumber = 50;
    int firstcoordinate_x = retRnd(25);
@@ -753,7 +754,7 @@ void ProbMaker::createFrame(){
 
 
 
-//    print_polygons.push_back(real_frame);
+    //print_polygons.push_back(real_frame);
 //    print_polygons.push_back(vertical);
 //    print_polygons.push_back(horizontal);
     //polygon_i sample_frame;//   テストで枠を生成

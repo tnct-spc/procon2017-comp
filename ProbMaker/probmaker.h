@@ -44,6 +44,7 @@ private:
     polygon_i frame;
     polygon_i check_frame;
     polygon_i inner_frame;
+    polygon_i real_frame;
 
     int interbal_judge(int interbal, int keeping_x, int keeping_y, int target_x, int target_y);
     int north_judge(int interval,int keeping_x,int keeping_y,int target_x,int target_y);
@@ -58,10 +59,8 @@ private:
     int coordinate_x(int direction,int interbal,int keeping_x);
     int coordinate_y(int direction,int interbal,int keeping_y);
     int interbal(int keeping_x,int keeping_y,int target_x,int target_y);
-
+    int frame_size = 4500;
     //void push_backer(int keeping_x,int keeping_y,int target_x,int target_y,polygon_i real_frame);
-
-    int polygon_size = 6000;
 
 private slots:
     void step();
