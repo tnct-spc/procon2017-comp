@@ -17,10 +17,6 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
-void NeoAnswerBoard::singleMode(){
-    singleif = true;
-}
-
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
@@ -240,9 +236,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     drawDownBackground();
 
-    if(singleif){
-        for(unsigned int piecenumber = 0; piecenumber < field.getPieces.size(); ++piecenumber){
-            drawAfterPiece(piecenumber);
+    if(single_mode){
+        for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
+            drawAfterPiece(piece_num);
+            drawPieceId(piece_num);
         }
 
     }else{
