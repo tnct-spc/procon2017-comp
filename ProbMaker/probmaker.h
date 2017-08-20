@@ -28,7 +28,7 @@ private:
     void setInnerFrame(polygon_i frame);
     void checkClossLine(polygon_i& poly , polygon_i& change_frame);
     void jointPiece();
-    void splitPiece();
+    bool splitPiece();
     bool congruenceCheck();
     void erasePoint();
     void createFrame();

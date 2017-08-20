@@ -21,6 +21,8 @@
 #include <QKeyEvent>
 #include <QEventLoop>
 
+#include <time.h>
+
 
 
 ProbMaker::ProbMaker(QWidget *parent) :
@@ -494,6 +496,8 @@ void ProbMaker::angulated_graphic(){
     //frame = sample_frame;
 
     createFrame();
+    std::cout << "枠生成完了　" << std::endl;
+
 
     check_frame = frame;//すでにはめられたピースも含むpolygonを生成する
 
@@ -505,24 +509,33 @@ void ProbMaker::angulated_graphic(){
     }
     //枠の残り部分をそのままピースとして出力する
     print_polygons.push_back(check_frame);
+    std::cout << "ピース生成完了" << std::endl;
 
     //大きいのを分割
-    splitPiece();//この部分でちゃんと分割できてなさそう
-    //小さなピースの結合
-    jointPiece();
+    if(splitPiece()){
+        std::cout << "ピース分割完了" << std::endl;
+        //小さなピースの結合
+        jointPiece();
+        std::cout << "ピース結合完了" << std::endl;
 
 
-    tescou++;
-    flag=false;
-    for(auto poly : print_polygons){
-        if(bg::area(poly) > 550)flag=true;//ここでピースの大きさの最大値を設定している
-    }
-    if(congruenceCheck())flag=true;
+        tescou++;
+        flag=false;
+        for(auto poly : print_polygons){
+            if(bg::area(poly) > 550){flag=true;//ここでピースの大きさの最大値を設定している
+            std::cout << "ピースの大きさが限界値を超えています" << std::endl;}
+        }
+        if(congruenceCheck())flag=true;
+        std::cout << "問題検知終了" << std::endl;
 
+    }else flag=true;//falseが返されたなら分割ができていないためやり直し
+
+    if(flag)std::cout << "問題があったのでやり直し" << std::endl;
     }while(flag);
 
     erasePoint();
 
+    /*
     for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
         std::cout << "polygon = " << bg::dsv(polygon) << std::endl;
         std::cout << "area = " << bg::area(polygon) << std::endl << std::endl;
@@ -530,9 +543,8 @@ void ProbMaker::angulated_graphic(){
     std::cout << "piece area = " << bg::area(frame) << std::endl;
     std::cout << "piece count = " << print_polygons.size() << std::endl;
     std::cout << "piece area average = " << bg::area(frame) / print_polygons.size() << std::endl;
-
+    */
     if(tescou)std::cout << "やり直されています　回数 : " << tescou << std::endl;
-    std::cout << "このポリゴンの面積は" <<bg::area(real_frame)<<std::endl;
 }
 
 
@@ -549,11 +561,8 @@ void ProbMaker::createFrame(){//本物の
     }
     int inter;
     std::set<int> anaraiz(vertex1.begin(),vertex1.end());
-    std::cout<<"set is done"<<std::endl;
     std::vector<int> vertex(anaraiz.begin(),anaraiz.end());
-    std::cout <<"vector is done" << std::endl;
     int count0 = 0,count1 = 0,count2 = 0,count3 = 0;
-    std::cout << "int is done"<<std::endl;
     int num;
     for(int count = 0;count != vertex.size();count++){
         num = vertex[count];
@@ -570,7 +579,6 @@ void ProbMaker::createFrame(){//本物の
             count3 = 1;
         }
     }
-    std::cout <<"count is done"<<std::endl;
     inter = retRnd(22);
     if(count0 == 1){
         real_frame.outer().push_back(point_i(inter+leftline,overline));
@@ -736,7 +744,6 @@ void ProbMaker::createFrame(){//本物の
    std::cout <<"一二個目の頂点####################################################################################################" <<std::endl;
 */
    //real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y);
-    std::cout << "このポリゴンの面積は" << bg::area(real_frame) << std::endl;
 
    /* polygon_i vertical;
     vertical.outer().push_back(point_i(50,0));
@@ -804,7 +811,6 @@ void ProbMaker::erasePoint(){//直線上にある(消しても問題ない)頂�
             check_line.push_back(vec_points.at(point_cou + 2));
 
             if(bg::intersects(check_line,vec_points.at(point_cou + 1))){//接触判定
-                std::cout << "intersects" << bg::dsv(check_line) << bg::dsv(poly.outer().at(point_cou + 1)) << std::endl;
 
                 vec_points.erase(vec_points.begin() + point_cou + 1);
                 vec_points.erase(vec_points.begin());//ここ消さないとcorrect時に削除した頂点がくっついちゃってヤバい
@@ -823,37 +829,33 @@ void ProbMaker::erasePoint(){//直線上にある(消しても問題ない)頂�
     }
 }
 
-void ProbMaker::splitPiece(){
-    std::cout << "start split mode" << std::endl;
-    bool flag = false;
-    for(int count=0;count < 300;count++){//分割できないパターンでの無限ループ防止
-    int cou=0;
-    //for(auto& poly : print_polygons){
+bool ProbMaker::splitPiece(){
+    bool flag;
+    for(int count=0;count < 15;count++){//分割できないパターンでの無限ループ防止
+    flag=true;
     for(unsigned int poly_num =0;poly_num<print_polygons.size();++poly_num){//for eachから変更したら問題を起こさなくなった
-        //polygon_i poly = print_polygons[poly_num];
         if(bg::area(print_polygons[poly_num]) > 200){//ピースの大きさが一定を超えているなら
-            std::cout << "areaが一定値を超えてるので分割" << std::endl;
-            std::cout << "分割前のピース" << bg::dsv(print_polygons[poly_num]) << std::endl;
             createPiece(print_polygons[poly_num]);
+            flag=false;
         }
         if(print_polygons.size() > 49)break;//ピース数が50を超えないように調整
-        cou++;
     }
-    flag = true;
     if(print_polygons.size() > 49)break;
     for(auto poly : print_polygons){
         if(bg::area(poly) > 200) flag = false;
     }
     if(flag)break;
     }
-
+    for(auto poly : print_polygons){
+        if(bg::area(poly) > 550) return false;
+    }
+    return true;
 }
 
 void ProbMaker::jointPiece(){
 
-    std::cout << "start joint mode" << std::endl << std::endl;
     bool flag = false;
-    while(!flag){
+    for(int count=0;count < 30;count++){
         bool check = false;
         int piece_cou = 0;//結合元のpieceの番号
         for(auto poly : print_polygons){
@@ -861,14 +863,16 @@ void ProbMaker::jointPiece(){
             int check_cou = 0;//結合先のpieceの番号
             for(auto check_poly : print_polygons){
                 if(bg::area(poly) < 50 && bg::intersects(poly,check_poly) && !bg::equals(poly,check_poly)){//面積が一定以下で他のピースと隣接していたなら結合
-                    std::cout << "接触してる" << std::endl;
+
                     std::vector<polygon_i> union_poly;
                     bg::union_(poly,check_poly,union_poly);
-                    if(!bg::num_interior_rings(union_poly[0]) && union_poly.size() == 1){//結合後にinnerが存在してしまうようなら結合しない
-                        print_polygons[piece_cou] = union_poly[0];
-                        print_polygons.erase(print_polygons.begin() + check_cou);
-                        check=true;
-                        break;
+                    if(!bg::num_interior_rings(union_poly[0]) && union_poly.size() == 1 ){//結合後にinnerが存在してしまうようなら結合しない
+                        if(bg::area(union_poly[0]) < 550 || count == 29 ){
+                            print_polygons[piece_cou] = union_poly[0];
+                            print_polygons.erase(print_polygons.begin() + check_cou);
+                            check=true;
+                            break;
+                        }
                     }
                 }
                 ++check_cou;
@@ -879,6 +883,7 @@ void ProbMaker::jointPiece(){
         for(auto poly : print_polygons){
             if(bg::area(poly) < 50) flag = false;// areaが一定以下のピースが存在するならもう一度繰り返す
         }
+        if(flag)break;
     }
 }
 
@@ -899,7 +904,6 @@ void ProbMaker::setInnerFrame(polygon_i frame){
 void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指定する
     //ここから関数
     polygon_i poly;
-
     bool check = false;
     int point_y,point_x;
     setInnerFrame(argument_frame);
@@ -907,7 +911,6 @@ void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指�
         point_x = 1 + retRnd(99);//ランダムでx座標を出す
         for(int closspointy=0;closspointy<66;closspointy++){//縦に引かれた線と枠の線の交点を出す
             if( bg::intersects(point_i(point_x,closspointy), argument_frame)){
-                if(!bg::within(point_i(point_x,closspointy + 1) , argument_frame))break;//記憶せずにもう一度
                 point_y = closspointy; //交点のy座標を記憶
                 check = true;
                 break;
@@ -926,7 +929,8 @@ void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指�
 
     while(!flag){//他の枠やピース、自分の線とぶつかったら終了するようにする
         cou++;
-        bool add_or_subt = retRnd(2);//retRnd(2); // retRnd(2); //trueなら数値を加算、falseなら減算(原点方向へ移動)させる
+
+        bool add_or_subt = retRnd(2);
         point_pushback = true; // 頂点をpush_backするか決める変数　これがfalseなら点をpush_backせずやり直す
         if(add_or_subt){
             if(point_x != 101 && point_y != 65){
@@ -978,18 +982,12 @@ void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指�
             poly.outer().push_back(point_i(point_x , point_y)); //頂点を確定させる
             x_or_y ^= 1;//次の実行時に向きを変えるようにする(xに進めるかyに進めるかを決める)
         }
-
     }
 
     if(point_pushback){
-            checkClossLine(poly , argument_frame);//ここでpolygonの始点と終点を補完する   ここまでは正常に進んでそうです
-            std::cout << "pushbackされるポリゴン : " << bg::dsv(poly) << std::endl;
-            std::cout << "checkClossLineした後のargument_frame : " << bg::dsv(argument_frame) << std::endl;
+            checkClossLine(poly , argument_frame);
             print_polygons.push_back(poly);
-            std::cout << "pushbackされたポリゴン : " << bg::dsv(print_polygons[print_polygons.size()-1]) << std::endl;//ここの出力を最後に実行が止まる事があります　修正事項
     }
-    std::cout << "分割終わり" << std::endl;//ここが連続で出てきてるパターンがあるみたい
-
 }
 
 
@@ -1070,17 +1068,11 @@ void ProbMaker::checkClossLine(polygon_i& poly , polygon_i& change_frame){//poly
     bg::correct(pattern_two);
     if(bg::area(pattern_one) < bg::area(pattern_two)) poly = pattern_one;//polyに結果を代入する
     else poly = pattern_two;
-
-    std::cout << "splited　polygon : " << bg::dsv(poly) << std::endl;
-    std::cout << "分割される前のポリゴン (変更前)" << bg::dsv(change_frame) << std::endl;
-    //ここからchange_frameの変更
     //differenceで異なる部分(重複していない部分)を取り出す
     //それをchange_frameに格納する
     bg::correct(change_frame);
     std::vector<polygon_i> differences;
     bg::difference(change_frame,poly,differences);
-    std::cout << "異なる部分のsize" << differences.size() << std::endl;
-    std::cout << "difference(polyに代入するやつ)" << bg::dsv(differences[0]) << std::endl;
     change_frame.clear();
     change_frame = differences[0];
 
