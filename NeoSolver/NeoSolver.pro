@@ -29,17 +29,24 @@ CONFIG   += precompile_header
 CONFIG += c++14
 
 LIBS += -L/usr/lib `pkg-config --libs opencv`
+LIBS += -lboost_system -lboost_thread
 
 SOURCES += neosolver.cpp \
     Algorithm/algorithmwrapper.cpp \
     Algorithm/testalgortithm.cpp \
-    RotatePolygon/rotatepolygon.cpp
+    RotatePolygon/rotatepolygon.cpp \
+    Evaluation/evaluation.cpp \
+    Utils/polygonconnector.cpp \
+    feature/setpiecetoframe
 
 HEADERS += neosolver.h\
-        neosolver_global.h \
+    neosolver_global.h \
     Algorithm/algorithmwrapper.h \
     Algorithm/testalgortithm.h \
-    RotatePolygon/rotatepolygon.h
+    RotatePolygon/rotatepolygon.h \
+    Evaluation/evaluation.h \
+    Utils/polygonconnector.h \
+    feature/setpiecetoframe
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
