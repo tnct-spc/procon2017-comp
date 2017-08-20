@@ -2,33 +2,25 @@
 
 std::vector<polygon_i> rotate_polygon(polygon_i polygon_in)
 {
-    // p = past 、poss = possibility
+    // p = past, poss = possibility
 
+    std::vector<point_i> in_outer = polygon_in.outer();
     std::vector<polygon_i> polygon_out;
 
-    auto rotate = [&polygon_out, &polygon_in]()
+    auto rotate = [&polygon_out, &in_outer]()
     {
-        int point = 0, a, ap, b, bp, n;
-        std::vector<complex_d> poss_anglesp;
+        int a, ap, b, bp, n;
+        int in_size = in_outer.size();
+        std::vector<ComplexAngle> poss_anglesp;
         polygon_i polygon;
-        std::vector<point_i> points, pointsp, points_true;
+        std::vector<point_i> points, pointsp;
         std::vector<std::vector<point_i> > points_possiesp;
 
-        auto rotate_point = [](int a, int b, int n, std::vector<point_i> points) //座標回転
+        auto rotate_point = [&n, &points]() //座標回転
         {
-            points.push_back({b, a});
-            points.push_back({a, -b});
-            points.push_back({-b, -a});
-            points.push_back({-a, b});
-
-            if(abs(a) > abs(b)) { // |a| は |b| 以下
-                int x = a;
-                a = b;
-                b = x;
-            }
-
-            for(int aa = 0; aa < a; ++aa) { //回転
-                int B = sqrt(static_cast<double> (n - aa * aa));
+            int x = static_cast<int> (sqrt(static_cast<double> (n) / 2.0)) + 1;
+            for(int aa = 0; aa < x; ++aa) { //回転
+                double B = sqrt(static_cast<double> (n - aa * aa));
                 if(B == static_cast<double> (static_cast<int> (B))) { // √(n - a^2) は整数
                     int bb = static_cast<int> (B);
                     points.push_back({aa, bb});
@@ -41,20 +33,19 @@ std::vector<polygon_i> rotate_polygon(polygon_i polygon_in)
                     points.push_back({-aa, bb});
                 }
             }
-            return points;
         };
 
-        auto check_angle_size1 = [&points_possiesp, &poss_anglesp](complex_d i, complex_d ip, std::vector<point_i> points, std::vector<point_i> pointsp) //２点回転
+        auto check_angle_first = [&points_possiesp, &poss_anglesp](ComplexAngle i, ComplexAngle ip, std::vector<point_i> points, std::vector<point_i> pointsp) //２点回転
         {
             std::vector<point_i> points_poss;
 
-            for(point_i pointp : pointsp) { //回転前の角度
-                complex_d iip(pointp.x(), pointp.y());
-                complex_d ip_angle = ip / iip;
+            for(point_i pointp : pointsp) { //前の回転角
+                ComplexAngle iip(pointp.x(), pointp.y());
+                ComplexAngle ip_angle = ip / iip;
 
-                for(point_i point : points) { //回転後の角度
-                    complex_d ii(point.x(), point.y());
-                    complex_d i_angle = i / ii;
+                for(point_i point : points) { //今の回転角
+                    ComplexAngle ii(point.x(), point.y());
+                    ComplexAngle i_angle = i / ii;
 
                     if(ip_angle == i_angle) { //角度一致
                         points_poss.push_back(pointp);
@@ -70,16 +61,16 @@ std::vector<polygon_i> rotate_polygon(polygon_i polygon_in)
             }
         };
 
-        auto check_angle = [&points_possiesp, &poss_anglesp](complex_d i, std::vector<point_i> points) //３点以上回転
+        auto check_angle = [&points_possiesp, &poss_anglesp](ComplexAngle i, std::vector<point_i> points) //３点以上回転
         {
             int poss = 0;
-            std::vector<complex_d> poss_angles;
+            std::vector<ComplexAngle> poss_angles;
             std::vector<std::vector<point_i> > points_possies;
 
-            for(complex_d ip_angle : poss_anglesp) { //回転前の角度
-                for(point_i point : points) { //回転後の角度
-                    complex_d ii(point.x(), point.y());
-                    complex_d i_angle = i / ii;
+            for(ComplexAngle ip_angle : poss_anglesp) { //前の回転角
+                for(point_i point : points) { //今の回転角
+                    ComplexAngle ii(point.x(), point.y());
+                    ComplexAngle i_angle = i / ii;
 
                     if(ip_angle == i_angle) { //角度一致
                         std::vector<point_i> points_poss = points_possiesp[poss];
@@ -101,22 +92,21 @@ std::vector<polygon_i> rotate_polygon(polygon_i polygon_in)
             points_possies.clear();
         };
 
-        for(point_i polygon_point : polygon_in.outer()) { //回転司令塔
-            a = polygon_point.x();
-            b = polygon_point.y();
+        for(int j = 1; j < in_size - 1; ++j) { //回転司令塔
+            point_i in_point = in_outer.at(j);
+            a = in_point.x();
+            b = in_point.y();
             n = a * a + b * b;
 
-            points = rotate_point(a, b, n, points); //今の点
+            rotate_point(); //今の点
 
-            if(point != 0) {
-
+            if(j != 1) {
                 //今の点
-                complex_d i(a, b);
-                complex_d ip(ap, bp);
+                ComplexAngle i(a, b);
+                ComplexAngle ip(ap, bp);
 
-                (point == 1) ? check_angle_size1(i, ip, points, pointsp) : check_angle(i, points);
+                (j == 2) ? check_angle_first(i, ip, points, pointsp) : check_angle(i, points);
             }
-            ++point;
 
             //引継ぎ
             ap = a;
@@ -126,40 +116,15 @@ std::vector<polygon_i> rotate_polygon(polygon_i polygon_in)
             points.clear();
         }
 
-        for(int z = 0; z < 4; ++z) { // 絶対にグリッドに乗る４つ
-            for(point_i polygon_point : polygon_in.outer()) {
-                switch (z) {
-                case 0:
-                    points_true.push_back({polygon_point.x(), polygon_point.y()});
-                    break;
-                case 1:
-                    points_true.push_back({polygon_point.y(), -polygon_point.x()});
-                    break;
-                case 2:
-                    points_true.push_back({-polygon_point.x(), -polygon_point.y()});
-                    break;
-                case 3:
-                    points_true.push_back({-polygon_point.y(), polygon_point.x()});
-                    break;
-                }
-            }
-
-            //値のセット
-            for(point_i point : points_true) {
-                std::vector<point_i> &outer = polygon.outer();
-                outer.push_back(point);
-            }
-            polygon_out.push_back(polygon);
-
-            points_true.clear();
-            polygon.clear();
-        }
-
         for(std::vector<point_i> points_possp : points_possiesp) { //回転後の値のセット
+            std::vector<point_i> &outer = polygon.outer();
+
+            outer.push_back({0, 0});
             for(point_i pointp : points_possp) {
-                std::vector<point_i> &outer = polygon.outer();
                 outer.push_back(pointp);
             }
+            outer.push_back({0, 0});
+
             polygon_out.push_back(polygon);
 
             polygon.clear();
@@ -199,9 +164,10 @@ std::vector<polygon_i> rotate_polygon(polygon_i polygon_in)
             return false;
         };
 
-        for(int i = 0; i != polygons.size() - 1; ++i) {
+        int polygons_size = polygons.size();
+        for(int i = 0; i < polygons_size - 1; ++i) {
             if(!check(i)) {
-                for(int j = i + 1; j != polygons.size(); ++j) {
+                for(int j = i + 1; j < polygons_size; ++j) {
                     if(!check(j)) {
                         polygon_i polygon_re = polygons.at(j);
                         bg::reverse(polygon_re);
@@ -216,10 +182,15 @@ std::vector<polygon_i> rotate_polygon(polygon_i polygon_in)
         return polygon_out;
     };
 
+    point_i in_point0 = in_outer.at(0);
+    for(point_i &in_point : in_outer) {
+        in_point = {in_point.x() - in_point0.x(), in_point.y() - in_point0.y()};
+    }
+
     rotate(); //回転
 
-    for(point_i &polygon_point : polygon_in.outer()) { //X軸でひっくり返して
-        polygon_point = {polygon_point.x(), -polygon_point.y()};
+    for(point_i &in_point : in_outer) { //X軸でひっくり返して
+        in_point = {in_point.x(), -in_point.y()};
     }
     rotate(); //回転
 
