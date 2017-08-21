@@ -10,7 +10,6 @@ SUBDIRS += \
     NeoSolver \
     ProbMaker \
     Hazama \
-    Test \
     Slave \
     Kunugida \
     AbilityCheck

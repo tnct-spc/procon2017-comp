@@ -41,7 +41,7 @@
         <number>0</number>
        </property>
        <property name="spacing">
-        <number>4</number>
+        <number>3</number>
        </property>
       </layout>
      </item>
@@ -59,15 +59,18 @@
    </property>
    <property name="font">
     <font>
-     <family>Century Schoolbook L</family>
-     <pointsize>48</pointsize>
+     <family>Cantarell</family>
+     <pointsize>50</pointsize>
      <weight>50</weight>
      <italic>true</italic>
      <bold>false</bold>
     </font>
    </property>
+   <property name="lineWidth">
+    <number>1</number>
+   </property>
    <property name="text">
-    <string>AnswerDocker</string>
+    <string> AnswerDocker</string>
    </property>
   </widget>
   <widget class="QGraphicsView" name="Picture">
@@ -80,9 +83,32 @@
     </rect>
    </property>
   </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>1720</x>
+     <y>160</y>
+     <width>261</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cantarell</family>
+     <pointsize>46</pointsize>
+     <weight>50</weight>
+     <italic>true</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Mk.II</string>
+   </property>
+  </widget>
   <zorder>Picture</zorder>
   <zorder>scrollArea</zorder>
   <zorder>label</zorder>
+  <zorder>label_2</zorder>
  </widget>
  <resources/>
  <connections/>
