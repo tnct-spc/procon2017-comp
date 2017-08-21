@@ -5,7 +5,7 @@
 #include "utilities.h"
 #include "neosinglepolygondisplay.h"
 
-procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
+procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
     raw_pieces_pic = raw_pieces_image;
 
@@ -37,17 +37,33 @@ procon::Field ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
-    std::vector<polygon_i> pieces;
-    for (unsigned int i=1; i<polygons.size(); i++) {
-        pieces.push_back(placeGrid(polygons[i]));
-        getError(pieces[i-1],i);
+    // frameのinnersをouterに入れ替える
+    field_num = polygons[0].inners().size();
+    for (unsigned int i=0; i<field_num; i++) {
+        polygon_t inside;
+        for (unsigned int j=0; j<polygons[0].inners()[i].size(); j++) {
+            inside.outer().push_back(polygons[0].inners()[i].at(j));
+        }
+        polygons.push_back(inside);
     }
+
+    // 元のフレームは削除
+    polygons.erase(polygons.begin());
+
+    std::vector<polygon_i> pieces;
+    double error;
+    for (unsigned int i=0; i<polygons.size(); i++) {
+        pieces.push_back(placeGrid(polygons[i]));
+        //error = getError(pieces[i], i+1);
+    }
+
+    error = getError(pieces);
 
     // fieldクラスのデータに変換
     // 色々変更しなきゃいけないかも
-    procon::Field field = makeField(polygons);
+    procon::NeoField field = makeNeoField(pieces);
 
-    return std::move(field);
+    return field;
 }
 
 void ImageRecognition::threshold(cv::Mat& image)
@@ -868,8 +884,10 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 }
 
 polygon_i ImageRecognition::placeGrid(polygon_t vertex)
-{
-    unsigned int size = vertex.outer().size();
+{    
+    auto polygon = vertex.outer();
+
+    unsigned int size = polygon.size();
 
     /*
     // 最も長い辺から始める（誤差を減らす）
@@ -895,15 +913,13 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     polygon.outer().push_back(polygon.outer().at(0));
     */
 
-    polygon_t polygon = vertex;
-
     // グリッドの点番号で保存
     polygon_i grid_piece;
     grid_piece.outer().push_back(point_i(0,0));
 
     // 最初の辺の長さをグリッド基準で計算
-    double first_x = polygon.outer().at(1).x() - polygon.outer().at(0).x();
-    double first_y = polygon.outer().at(1).y() - polygon.outer().at(0).y();
+    double first_x = polygon.at(1).x() - polygon.at(0).x();
+    double first_y = polygon.at(1).y() - polygon.at(0).y();
     double x_dif = first_x * scale / 2.5;
     double y_dif = first_y * scale / 2.5;
     double len = sqrt(pow(x_dif, 2.0) + pow(y_dif, 2.0));
@@ -951,8 +967,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     // 2つの角度から選ぶ
     if (theta_2 != 0) {
-        double sec_x = polygon.outer().at(2).x() - polygon.outer().at(0).x();
-        double sec_y = polygon.outer().at(2).y() - polygon.outer().at(0).y();
+        double sec_x = polygon.at(2).x() - polygon.at(0).x();
+        double sec_y = polygon.at(2).y() - polygon.at(0).y();
         double acute_x = sec_x * cos(theta) - sec_y * sin(theta);
         double acute_y = sec_x * sin(theta) + sec_y * cos(theta);
         double obtuse_x = sec_x * cos(M_PI/2-theta_2-theta_1) - sec_y * sin(M_PI/2-theta_2-theta_1);
@@ -966,8 +982,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     polygon_t turn;
     turn.outer().push_back(point_t(0,0));
     for (unsigned int i=1; i<size; i++) {
-        double x = polygon.outer().at(i).x() - polygon.outer().at(0).x();
-        double y = polygon.outer().at(i).y() - polygon.outer().at(0).y();
+        double x = polygon.at(i).x() - polygon.at(0).x();
+        double y = polygon.at(i).y() - polygon.at(0).y();
         double move_x = x * cos(theta) - y * sin(theta);
         double move_y = x * sin(theta) + y * cos(theta);
         turn.outer().push_back(point_t(move_x,move_y));
@@ -988,15 +1004,15 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     return grid_piece;
 }
 
-void ImageRecognition::getError(polygon_i p, int num)
+/*
+double ImageRecognition::getError(polygon_i p,int num)
 {
-    int size = p.outer().size();
     double piece_area = 0;
 
-    for (int i=0; i<size-1; i++) {
-        auto point1 = p.outer().at(i);
-        auto point2 = p.outer().at(i+1);
-        piece_area += point1.x() * point2.y() - point1.y() * point2.x();
+    for (unsigned int j=0; j<p.outer().size()-1; j++) {
+        auto point1 = p.outer().at(j);
+        auto point2 = p.outer().at(j+1);
+        piece_area += (point1.x() - point2.x()) * (point1.y() +point2.y());
     }
 
     piece_area = fabs(piece_area) * 0.5 * 2.5 * 2.5;
@@ -1005,5 +1021,60 @@ void ImageRecognition::getError(polygon_i p, int num)
 
     double error = scan_area - piece_area;
 
-    int a;
+    return error;
+}
+*/
+
+double ImageRecognition::getError(std::vector<polygon_i> p)
+{
+    double piece_area = 0;
+
+    for (unsigned int i=1; i<p.size(); i++) {
+        for (unsigned int j=0; j<p[i].outer().size()-1; j++) {
+            auto point1 = p[i].outer().at(j);
+            auto point2 = p[i].outer().at(j+1);
+            piece_area += (point1.x() - point2.x()) * (point1.y() + point2.y());
+        }
+    }
+
+    piece_area = fabs(piece_area) * 0.5 * 2.5 * 2.5;
+
+    double scan_area = 0;
+
+    for (unsigned int i=1; i<area.size(); i++) {
+        scan_area += area[i];
+    }
+
+    scan_area = scan_area * pow(scale, 2.0);
+
+    double error = scan_area - piece_area;
+
+    return error;
+}
+
+procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
+{
+    procon::NeoField field;
+
+    std::vector<procon::NeoExpandedPolygon> neo_pieces;
+
+    for (unsigned int i=0; i<pieces.size() - field_num; i++) {
+        procon::NeoExpandedPolygon polygon;
+        polygon.resetPolygonForce(pieces[i]);
+        neo_pieces.push_back(polygon);
+
+        field.setPiece(polygon);
+    }
+
+    std::vector<procon::NeoExpandedPolygon> neo_frame;
+
+    for (unsigned int i=0; i<field_num; i++) {
+        procon::NeoExpandedPolygon polygon;
+        polygon.resetPolygonForce(pieces[pieces.size() - 1 - i]);
+        neo_frame.push_back(polygon);
+    }
+
+    field.setFrame(neo_frame);
+
+    return field;
 }

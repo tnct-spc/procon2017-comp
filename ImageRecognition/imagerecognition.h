@@ -4,6 +4,7 @@
 #include "imagerecognition_global.h"
 
 #include "field.h"
+#include "neofield.h"
 #include "expandedpolygon.h"
 #include "neoexpandedpolygon.h"
 #include "singlepolygondisplay.h"
@@ -12,7 +13,7 @@ class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
 
 public:
-    procon::Field run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
+    procon::NeoField run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
 
     const cv::Mat& getRawPiecesPic(){
         return raw_colored_pic;
@@ -43,7 +44,9 @@ private:
     cv::Mat HSVDetection(cv::Mat src_image);
     std::vector<cv::Mat> dividePiece(cv::Mat src_image);
     polygon_i placeGrid(polygon_t vertex);
-    void getError(polygon_i , int num);
+    double getError(std::vector<polygon_i> p);
+    //double getError(polygon_i p, int num);
+    procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
 
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;
@@ -52,6 +55,7 @@ private:
     double scale;
     static constexpr double cutting_allowance = 0.0;
     std::vector<int> area;
+    int field_num;
 };
 
 #endif // IMAGERECOGNITION_H

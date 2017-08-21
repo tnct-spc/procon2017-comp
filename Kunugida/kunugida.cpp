@@ -132,5 +132,5 @@ void Kunugida::imageRecognitonTest()
     cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece1.png", 1);
 
     ImageRecognition imrec;
-    procon::Field PDATA = imrec.run(nocframe, nocpieces);
+    procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
 }
