@@ -11,6 +11,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = QRcode
 TEMPLATE = lib
 
+CONFIG   += precompile_header
+
+# Use Precompiled headers (PCH)
+PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -21,13 +26,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-
-CONFIG   += precompile_header
-
-# Use Precompiled headers (PCH)
-PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
-
 
 
 SOURCES += \
@@ -45,9 +43,17 @@ FORMS += \
         mainwindow.ui
 
 LIBS += -L/usr/lib -lzbar
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
-unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
+}
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
+else:unix: LIBS += -L$$OUT_PWD/../Polygon -lPolygon
+
 INCLUDEPATH += $$PWD/../Polygon
 DEPENDPATH += $$PWD/../Polygon
 
@@ -65,24 +71,9 @@ else:unix: LIBS += -L$$OUT_PWD/../DisplayAnswer/ -lDisplayAnswer
 INCLUDEPATH += $$PWD/../DisplayAnswer
 DEPENDPATH += $$PWD/../DisplayAnswer
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Solver/release/ -lSolver
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Solver/debug/ -lSolver
-else:unix: LIBS += -L$$OUT_PWD/../Solver/ -lSolver
-
-INCLUDEPATH += $$PWD/../Solver
-DEPENDPATH += $$PWD/../Solver
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
 else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
-
-INCLUDEPATH += $$PWD/../spdlog/include
-DEPENDPATH += $$PWD/../spdlog/include
-
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}

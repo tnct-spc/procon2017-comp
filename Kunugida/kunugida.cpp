@@ -1,12 +1,17 @@
 #include "kunugida.h"
 #include "ui_kunugida.h"
 #include "qrlibrary.h"
+#include "neofield.h"
+#include "probmaker.h"
+#include "neosolver.h"
+#include "neoexpandedpolygon.h"
 
 #include <iostream>
 
 #include <QDebug>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QRadioButton>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
@@ -18,6 +23,12 @@ Kunugida::Kunugida(QWidget *parent) :
 //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
+
+    board = std::make_shared<NeoAnswerBoard>();
+    board->show();
+
+    dock_board = std::make_shared<NeoAnswerDock>();
+    dock_board->show();
 }
 
 Kunugida::~Kunugida()
@@ -27,10 +38,59 @@ Kunugida::~Kunugida()
 
 void Kunugida::run()
 {
-    std::cout << "Run" << std::endl;
     logger->info("Run Button Clicked");
-    QRLibrary lib;
-    lib.Decoder(true);
+
+    procon::NeoField field;
+
+    if(ui->probmaker_button->isChecked()){
+        //selected probmaker
+        logger->info("Selected ProbMaker DataSource");
+
+        ProbMaker *PbMaker = new ProbMaker();
+
+        //もしProbMakerの結果を表示したければ下をコメントアウト
+        PbMaker->show();
+        std::vector<polygon_i> pieces_ = PbMaker->getPieces();
+        polygon_i frame_ = PbMaker->getFrame();
+
+        std::vector<procon::NeoExpandedPolygon> pieces;
+        procon::NeoExpandedPolygon frame;
+
+        for(auto piece : pieces_){
+            procon::NeoExpandedPolygon buf;
+            buf.resetPolygonForce(piece);
+            pieces.push_back(buf);
+        }
+        frame.resetPolygonForce(frame_);
+        std::vector<procon::NeoExpandedPolygon> vec_frame;
+        vec_frame.push_back(frame);
+        field.setElementaryFrame(vec_frame);
+        field.setElementaryPieces(pieces);
+        board->update();
+
+    }else if(ui->scanner_button->isChecked()){
+        //selected scanner
+        logger->info("Selected Scanner DataSource");
+
+    }else if(ui->image_data_button->isChecked()){
+        //selected image
+        logger->info("Selected ImageData DataSource");
+
+    }
+//    TODO: ここまでで各データソースから読み込むようにする
+
+//    TODO: algorithm_numberをGUIで選択できるようにする
+    int algorithm_number = 0;
+
+
+    NeoSolver *solver = new NeoSolver();
+    connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
+    solver->run(field,0);
+
+
+//    QRLibrary lib;
+//    lib.Decoder(true);
+    
     this->finishedProcess();
 }
 
@@ -44,6 +104,13 @@ void Kunugida::clickedRunButton()
         //warning
         logger->warn("solving process is already running");
     }
+}
+
+void Kunugida::emitAnswer(procon::NeoField field)
+{
+   logger->info("emitted answer");
+   this->board->setField(field);
+   this->dock_board->addAnswer(field);
 }
 
 void Kunugida::finishedProcess()

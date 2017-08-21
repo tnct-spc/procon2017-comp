@@ -9,7 +9,7 @@ QT       += core gui widgets
 CONFIG += c++14
 
 TARGET = ProbMaker
-TEMPLATE = app
+TEMPLATE = lib
 
 CONFIG   += precompile_header
 
