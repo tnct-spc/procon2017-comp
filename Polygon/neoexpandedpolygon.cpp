@@ -96,10 +96,7 @@ void procon::NeoExpandedPolygon::calcSideAngle()
         p2 = outer.at(i + 1);
         ComplexAngle cp2(p2.x() - p.x(), p2.y() - p.y());
 
-        ComplexAngle angle = cp2 / cp1;
-        std::complex<int> angle_(angle.x, angle.y);
-        double arg = std::arg(angle_);
-        side_angle.push_back((signbit(arg)) ? M_PI * 2 + arg : arg);
+        side_angle.push_back(ComplexAngle::angle(cp2 / cp1));
     }
 
     /*
