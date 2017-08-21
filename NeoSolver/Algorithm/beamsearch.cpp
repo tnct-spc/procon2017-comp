@@ -173,14 +173,14 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
         makeNextFieldFromEvaluate(eval);
 
         //ビーム幅を超えたらああああ終わりです。
-        if(next_field.size() == 100){
+        if(next_field.size() == this->beam_width){
             break;
         }
     }
     fields.clear();
     std::copy(next_field.begin(),next_field.end(),std::back_inserter(fields));
 #elif
-
+    std::cout << "hogehoge"
 #endif
 }
 
