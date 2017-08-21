@@ -42,3 +42,9 @@ bool ComplexAngle::operator ==(ComplexAngle angle)
     else if((x1 / y1 == x2 / y2) && (std::signbit(x1) == std::signbit(x2)) && (std::signbit(y1) == std::signbit(y2))) return true;
     else return false;
 }
+
+double ComplexAngle::angle()
+{
+    double atan = std::atan2(static_cast<double>(this->y), static_cast<double>(this->x));
+    return signbit(atan) ? M_PI * 2 + atan : atan;
+}
