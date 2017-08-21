@@ -284,3 +284,6 @@ void BeamSearch::run(procon::NeoField field)
 //    test();
 }
 
+std::string BeamSearch::hashField(procon::NeoField field){
+
+}
