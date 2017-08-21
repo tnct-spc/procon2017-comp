@@ -35,7 +35,9 @@ public:
     void evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
     bool checkCanPrune(procon::NeoField const& field);
     std::vector<procon::NeoField> debug_field;
-    std::string hashField(procon::NeoField field);
+
+    static std::string hashField(procon::NeoField field);
+
 private:
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;
