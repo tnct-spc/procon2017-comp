@@ -48,3 +48,9 @@ double ComplexAngle::angle()
     double atan = std::atan2(static_cast<double>(this->y), static_cast<double>(this->x));
     return signbit(atan) ? M_PI * 2 + atan : atan;
 }
+
+double ComplexAngle::angle(ComplexAngle angle)
+{
+    double atan = std::atan2(static_cast<double>(angle.y), static_cast<double>(angle.x));
+    return signbit(atan) ? M_PI * 2 + atan : atan;
+}
