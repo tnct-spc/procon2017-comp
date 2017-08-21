@@ -4,10 +4,16 @@
 #include "polygonviewer.h"
 #include "Utils/polygonconnector.h"
 #include "Evaluation/evaluation.h"
+#include "parallel.h"
 
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
+#include <tbb/task_scheduler_init.h>
+#include <tbb/tick_count.h>
 
 //もしデバックモードにしたければ下をコメントアウト
 #define DEBUG_MODE
@@ -17,26 +23,26 @@
 //PolygonConnector用の
 typedef std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> ConnectedResult;
 
-void connect_polygon(polygon_i& frame, polygon_i& connecting_polygon,Connect connection)
+void connect_polygon(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon connecting_polygon,Connect connection)
 {
-    NeoPolygonViewer::getInstance().displayPolygon(frame,"hogehoge",false);
-    NeoPolygonViewer::getInstance().displayPolygon(connecting_polygon,"hogehoge",false);
+    NeoPolygonViewer::getInstance().displayPolygon(frame.getPolygon(),"hogehoge",false);
+    NeoPolygonViewer::getInstance().displayPolygon(connecting_polygon.getPolygon(),"hogehoge",false);
 
 	//まずくっつくべきpolygon点を原点に持ってきて回転の中心にする
     boost::geometry::strategy::transform::translate_transformer<int,2,2> transform_connect_point_to_origin(
-        -connecting_polygon.outer()[connection.polygon_point_index].x(),
-        -connecting_polygon.outer()[connection.polygon_point_index].y()
+        -connecting_polygon.getPolygon().outer()[connection.polygon_point_index].x(),
+        -connecting_polygon.getPolygon().outer()[connection.polygon_point_index].y()
     );
     polygon_i result;
-    boost::geometry::transform(connecting_polygon,result,transform_connect_point_to_origin);
+    boost::geometry::transform(connecting_polygon.getPolygon(),result,transform_connect_point_to_origin);
     
     std::pair<int,int> piece_vec = std::make_pair(
-        connecting_polygon.outer()[connection.polygon_side_index + 1].x() - connecting_polygon.outer()[connection.polygon_side_index].x(),
-        connecting_polygon.outer()[connection.polygon_side_index + 1].y() - connecting_polygon.outer()[connection.polygon_side_index].y()
+        connecting_polygon.getPolygon().outer()[connection.polygon_side_index + 1].x() - connecting_polygon.getPolygon().outer()[connection.polygon_side_index].x(),
+        connecting_polygon.getPolygon().outer()[connection.polygon_side_index + 1].y() - connecting_polygon.getPolygon().outer()[connection.polygon_side_index].y()
     );
     std::pair<int,int> frame_vec = std::make_pair(
-        frame.outer()[connection.frame_side_index + 1].x() - frame.outer()[connection.frame_side_index].x(),
-        frame.outer()[connection.frame_side_index + 1].y() - frame.outer()[connection.frame_side_index].y()
+        frame.getPolygon().outer()[connection.frame_side_index + 1].x() - frame.getPolygon().outer()[connection.frame_side_index].x(),
+        frame.getPolygon().outer()[connection.frame_side_index + 1].y() - frame.getPolygon().outer()[connection.frame_side_index].y()
     );
     
     double piece_angle = std::atan2(piece_vec.first,piece_vec.second);
@@ -44,21 +50,24 @@ void connect_polygon(polygon_i& frame, polygon_i& connecting_polygon,Connect con
    
     polygon_i result2;
     polygon_t result2_t;
-    boost::geometry::strategy::transform::rotate_transformer<bg::radian,int,2,2> rotate_1(-(piece_angle - frame_angle));
+    boost::geometry::strategy::transform::rotate_transformer<bg::radian,double,2,2> rotate_1(-(piece_angle - frame_angle));
     boost::geometry::strategy::transform::rotate_transformer<bg::radian,double,2,2> rotate_2(-(piece_angle - frame_angle));
 
     std::cout << "hogehoge" << -(piece_angle - frame_angle) << std::endl;
     std::cout << "hogehoge" << boost::geometry::transform(result,result2,rotate_1) << std::endl;
     std::cout << "hogehoge" << boost::geometry::transform(result,result2_t,rotate_2) << std::endl;
+    
+    std::cout << "hogehogedksljflksdajklfhja" << boost::geometry::dsv(result2) << std::endl;
+    std::cout << "hogehogedksljflksdajklfhja" << boost::geometry::dsv(result2_t) << std::endl;
 
-    procon::ExpandedPolygon pol;
+    procon::ExpandedPolygon pol(connecting_polygon.getId());
     pol.resetPolygonForce(result2_t);
     PolygonViewer::getInstance().pushPolygon(pol,"kkk");
     NeoPolygonViewer::getInstance().displayPolygon(result2,"jjsg",false);
     
     boost::geometry::strategy::transform::translate_transformer<int,2,2> transform_to_connect_point(
-        frame.outer()[connection.frame_point_index].x(),
-        frame.outer()[connection.frame_point_index].y()
+        frame.getPolygon().outer()[connection.frame_point_index].x(),
+        frame.getPolygon().outer()[connection.frame_point_index].y()
     );
     polygon_i result3;
     boost::geometry::transform(result2,result3);
@@ -82,20 +91,30 @@ void test()
     boost::geometry::transform(sample_extra_rotate_polygon,sample_answer,rotate);
     boost::geometry::transform(sample_extra_rotate_polygon,sampleanswer,rotate2);
 
-    NeoPolygonViewer::getInstance().displayPolygon(sampleanswer,"hgeoa",false);
+//    NeoPolygonViewer::getInstance().displayPolygon(sampleanswer,"hgeoa",false);
 
     std::cout << std::atan2(3,4) << std::endl;
 
-    NeoPolygonViewer::getInstance().displayPolygon(sample_extra_rotate_polygon,"before",false);
+//    NeoPolygonViewer::getInstance().displayPolygon(sample_extra_rotate_polygon,"before",false);
 //    NeoPolygonViewer::getInstance().displayPolygon(sample_answer,"after",false);
     procon::ExpandedPolygon po;
     po.resetPolygonForce(sample_answer);
-    PolygonViewer::getInstance().pushPolygon(po,"hgoehoge");
+//    PolygonViewer::getInstance().pushPolygon(po,"hgoehoge");
 
     std::cout << boost::geometry::dsv(sample_extra_rotate_polygon) << std::endl;
     std::cout << boost::geometry::dsv(sample_answer) << std::endl;
 
-    connect_polygon(sample1,sample2,con);
+//    connect_polygon(sample1,sample2,con);
+
+
+    polygon_i frame,piece;
+    boost::geometry::exterior_ring(frame) = boost::assign::list_of<point_i>(0,8)(6,0)(14,6)(8,14)(0,8);
+    boost::geometry::exterior_ring(piece) = boost::assign::list_of<point_i>(0,0)(0,5)(5,5)(5,0)(0,0);
+    procon::NeoExpandedPolygon frameg,pieceg;
+    frameg.resetPolygonForce(frame);
+    pieceg.resetPolygonForce(piece);
+    connect_polygon(frameg,pieceg,con);
+
 }
 
 BeamSearch::BeamSearch()
