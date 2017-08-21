@@ -260,7 +260,6 @@ void BeamSearch::init()
 
 void BeamSearch::run(procon::NeoField field)
 {
-    /*
     logger->info("beamsearch run");
     dock->addAnswer(field);
 
@@ -283,7 +282,6 @@ void BeamSearch::run(procon::NeoField field)
     for(const auto& f : this->debug_field){
         neo->addAnswer(f);
     }
-    */
-    test();
+//    test();
 }
 
