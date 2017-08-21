@@ -17,10 +17,6 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
-void NeoAnswerBoard::singleMode(){
-    singleif = true;
-}
-
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
@@ -232,7 +228,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         for(auto frame_ : frame__){
             jointed_piece_total += frame_.getJointedPieces().size();
         }
-        painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+        painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
     };
@@ -240,12 +236,11 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     drawDownBackground();
 
-    //TODO field.pieceが空だと落ちる
-
-    if(singleif || piece_size < field.getPieces().size()){
-
-       drawAfterPiece(piece_size);
-       ++piece_size;
+    if(single_mode){
+        for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
+            drawAfterPiece(piece_num);
+            drawPieceId(piece_num);
+        }
 
     }else{
 
@@ -317,9 +312,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     if( !field.getPieces().empty() ){
-        int hoge = field.getPieces().size();
+        int hoge = field.getPieces().size() - 1;
         if(point_id > 0){
-            if(point_id < hoge-1){
+            if(point_id < hoge){
                 paintif = true;
                 if(event->key() == Qt::Key_A){
                     selecter = true;
@@ -329,10 +324,10 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
                     selecter = false;
                     ++point_id;
                 }
-                this->update();
             }
 
-            if(point_id < hoge){
+            if(point_id < hoge + 1){
+                paintif = true;
                 if(event->key() == Qt::Key_S){
                     selecter = true;
                     --point_id;
@@ -342,6 +337,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
                     --point_id;
                 }
             }
+            this->update();
         }
     }
 }

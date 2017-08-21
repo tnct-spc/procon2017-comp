@@ -32,7 +32,6 @@ public:
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
     void setSingleMode(bool inp);
-    void singleMode();
 
 private:
     int frame_margin;
