@@ -354,52 +354,6 @@ void BeamSearch::run(procon::NeoField field)
     std::vector<procon::NeoField> state;
     state.push_back(field);
 
-    //フレームの同じ傾きの頂点を除去
-    auto delete_deplicate_point = [](procon::NeoField & field){
-        int frame_index = 0;
-        for(auto & frame : field.getFrame()){
-            std::vector<int> parallel_dot;
-            int count = 0;
-            for(auto const& angle : frame.getSideAngle()){
-                if(angle == M_PI){
-                    parallel_dot.insert(parallel_dot.begin(),count);
-                }
-                ++count;
-            }
-            if(parallel_dot.size()){
-                std::vector<point_i> points;
-                std::vector<procon::NeoExpandedPolygon> frames;
-
-                std::copy(field.getFrame().begin(),field.getFrame().end(),std::back_inserter(frames));
-
-                frames.erase(frames.begin() + frame_index);
-
-                std::copy(frame.getPolygon().outer().begin(),
-                          frame.getPolygon().outer().end(),
-                          std::back_inserter(points)
-                );
-
-                for(auto const& c : parallel_dot){
-                    points.erase(points.begin() + c);
-                }
-
-                procon::NeoExpandedPolygon f;
-                polygon_i p;
-                for(auto const& point : points){
-                    p.outer().push_back(point);
-                }
-                f.resetPolygonForce(p);
-
-                frames.insert(frames.begin() + frame_index,f);
-                field.setFrame(frames);
-            }
-            ++frame_index;
-        }
-    };
-
-    delete_deplicate_point(field);
-
-
     for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
         std::vector<Evaluate> ev;
         evaluateNextState(state,ev);
@@ -410,12 +364,12 @@ void BeamSearch::run(procon::NeoField field)
         }
     }
 
-    //    neo = std::make_shared<NeoAnswerDock>();
-    //    neo->show();
-    //    for(const auto& f : this->debug_field){
-    //        neo->addAnswer(f);
-    //    }
-    //    test();
+//    neo = std::make_shared<NeoAnswerDock>();
+//    neo->show();
+//    for(const auto& f : this->debug_field){
+//        neo->addAnswer(f);
+//    }
+//    test();
 }
 
 

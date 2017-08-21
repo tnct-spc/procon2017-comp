@@ -345,16 +345,6 @@ ONCE_MORE:
         std::copy(pieces_buf.begin(),pieces_buf.end(),std::back_inserter(pieces));
     }
 
-    auto delete_sample_slope_side = [](polygon_i & p){
-
-        auto calc_slope = [](point_i a,point_i b){
-            std::pair<int,int> slope;
-            slope.first = boost::math::gcd(std::abs(b.x()-a.x()),std::abs(b.y()-a.y()));
-//            slope.second = boos
-        };
-    };
-
-
     this->print_polygons.clear();
     std::copy(pieces.begin(),pieces.end(),std::back_inserter(this->print_polygons));
 
