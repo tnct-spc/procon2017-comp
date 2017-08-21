@@ -2,6 +2,7 @@
 
 #include "utilities.h"
 #include "utility"
+#include "complexangle.h"
 
 //-------------------constructor--------------------
 procon::NeoExpandedPolygon::NeoExpandedPolygon(int id_)
@@ -90,12 +91,14 @@ void procon::NeoExpandedPolygon::calcSideAngle()
         p = outer.at(i);
 
         p1 = (i == 0) ? outer.at(size - 1) : outer.at(i - 1);
-        std::complex<double> cp1(static_cast<double> (p1.x() - p.x()), static_cast<double> (p1.y() - p.y()));
+        ComplexAngle cp1(p1.x() - p.x(), p1.y() - p.y());
 
         p2 = outer.at(i + 1);
-        std::complex<double> cp2(static_cast<double> (p2.x() - p.x()), static_cast<double> (p2.y() - p.y()));
+        ComplexAngle cp2(p2.x() - p.x(), p2.y() - p.y());
 
-        double arg = std::arg(cp2 / cp1);
+        ComplexAngle angle = cp2 / cp1;
+        std::complex<int> angle_(angle.x, angle.y);
+        double arg = std::arg(angle_);
         side_angle.push_back((signbit(arg)) ? M_PI * 2 + arg : arg);
     }
 
