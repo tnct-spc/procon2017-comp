@@ -285,5 +285,76 @@ void BeamSearch::run(procon::NeoField field)
 }
 
 std::string BeamSearch::hashField(procon::NeoField field){
+    std::vector<procon::NeoExpandedPolygon> polygons = field.getFrame();
+    std::vector<procon::NeoExpandedPolygon> frame = field.getElementaryFrame();
+    //polygonのvectorをすべてpointのvectorにまとめる
+    auto polygons_to_points=[](std::vector<procon::NeoExpandedPolygon> vectorA){
+        std::vector<point_i> v;
+        for(procon::NeoExpandedPolygon i : vectorA){
+            polygon_i polygon1 = i.getPolygon();
+            polygon1.outer().pop_back();
+            for(point_i j : polygon1.outer()){
+                v.push_back(j);
+            }
+        }
+        return v;
+    };
+    //pointのvectorをソートする
+    auto sort_points=[](std::vector<point_i> vectorA){
+        sort(vectorA.begin(),
+             vectorA.end(),
+             [](point_i a,point_i b){
+                if(a.x()==b.x()){
+                    return (a.y() < b.y());
+                }
+                return (a.x() < b.x());
+             }
+        );
+        return vectorA;
+    };
+    //int型10進数をstring型16進数に変換する
+    auto int_to_string=[](unsigned int val,bool lower = true){
+        if( !val )
+                return std::string("0");
+            std::string str;
+            const char hc = lower ? 'a' : 'A';     // 小文字 or 大文字表記
+            while( val != 0 ) {
+                int d = val & 15;     // 16進数一桁を取得
+                if( d < 10 )
+                    str.insert(str.begin(), d + '0');  //  10未満の場合
+                else //  10以上の場合
+                    str.insert(str.begin(), d - 10 + hc);
+                val >>= 4;
+            }
+            return str;
+    };
+    //pointのvectorを文字列に変換する
+    auto points_to_string=[int_to_string](std::vector<point_i> vectorA){
+        std::string string;
+        for(point_i i : vectorA){
+            string+=int_to_string(i.x());
+            string+=int_to_string(i.y());
+        }
+        return string;
+    };
 
+    //polygonのvectorをpointにしてソートする
+    std::vector<point_i> polygons_points_vector=polygons_to_points(polygons);
+    polygons_points_vector=sort_points(polygons_points_vector);
+
+    //frameのouterのpointをソートする
+    std::vector<point_i> frame_points_vector;
+    for(procon::NeoExpandedPolygon i : frame){
+        polygon_i polygon1 = i.getPolygon();
+        for(point_i j : polygon1.outer()){
+            frame_points_vector.push_back(j);
+        }
+    }
+    frame_points_vector=sort_points(frame_points_vector);
+
+    std::string answer;
+    answer+=points_to_string(polygons_points_vector);
+    answer+="_";
+    answer+=points_to_string(frame_points_vector);
+    return answer;
 }
