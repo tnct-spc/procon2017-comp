@@ -274,14 +274,13 @@ void BeamSearch::run(procon::NeoField field)
         for(auto const& _field : state){
             dock->addAnswer(_field);
         }
-        break;
     }
 
-    neo = std::make_shared<NeoAnswerDock>();
-    neo->show();
-    for(const auto& f : this->debug_field){
-        neo->addAnswer(f);
-    }
+//    neo = std::make_shared<NeoAnswerDock>();
+//    neo->show();
+//    for(const auto& f : this->debug_field){
+//        neo->addAnswer(f);
+//    }
 //    test();
 }
 

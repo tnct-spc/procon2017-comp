@@ -31,7 +31,7 @@ public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
-    void setDockMode(bool inp);
+    void setSingleMode(bool inp);
 
 private:
     int frame_margin;
@@ -54,10 +54,11 @@ private:
 
     //draw processingLine
     point_i center;
-    int point_id = -1;
-    int red_id;
-    int blue_id;
+    int point_id = 0;
+    int blue_id = 1;
+    int red_id = 1;
     bool selecter;//true = left, false = right
+    bool pre = false;
     bool paintif = false;
 
 protected:
