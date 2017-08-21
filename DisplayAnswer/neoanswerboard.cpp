@@ -228,7 +228,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         for(auto frame_ : frame__){
             jointed_piece_total += frame_.getJointedPieces().size();
         }
-        painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+        painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
     };
