@@ -3,9 +3,12 @@
 
 #include "precompile.h"
 #include "neoexpandedpolygon.h"
+#include "complexangle.h"
 
 namespace bg = boost::geometry;
-typedef std::complex<double> complex_d;
+using point_t = bg::model::d2::point_xy<double>;
+using polygon_t = bg::model::polygon<point_t,true,true,std::vector,std::vector,std::allocator,std::allocator>;
+typedef std::complex<int> complex_i;
 
 class Connect
 {
@@ -25,7 +28,7 @@ class PolygonConnector
 public:
     PolygonConnector();
     static std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter);
-    static std::pair<polygon_i, bool> rotate(polygon_i polygon_in, point_i after_angle, int first_index, int second_index);
+    static std::pair<polygon_i, bool> rotate(polygon_i polygon_in, ComplexAngle after_angle, int first_index, int second_index);
 };
 
 #endif // POLYGONCONNECTOR_H

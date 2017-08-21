@@ -60,24 +60,25 @@ bool TestPolygonConnector::run()
             connecter.polygon_point_index = piece_point;
 
             std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> result = polygon_connector.connect(frame, piece, connecter);
+            std::vector<procon::NeoExpandedPolygon> result_frames = std::get<0>(result);
+            procon::NeoExpandedPolygon result_piese = std::get<1>(result);
+
+            auto out = [&i, &j](procon::NeoExpandedPolygon expoly, std::string name)
+            {
+                polygon_i poly = expoly.getPolygon();
+
+                std::cout << name << " -> ";
+
+                for(point_i point : poly.outer()) {
+                    std::cout << "(" << point.x() << ", " << point.y() << "), ";
+                }
+
+                std::cout << std::endl;
+
+                NeoPolygonViewer::getInstance().displayPolygon(poly, name + " (" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + ")", false);
+            };
+
             if(std::get<2>(result)) {
-                std::vector<procon::NeoExpandedPolygon> result_frames = std::get<0>(result);
-                procon::NeoExpandedPolygon result_piese = std::get<1>(result);
-
-                auto out = [&i, &j](procon::NeoExpandedPolygon expoly, std::string name)
-                {
-                    polygon_i poly = expoly.getPolygon();
-
-                    std::cout << name << " -> ";
-
-                    for(point_i point : poly.outer()) {
-                        std::cout << "(" << point.x() << ", " << point.y() << "), ";
-                    }
-
-                    std::cout << std::endl;
-
-                    NeoPolygonViewer::getInstance().displayPolygon(poly, name + " (" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + ")", false);
-                };
 
                 int f = 1;
                 for(procon::NeoExpandedPolygon result_frame : result_frames) {
@@ -89,7 +90,12 @@ bool TestPolygonConnector::run()
                 std::cout << std::endl << "    ";
                 out(result_piese, "piese");
 
-            } else std::cout << "false" << std::endl;
+            } else {
+                std::cout << "false" << std::endl << "    ";
+                out(result_frames.at(0), "frame");
+                std::cout << std::endl << "    ";
+                out(result_piese, "piese");
+            }
         }
     }
     std::cout << std::endl;
