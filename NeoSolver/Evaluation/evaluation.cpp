@@ -20,7 +20,8 @@ int Evaluation::calculation_nep(const procon::NeoExpandedPolygon &nep , int inde
 std::vector<std::pair<double , Connect>> Evaluation::evaluation(
         procon::NeoExpandedPolygon const& frame ,
         procon::NeoExpandedPolygon const& polygon,
-        double angle_weight, double side_weight
+        double angle_weight,
+        double side_weight
         )
 {
     //一番貴重なときの評価値の大きさ

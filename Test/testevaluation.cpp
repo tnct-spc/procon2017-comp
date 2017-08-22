@@ -62,7 +62,7 @@ bool TestEvaluation::run()
 
     std::vector<std::pair<double , Connect>> vector;
 
-    vector = Evaluation::evaluation(frames.at(1),polygons.at(5) , 1.0 , 1.0);
+    vector = Evaluation::evaluation(frames.at(1),polygons.at(5));
 //    vector = e.evaluation(frames.at(0),polygons.at(0));
 
     double evaluation;
