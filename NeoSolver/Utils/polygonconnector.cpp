@@ -2,7 +2,7 @@
 #include <boost/geometry/algorithms/union.hpp>
 #define DEBUG
 #define TEST
-#define USE_BOOST_TRANSFORM
+//#define USE_BOOST_TRANSFORM
 
 PolygonConnector::PolygonConnector()
 {

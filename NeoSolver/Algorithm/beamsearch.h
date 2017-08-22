@@ -43,7 +43,7 @@ private:
     std::shared_ptr<NeoAnswerDock> dock;
     std::shared_ptr<NeoAnswerDock> neo;
     unsigned int processor_num = 0;
-    unsigned int beam_width = 300;
+    unsigned int beam_width = 50;
 };
 
 #endif // BEAMSEARCH_H

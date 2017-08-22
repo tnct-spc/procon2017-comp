@@ -408,6 +408,10 @@ void BeamSearch::run(procon::NeoField field)
         for(auto const& _field : state){
             dock->addAnswer(_field);
         }
+
+        if(piece_num == 20){
+            break;
+        }
     }
 
     //    neo = std::make_shared<NeoAnswerDock>();
