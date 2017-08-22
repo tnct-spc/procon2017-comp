@@ -12,7 +12,8 @@ public:
             procon::NeoExpandedPolygon const& frame ,
             procon::NeoExpandedPolygon const& polygon ,
             double angle_weight = 1.0 ,
-            double side_weight = 1.0);
+            double side_weight = 1.0,
+            bool contain_zero = true);
 };
 
 #endif // EVALUATION_H
