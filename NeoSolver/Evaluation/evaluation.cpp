@@ -7,18 +7,18 @@ Evaluation::Evaluation()
 
 }
 
+//要素数の計算
+int Evaluation::calculation_nep(const procon::NeoExpandedPolygon &nep , int index , int cal){
+    index = index + cal;
+    index = index % nep.getSize();
+    if(index < 0){
+        index = nep.getSize() + index;
+    }
+    return index;
+}
+
 std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {
-    //要素数の計算
-    auto calculation_nep = [](const procon::NeoExpandedPolygon &nep , int index , int cal){
-        index = index + cal;
-        index = index % nep.getSize();
-        if(index < 0){
-            index = nep.getSize() + index;
-        }
-        return index;
-    };
-
     //要素があるかないかの判定
     auto is_there_element = [](const std::vector<std::pair<int , int>> &vector , int frame_point_index , int polygon_point_index){
         for(std::pair<int , int> i :vector){
@@ -48,7 +48,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
     };
 
     //どれだけ辺に寄り添ってきたか
-    auto snuggle_up_counter = [&frame , &polygon , &calculation_nep , &angle_status , &length_status]
+    auto snuggle_up_counter = [&frame , &polygon , &angle_status , &length_status]
             (int frame_point_index , int polygon_point_index){
         //辺に沿って角の大きさや辺の長さが合わなくなるまでカウント
         int length_agreement , angle_agreement;
