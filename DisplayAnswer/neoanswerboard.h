@@ -49,6 +49,8 @@ private:
 
     // Only field mode
     bool single_mode = false;
+    bool singleif = false;
+    int piece_size = 1;
 
     //make id_list
     std::vector<polygon_i> polygon_list;
@@ -57,7 +59,7 @@ private:
     point_i center;
     int point_id = 0;
     int blue_id = 1;
-    int red_id = 1;
+    int red_id = 0;
     bool selecter;//true = left, false = right
     bool pre = false;
     bool paintif = false;
