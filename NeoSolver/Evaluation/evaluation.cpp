@@ -20,6 +20,9 @@ int Evaluation::calculation_nep(const procon::NeoExpandedPolygon &nep , int inde
 std::vector<std::pair<double , Connect>> Evaluation::evaluation(
         procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon , double angle_weight , double side_weight)
 {
+    //一番貴重なときの評価値の大きさ
+    const double max_precious = 0.5;
+
     //要素があるかないかの判定
     auto is_there_element = [](const std::vector<std::pair<int , int>> &vector , int frame_point_index , int polygon_point_index){
         for(std::pair<int , int> i :vector){
@@ -101,11 +104,11 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
         return map2;
     };
 
-    //すでに通ったことのあるところのchecker
-    std::vector<std::pair<int , int>> passed_checker;
     //同じ角度の角は何個あるか示すmap
     std::map<double , int> frame_same_angle = count_same_angle(frame);
     std::map<double , int> polygon_same_angle = count_same_angle(polygon);
+    //すでに通ったことのあるところのchecker
+    std::vector<std::pair<int , int>> passed_checker;
 
     //どれだけ辺に寄り添ってきたか(最初によばれるほう)
     auto snuggle_processing = [&](int frame_point_index , int polygon_point_index){
@@ -124,7 +127,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
 
             double precious_frame_degree = frame_same_angle[frame.getSideAngle().at(calculated_frame_index)];
             double precious_polygon_degree = polygon_same_angle[polygon.getSideAngle().at(calculated_polygon_index)];
-            precious_degree += 0.5 / (precious_frame_degree * precious_polygon_degree);
+            precious_degree += max_precious / (precious_frame_degree * precious_polygon_degree);
         }
         snuggle_up += precious_degree;
         return snuggle_up;
@@ -160,12 +163,12 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
 
             if((!passed) && (angle_agreement == 1)){
                 //角が同じだったとき
-                double evaluation = 1.5;
+                double evaluation = angle_weight;
 
                 //角の貴重度
-                double precious_frame_degree = frame_same_angle[frame.getSideAngle().at(frame_point_index)];
-                double precious_polygon_degree = polygon_same_angle[polygon.getSideAngle().at(polygon_point_index)];
-                double precious_degree = 0.5 / (precious_frame_degree * precious_polygon_degree);
+                int precious_frame_degree = frame_same_angle[frame.getSideAngle().at(frame_point_index)];
+                int precious_polygon_degree = polygon_same_angle[polygon.getSideAngle().at(polygon_point_index)];
+                double precious_degree = max_precious / (precious_frame_degree * precious_polygon_degree);
 
                 if(snuggle_up > 0) evaluation = std::pow(snuggle_up , 2);
                 vector.push_back((std::pair<double , Connect>(evaluation + precious_degree, connect1)));
