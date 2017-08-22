@@ -27,7 +27,7 @@ typedef std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedP
 
 BeamSearch::BeamSearch()
 {
-    logger = spdlog::get("beamsearch");
+//    logger = spdlog::get("beamsearch");
     dock = std::make_shared<NeoAnswerDock>();
     dock->show();
 }
@@ -222,7 +222,7 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
 void BeamSearch::init()
 {
 #ifdef DEBUG_MODE
-    logger->info("debug mode");
+//    logger->info("debug mode");
 #else
     logger->info("efficient mode");
 #endif
@@ -231,7 +231,7 @@ void BeamSearch::init()
 
 void BeamSearch::run(procon::NeoField field)
 {
-    logger->info("beamsearch run");
+//    logger->info("beamsearch run");
 
     std::vector<procon::NeoField> state;
     state.push_back(field);

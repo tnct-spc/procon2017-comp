@@ -2,7 +2,7 @@
 #define BEAMSEARCH_H
 
 #include "algorithmwrapper.h"
-#include "spdlog/spdlog.h"
+//#include "spdlog/spdlog.h"
 #include "Utils/polygonconnector.h"
 #include "Evaluation/evaluation.h"
 #include "neoanswerdock.h"
@@ -36,7 +36,7 @@ public:
     bool checkCanPrune(procon::NeoField const& field);
 
 private:
-    std::shared_ptr<spdlog::logger> logger;
+//    std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;
     unsigned int processor_num = 0;
 };

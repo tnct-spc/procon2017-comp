@@ -1,6 +1,7 @@
 #include "testcheckcanprume.h"
 #include "neofield.h"
 #include "neopolygonviewer.h"
+#include "Algorithm/beamsearch.h"
 
 TestCheckCanPrume::TestCheckCanPrume()
 {
@@ -191,5 +192,8 @@ procon::NeoField TestCheckCanPrume::makeField(){
 }
 
 bool TestCheckCanPrume::run(){
+    BeamSearch beamsearch;
+    bool a = beamsearch.checkCanPrune(makeField());
+    std::cout<<a<<std::endl;
     return true;
 }
