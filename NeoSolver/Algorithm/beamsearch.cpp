@@ -293,6 +293,7 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
 //            TODO: いい感じにここをパフォーマンスよくする
             Evaluate ev_buf;
             for(const auto& e : evaluate){
+                if(e.first){
                 ev_buf.score = e.first;
                 ev_buf.connection = e.second;
                 ev_buf.fields_index = fields_index;
@@ -300,16 +301,20 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
                 ev_buf.piece_index = piece_index;
                 ev_buf.is_inversed = false;
                 evaluations.push_back(ev_buf);
-            }
 
+                }
+            }
             for(const auto& e : evaluate_inversed){
-                ev_buf.score = e.first;
+                if(e.first){
+                    ev_buf.score = e.first;
                 ev_buf.connection = e.second;
                 ev_buf.fields_index = fields_index;
                 ev_buf.frame_index = frame_index;
                 ev_buf.piece_index = piece_index;
                 ev_buf.is_inversed = true;
                 evaluations.push_back(ev_buf);
+
+                }
             }
 
             ++frame_index;
@@ -399,19 +404,21 @@ void BeamSearch::run(procon::NeoField field)
 
     delete_deplicate_point(field);
 
-
+    std::vector<Evaluate> ev;
+//    ev.resize(2000000);
     for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
-        std::vector<Evaluate> ev;
+
         evaluateNextState(state,ev);
         makeNextState(state,ev);
+        ev.clear();
 
         for(auto const& _field : state){
             dock->addAnswer(_field);
         }
 
-        if(piece_num == 20){
-            break;
-        }
+//        if(piece_num == 40){
+//            break;
+//        }
     }
 
     //    neo = std::make_shared<NeoAnswerDock>();
