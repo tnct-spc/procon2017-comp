@@ -60,7 +60,8 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
 
             length_agreement = length_status(calculated_frame_index , calculated_polygon_index);
             angle_agreement = angle_status(calculated_frame_index , calculated_polygon_index);
-
+            //無限ループ回避
+            if(trigger_count == polygon.getSize()) break;
         }while(angle_agreement && length_agreement);
 
         double snuglle_up;
