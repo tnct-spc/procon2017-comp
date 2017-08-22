@@ -25,10 +25,7 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     board = std::make_shared<NeoAnswerBoard>();
-    dock_board = std::make_shared<NeoAnswerDock>();
     board->show();
-    dock_board->show();
-
 }
 
 Kunugida::~Kunugida()
@@ -83,13 +80,17 @@ void Kunugida::run()
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 
-//    TODO: algorithm_numberをGUIで選択できるようにする
     int algorithm_number = 0;
 
+    if(ui->test_algorithm_button->isChecked()){
+        algorithm_number = 0;
+    } else if (ui->beamsearch_button->isChecked()) {
+        algorithm_number = 1;
+    }
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
-    solver->run(field,0);
+    solver->run(field,algorithm_number);
 
 
 //    QRLibrary lib;
@@ -114,7 +115,6 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setField(field);
-   this->dock_board->addAnswer(field);
 }
 
 void Kunugida::finishedProcess()
