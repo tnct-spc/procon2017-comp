@@ -13,18 +13,20 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
 #ifdef USE_BOOST_TRANSFORM
 {
     //Connectクラスからindexを抽出
-    int frame_index1 = connecter.frame_point_index; //フレームの接すべき点のindex
-    int piece_index1 = connecter.polygon_point_index; //ピースの接すべき点のindex
-    int frame_index2; //フレームのもう一方の点のindex
-    int piece_index2; //ピースのもう一方の点のindex
+    unsigned int frame_index1 = static_cast<unsigned int>(connecter.frame_point_index); //フレームの接すべき点のindex
+    unsigned int piece_index1 = static_cast<unsigned int>(connecter.polygon_point_index); //ピースの接すべき点のindex
+    unsigned int frame_index2; //フレームのもう一方の点のindex
+    unsigned int piece_index2; //ピースのもう一方の点のindex
+    unsigned int frame_size = static_cast<unsigned int>(frame.getSize());
+    unsigned int piece_size = static_cast<unsigned int>(piece.getSize());
     if(connecter.frame_point_index == connecter.frame_side_index) { //接すべき点のindex < もう一方の点のindex
         //indexが参照外にならないように
-        frame_index2 = (frame_index1 != frame.getSize() - 1) ? frame_index1 + 1 : 0;
-        piece_index2 = (piece_index1 != piece.getSize() - 1) ? piece_index1 + 1 : 0;
+        frame_index2 = static_cast<unsigned int>((frame_index1 != frame_size - 1) ? frame_index1 + 1 : 0);
+        piece_index2 = static_cast<unsigned int>((piece_index1 != piece_size - 1) ? piece_index1 + 1 : 0);
     } else { //接すべき点のindex > もう一方の点のindex
         //indexが参照外にならないように
-        frame_index2 = (frame_index1 != 0) ? frame_index1 - 1 : frame.getSize() - 1;
-        piece_index2 = (piece_index1 != 0) ? piece_index1 - 1 : piece.getSize() - 1;
+        frame_index2 = static_cast<unsigned int>((frame_index1 != 0) ? frame_index1 - 1 : frame_size - 1);
+        piece_index2 = static_cast<unsigned int>((piece_index1 != 0) ? piece_index1 - 1 : piece_size - 1);
     }
 
 #ifndef DEBUG
@@ -232,18 +234,20 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
 
 {
     //Connectクラスからindexを抽出
-    int frame_index1 = connecter.frame_point_index; //フレームの接すべき点のindex
-    int piece_index1 = connecter.polygon_point_index; //ピースの接すべき点のindex
-    int frame_index2; //フレームのもう一方の点のindex
-    int piece_index2; //ピースのもう一方の点のindex
+    unsigned int frame_index1 = static_cast<unsigned int>(connecter.frame_point_index); //フレームの接すべき点のindex
+    unsigned int piece_index1 = static_cast<unsigned int>(connecter.polygon_point_index); //ピースの接すべき点のindex
+    unsigned int frame_index2; //フレームのもう一方の点のindex
+    unsigned int piece_index2; //ピースのもう一方の点のindex
+    unsigned int frame_size = static_cast<unsigned int>(frame.getSize());
+    unsigned int piece_size = static_cast<unsigned int>(piece.getSize());
     if(connecter.frame_point_index == connecter.frame_side_index) { //接すべき点のindex < もう一方の点のindex
         //indexが参照外にならないように
-        frame_index2 = (frame_index1 != frame.getSize() - 1) ? frame_index1 + 1 : 0;
-        piece_index2 = (piece_index1 != piece.getSize() - 1) ? piece_index1 + 1 : 0;
+        frame_index2 = static_cast<unsigned int>((frame_index1 != frame_size - 1) ? frame_index1 + 1 : 0);
+        piece_index2 = static_cast<unsigned int>((piece_index1 != piece_size - 1) ? piece_index1 + 1 : 0);
     } else { //接すべき点のindex > もう一方の点のindex
         //indexが参照外にならないように
-        frame_index2 = (frame_index1 != 0) ? frame_index1 - 1 : frame.getSize() - 1;
-        piece_index2 = (piece_index1 != 0) ? piece_index1 - 1 : piece.getSize() - 1;
+        frame_index2 = static_cast<unsigned int>((frame_index1 != 0) ? frame_index1 - 1 : frame_size - 1);
+        piece_index2 = static_cast<unsigned int>((piece_index1 != 0) ? piece_index1 - 1 : piece_size - 1);
     }
 
 #ifndef DEBUG
@@ -350,13 +354,13 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
 #endif
 }
 
-std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, ComplexAngle after_angle, int before_index1, int before_index2)
+std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, ComplexAngle after_angle, unsigned int before_index1, unsigned int before_index2)
 {
     // p = past, poss = possibility
 
     std::vector<point_i> in_outer = polygon_in.outer();
-    int a, ap, b, bp, n;
-    int in_size = in_outer.size();
+    int a = 0, ap = 0, b = 0, bp = 0, n = 0;
+    const unsigned long in_size = in_outer.size();
     std::vector<ComplexAngle> poss_anglesp;
     polygon_i polygon;
     std::vector<point_i> points, pointsp, points_true;
@@ -364,11 +368,11 @@ std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, Comple
 
     auto rotate_point = [&n, &points]() //座標回転
     {
+        double double_i;
         int x = static_cast<int> (sqrt(static_cast<double> (n) / 2.0)) + 1;
         for(int aa = 0; aa < x; ++aa) { //回転
-            double B = sqrt(static_cast<double> (n - aa * aa));
-            if(B == static_cast<double> (static_cast<int> (B))) { // √(n - a^2) は整数
-                int bb = static_cast<int> (B);
+            if(!(0.00 < std::modf(sqrt(static_cast<double> (n - aa * aa)), &double_i))) { // √(n - a^2) は整数
+                int bb = static_cast<int> (double_i);
                 points.push_back({aa, bb});
                 points.push_back({bb, aa});
                 points.push_back({bb, -aa});
@@ -409,7 +413,7 @@ std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, Comple
 
     auto check_angle = [&points_possiesp, &poss_anglesp](ComplexAngle i, std::vector<point_i> points) //３点以上回転
     {
-        int poss = 0;
+        unsigned long poss = 0;
         std::vector<ComplexAngle> poss_angles;
         std::vector<std::vector<point_i> > points_possies;
 
@@ -460,7 +464,7 @@ std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, Comple
         in_point = {in_point.x() - in_point0.x(), in_point.y() - in_point0.y()};
     }
 
-    for(int j = 1; j < in_size - 1; ++j) { //回転司令塔
+    for(unsigned long j = 1; j < in_size - 1; ++j) { //回転司令塔
         point_i in_point = in_outer.at(j);
         a = in_point.x();
         b = in_point.y();
