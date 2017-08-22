@@ -9,18 +9,18 @@ Evaluation::Evaluation()
 
 std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpandedPolygon const& frame , procon::NeoExpandedPolygon const& polygon)
 {
+    //要素数の計算
     auto calculation_nep = [](const procon::NeoExpandedPolygon &nep , int index , int cal){
-        index = index % nep.getSize();
         index = index + cal;
+        index = index % nep.getSize();
         if(index < 0){
-            index = index % nep.getSize();
             index = nep.getSize() + index;
         }
-        if(index >= nep.getSize()) index = index % nep.getSize();
         return index;
     };
 
-    auto check_is_there = [](const std::vector<std::pair<int , int>> &vector , int frame_point_index , int polygon_point_index){
+    //要素があるかないかの判定
+    auto is_there_element = [](const std::vector<std::pair<int , int>> &vector , int frame_point_index , int polygon_point_index){
         for(std::pair<int , int> i :vector){
             if((i.first == frame_point_index) && (i.second == polygon_point_index)) return true;
         }
@@ -47,49 +47,129 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(procon::NeoExpan
         else return 0;
     };
 
+    //どれだけ辺に寄り添ってきたか
+    auto snuggle_up_counter = [&frame , &polygon , &calculation_nep , &angle_status , &length_status]
+            (int frame_point_index , int polygon_point_index){
+        //辺に沿って角の大きさや辺の長さが合わなくなるまでカウント
+        int length_agreement , angle_agreement;
+        int trigger_count = 0;
+        do{
+            trigger_count++;
+            int calculated_frame_index = calculation_nep(frame , frame_point_index , trigger_count);
+            int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , trigger_count);
+
+            length_agreement = length_status(calculated_frame_index , calculated_polygon_index);
+            angle_agreement = angle_status(calculated_frame_index , calculated_polygon_index);
+
+        }while(angle_agreement && length_agreement);
+
+        double snuglle_up;
+        //行き着いた先がありえない角だったら排除
+        if(angle_agreement == -1) return 0.0;
+        //行き着いた先の角がぴったりだったら気持ちだけ(0.5)足してあげる
+        snuglle_up = trigger_count;
+        if(angle_agreement == 1) snuglle_up = trigger_count + 0.5;
+        return snuglle_up;
+    };
+
+    //同じ角度を持つものは何個あるか調べる
+    auto count_same_angle = [](const procon::NeoExpandedPolygon &polygon){
+        std::vector<std::pair<double , int>> map;
+        std::vector<double> vector = polygon.getSideAngle();
+        sort(vector.begin() , vector.end(), [](double angle1 , double angle2){ return angle1 < angle2; });
+
+        double before_angle = -1;
+        int count;
+        for(double i : vector){
+            if(i != before_angle){
+                count = 1;
+                map.push_back(std::pair<double , int>(i , count));
+            }else{
+                auto itr = map.end() - 1;
+                *itr = std::pair<double , int>(i , count);
+            }
+            count++;
+            before_angle = i;
+        }
+        //vectorをmapに変換
+        std::map<double , int> map2;
+        for(std::pair<double , int> i : map){
+            map2.insert(i);
+        }
+        return map2;
+    };
+
+    //返すときに使うvector
     std::vector<std::pair<double , Connect>> vector;
-    std::vector<std::pair<int , int>> checker;
+
+    //すでに通ったことのあるところのchecker
+    std::vector<std::pair<int , int>> passed_checker;
+
+    //同じ角度の角は何個あるか示すmap
+    std::map<double , int> frame_same_angle = count_same_angle(frame);
+    std::map<double , int> polygon_same_angle = count_same_angle(polygon);
+
+    //二重ループ開始
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
 
-            bool length_agreement = length_status(frame_point_index , polygon_point_index);
-            bool check_bool = check_is_there(checker , frame_point_index , polygon_point_index);
             int angle_agreement = angle_status(frame_point_index , polygon_point_index);
+            if (angle_agreement == -1) continue;
+            bool length_agreement = length_status(frame_point_index , polygon_point_index);
+            bool passed = is_there_element(passed_checker , frame_point_index , polygon_point_index);
+
+            Connect connect1;
+            connect1.frame_side_index = calculation_nep(frame , frame_point_index , -1);
+            connect1.polygon_side_index = calculation_nep(polygon , polygon_point_index , -1);
+            connect1.frame_point_index = frame_point_index;
+            connect1.polygon_point_index = polygon_point_index;
+
+            Connect connect2;
+            connect2.frame_side_index = frame_point_index;
+            connect2.polygon_side_index = polygon_point_index;
+            connect2.frame_point_index = frame_point_index;
+            connect2.polygon_point_index = polygon_point_index;
+
+            double snuggle_up = 0;
             //辺が同じだったとき
-            if(length_agreement && (angle_agreement == 0)){
-                int trigger_count = 1;
-                angle_agreement = angle_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
-                length_agreement = length_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
-                checker.push_back(std::pair<int, int>(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count)));
-                while(angle_agreement && length_agreement){
-                    trigger_count++;
-                    checker.push_back(std::pair<int, int>(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count)));
-                    angle_agreement = angle_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
-                    length_agreement = length_status(calculation_nep(frame , frame_point_index , trigger_count) , calculation_nep(polygon , polygon_point_index , trigger_count));
+            if(length_agreement){
+                snuggle_up = snuggle_up_counter(frame_point_index , polygon_point_index);
+                //通ってきた道のしるしづけ
+                for(int i = 1; i <= snuggle_up ; i ++){
+                    int calculated_frame_index = calculation_nep(frame , frame_point_index , i);
+                    int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , i);
+                    passed_checker.push_back(std::pair<int , int>(calculated_frame_index , calculated_polygon_index));
                 }
-                if(angle_agreement != -1){
-                    double evaluation;
-                    if(angle_agreement == 1){
-                        evaluation = std::pow(trigger_count + 0.5 , 2.0);
-                    }else{
-                        evaluation = std::pow(trigger_count , 2.0);
-                    }
-                    Connect connect;
-                    connect.frame_side_index = frame_point_index;
-                    connect.polygon_side_index = polygon_point_index;
-                    connect.frame_point_index = frame_point_index;
-                    connect.polygon_point_index = polygon_point_index;
-                    vector.push_back(std::pair<double , Connect>(evaluation , connect));
+                //通ってきた道がいかに貴重だったかを確認する
+                double precious_degree = 0;
+                for(int i = 1; i <= snuggle_up ; i ++){
+                    int calculated_frame_index = calculation_nep(frame , frame_point_index , i);
+                    int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , i);
+
+                    double precious_frame_degree = frame_same_angle[frame.getSideAngle().at(calculated_frame_index)];
+                    double precious_polygon_degree = polygon_same_angle[polygon.getSideAngle().at(calculated_polygon_index)];
+                    precious_degree += 0.5 / (precious_frame_degree * precious_polygon_degree);
                 }
-            //角が同じだったとき
-            }else if((!check_bool) && (angle_agreement == 1)){
-                double evaluation = 1;
-                Connect connect;
-                connect.frame_side_index = calculation_nep(frame , frame_point_index , -1);
-                connect.polygon_side_index = calculation_nep(polygon , polygon_point_index , -1);
-                connect.frame_point_index = frame_point_index;
-                connect.polygon_point_index = polygon_point_index;
-                vector.push_back((std::pair<double , Connect>(evaluation , connect)));
+                snuggle_up += precious_degree;
+            }
+
+            if((!passed) && (angle_agreement == 1)){
+                //角が同じだったとき
+                double evaluation = 1.5;
+
+                //角の貴重度
+                double precious_frame_degree = frame_same_angle[frame.getSideAngle().at(frame_point_index)];
+                double precious_polygon_degree = polygon_same_angle[polygon.getSideAngle().at(polygon_point_index)];
+                double precious_degree = 0.5 / (precious_frame_degree * precious_polygon_degree);
+
+                if(snuggle_up > 0) evaluation = std::pow(snuggle_up , 2);
+                vector.push_back((std::pair<double , Connect>(evaluation + precious_degree, connect1)));
+            }else if(angle_agreement == 0){
+                //角に隙間があるとき
+                if(!passed) vector.push_back((std::pair<double , Connect>(0 , connect1)));
+                double evaluation = 0;
+                if(snuggle_up > 0) evaluation = std::pow(snuggle_up , 2);
+                vector.push_back((std::pair<double , Connect>(evaluation , connect2)));
             }
         }
     }
