@@ -49,6 +49,8 @@ void Kunugida::run()
         ProbMaker *PbMaker = new ProbMaker();
 
         //もしProbMakerの結果を表示したければ下をコメントアウト
+        std::string test_text = "test";
+        board->setText(test_text);
         PbMaker->show();
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();

@@ -32,6 +32,7 @@ public:
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
     void setSingleMode(bool inp);
+    void setText(std::string text);
 
 private:
     int frame_margin;
@@ -60,6 +61,8 @@ private:
     bool selecter;//true = left, false = right
     bool pre = false;
     bool paintif = false;
+
+    QString output_string;//ここのメンバ変数に入ってる文字列をAnswerBoardの画面下に表示するようにする
 
 protected:
     void beforePolygon();

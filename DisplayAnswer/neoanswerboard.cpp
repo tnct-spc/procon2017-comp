@@ -17,6 +17,9 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
+void NeoAnswerBoard::setText(std::string text){
+    output_string = QString::fromStdString(text);
+}
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
@@ -208,7 +211,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     };
 
-    //評価値を描画
+    //評価値を描画 設定されたtextもここで描画する
     auto drawEvalution = [&]{
         painter.setBackgroundMode(Qt::TransparentMode);
         QColor evalution_color = {255,0,255};
@@ -229,6 +232,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             jointed_piece_total += frame_.getJointedPieces().size();
         }
         painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+
+        QPointF text_point = evalution_point;
+        text_point.setY(splitedheight);
+        painter.drawText(text_point, output_string);
         //painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
     };
