@@ -87,5 +87,7 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/release/ 
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/debug/ -lNeoSolver
 else:unix: LIBS += -L$$OUT_PWD/../NeoSolver/ -lNeoSolver
 
+include(qhttpserver/qhttpserver.pri)
+
 INCLUDEPATH += $$PWD/../NeoSolver
 DEPENDPATH += $$PWD/../NeoSolver
