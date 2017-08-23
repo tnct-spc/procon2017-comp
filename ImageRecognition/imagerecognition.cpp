@@ -5,6 +5,8 @@
 #include "utilities.h"
 #include "neosinglepolygondisplay.h"
 
+#include "math.h"
+
 procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
     raw_pieces_pic = raw_pieces_image;
@@ -39,7 +41,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // frameのinnersをouterに入れ替える
     field_num = polygons[0].inners().size();
-    for (unsigned int i=0; i<field_num; i++) {
+    for (int i=0; i<field_num; i++) {
         polygon_t inside;
         for (unsigned int j=0; j<polygons[0].inners()[i].size(); j++) {
             inside.outer().push_back(polygons[0].inners()[i].at(j));
@@ -54,10 +56,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     double error;
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
-        //error = getError(pieces[i], i+1);
+
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        error = getError(pieces[i], i+1);
+        printf("%d : %f\n", i, error);
     }
 
-    error = getError(pieces);
+    //error = getError(pieces);
 
     // fieldクラスのデータに変換
     // 色々変更しなきゃいけないかも
@@ -906,11 +911,12 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     // 配列を循環
     vertex.outer().pop_back();
-    polygon_t polygon;
+    polygon_t po;
     for (unsigned int i = 0; i < size-1; i++) {
-        polygon.outer().push_back(vertex.outer().at((i+longgest)%(size-1)));
+        po.outer().push_back(vertex.outer().at((i+longgest)%(size-1)));
     }
-    polygon.outer().push_back(polygon.outer().at(0));
+    po.outer().push_back(po.outer().at(0));
+    vertex = po;
     */
 
     // グリッドの点番号で保存
@@ -920,9 +926,12 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     // 最初の辺の長さをグリッド基準で計算
     double first_x = polygon.at(1).x() - polygon.at(0).x();
     double first_y = polygon.at(1).y() - polygon.at(0).y();
+    /*
     double x_dif = first_x * scale / 2.5;
     double y_dif = first_y * scale / 2.5;
     double len = sqrt(pow(x_dif, 2.0) + pow(y_dif, 2.0));
+    */
+    double len = hypot(first_x * scale / 2.5, first_y * scale / 2.5);
 
     double dif_min = 1.0;
     double dy;
@@ -938,8 +947,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
 
         // 計算上の点から上下の点で誤差を比べる
-        double top_error = fabs(sqrt(pow(floor(dy), 2.0) + pow(x, 2.0)) - len);
-        double bottom_error = fabs(sqrt(pow(ceil(dy), 2.0) + pow(x, 2.0)) - len);
+        double top_error = fabs(hypot(floor(dy), x) - len);
+        double bottom_error = fabs(hypot(ceil(dy), x) - len);
         if (dif_min > top_error) {
             p[0] = x;
             p[1] = (int)floor(dy);
@@ -951,8 +960,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     }
 
-    grid_piece.outer().push_back(point_i(p[0],p[1]));
-
     // 回転角を算出
     double theta_1;
     if (first_x < 0 && first_y > 0) {
@@ -962,22 +969,24 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     } else {
         theta_1 = atan(first_y / first_x);
     }
-    double theta_2 = atan((double)grid_piece.outer().at(1).y() / (double)grid_piece.outer().at(1).x());
+    double theta_2 = atan((double)p[0] / (double)p[1]);
     double theta = theta_2 - theta_1;
 
     // 2つの角度から選ぶ
     if (theta_2 != 0) {
         double sec_x = polygon.at(2).x() - polygon.at(0).x();
         double sec_y = polygon.at(2).y() - polygon.at(0).y();
-        double acute_x = sec_x * cos(theta) - sec_y * sin(theta);
-        double acute_y = sec_x * sin(theta) + sec_y * cos(theta);
-        double obtuse_x = sec_x * cos(M_PI/2-theta_2-theta_1) - sec_y * sin(M_PI/2-theta_2-theta_1);
-        double obtuse_y = sec_x * sin(M_PI/2-theta_2-theta_1) + sec_y * cos(M_PI/2-theta_2-theta_1);
-        double dacute_len = pow(acute_x - round(acute_x), 2.0) + pow(acute_y - round(acute_y), 2.0);
-        double dobtuse_len = pow(obtuse_x - round(obtuse_x), 2.0) + pow(obtuse_y - round(obtuse_y), 2.0);
+        len = hypot(sec_x, sec_y) * scale / 2.5;
+        double acute_x = (sec_x * cos(theta) - sec_y * sin(theta)) * scale / 2.5;
+        double acute_y = (sec_x * sin(theta) + sec_y * cos(theta)) * scale / 2.5;
+        double obtuse_x = (sec_x * cos(M_PI/2-theta_2-theta_1) - sec_y * sin(M_PI/2-theta_2-theta_1)) * scale / 2.5;
+        double obtuse_y = (sec_x * sin(M_PI/2-theta_2-theta_1) + sec_y * cos(M_PI/2-theta_2-theta_1)) * scale / 2.5;
+        double dacute_len = hypot(round(acute_x), round(acute_y)) - len;
+        double dobtuse_len = hypot(round(obtuse_x), round(obtuse_y)) - len;
 
         if (dobtuse_len < dacute_len) theta = M_PI / 2 - theta_2 - theta_1;
     }
+
     // 全ての点を回転後のいちに移動
     polygon_t turn;
     turn.outer().push_back(point_t(0,0));
@@ -990,21 +999,16 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     }
 
     // 全ての点の座標をグリッドに変換
-    for (unsigned int i=2; i<size; i++) {
+    for (unsigned int i=1; i<size; i++) {
         double x = turn.outer().at(i).x() * scale / 2.5;
         double y = turn.outer().at(i).y() * scale / 2.5;
         grid_piece.outer().push_back(point_i(round(x),round(y)));
     }
 
-    procon::NeoExpandedPolygon piece;
-    piece.resetPolygonForce(grid_piece);
-
-    NeoPolygonViewer::getInstance().displayPolygon(grid_piece, "Grid", false);
-
     return grid_piece;
 }
 
-/*
+
 double ImageRecognition::getError(polygon_i p,int num)
 {
     double piece_area = 0;
@@ -1023,13 +1027,14 @@ double ImageRecognition::getError(polygon_i p,int num)
 
     return error;
 }
-*/
 
+
+/*
 double ImageRecognition::getError(std::vector<polygon_i> p)
 {
     double piece_area = 0;
 
-    for (unsigned int i=1; i<p.size(); i++) {
+    for (unsigned int i=0; i<p.size()-1; i++) {
         for (unsigned int j=0; j<p[i].outer().size()-1; j++) {
             auto point1 = p[i].outer().at(j);
             auto point2 = p[i].outer().at(j+1);
@@ -1051,6 +1056,7 @@ double ImageRecognition::getError(std::vector<polygon_i> p)
 
     return error;
 }
+*/
 
 procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 {
@@ -1058,7 +1064,7 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
     std::vector<procon::NeoExpandedPolygon> neo_pieces;
 
-    for (unsigned int i=0; i<pieces.size() - field_num; i++) {
+    for (unsigned int i=0; i<pieces.size() - (unsigned int)field_num; i++) {
         procon::NeoExpandedPolygon polygon;
         polygon.resetPolygonForce(pieces[i]);
         neo_pieces.push_back(polygon);
@@ -1068,7 +1074,7 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
     std::vector<procon::NeoExpandedPolygon> neo_frame;
 
-    for (unsigned int i=0; i<field_num; i++) {
+    for (int i=0; i<field_num; i++) {
         procon::NeoExpandedPolygon polygon;
         polygon.resetPolygonForce(pieces[pieces.size() - 1 - i]);
         neo_frame.push_back(polygon);
