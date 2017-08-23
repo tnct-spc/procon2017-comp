@@ -192,8 +192,23 @@ procon::NeoField TestCheckCanPrume::makeField(){
 }
 
 bool TestCheckCanPrume::run(){
+    procon::NeoField field;
+
+    procon::NeoExpandedPolygon nep;
+
+    polygon_i boostPolygon_i;
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,1)(0,2)(0,0);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    field.setFrame({nep});
+
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(3,0)(3,3)(0,3)(0,0);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    field.setElementaryPieces({nep});
+
     BeamSearch beamsearch;
-    bool a = beamsearch.checkCanPrune(makeField());
+    bool a = beamsearch.checkCanPrune(field);
     std::cout<<a<<std::endl;
     return true;
 }
