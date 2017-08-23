@@ -26,7 +26,6 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     board->show();
-
 }
 
 Kunugida::~Kunugida()
@@ -54,12 +53,13 @@ void Kunugida::run()
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
 
-        int id = 0;
+        int id = 1;
         for(auto& piece : pieces_){
             procon::NeoExpandedPolygon buf(id);
             buf.resetPolygonForce(piece);
             pieces.push_back(buf);
             ++id;
+            //break;
         }
         frame.resetPolygonForce(frame_);
         std::vector<procon::NeoExpandedPolygon> vec_frame;
@@ -81,13 +81,17 @@ void Kunugida::run()
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 
-//    TODO: algorithm_numberをGUIで選択できるようにする
     int algorithm_number = 0;
 
+    if(ui->test_algorithm_button->isChecked()){
+        algorithm_number = 0;
+    } else if (ui->beamsearch_button->isChecked()) {
+        algorithm_number = 1;
+    }
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
-    solver->run(field,0);
+    solver->run(field,algorithm_number);
 
 
 //    QRLibrary lib;
