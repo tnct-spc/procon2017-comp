@@ -87,10 +87,10 @@ void procon::NeoExpandedPolygon::calcSideAngle()
     if(!calcSize_flag) calcSize();
     side_angle.clear();
 
-    for(int i = 0; i < size - 1; ++i) {
+    for(int i = 0; i < size; ++i) {
         p = outer.at(i);
 
-        p1 = outer.at((i == 0) ? size - 2 : i - 1);
+        p1 = outer.at((i == 0) ? size - 1 : i - 1);
         ComplexAngle cp1(p1.x() - p.x(), p1.y() - p.y());
 
         p2 = outer.at(i + 1);
