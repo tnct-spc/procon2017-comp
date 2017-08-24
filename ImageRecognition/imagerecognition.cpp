@@ -58,14 +58,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pieces.push_back(placeGrid(polygons[i]));
 
         NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
-        error = getError(pieces[i], i+1);
-        printf("%d : %f\n", i, error);
+        //error = getError(pieces[i], i+1);
+        //printf("%d : %f\n", i, error);
     }
 
-    //error = getError(pieces);
+    error = getError(pieces);
 
     // fieldクラスのデータに変換
-    // 色々変更しなきゃいけないかも
     procon::NeoField field = makeNeoField(pieces);
 
     return field;
@@ -865,7 +864,7 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 
         // 面積の小さいものは省く
         int piece_area = param[cv::ConnectedComponentsTypes::CC_STAT_AREA];
-        if (piece_area > 10000) { // 調節
+        if (piece_area > 1600) { // 調節
 
             // 各ピースごとに移し替える
             cv::Mat piece_image(cv::Size(width, height), CV_8UC1);
@@ -890,7 +889,7 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 
 polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 {    
-    auto polygon = vertex.outer();
+    auto& polygon = vertex.outer();
 
     unsigned int size = polygon.size();
 
@@ -942,7 +941,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                 spin.outer().push_back(vertex.outer().at((j+i)%(size-1)));
             }
             spin.outer().push_back(spin.outer().at(0));
-            polygon = spin.outer();
+            vertex = spin;
 
             right_angle = true;
 
@@ -1040,7 +1039,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     return grid_piece;
 }
 
-
+/*
 double ImageRecognition::getError(polygon_i p,int num)
 {
     double piece_area = 0;
@@ -1059,9 +1058,8 @@ double ImageRecognition::getError(polygon_i p,int num)
 
     return error;
 }
+*/
 
-
-/*
 double ImageRecognition::getError(std::vector<polygon_i> p)
 {
     double piece_area = 0;
@@ -1074,7 +1072,7 @@ double ImageRecognition::getError(std::vector<polygon_i> p)
         }
     }
 
-    piece_area = fabs(piece_area) * 0.5 * 2.5 * 2.5;
+    piece_area = fabs(piece_area);
 
     double frame_area = 0;
 
@@ -1084,24 +1082,13 @@ double ImageRecognition::getError(std::vector<polygon_i> p)
         frame_area += (point1.x() - point2.x()) * (point1.y() + point2.y());
     }
 
-    frame_area = fabs(frame_area) * 0.5 * 2.5 * 2.5;
+    frame_area = fabs(frame_area);
 
-    double error = frame_area - piece_area;
-
-    double scan_area = 0;
-
-    for (unsigned int i=1; i<area.size(); i++) {
-        scan_area += area[i];
-    }
-
-    scan_area = scan_area * pow(scale, 2.0);
-
-    double error = scan_area - piece_area;
-
+    double error = (frame_area - piece_area);
 
     return error;
 }
-*/
+
 
 procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 {
