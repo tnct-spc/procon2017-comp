@@ -923,6 +923,33 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     polygon_i grid_piece;
     grid_piece.outer().push_back(point_i(0,0));
 
+    // ９０度の角を持つピースはそこを基準に計算
+    bool right_angle = false;
+
+    for (unsigned int i=0; i<size-1; i++) {
+        double vec[4];
+        vec[0] = polygon.at(i).x() - polygon.at(i+1).x();
+        vec[1] = polygon.at(i).y() - polygon.at(i+1).y();
+        vec[2] = polygon.at((i+2) % (size-1)).x() - polygon.at(i+1).x();
+        vec[3] = polygon.at((i+2) % (size-1)).y() - polygon.at(i+1).y();
+        double degree = acos((vec[0] * vec[2] + vec[1] * vec[3]) / (hypot(vec[0], vec[1]) * hypot(vec[2], vec[3])));
+
+        // 配列を循環
+        if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
+            polygon.pop_back();
+            polygon_t spin;
+            for (unsigned int j = 0; j < size-1; j++) {
+                spin.outer().push_back(vertex.outer().at((j+i)%(size-1)));
+            }
+            spin.outer().push_back(spin.outer().at(0));
+            polygon = spin.outer();
+
+            right_angle = true;
+
+            break;
+        }
+    }
+
     // 最初の辺の長さをグリッド基準で計算
     double first_x = polygon.at(1).x() - polygon.at(0).x();
     double first_y = polygon.at(1).y() - polygon.at(0).y();
@@ -937,26 +964,31 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     double dy;
     int p[2];
 
-    // 45度の範囲から辺の長さの誤差がもっとも小さいものをピックアップ
-    for (int x = ceil(len); x >= floor(len * sqrt(0.5)); x--) {
+    if (right_angle) {
+        p[0] = (int)round(len);
+        p[1] = 0;
+    } else {
+        // 45度の範囲から辺の長さの誤差がもっとも小さいものをピックアップ
+        for (int x = ceil(len); x >= floor(len * sqrt(0.5)); x--) {
 
-        if (len < x) {
-            dy = 0;
-        } else {
-            dy = sqrt(pow(len, 2.0) - pow(x, 2.0));
-        }
+            if (len < x) {
+                dy = 0;
+            } else {
+                dy = sqrt(pow(len, 2.0) - pow(x, 2.0));
+            }
 
-        // 計算上の点から上下の点で誤差を比べる
-        double top_error = fabs(hypot(floor(dy), x) - len);
-        double bottom_error = fabs(hypot(ceil(dy), x) - len);
-        if (dif_min > top_error) {
-            p[0] = x;
-            p[1] = (int)floor(dy);
-            dif_min = top_error;
-        } else if (dif_min > bottom_error) {
-            p[0] = x;
-            p[1] = (int)ceil(dy);
-            dif_min = bottom_error;
+            // 計算上の点から上下の点で誤差を比べる
+            double top_error = fabs(hypot(floor(dy), x) - len);
+            double bottom_error = fabs(hypot(ceil(dy), x) - len);
+            if (dif_min > top_error) {
+                p[0] = x;
+                p[1] = (int)floor(dy);
+                dif_min = top_error;
+            } else if (dif_min > bottom_error) {
+                p[0] = x;
+                p[1] = (int)ceil(dy);
+                dif_min = bottom_error;
+            }
         }
     }
 
@@ -1044,6 +1076,18 @@ double ImageRecognition::getError(std::vector<polygon_i> p)
 
     piece_area = fabs(piece_area) * 0.5 * 2.5 * 2.5;
 
+    double frame_area = 0;
+
+    for (unsigned int j=0; j<p[p.size()-1].outer().size()-1; j++) {
+        auto point1 = p[p.size()-1].outer().at(j);
+        auto point2 = p[p.size()-1].outer().at(j+1);
+        frame_area += (point1.x() - point2.x()) * (point1.y() + point2.y());
+    }
+
+    frame_area = fabs(frame_area) * 0.5 * 2.5 * 2.5;
+
+    double error = frame_area - piece_area;
+
     double scan_area = 0;
 
     for (unsigned int i=1; i<area.size(); i++) {
@@ -1053,6 +1097,7 @@ double ImageRecognition::getError(std::vector<polygon_i> p)
     scan_area = scan_area * pow(scale, 2.0);
 
     double error = scan_area - piece_area;
+
 
     return error;
 }
