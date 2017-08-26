@@ -24,7 +24,7 @@ public:
 private:
     Ui::ProbMaker *ui;
 
-    const bool usePieceDataToFrame = true;//これがtrueだったらピースのデータを元に枠を生成するようにする
+    const bool usePieceDataToFrame = false;//これがtrueだったらピースのデータを元に枠を生成するようにする
     const int frame_size = 4500;
 
     void createPiece(polygon_i& argument_frame);

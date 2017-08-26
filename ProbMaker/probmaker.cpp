@@ -379,7 +379,7 @@ void ProbMaker::createFrame(){//枠の生成　const定数で挙動の変更を�
 
 void ProbMaker::createFrameFromPiece(){
     setInnerFrame(frame);
-    while(bg::area(frame) > 4700){
+    while(bg::area(frame) > frame_size){
     for(unsigned int count = 0;count < print_polygons.size();++count){//要素そのものを削除する都合上for eachは使わない方向で
         //setInnerFrame(frame);
         if(bg::intersects(inner_frame,print_polygons.at(count)) && !retRnd(8)){//frameと接触している時に一定確率で
