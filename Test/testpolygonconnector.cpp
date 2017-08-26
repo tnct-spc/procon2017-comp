@@ -19,14 +19,15 @@ bool TestPolygonConnector::run()
     Connect connecter;
     int frame_side, piece_side, frame_point, piece_point;
     PolygonConnector polygon_connector;
+    int frame_size = polygon_frames.size();
+    int piece_size = polygon_pieces.size();
 
-
-    for(int i = 0; i < polygon_frames.size(); ++i) {
-        std::cout << std::endl << "frame---------------------------<< " << i << " >>---------------------------" << std::endl << std::endl;
+    for(int i = 0; i < frame_size; ++i) {
+        std::cout << std::endl << std::endl << "frame<< " << i << " >>----------------------------------------------------------------" << std::endl;
         polygon_i polygon_frame = polygon_frames.at(i);
 
-        for(int j = 0; j < polygon_pieces.size(); ++j) {
-            std::cout << "piece---------------------------<< " << j << " >>---------------------------" << std::endl << std::endl;
+        for(int j = 0; j < piece_size; ++j) {
+            std::cout << std::endl << "    piece<< " << j << " >>------------------------------------------------------------" << std::endl;
             polygon_i polygon_piece = polygon_pieces.at(j);
 
             frame.resetPolygonForce(polygon_frame);
@@ -59,31 +60,44 @@ bool TestPolygonConnector::run()
             connecter.polygon_point_index = piece_point;
 
             std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> result = polygon_connector.connect(frame, piece, connecter);
-            if(std::get<2>(result)) {
-                std::vector<procon::NeoExpandedPolygon> result_frames = std::get<0>(result);
-                procon::NeoExpandedPolygon result_piese = std::get<1>(result);
+            std::vector<procon::NeoExpandedPolygon> result_frames = std::get<0>(result);
+            procon::NeoExpandedPolygon result_piese = std::get<1>(result);
 
-                auto out = [](procon::NeoExpandedPolygon expoly, std::string name)
-                {
-                    polygon_i poly = expoly.getPolygon();
+            auto out = [&i, &j](procon::NeoExpandedPolygon expoly, std::string name)
+            {
+                polygon_i poly = expoly.getPolygon();
 
-                    std::cout << name << " -> ";
+                std::cout << name << " -> ";
 
-                    for(point_i point : poly.outer()) {
-                        std::cout << "(" << point.x() << ", " << point.y() << "), ";
-                    }
-
-                    std::cout << std::endl << std::endl;
-                };
-
-                for(procon::NeoExpandedPolygon result_frame : result_frames) {
-                    out(result_frame, "frame");
+                for(point_i point : poly.outer()) {
+                    std::cout << "(" << point.x() << ", " << point.y() << "), ";
                 }
+
                 std::cout << std::endl;
+
+                NeoPolygonViewer::getInstance().displayPolygon(poly, name + " (" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + ")", false);
+            };
+
+            if(std::get<2>(result)) {
+
+                int f = 1;
+                for(procon::NeoExpandedPolygon result_frame : result_frames) {
+                    std::cout << "    ";
+                    out(result_frame, "frame" + std::to_string(f));
+                    ++f;
+                }
+
+                std::cout << std::endl << "    ";
                 out(result_piese, "piese");
-            } else std::cout << "false" << std::endl;
-            std::cout << "end" << std::endl;
+
+            } else {
+                std::cout << "false" << std::endl << "    ";
+                out(frame, "frame");
+                std::cout << std::endl << "    ";
+                out(result_piese, "piese");
+            }
         }
     }
+    std::cout << std::endl;
     return true;
 }
