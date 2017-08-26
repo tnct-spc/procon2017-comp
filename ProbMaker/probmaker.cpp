@@ -243,7 +243,7 @@ void ProbMaker::angulated_graphic(){
     //frame = sample_frame;
 
     createFrame();
-    std::cout << "枠生成完了　" << std::endl;
+    if(!usePieceDataToFrame)std::cout << "枠生成完了　" << std::endl;
 
 
     check_frame = frame;//すでにはめられたピースも含むpolygonを生成する
@@ -266,22 +266,23 @@ void ProbMaker::angulated_graphic(){
         std::cout << "ピース結合完了" << std::endl;
 
 
-        tescou++;
         flag=false;
         for(auto poly : print_polygons){
-            if(bg::area(poly) > 550){flag=true;//ここでピースの大きさの最大値を設定している
+            if(bg::area(poly) > bg::area(frame) / 8){flag=true;//ここでピースの大きさの最大値を設定している
             std::cout << "ピースの大きさが限界値を超えています" << std::endl;}
         }
         if(congruenceCheck())flag=true;
         std::cout << "問題検知終了" << std::endl;
 
     }else flag=true;//falseが返されたなら分割ができていないためやり直し
+    tescou++;
 
     if(flag)std::cout << "問題があったのでやり直し" << std::endl;
     }while(flag);
 
     erasePoint();
 
+    if(usePieceDataToFrame)createFrameFromPiece();
     /*
     for(auto polygon : print_polygons){//生成されたポリゴンの一覧を出力する
         std::cout << "polygon = " << bg::dsv(polygon) << std::endl;
@@ -295,7 +296,11 @@ void ProbMaker::angulated_graphic(){
 }
 
 
-void ProbMaker::createFrame(){//本物の
+void ProbMaker::createFrame(){//枠の生成　const定数で挙動の変更をしている
+
+    frame.clear();
+    if(!usePieceDataToFrame){
+
     int firstcoordinate_x,firstcoordinate_y,leftline,overline,rightline,underline;
     do{
     leftline = retRnd(15),overline = retRnd(10),rightline = 86+retRnd(15),underline = 56+retRnd(10);
@@ -359,6 +364,36 @@ void ProbMaker::createFrame(){//本物の
     real_frame.outer().push_back(point_i(firstcoordinate_x,firstcoordinate_y));
 }while(bg::area(real_frame) < frame_size);
     frame = real_frame;
+
+    }else{
+
+        frame.outer().push_back(point_i(0,0));
+        frame.outer().push_back(point_i(0,65));
+        frame.outer().push_back(point_i(101,65));
+        frame.outer().push_back(point_i(101,0));
+        frame.outer().push_back(point_i(0,0));
+        bg::correct(frame);
+
+    }
+}
+
+void ProbMaker::createFrameFromPiece(){
+    setInnerFrame(frame);
+    while(bg::area(frame) > 4700){
+    for(unsigned int count = 0;count < print_polygons.size();++count){//要素そのものを削除する都合上for eachは使わない方向で
+        //setInnerFrame(frame);
+        if(bg::intersects(inner_frame,print_polygons.at(count)) && !retRnd(8)){//frameと接触している時に一定確率で
+            std::vector<polygon_i> differ_frame;
+            bg::difference(frame,print_polygons.at(count),differ_frame);
+            if(differ_frame.size() == 1){
+                bg::correct(differ_frame.at(0));
+                print_polygons.erase(print_polygons.begin() + count);
+                frame = differ_frame.at(0);
+                break;
+            }
+        }
+    }
+    }
 }
 
 bool ProbMaker::congruenceCheck(){
@@ -430,7 +465,7 @@ bool ProbMaker::splitPiece(){
     if(flag)break;
     }
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 550) return false;
+        if(bg::area(poly) > bg::area(frame) / 8) return false;
     }
     return true;
 }

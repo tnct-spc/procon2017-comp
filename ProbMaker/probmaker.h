@@ -24,6 +24,9 @@ public:
 private:
     Ui::ProbMaker *ui;
 
+    const bool usePieceDataToFrame = true;//これがtrueだったらピースのデータを元に枠を生成するようにする
+    const int frame_size = 4500;
+
     void createPiece(polygon_i& argument_frame);
     void setInnerFrame(polygon_i frame);
     void checkClossLine(polygon_i& poly , polygon_i& change_frame);
@@ -32,6 +35,7 @@ private:
     bool congruenceCheck();
     void erasePoint();
     void createFrame();
+    void createFrameFromPiece();
 
     bool IsCongruence(polygon_i polygon1 , polygon_i polygon2);//中野先輩のやつ
 
@@ -59,7 +63,6 @@ private:
     int coordinate_x(int direction,int interbal,int keeping_x);
     int coordinate_y(int direction,int interbal,int keeping_y);
     int interbal(int keeping_x,int keeping_y,int target_x,int target_y);
-    int frame_size = 4500;
     //void push_backer(int keeping_x,int keeping_y,int target_x,int target_y,polygon_i real_frame);
 
 private slots:
