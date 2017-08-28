@@ -262,7 +262,7 @@ void ProbMaker::angulated_graphic(){
     if(splitPiece()){
         std::cout << "ピース分割完了" << std::endl;
         //小さなピースの結合
-        jointPiece();
+        jointPiece();//この関数内でSEGV起こしてる
         std::cout << "ピース結合完了" << std::endl;
 
 
@@ -379,7 +379,7 @@ void ProbMaker::createFrame(){//枠の生成　const定数で挙動の変更を�
 
 void ProbMaker::createFrameFromPiece(){
     setInnerFrame(frame);
-    while(bg::area(frame) > frame_size){
+    while(bg::area(frame) > frame_size + 1000){
     for(unsigned int count = 0;count < print_polygons.size();++count){//要素そのものを削除する都合上for eachは使わない方向で
         //setInnerFrame(frame);
         if(bg::intersects(inner_frame,print_polygons.at(count)) && !retRnd(8)){//frameと接触している時に一定確率で
@@ -448,12 +448,14 @@ void ProbMaker::erasePoint(){//直線上にある(消しても問題ない)頂�
 }
 
 bool ProbMaker::splitPiece(){
+
     bool flag;
     for(int count=0;count < 15;count++){//分割できないパターンでの無限ループ防止
     flag=true;
     for(unsigned int poly_num =0;poly_num<print_polygons.size();++poly_num){//for eachから変更したら問題を起こさなくなった
         if(bg::area(print_polygons[poly_num]) > 200){//ピースの大きさが一定を超えているなら
-            createPiece(print_polygons[poly_num]);
+            if(onlySplitRightAngle) createPiece(print_polygons[poly_num]);
+            else splitDiagonally(print_polygons[poly_num]);
             flag=false;
         }
         if(print_polygons.size() > 49)break;//ピース数が50を超えないように調整
@@ -467,7 +469,61 @@ bool ProbMaker::splitPiece(){
     for(auto poly : print_polygons){
         if(bg::area(poly) > bg::area(frame) / 8) return false;
     }
-    return true;
+        return true;
+}
+
+void ProbMaker::splitDiagonally(polygon_i& poly){
+    bool flag=false;
+    bool check;
+    setInnerFrame(poly);
+    point_i closs_point;
+    do{
+        check=false;
+        closs_point = returnClossPoint(poly);
+        for(auto point : poly.outer()){
+            if(bg::equals(closs_point,point))check=true;
+        }
+    }while(check);
+    bool left_or_right = retRnd(2);
+    std::vector<point_i> vec_points;//図形の頂点をこれに格納
+    for(auto point : poly.outer()){
+        vec_points.push_back(point);
+    }
+    vec_points.push_back(poly.outer().at(1));
+    bool change_side = false;
+    for(int count=0;count<2;count++){//右下方向、左下方向へ二回繰り返される
+        for(int extend = 1;extend < 65;extend++){
+            int extend_x = (left_or_right
+                                   ? closs_point.x()+extend
+                                   : closs_point.x()-extend
+                                   );
+            int extend_y = closs_point.y()+extend;
+            point_i extend_point = point_i(extend_x,extend_y);
+
+            for(unsigned int point_cou=0;point_cou < vec_points.size() - 2;++point_cou){
+                bg::model::linestring<point_i> check_line;//二点で線を作り、それが点と接触しているかを判定する
+                check_line.push_back(vec_points.at(point_cou));
+                check_line.push_back(vec_points.at(point_cou + 1));
+
+                if(bg::intersects(check_line,extend_point)){//接触判定
+                    if(extend==1){
+                        change_side = true;
+                        break;
+                    }
+                    polygon_i split_poly;
+                    split_poly.outer().push_back(closs_point);
+                    split_poly.outer().push_back(extend_point);
+                    checkClossLine(split_poly,poly);//ここでSEGV 交点はちゃんと出せてるのだが…　　交点が丁度頂点の位置になっていたり交点と平行になっていたりするっぽい…？　　　ランダムで選んだ始点がチェックする線の交点と重なってるぞ！！！
+                    print_polygons.push_back(split_poly);
+                    flag=true;
+                    break;
+                }
+            }
+            if(flag || change_side)break;
+        }
+        if(flag)break;
+        left_or_right ^= 1;
+    }
 }
 
 void ProbMaker::jointPiece(){
@@ -519,24 +575,33 @@ void ProbMaker::setInnerFrame(polygon_i frame){
     }
 }
 
-void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指定する
-    //ここから関数
-    polygon_i poly;
-    bool check = false;
+point_i ProbMaker::returnClossPoint(polygon_i poly){
+    bool check=false;
     int point_y,point_x;
-    setInnerFrame(argument_frame);
     while(!check){
         point_x = 1 + retRnd(99);//ランダムでx座標を出す
         for(int closspointy=0;closspointy<66;closspointy++){//縦に引かれた線と枠の線の交点を出す
-            if( bg::intersects(point_i(point_x,closspointy), argument_frame)){
+            if( bg::intersects(point_i(point_x,closspointy), poly)){
                 point_y = closspointy; //交点のy座標を記憶
                 check = true;
                 break;
             }
         }
     }
-    poly.outer().push_back(point_i(point_x,point_y));
+    return point_i(point_x,point_y);
+}
 
+void ProbMaker::createPiece(polygon_i& argument_frame){//引数には枠を指定する
+    //ここから関数
+    polygon_i poly;
+    int point_y,point_x;
+    setInnerFrame(argument_frame);
+
+    point_i closs_point = returnClossPoint(argument_frame);
+    poly.outer().push_back(closs_point);
+
+    point_x = closs_point.x();
+    point_y = closs_point.y();
 
     bool x_or_y = true;//次にx軸方向へ伸ばすかy軸方向に伸ばすかを記録する trueならy軸方向、falseならx軸方向に伸ばす
     //次はx座標に正の方向へ頂点を移動させるサンプルを作ってみる

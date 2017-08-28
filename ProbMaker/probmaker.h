@@ -25,6 +25,7 @@ private:
     Ui::ProbMaker *ui;
 
     const bool usePieceDataToFrame = false;//これがtrueだったらピースのデータを元に枠を生成するようにする
+    const bool onlySplitRightAngle = false;//これがfalseだったらピースの分割を斜めに行うようにする
     const int frame_size = 4500;
 
     void createPiece(polygon_i& argument_frame);
@@ -36,6 +37,8 @@ private:
     void erasePoint();
     void createFrame();
     void createFrameFromPiece();
+    void splitDiagonally(polygon_i& poly);
+    point_i returnClossPoint(polygon_i poly);
 
     bool IsCongruence(polygon_i polygon1 , polygon_i polygon2);//中野先輩のやつ
 
