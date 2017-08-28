@@ -2,11 +2,8 @@
 #include "request.h"
 
 TcpMain::TcpMain(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TcpMain)
+    QMainWindow(parent)
 {
-    ui->setupUi(this);
-
     server = new QTcpServer(this);
     server->listen(QHostAddress::Any, 6178);
 
@@ -25,8 +22,16 @@ void TcpMain::setfield(procon::NeoField input_field)
     field = input_field;
 }
 
-void TcpMain::make_send_data(int piece_number)
+void TcpMain::make_send_data()
 {
+    const int piece_data = 0;
+    const int frame_data = 1;
+    std::vector<QPointF> points;
+    for(auto pieces_data_size : field.getPieces().size()){
+        for(auto point : field.getPieces().at(pieces_data_size).getPolygon().outer()){
+            points.push_back(point);
+        }
+    }
 
 }
 
