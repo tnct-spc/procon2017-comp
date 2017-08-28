@@ -278,6 +278,31 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     //OKならfalseを返す
 }
 
+int BeamSearch::checkOddField(const procon::NeoField &field, const Connect &connector, const int field_frame_index) //field_frame_indexはConnectクラスのindexで参照すべきframeのindex
+{
+    //mag = magnification（倍率）
+    int odd_score = 0; //ゲテモノポイント
+    const int odd_connect_length = 3; //これ以下の長さだとゲテモノ（単位はグリット）
+    const int check_connect_length_mag = 10; //１倍のときのゲテモノポイント加算値はodd_connect_length以下の整数になる
+
+    std::vector<procon::NeoExpandedPolygon> frames = field.getFrame();
+
+    auto check_connect_length = [&]() //結合した辺のゲテモノ度
+    {
+         procon::NeoExpandedPolygon frame = frames.at(static_cast<unsigned int>(field_frame_index));
+         std::vector<double> frame_length = frame.getSideLength();
+         double length = frame_length.at(static_cast<unsigned int>((connector.frame_point_index != connector.frame_side_index) ? connector.frame_side_index : connector.frame_point_index + 1));
+         double length_int;
+         double length_double = modf(length, &length_int);
+         int length_up_int = static_cast<int>((length_double > 0.0) ? length_int + 1.0 : length_int);
+         if(length_up_int < odd_connect_length) odd_score += (odd_connect_length - length_up_int) * check_connect_length_mag;
+    };
+
+    if(odd_connect_length > 0 && check_connect_length_mag > 0) check_connect_length();
+
+    return odd_score;
+}
+
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
     //frameがstd::vector<NeoExPolygon>なのでそれぞれに対して、評価関数を回す

@@ -34,6 +34,8 @@ public:
     void makeNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
     void evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
     bool checkCanPrune(procon::NeoField const& field);
+    int checkOddField(const procon::NeoField &field, const Connect &connector, const int field_frame_index);
+
     std::vector<procon::NeoField> debug_field;
 
     static std::string hashField(procon::NeoField field);
