@@ -133,12 +133,24 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             total_area += area_vec.at(count);
             if(total_area > frame_area)max_count = count;
         }
-
+        std::vector<double> add_vec = area_vec;
+        for(int count = 2;count < max_count;++count){
+            for(auto area : area_vec){
+                for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
+                    int add_cou = area + add_vec.at(vec_count);
+                    if(add_cou < frame_area)add_vec.push_back(add_cou);
+                    else if(add_cou == frame_area)return false;
+                    else break;
+                }
+            std::sort(add_vec.begin(),add_vec.end());
+            }
+        }
+        return true;
     };
 
     //複数のFrameがあるときにピースと面積が合致するか
     auto about_framesize = [&field,&framesize_single](){
-        const int frame_size_max = 2000;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
+        const int frame_size_max = 6565;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
 
         for(auto frame : field.getFrame()){
             if(bg::area(frame.getPolygon()) < frame_size_max){
