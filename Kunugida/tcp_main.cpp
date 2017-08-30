@@ -25,22 +25,30 @@ void TcpMain::setfield(procon::NeoField input_field)
 void TcpMain::make_send_data()
 {
 
-    //piece or frame(1) + range of vector(2) + number of vertices(6) + QPoint(x(3), y(3))
-    //example: 0 + 49 + 000006 + 9032 -> 0490000069032
+    //piece or frame(1) + range of vector(2) + QPoint(x(3), y(3))
     const int piece_data = 0;
     const int frame_data = 1;
-    std::vector<QPointF> points;
+    QVector<QPointF> points;
     for(auto& piece : field.getPieces()){
         for(auto point : piece.getPolygon().outer()){
-            points.push_back(getPosition(point));
+            points << getPosition(point);
+        }
+    }
+    QVector<QPointF> frames;
+    for(auto& frame : field.getFrame()){
+        for(auto point : frame.getPolygon().outer()){
+            frames << getPosition(point);
         }
     }
 
-    std::vector<QPointF> frames;
-    for(auto& frame : field.getFrame()){
-        for(auto point : frame.getPolygon().outer()){
-            frames.push_back(getPosition(point));
-        }
+    QVector<std::string> send_data;
+    std::ostringstream ss;
+    std::string pointssize = getSupportedString(points.size(), 2);
+    for(int i = 0; i < points.size(); ++i){
+        std::string xint = getSupportedString(points[i].x(), 3);
+        std::string yint = getSupportedString(points[i].y(), 3);
+        ss << piece_data << pointssize << xint << yint;
+        send_data[i] = ss.str();
     }
 }
 
@@ -49,6 +57,19 @@ QPointF TcpMain::getPosition(point_i point)
     int pointx = point.x();
     int pointy = point.y();
     return QPointF(pointx, pointy);
+}
+
+std::string TcpMain::getSupportedString(int n, int m)
+{
+    std::ostringstream hoge;
+    std::string str;
+    hoge << n;
+    str = hoge.str();
+    if(n < 100 && m == 3)
+        str = '0' + str;
+    if(n < 10 && m <= 3)
+        str = '0' + str;
+    return str;
 }
 
 void TcpMain::send()
