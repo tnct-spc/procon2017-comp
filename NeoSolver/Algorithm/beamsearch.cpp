@@ -136,12 +136,12 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             if(total_area > frame_area)max_count = count;
         }
         std::vector<double> add_vec = area_vec;
-        std::cout << "max : " << max_count << std::endl;//max_count息してないぞ！！！！！！！！！
-        for(int count = 1;count < max_count;++count){
+        std::cout << "max : " << max_count << std::endl;
+        for(int count = 2;count < max_count;++count){
             std::cout << "area_vec.size : " << area_vec.size() << "   add_vec.size : " << add_vec.size() << std::endl;
             for(auto area : area_vec){
                 for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
-                    std::cout << "どうでしょう" << vec_count << std::endl;//ここに入った場合必ず無限ループおきてんぞ！！！！！！
+                    std::cout << "どうでしょう" << vec_count << std::endl;
                     int add_cou = area + add_vec.at(vec_count);
                     if(add_cou < frame_area)add_vec.push_back(add_cou);
                     else if(add_cou == frame_area)return false;
@@ -164,7 +164,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         std::cout << "frame_size : " << field.getFrame().size() << std::endl;
         for(auto frame : field.getFrame()){
           //  if(bg::area(frame.getPolygon()) < frame_size_max){
-                if(framesize_single(frame))return true;
+                if(framesize_single(frame)){
+                    std::cout << "問題の原因になったframe : " << bg::dsv(frame.getPolygon()) << std::endl;
+                    return true;
+                }
           //  }
         }
         return false;
