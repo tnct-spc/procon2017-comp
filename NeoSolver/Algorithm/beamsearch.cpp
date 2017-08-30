@@ -140,7 +140,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         for(int count = 2;count < max_count;++count){
             for(auto area : area_vec){
                 for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
-                    std::cout << "どうでしょう" << vec_count << std::endl;//ここでなぜか無限ループ起こしてる add_vecが1のときに起こってるっぽい？　ここに入った場合必ず無限ループおきてんぞ！！！！！！
+                    std::cout << "どうでしょう" << vec_count << std::endl;//ここに入った場合必ず無限ループおきてんぞ！！！！！！
                     int add_cou = area + add_vec.at(vec_count);
                     if(add_cou < frame_area)add_vec.push_back(add_cou);
                     else if(add_cou == frame_area)return false;
@@ -163,7 +163,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         std::cout << "frame_size : " << field.getFrame().size() << std::endl;
         for(auto frame : field.getFrame()){
           //  if(bg::area(frame.getPolygon()) < frame_size_max){
-                if(framesize_single(frame))std::cout << "true";//return true;
+                if(framesize_single(frame))return true;
           //  }
         }
         return false;

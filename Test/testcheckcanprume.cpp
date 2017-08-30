@@ -197,6 +197,7 @@ bool TestCheckCanPrume::run(){
     procon::NeoExpandedPolygon nep;
     polygon_i boostPolygon_i;
     std::vector<procon::NeoExpandedPolygon>frame;
+    std::vector<procon::NeoExpandedPolygon>pieces;
 
     //ここからframe
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,2)(0,2)(0,0);
@@ -218,27 +219,29 @@ bool TestCheckCanPrume::run(){
     bg::correct(boostPolygon_i);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
     nep.resetPolygonForce(boostPolygon_i);
-    field.setElementaryPieces({nep});
+    pieces.push_back(nep);
 
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(1,0)(1,2)(0,2)(0,0);
     bg::correct(boostPolygon_i);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
     nep.resetPolygonForce(boostPolygon_i);
-    field.setElementaryPieces({nep});
-
+    pieces.push_back(nep);
 
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(1,0)(1,2)(0,2)(0,0);
     bg::correct(boostPolygon_i);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
     nep.resetPolygonForce(boostPolygon_i);
-    field.setElementaryPieces({nep});
+    pieces.push_back(nep);
 
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,-2)(2,0)(2,2)(0,2)(0,-2);
     bg::correct(boostPolygon_i);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
     nep.resetPolygonForce(boostPolygon_i);
-    field.setElementaryPieces({nep});
+    pieces.push_back(nep);
 
+    std::cout << pieces.size() << std::endl;
+
+    field.setElementaryPieces(pieces);
 
 
     BeamSearch beamsearch;
