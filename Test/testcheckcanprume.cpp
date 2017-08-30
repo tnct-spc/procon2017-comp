@@ -197,18 +197,21 @@ bool TestCheckCanPrume::run(){
     procon::NeoExpandedPolygon nep;
 
     polygon_i boostPolygon_i;
-    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,1)(0,2)(0,0);
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,2)(0,2)(0,0);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"",false);
     nep.resetPolygonForce(boostPolygon_i);
     field.setFrame({nep});
 
-    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(3,0)(3,3)(0,3)(0,0);
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,1)(0,2)(0,0);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"",false);
     nep.resetPolygonForce(boostPolygon_i);
     field.setElementaryPieces({nep});
 
     BeamSearch beamsearch;
     bool a = beamsearch.checkCanPrune(field);
-    std::cout<<a<<std::endl;
+    std::string str =( a
+                      ?"枝切りが可能です(矛盾があります)"
+                      :"枝切りできません(問題はないです)");
+    std::cout << "結果　：　"<< str << std::endl;
     return true;
 }
