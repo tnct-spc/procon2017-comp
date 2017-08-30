@@ -196,19 +196,22 @@ bool TestCheckCanPrume::run(){
 
     procon::NeoExpandedPolygon nep;
     polygon_i boostPolygon_i;
+    std::vector<procon::NeoExpandedPolygon>frame;
 
     //ここからframe
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,2)(0,2)(0,0);
     bg::correct(boostPolygon_i);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Frame",false);
     nep.resetPolygonForce(boostPolygon_i);
-    field.setFrame({nep});
+    frame.push_back(nep);
 
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(3,0)(5,0)(5,3)(3,5)(3,0);
     bg::correct(boostPolygon_i);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Frame",false);
     nep.resetPolygonForce(boostPolygon_i);
-    field.setFrame({nep});
+    frame.push_back(nep);
+
+    field.setFrame(frame);
 
     //ここからpiece
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(1,0)(1,2)(0,2)(0,0);

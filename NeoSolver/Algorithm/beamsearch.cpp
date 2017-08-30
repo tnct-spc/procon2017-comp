@@ -136,7 +136,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             if(total_area > frame_area)max_count = count;
         }
         std::vector<double> add_vec = area_vec;
-        std::cout << "max :" << max_count;//max_count息してないぞ！！！！！！！！！
+        std::cout << "max : " << max_count << std::endl;//max_count息してないぞ！！！！！！！！！
         for(int count = 2;count < max_count;++count){
             for(auto area : area_vec){
                 for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
@@ -149,6 +149,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             std::sort(add_vec.begin(),add_vec.end());
             }
         }
+        std::cout << "add_vec一覧表示 : ";
         for(auto count : add_vec){
            std::cout << count << " ";
         }
@@ -159,10 +160,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     //複数のFrameがあるときにピースと面積が合致するか
     auto about_framesize = [&field,&framesize_single](){
         const int frame_size_max = 2000;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
-
+        std::cout << "frame_size : " << field.getFrame().size() << std::endl;
         for(auto frame : field.getFrame()){
           //  if(bg::area(frame.getPolygon()) < frame_size_max){
-                if(framesize_single(frame))return true;
+                if(framesize_single(frame))std::cout << "true";//return true;
           //  }
         }
         return false;
