@@ -278,7 +278,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     //OKならfalseを返す
 }
 
-int BeamSearch::checkOddField(const procon::NeoField &field, const Connect &connector, const int field_frame_index) //field_frame_indexはConnectクラスのindexで参照すべきframeのindex
+int BeamSearch::checkOddField(const procon::NeoField &field, const Connect &connector, const int field_frame_index, const int field_piece_index) //field_frame_indexはConnectクラスのindexで参照すべきframeのindex
 {
     //mag = magnification（倍率）
     int odd_score = 0; //ゲテモノポイント
@@ -289,13 +289,26 @@ int BeamSearch::checkOddField(const procon::NeoField &field, const Connect &conn
 
     auto check_connect_length = [&]() //結合した辺のゲテモノ度
     {
-         procon::NeoExpandedPolygon frame = frames.at(static_cast<unsigned int>(field_frame_index));
-         std::vector<double> frame_length = frame.getSideLength();
-         double length = frame_length.at(static_cast<unsigned int>((connector.frame_point_index != connector.frame_side_index) ? connector.frame_side_index : connector.frame_point_index + 1));
-         double length_int;
-         double length_double = modf(length, &length_int);
-         int length_up_int = static_cast<int>((length_double > 0.0) ? length_int + 1.0 : length_int);
-         if(length_up_int < odd_connect_length) odd_score += (odd_connect_length - length_up_int) * check_connect_length_mag;
+        procon::NeoExpandedPolygon frame = frames.at(static_cast<unsigned int>(field_frame_index));
+        std::vector<double> frame_lengthes = frame.getSideLength();
+        double frame_length = frame_lengthes.at(static_cast<unsigned int>(connector.frame_side_index));
+
+        auto checklength = [](double length)
+        {
+            double length_int;
+            double length_double = modf(length, &length_int);
+            return static_cast<int>((length_double > 0.0) ? length_int + 1.0 : length_int);
+        };
+
+        int frame_length_up_int = checklength(frame_length);
+        if(frame_length_up_int <= odd_connect_length) odd_score += (odd_connect_length + 1 - frame_length_up_int) * check_connect_length_mag;
+        else {
+            procon::NeoExpandedPolygon piece = field.getPiece(field_piece_index);
+            std::vector<double> piece_lengthes = piece.getSideLength();
+            double piece_length = piece_lengthes.at(static_cast<unsigned int>(connector.polygon_side_index));
+            int piece_length_up_int = checklength(piece_length);
+            if(piece_length_up_int <= odd_connect_length) odd_score += (odd_connect_length + 1 - piece_length_up_int) * check_connect_length_mag;
+        }
     };
 
     if(odd_connect_length > 0 && check_connect_length_mag > 0) check_connect_length();
