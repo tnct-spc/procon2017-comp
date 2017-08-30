@@ -125,7 +125,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             if(area < frame_area)area_vec.push_back(area);//面積を片っ端から代入
             else if(area == frame_area)return false;//このframeに関しては問題ない
         }
-        std::cout << "area_vec.size : " << area_vec.size() << std::endl;//ここのsizeが0になってるのが誤動作の原因になってそうね
+        std::cout << "area_vec.size : " << area_vec.size() << std::endl;
         if(area_vec.size() == 0)return true;//問題があるのでtrue返して終了
         std::sort(area_vec.begin(),area_vec.end());
 
@@ -137,7 +137,8 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         }
         std::vector<double> add_vec = area_vec;
         std::cout << "max : " << max_count << std::endl;//max_count息してないぞ！！！！！！！！！
-        for(int count = 2;count < max_count;++count){
+        for(int count = 1;count < max_count;++count){
+            std::cout << "area_vec.size : " << area_vec.size() << "   add_vec.size : " << add_vec.size() << std::endl;
             for(auto area : area_vec){
                 for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
                     std::cout << "どうでしょう" << vec_count << std::endl;//ここに入った場合必ず無限ループおきてんぞ！！！！！！
