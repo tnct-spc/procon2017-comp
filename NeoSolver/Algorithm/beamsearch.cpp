@@ -129,15 +129,8 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         if(area_vec.size() == 0)return true;//問題があるのでtrue返して終了
         std::sort(area_vec.begin(),area_vec.end());
 
-        int total_area = 0;
-        int max_count = area_vec.size() - 1;//組み合わせる時の最大数
-        for(unsigned int count=0;count<area_vec.size();++count){
-            total_area += area_vec.at(count);
-            if(total_area > frame_area)max_count = count;
-        }
         std::vector<double> add_vec = area_vec;
-        std::cout << "max : " << max_count << std::endl;
-        for(int count = 2;count < max_count;++count){
+        for(unsigned int count = 1;count < add_vec.size();++count){
             std::cout << "area_vec.size : " << area_vec.size() << "   add_vec.size : " << add_vec.size() << std::endl;
             for(auto area : area_vec){
                 for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
