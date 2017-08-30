@@ -24,6 +24,9 @@ void TcpMain::setfield(procon::NeoField input_field)
 
 void TcpMain::make_send_data()
 {
+
+    //piece or frame(1) + range of vector(2) + number of vertices(6) + QPoint(x(3), y(3))
+    //example: 0 + 49 + 000006 + 9032 -> 0490000069032
     const int piece_data = 0;
     const int frame_data = 1;
     std::vector<QPointF> points;
@@ -32,6 +35,9 @@ void TcpMain::make_send_data()
             points.push_back(point);
         }
     }
+    std::vector<>
+
+
 
 }
 
