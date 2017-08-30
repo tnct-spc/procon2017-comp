@@ -32,6 +32,7 @@ private:
     QTcpServer *server;
     Request *request;
     procon::NeoField field;
+    QPointF getPosition(point_i point);
 
 };
 
