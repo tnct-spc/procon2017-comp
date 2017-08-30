@@ -30,15 +30,25 @@ void TcpMain::make_send_data()
     const int piece_data = 0;
     const int frame_data = 1;
     std::vector<QPointF> points;
-    for(auto pieces_data_size : field.getPieces().size()){
-        for(auto point : field.getPieces().at(pieces_data_size).getPolygon().outer()){
-            points.push_back(point);
+    for(auto& piece : field.getPieces()){
+        for(auto point : piece.getPolygon().outer()){
+            points.push_back(getPosition(point));
         }
     }
-    std::vector<>
 
+    std::vector<QPointF> frames;
+    for(auto& frame : field.getFrame()){
+        for(auto point : frame.getPolygon().outer()){
+            frames.push_back(getPosition(point));
+        }
+    }
+}
 
-
+QPointF TcpMain::getPosition(point_i point)
+{
+    int pointx = point.x();
+    int pointy = point.y();
+    return QPointF(pointx, pointy);
 }
 
 void TcpMain::send()
