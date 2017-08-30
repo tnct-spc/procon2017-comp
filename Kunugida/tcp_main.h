@@ -4,6 +4,10 @@
 #include <QTcpSocket>
 #include <QTcpServer>
 #include <QMainWindow>
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <QVector>
 #include "request.h"
 #include "neofield.h"
 #include "neoexpandedpolygon.h"
@@ -33,6 +37,7 @@ private:
     Request *request;
     procon::NeoField field;
     QPointF getPosition(point_i point);
+    std::string getSupportedString(int n, int m);
 
 };
 
