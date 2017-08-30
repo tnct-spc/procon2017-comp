@@ -195,17 +195,48 @@ bool TestCheckCanPrume::run(){
     procon::NeoField field;
 
     procon::NeoExpandedPolygon nep;
-
     polygon_i boostPolygon_i;
+
+    //ここからframe
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,2)(0,2)(0,0);
-    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"",false);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Frame",false);
     nep.resetPolygonForce(boostPolygon_i);
     field.setFrame({nep});
 
-    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,1)(0,2)(0,0);
-    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"",false);
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(3,0)(5,0)(5,3)(3,5)(3,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Frame",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    field.setFrame({nep});
+
+    //ここからpiece
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(1,0)(1,2)(0,2)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
     nep.resetPolygonForce(boostPolygon_i);
     field.setElementaryPieces({nep});
+
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(1,0)(1,2)(0,2)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    field.setElementaryPieces({nep});
+
+
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(1,0)(1,2)(0,2)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    field.setElementaryPieces({nep});
+
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,-2)(2,0)(2,2)(0,2)(0,-2);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    field.setElementaryPieces({nep});
+
+
 
     BeamSearch beamsearch;
     bool a = beamsearch.checkCanPrune(field);

@@ -121,23 +121,26 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         std::cout << field.getElementaryPieces().size() << field.getFrame().size() << std::endl;
         for(auto piece : field.getElementaryPieces()){
             int area = bg::area(piece.getPolygon());
+            std::cout << "frame_area : " << frame_area << "  piece_area : " << area << std::endl;
             if(area < frame_area)area_vec.push_back(area);//面積を片っ端から代入
             else if(area == frame_area)return false;//このframeに関しては問題ない
         }
-        std::cout << "はい" << std::endl;
+        std::cout << "area_vec.size : " << area_vec.size() << std::endl;//ここのsizeが0になってるのが誤動作の原因になってそうね
         if(area_vec.size() == 0)return true;//問題があるのでtrue返して終了
         std::sort(area_vec.begin(),area_vec.end());
 
         int total_area = 0;
-        int max_count;//組み合わせる時の最大数
+        int max_count = area_vec.size() - 1;//組み合わせる時の最大数
         for(unsigned int count=0;count<area_vec.size();++count){
             total_area += area_vec.at(count);
             if(total_area > frame_area)max_count = count;
         }
         std::vector<double> add_vec = area_vec;
+        std::cout << "max :" << max_count;//max_count息してないぞ！！！！！！！！！
         for(int count = 2;count < max_count;++count){
             for(auto area : area_vec){
                 for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
+                    std::cout << "どうでしょう" << vec_count << std::endl;//ここでなぜか無限ループ起こしてる add_vecが1のときに起こってるっぽい？　ここに入った場合必ず無限ループおきてんぞ！！！！！！
                     int add_cou = area + add_vec.at(vec_count);
                     if(add_cou < frame_area)add_vec.push_back(add_cou);
                     else if(add_cou == frame_area)return false;
@@ -146,6 +149,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             std::sort(add_vec.begin(),add_vec.end());
             }
         }
+        for(auto count : add_vec){
+           std::cout << count << " ";
+        }
+        std::cout << std::endl;
         return true;
     };
 
