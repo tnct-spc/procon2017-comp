@@ -323,9 +323,9 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
         int frame_index = 0;
         for(const auto& f : field.getFrame()){
             //inverseしていない方のpiece評価
-            std::vector<std::pair<double,Connect>> evaluate = Evaluation::evaluation(f,field.getElementaryPieces()[piece_index]);
+            std::vector<std::pair<double,Connect>> evaluate = Evaluation::evaluation(f,field.getElementaryPieces()[piece_index],1.0,1.0,true);
             //inverseしている方のpiece評価
-            std::vector<std::pair<double,Connect>> evaluate_inversed = Evaluation::evaluation(f,field.getElementaryInversePieces()[piece_index]);
+            std::vector<std::pair<double,Connect>> evaluate_inversed = Evaluation::evaluation(f,field.getElementaryInversePieces()[piece_index],1.0,1.0,true);
 
             //一時保存用の変数
 //            TODO: いい感じにここをパフォーマンスよくする
@@ -448,6 +448,10 @@ void BeamSearch::run(procon::NeoField field)
 
         evaluateNextState(state,ev);
         makeNextState(state,ev);
+
+        std::cout << "evaluated state size:" << ev.size() << std::endl;
+        std::cout << "field size:" << state.size() << std::endl;
+
         ev.clear();
 
         for(auto const& _field : state){
