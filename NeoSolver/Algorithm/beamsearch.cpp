@@ -380,11 +380,15 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         std::cout << std::endl;
 
         for(auto frame_angle : frameangle_vec){
-            bool check=false;
-            for(auto angle : add_vec){
-                if(frame_angle == angle)check=true;
+            std::cout << frame_angle << std::endl;
+            if(frame_angle < frame_angle_max){
+                bool check=false;
+                for(auto angle : add_vec){
+                    std::cout << frame_angle << " " << angle << std::endl;
+                    if(frame_angle < angle + 0.01 || frame_angle > angle - 0.01)check=true;
+                }
+                if(!check)return true;
             }
-            if(!check)return true;
         }
 
         return false;
@@ -392,10 +396,11 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
     bool a = about_angle();
     bool b = about_side();
-  //  bool c = about_framesize();
-  //  bool d = about_distance();
+    bool c = about_framesize();
+    bool d = about_distance();
+    std::cout << "hai";
     bool e = about_frameangle();
-    return a;
+    return a || b || c || d || e;
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
