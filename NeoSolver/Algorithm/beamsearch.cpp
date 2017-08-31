@@ -232,7 +232,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         const int piece_cou = field.getElementaryPieces().size();
         for(int cou=0;cou < std::pow(2,piece_cou );++cou){
             double add_number = 0;//ここの数値に対応する値を加算していく
-            for(unsigned int digit=0;digit<piece_cou;++digit){
+            for(int digit=0;digit<piece_cou;++digit){
                 int count = std::pow(2 , digit);//pieceの合計が3つなら4,2,1みたいな感じのが出る(100,010,001みたいになる)
                 if(count & cou){//100,101みたいな感じなら100が返ってくるからn桁目が0か1かが分かる
                     add_number += piecearea_vec.at(digit);
@@ -249,7 +249,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
     //複数のFrameがあるときにピースと面積が合致するか
     auto about_framesize = [&field,&framesize_single](){
-        const int frame_size_max = 6566;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
+        const int frame_size_max = 1000;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
         std::cout << "frame_size : " << field.getFrame().size() << std::endl;
         for(auto frame : field.getFrame()){
             if(bg::area(frame.getPolygon()) < frame_size_max){
