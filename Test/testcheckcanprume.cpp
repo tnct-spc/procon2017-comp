@@ -2,6 +2,7 @@
 #include "neofield.h"
 #include "neopolygonviewer.h"
 #include "Algorithm/beamsearch.h"
+#include "probmaker.h"
 
 TestCheckCanPrume::TestCheckCanPrume()
 {
@@ -195,20 +196,85 @@ bool TestCheckCanPrume::run(){
     procon::NeoField field;
 
     procon::NeoExpandedPolygon nep;
-
     polygon_i boostPolygon_i;
-    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,1)(0,2)(0,0);
-    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"",false);
+    std::vector<procon::NeoExpandedPolygon>frame;
+    std::vector<procon::NeoExpandedPolygon>pieces;
+/*
+    //ここからframe
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,2)(0,2)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Frame",false);
     nep.resetPolygonForce(boostPolygon_i);
-    field.setFrame({nep});
+    frame.push_back(nep);
 
-    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(3,0)(3,3)(0,3)(0,0);
-    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"",false);
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(5,0)(5,3)(3,5)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Frame",false);
     nep.resetPolygonForce(boostPolygon_i);
-    field.setElementaryPieces({nep});
+    frame.push_back(nep);
+
+    field.setFrame(frame);
+
+    //ここからpiece
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,3)(0,3)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    pieces.push_back(nep);
+
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(1,0)(1,2)(0,2)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    pieces.push_back(nep);
+
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(1,0)(1,2)(0,2)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    pieces.push_back(nep);
+
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(0,2)(0,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    pieces.push_back(nep);
+
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(5,0)(0,0)(5,3)(5,0);
+    bg::correct(boostPolygon_i);
+    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
+    nep.resetPolygonForce(boostPolygon_i);
+    pieces.push_back(nep);
+
+    field.setElementaryPieces(pieces);
+*/
+
+    //検査用にProbMakerからテストパターンを引っ張る
+    ProbMaker *PbMaker = new ProbMaker();
+    PbMaker->show();
+    std::vector<polygon_i> pieces_ = PbMaker->getPieces();
+    polygon_i frame_ = PbMaker->getFrame();
+
+    std::vector<procon::NeoExpandedPolygon> neo_pieces;
+    for(auto piece_ : pieces_){
+        procon::NeoExpandedPolygon buf;
+        buf.resetPolygonForce(piece_);
+        neo_pieces.push_back(buf);
+    }
+    std::vector<procon::NeoExpandedPolygon> neo_frame;
+    procon::NeoExpandedPolygon buf;
+    buf.resetPolygonForce(frame_);
+    neo_frame.push_back(buf);
+
+    field.setElementaryPieces(neo_pieces);
+    field.setFrame(neo_frame);
+    //ここまでProbMakerからの部分　使わないならコメントアウトで
 
     BeamSearch beamsearch;
     bool a = beamsearch.checkCanPrune(field);
-    std::cout<<a<<std::endl;
+    std::string str =( a
+                      ?"枝切りが可能です(矛盾があります)"
+                      :"枝切りできません(問題はないです)");
+    std::cout << "結果　：　"<< str << std::endl;
     return true;
 }
