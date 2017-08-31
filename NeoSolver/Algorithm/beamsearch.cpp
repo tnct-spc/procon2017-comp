@@ -181,7 +181,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     };
 
     auto framesize_single = [&field](procon::NeoExpandedPolygon frame){//一つのフレームとピースとの面積が合致するかを出す関数    時間に対して弾けるパターンが少なすぎるので改善しましょう
-
+        /*
         std::vector<double> area_vec;
         const double frame_area = bg::area(frame.getPolygon());
         std::cout << field.getElementaryPieces().size() << field.getFrame().size() << std::endl;
@@ -219,6 +219,30 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             add_vec.erase(std::unique(add_vec.begin(),add_vec.end()) , add_vec.end());
             }
         }
+        return true;*/
+
+
+        std::vector<double> piecearea_vec;
+        for(auto piece : field.getElementaryPieces()){
+            piecearea_vec.push_back(bg::area(piece.getPolygon()));
+        }
+        std::cout << field.getElementaryPieces().size() << std::endl;
+        const int piece_cou = field.getElementaryPieces().size();
+        for(int cou=0;cou < std::pow(2,piece_cou );++cou){
+            int add_number = 0;//ここの数値に対応する値を加算していく
+
+            for(unsigned int digit=piece_cou;digit > 0;--digit){
+                std::cout << "digit" << std::endl;
+                int count = std::pow(2 , digit);//pieceの合計が3つなら4,2,1みたいな感じのが出る(100,010,001みたいになる)
+                if(count & cou){//100,101みたいな感じなら100が返ってくるからn桁目が0か1かが分かる
+                    add_number += piecearea_vec.at(digit);
+                }
+            }
+            if(add_number == bg::area(frame.getPolygon()))return false;
+            cou++;
+        }
+
+
         return true;
     };
 
