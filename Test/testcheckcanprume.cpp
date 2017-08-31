@@ -199,7 +199,7 @@ bool TestCheckCanPrume::run(){
     polygon_i boostPolygon_i;
     std::vector<procon::NeoExpandedPolygon>frame;
     std::vector<procon::NeoExpandedPolygon>pieces;
-/*
+
     //ここからframe
     bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(2,0)(2,2)(0,2)(0,0);
     bg::correct(boostPolygon_i);
@@ -212,6 +212,7 @@ bool TestCheckCanPrume::run(){
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Frame",false);
     nep.resetPolygonForce(boostPolygon_i);
     frame.push_back(nep);
+
 
     field.setFrame(frame);
 
@@ -246,10 +247,12 @@ bool TestCheckCanPrume::run(){
     nep.resetPolygonForce(boostPolygon_i);
     pieces.push_back(nep);
 
+
     field.setElementaryPieces(pieces);
-*/
+
 
     //検査用にProbMakerからテストパターンを引っ張る
+    /*
     ProbMaker *PbMaker = new ProbMaker();
     PbMaker->show();
     std::vector<polygon_i> pieces_ = PbMaker->getPieces();
@@ -268,6 +271,8 @@ bool TestCheckCanPrume::run(){
 
     field.setElementaryPieces(neo_pieces);
     field.setFrame(neo_frame);
+
+*/
     //ここまでProbMakerからの部分　使わないならコメントアウトで
 
     BeamSearch beamsearch;
