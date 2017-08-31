@@ -86,6 +86,10 @@ std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryFr
     return elementary_frame;
 }
 
+std::vector<std::vector<procon::NeoExpandedPolygon>> const& procon::NeoField::getElementaryFrameInnerPices() const
+{
+    return elementary_frame_inner_pices;
+}
 
 std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryPieces() const
 {
