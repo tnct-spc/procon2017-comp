@@ -12,4 +12,6 @@ SUBDIRS += \
     Hazama \
     Slave \
     Kunugida \
-    AbilityCheck
+    AbilityCheck \
+    Test
+
