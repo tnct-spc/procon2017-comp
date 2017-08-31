@@ -180,7 +180,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         return size_only && angles;
     };
 
-    auto framesize_single = [&field](procon::NeoExpandedPolygon frame){//一つのフレームとピースとの面積が合致するかを出す関数
+    auto framesize_single = [&field](procon::NeoExpandedPolygon frame){//一つのフレームとピースとの面積が合致するかを出す関数    時間に対して弾けるパターンが少なすぎるので改善しましょう
 
         std::vector<double> area_vec;
         const double frame_area = bg::area(frame.getPolygon());
@@ -237,7 +237,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         return false;
     };
 
-    auto frameangle_single = [&field](procon::NeoExpandedPolygon frame){
+    auto frameangle_single = [&field](procon::NeoExpandedPolygon frame){//アルゴリズムに改善の余地があるので一旦中止
 
         auto calculation_rad = [](double a){
             //ラジアン(radian)から角度(degree)に変換
@@ -270,7 +270,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         return true;
     };
 
-    //複数のframeがある時にその内角を満たす角の組み合わせが存在するか調べる
+    //複数のframeがある時にその内角を満たす角の組み合わせが存在するか調べる　　　アルゴリズムに改善の余地があるので一旦中止
     auto about_frameangle = [&field,&frameangle_single](){
         //const int frame_angle_max = 91;
         for(auto frame : field.getFrame()){
