@@ -51,7 +51,7 @@ public:
     procon::NeoExpandedPolygon const& getPiece(int const& n) const;
     std::vector<procon::NeoExpandedPolygon> const& getFrame() const;
     std::vector<procon::NeoExpandedPolygon> const& getElementaryFrame() const;
-    std::vector<procon::NeoExpandedPolygon> const& getElementaryFrameInnerPices() const;
+    std::vector<std::vector<procon::NeoExpandedPolygon>> const& getElementaryFrameInnerPices() const;
     std::vector<procon::NeoExpandedPolygon> const& getElementaryPieces() const;
     std::vector<procon::NeoExpandedPolygon> const& getElementaryInversePieces() const;
     std::array<bool,50> const& getIsPlaced() const;
