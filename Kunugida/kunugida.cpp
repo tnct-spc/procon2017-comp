@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QMessageBox>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
@@ -25,6 +26,7 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     board = std::make_shared<NeoAnswerBoard>();
+    tcp = std::make_shared<TcpMain>();
     board->show();
 }
 
@@ -38,6 +40,11 @@ void Kunugida::run()
     logger->info("Run Button Clicked");
 
     procon::NeoField field;
+
+    QVector<std::string> hoge = this->tcp->make_send_data_piece();
+    QMessageBox msgBox(this);
+    msgBox.setText(hoge[0]);
+    msgBox.exec();
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
