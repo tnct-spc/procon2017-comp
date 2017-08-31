@@ -314,7 +314,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
     //複数のframeがある時にその内角を満たす角の組み合わせが存在するか調べる
     auto about_frameangle = [&field](){
-        const int frame_angle_max = 90;
+        const int frame_angle_max = 91;
 
         auto calculation_rad = [](double a){
             //ラジアン(radian)から角度(degree)に変換
@@ -322,15 +322,36 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         };
 
         std::vector<double> frameangle_vec;
+        std::vector<double> add_vec;
+
+        auto erase_frame_vec = [&frameangle_vec,&add_vec](){
+            bool flag;
+            while(!flag){
+                flag=true;
+                for(int count=0;count<frameangle_vec.size();++count){
+                    double frame_angle = frameangle_vec.at(count);
+                    for(auto angle : add_vec){
+                        if(frame_angle < angle + 0.01 || frame_angle > angle - 0.01){
+                            frameangle_vec.erase(frameangle_vec.begin() + count,frameangle_vec.end());
+                            flag=false;
+                        }
+                    }
+                }
+            }
+            if(frameangle_vec.size()==0)return true;
+            return false;
+        };
+
         std::vector<double> pieceangle_vec;
         for(auto frame : field.getFrame()){
             for(auto side_angle_ : frame.getSideAngle()){
                 double side_angle = calculation_rad(side_angle_);
-                frameangle_vec.push_back(side_angle);
+                if(side_angle < frame_angle_max)frameangle_vec.push_back(side_angle);
             }
         }
         std::sort(frameangle_vec.begin(),frameangle_vec.end());
         frameangle_vec.erase(std::unique(frameangle_vec.begin(),frameangle_vec.end()),frameangle_vec.end());
+
         for(auto piece : field.getElementaryPieces()){
             for(auto side_angle_ : piece.getSideAngle()){
                 double side_angle = calculation_rad(side_angle_);
@@ -338,8 +359,24 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             }
         }
         std::sort(pieceangle_vec.begin(),pieceangle_vec.end());
+        for(int count=0;count<pieceangle_vec.size();++count){
+           if(pieceangle_vec.at(count) >= frame_angle_max){
+               pieceangle_vec.erase(pieceangle_vec.begin() + count,pieceangle_vec.end());
+               break;
+           }
+        }
         pieceangle_vec.erase(std::unique(pieceangle_vec.begin(),pieceangle_vec.end()),pieceangle_vec.end());
-        std::vector<double> add_vec = pieceangle_vec;
+
+        if(erase_frame_vec())return false;
+
+        std::cout << "piece_vec一覧表示 : ";
+        for(auto angle : pieceangle_vec){
+            std::cout << angle << " ";
+        }
+        std::cout << std::endl;
+
+
+        add_vec = pieceangle_vec;
         bool flag= false;
         for(unsigned int count=0;count<pieceangle_vec.size();++count){//この内部で無限ループを起こしてる可能性が高いぞ！！！！！　アルゴリズムの改善を考えなければ
             std::cout << count << std::endl;
@@ -359,6 +396,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                 }
                 std::sort(add_vec.begin(),add_vec.end());
                 add_vec.erase(std::unique(add_vec.begin(),add_vec.end()),add_vec.end());
+                if(erase_frame_vec())return false;
                 std::cout << "ははは"  << add_vec.back() << std::endl;
             }
             if(flag)break;
@@ -382,19 +420,9 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         }
         std::cout << std::endl;
 
-        for(auto frame_angle : frameangle_vec){
-            std::cout << frame_angle << std::endl;
-            if(frame_angle < frame_angle_max){
-                bool check=false;
-                for(auto angle : add_vec){
-                    std::cout << frame_angle << " " << angle << std::endl;
-                    if(frame_angle < angle + 0.01 || frame_angle > angle - 0.01)check=true;
-                }
-                if(!check)return true;
-            }
-        }
+        if(erase_frame_vec())return false;
 
-        return false;
+        return true;
     };
 
     //bool a = about_angle();
