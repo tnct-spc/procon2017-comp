@@ -390,7 +390,6 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             boost::geometry::centroid(a.getPolygon(),center1);
             boost::geometry::centroid(b.getPolygon(),center2);
             return center1.x() < center2.x();
-
         });
         for(auto piece : pieces){
             if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
