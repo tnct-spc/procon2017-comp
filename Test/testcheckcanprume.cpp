@@ -246,16 +246,11 @@ bool TestCheckCanPrume::run(){
     nep.resetPolygonForce(boostPolygon_i);
     pieces.push_back(nep);
 
-    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(1,0)(0,0)(1,1)(1,0);
-    bg::correct(boostPolygon_i);
-    NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
-    nep.resetPolygonForce(boostPolygon_i);
-    pieces.push_back(nep);
 
 
     field.setElementaryPieces(pieces);
 
-
+/*
     //検査用にProbMakerからテストパターンを引っ張る
     ProbMaker *PbMaker = new ProbMaker();
     PbMaker->show();
@@ -276,7 +271,7 @@ bool TestCheckCanPrume::run(){
     field.setElementaryPieces(neo_pieces);
     field.setFrame(neo_frame);
     //ここまでProbMakerからの部分　使わないならコメントアウトで
-
+*/
 
     BeamSearch beamsearch;
     bool a = beamsearch.checkCanPrune(field);
