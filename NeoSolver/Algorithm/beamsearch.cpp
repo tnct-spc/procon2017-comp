@@ -442,17 +442,21 @@ void BeamSearch::run(procon::NeoField field)
 
     delete_deplicate_point(field);
 
-    std::vector<Evaluate> ev;
+
 //    ev.resize(2000000);
     for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
+        std::vector<Evaluate> ev;
 
         evaluateNextState(state,ev);
         makeNextState(state,ev);
 
+        std::cout << "now" << field.getElementaryPieces().size() << "/" << piece_num << std::endl;
         std::cout << "evaluated state size:" << ev.size() << std::endl;
         std::cout << "field size:" << state.size() << std::endl;
 
-        ev.clear();
+        //vectorのメモリ解放って頭悪くね？
+        std::vector<Evaluate>().swap(ev);
+
 
         for(auto const& _field : state){
             dock->addAnswer(_field);
