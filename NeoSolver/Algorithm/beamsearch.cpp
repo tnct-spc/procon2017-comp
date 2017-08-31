@@ -341,7 +341,8 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         pieceangle_vec.erase(std::unique(pieceangle_vec.begin(),pieceangle_vec.end()),pieceangle_vec.end());
         std::vector<double> add_vec = pieceangle_vec;
         bool flag= false;
-        while(!flag){
+        for(unsigned int count=0;count<pieceangle_vec.size();++count){//この内部で無限ループを起こしてる可能性が高いぞ！！！！！　アルゴリズムの改善を考えなければ
+            std::cout << count << std::endl;
             for(int add_count=0;add_count<add_vec.size();++add_count){
                 bool check=false;
                 for(auto piece_angle : pieceangle_vec){
@@ -352,13 +353,15 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                     }
                     else break;
                 }
-                if(!check){
+                if(!check){//ここまで行けばループ脱出
                     flag=true;
                     break;
                 }
                 std::sort(add_vec.begin(),add_vec.end());
                 add_vec.erase(std::unique(add_vec.begin(),add_vec.end()),add_vec.end());
+                std::cout << "ははは"  << add_vec.back() << std::endl;
             }
+            if(flag)break;
         }
 
         std::cout << "frame_vec一覧表示 : ";
@@ -394,13 +397,12 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         return false;
     };
 
-    bool a = about_angle();
-    bool b = about_side();
-    bool c = about_framesize();
-    bool d = about_distance();
-    std::cout << "hai";
-    bool e = about_frameangle();
-    return a || b || c || d || e;
+    //bool a = about_angle();
+    //bool b = about_side();
+    //bool c = about_framesize();
+    //bool d = about_distance();
+    bool e = about_frameangle();//ここまで進んだ後に何も出力されず終了　多分これ動いてないぞ
+    return e;
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
