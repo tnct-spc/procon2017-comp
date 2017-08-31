@@ -275,6 +275,7 @@ bool TestCheckCanPrume::run(){
 */
     //ここまでProbMakerからの部分　使わないならコメントアウトで
 
+
     BeamSearch beamsearch;
     bool a = beamsearch.checkCanPrune(field);
     std::string str =( a
