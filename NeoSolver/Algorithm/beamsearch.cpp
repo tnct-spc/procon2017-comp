@@ -232,15 +232,15 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         const int piece_cou = field.getElementaryPieces().size();
         for(int cou=0;cou < std::pow(2,piece_cou );++cou){
             double add_number = 0;//ここの数値に対応する値を加算していく
-            for(unsigned int digit=piece_cou;digit > 0;--digit){
+            for(unsigned int digit=0;digit<piece_cou;++digit){
                 int count = std::pow(2 , digit);//pieceの合計が3つなら4,2,1みたいな感じのが出る(100,010,001みたいになる)
                 if(count & cou){//100,101みたいな感じなら100が返ってくるからn桁目が0か1かが分かる
                     add_number += piecearea_vec.at(digit);
                 }
             }
             std::cout << add_number << "  " << bg::area(frame.getPolygon()) << std::endl;
+           // std::cout << std::pow(2,piece_cou) << " " << cou << std::endl;
             if(add_number == bg::area(frame.getPolygon()))return false;
-            cou++;
         }
 
 
