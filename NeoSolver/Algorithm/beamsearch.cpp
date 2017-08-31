@@ -141,6 +141,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                     else break;
                 }
             std::sort(add_vec.begin(),add_vec.end());
+            add_vec.erase(std::unique(add_vec.begin(),add_vec.end()) , add_vec.end());
             }
         }
         std::cout << "add_vec一覧表示 : ";

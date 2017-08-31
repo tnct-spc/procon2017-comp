@@ -2,6 +2,7 @@
 #include "neofield.h"
 #include "neopolygonviewer.h"
 #include "Algorithm/beamsearch.h"
+#include "probmaker.h"
 
 TestCheckCanPrume::TestCheckCanPrume()
 {
@@ -247,6 +248,25 @@ bool TestCheckCanPrume::run(){
 
     field.setElementaryPieces(pieces);
 
+
+    ProbMaker *PbMaker = new ProbMaker();
+    PbMaker->show();
+    std::vector<polygon_i> pieces_ = PbMaker->getPieces();
+    polygon_i frame_ = PbMaker->getFrame();
+
+    std::vector<procon::NeoExpandedPolygon> neo_pieces;
+    for(auto piece_ : pieces_){
+        procon::NeoExpandedPolygon buf;
+        buf.resetPolygonForce(piece_);
+        neo_pieces.push_back(buf);
+    }
+    std::vector<procon::NeoExpandedPolygon> neo_frame;
+    procon::NeoExpandedPolygon buf;
+    buf.resetPolygonForce(frame_);
+    neo_frame.push_back(buf);
+
+    field.setElementaryPieces(neo_pieces);
+    field.setFrame(neo_frame);
 
     BeamSearch beamsearch;
     bool a = beamsearch.checkCanPrune(field);
