@@ -183,10 +183,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     auto framesize_single = [&field](procon::NeoExpandedPolygon frame){//一つのフレームとピースとの面積が合致するかを出す関数
 
         std::vector<double> area_vec;
-        const int frame_area = bg::area(frame.getPolygon());
+        const double frame_area = bg::area(frame.getPolygon());
         std::cout << field.getElementaryPieces().size() << field.getFrame().size() << std::endl;
         for(auto piece : field.getElementaryPieces()){
-            int area = bg::area(piece.getPolygon());
+            double area = bg::area(piece.getPolygon());
             std::cout << "frame_area : " << frame_area << "  piece_area : " << area << std::endl;
             if(area < frame_area)area_vec.push_back(area);//面積を片っ端から代入
             else if(area == frame_area)return false;//このframeに関しては問題ない
@@ -202,7 +202,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             for(auto area : area_vec){
                 for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
                     std::cout << "どうでしょう" << vec_count << std::endl;
-                    int add_cou = area + add_vec.at(vec_count);
+                    double add_cou = area + add_vec.at(vec_count);
                     if(add_cou < frame_area)add_vec.push_back(add_cou);
                     else if(add_cou == frame_area){
 

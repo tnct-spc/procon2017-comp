@@ -255,7 +255,7 @@ bool TestCheckCanPrume::run(){
 
     field.setElementaryPieces(pieces);
 
-/*
+
     //検査用にProbMakerからテストパターンを引っ張る
     ProbMaker *PbMaker = new ProbMaker();
     PbMaker->show();
@@ -276,7 +276,7 @@ bool TestCheckCanPrume::run(){
     field.setElementaryPieces(neo_pieces);
     field.setFrame(neo_frame);
     //ここまでProbMakerからの部分　使わないならコメントアウトで
-*/
+
 
     BeamSearch beamsearch;
     bool a = beamsearch.checkCanPrune(field);
