@@ -181,6 +181,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     };
 
     auto framesize_single = [&field](procon::NeoExpandedPolygon frame){//一つのフレームとピースとの面積が合致するかを出す関数
+
         std::vector<double> area_vec;
         const int frame_area = bg::area(frame.getPolygon());
         std::cout << field.getElementaryPieces().size() << field.getFrame().size() << std::endl;
@@ -223,7 +224,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
     //複数のFrameがあるときにピースと面積が合致するか
     auto about_framesize = [&field,&framesize_single](){
-        const int frame_size_max = 2000;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
+        const int frame_size_max = 6566;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
         std::cout << "frame_size : " << field.getFrame().size() << std::endl;
         for(auto frame : field.getFrame()){
             if(bg::area(frame.getPolygon()) < frame_size_max){
@@ -237,23 +238,52 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     };
 
     auto frameangle_single = [&field](procon::NeoExpandedPolygon frame){
+
+        auto calculation_rad = [](double a){
+            //ラジアン(radian)から角度(degree)に変換
+            return a * 180.0 / 3.141592653589793;
+        };
+
+        std::vector<double> frameangle_vec;
+        std::vector<double> pieceangle_vec;
+        for(auto& side_angle_ : frame.getSideAngle()){
+            double side_angle = calculation_rad(side_angle_);
+            frameangle_vec.push_back(side_angle);
+        }
+        for(auto piece : field.getElementaryPieces()){
+            for(auto &side_angle_ : piece.getSideAngle()){
+                double side_angle = calculation_rad(side_angle_);
+                pieceangle_vec.push_back(side_angle);
+            }
+        }
+        std::cout << "frame_vec一覧表示 : ";
+        for(auto angle : frameangle_vec){
+            std::cout << angle << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "piece_vec一覧表示 : ";
+        for(auto angle : pieceangle_vec){
+            std::cout << angle << " ";
+        }
+        std::cout << std::endl;
         return true;
     };
 
     //複数のframeがある時にその内角を満たす角の組み合わせが存在するか調べる
     auto about_frameangle = [&field,&frameangle_single](){
-        const int frame_angle_max = 91;
+        //const int frame_angle_max = 91;
         for(auto frame : field.getFrame()){
-            if(frameangle_single(frame))return true;
+            if(frameangle_single(frame))int a=0;//return true;
         }
         return false;
     };
 
-    bool a = about_angle();
-    bool b = about_side();
+//    bool a = about_angle();
+//    bool b = about_side();
     bool c = about_framesize();
-    bool d = about_frameangle();
-    return d;
+    //bool d = about_frameangle();
+    return c;
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
