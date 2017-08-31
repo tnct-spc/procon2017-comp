@@ -115,62 +115,6 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         }
     };
 
-    auto framesize_single = [&field](procon::NeoExpandedPolygon frame){//一つのフレームとピースとの面積が合致するかを出す関数
-        std::vector<double> area_vec;
-        const int frame_area = bg::area(frame.getPolygon());
-        std::cout << field.getElementaryPieces().size() << field.getFrame().size() << std::endl;
-        for(auto piece : field.getElementaryPieces()){
-            int area = bg::area(piece.getPolygon());
-            std::cout << "frame_area : " << frame_area << "  piece_area : " << area << std::endl;
-            if(area < frame_area)area_vec.push_back(area);//面積を片っ端から代入
-            else if(area == frame_area)return false;//このframeに関しては問題ない
-        }
-        std::cout << "area_vec.size : " << area_vec.size() << std::endl;
-        if(area_vec.size() == 0)return true;//問題があるのでtrue返して終了
-        std::sort(area_vec.begin(),area_vec.end());
-
-
-        std::vector<double> add_vec = area_vec;
-        for(unsigned int count = 1;count < add_vec.size();++count){
-            std::cout << "area_vec.size : " << area_vec.size() << "   add_vec.size : " << add_vec.size() << std::endl;
-            for(auto area : area_vec){
-                for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
-                    std::cout << "どうでしょう" << vec_count << std::endl;
-                    int add_cou = area + add_vec.at(vec_count);
-                    if(add_cou < frame_area)add_vec.push_back(add_cou);
-                    else if(add_cou == frame_area){
-
-                        std::cout << "add_vec一覧表示 : ";
-                        for(auto count : add_vec){
-                            std::cout << count << " ";
-                        }
-                        std::cout << std::endl;
-                        return false;
-                    }
-                    else break;
-                }
-            std::sort(add_vec.begin(),add_vec.end());
-            add_vec.erase(std::unique(add_vec.begin(),add_vec.end()) , add_vec.end());
-            }
-        }
-        return true;
-    };
-
-    //複数のFrameがあるときにピースと面積が合致するか
-    auto about_framesize = [&field,&framesize_single](){
-        const int frame_size_max = 2000;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
-        std::cout << "frame_size : " << field.getFrame().size() << std::endl;
-        for(auto frame : field.getFrame()){
-            if(bg::area(frame.getPolygon()) < frame_size_max){
-                if(framesize_single(frame)){
-                    std::cout << "問題の原因になったframe : " << bg::dsv(frame.getPolygon()) << std::endl;
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
-
 
     //辺について枝きりできるかできないか
     auto about_side = [&field](){
@@ -236,8 +180,73 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         return size_only && angles;
     };
 
-    auto about_frameangle = [&field](){
+    auto framesize_single = [&field](procon::NeoExpandedPolygon frame){//一つのフレームとピースとの面積が合致するかを出す関数
+        std::vector<double> area_vec;
+        const int frame_area = bg::area(frame.getPolygon());
+        std::cout << field.getElementaryPieces().size() << field.getFrame().size() << std::endl;
+        for(auto piece : field.getElementaryPieces()){
+            int area = bg::area(piece.getPolygon());
+            std::cout << "frame_area : " << frame_area << "  piece_area : " << area << std::endl;
+            if(area < frame_area)area_vec.push_back(area);//面積を片っ端から代入
+            else if(area == frame_area)return false;//このframeに関しては問題ない
+        }
+        std::cout << "area_vec.size : " << area_vec.size() << std::endl;
+        if(area_vec.size() == 0)return true;//問題があるのでtrue返して終了
+        std::sort(area_vec.begin(),area_vec.end());
 
+
+        std::vector<double> add_vec = area_vec;
+        for(unsigned int count = 1;count < add_vec.size();++count){
+            std::cout << "area_vec.size : " << area_vec.size() << "   add_vec.size : " << add_vec.size() << std::endl;
+            for(auto area : area_vec){
+                for(unsigned int vec_count=0;vec_count<add_vec.size();++vec_count){
+                    std::cout << "どうでしょう" << vec_count << std::endl;
+                    int add_cou = area + add_vec.at(vec_count);
+                    if(add_cou < frame_area)add_vec.push_back(add_cou);
+                    else if(add_cou == frame_area){
+
+                        std::cout << "add_vec一覧表示 : ";
+                        for(auto count : add_vec){
+                            std::cout << count << " ";
+                        }
+                        std::cout << std::endl;
+                        return false;
+                    }
+                    else break;
+                }
+            std::sort(add_vec.begin(),add_vec.end());
+            add_vec.erase(std::unique(add_vec.begin(),add_vec.end()) , add_vec.end());
+            }
+        }
+        return true;
+    };
+
+    //複数のFrameがあるときにピースと面積が合致するか
+    auto about_framesize = [&field,&framesize_single](){
+        const int frame_size_max = 2000;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
+        std::cout << "frame_size : " << field.getFrame().size() << std::endl;
+        for(auto frame : field.getFrame()){
+            if(bg::area(frame.getPolygon()) < frame_size_max){
+                if(framesize_single(frame)){
+                    std::cout << "問題の原因になったframe : " << bg::dsv(frame.getPolygon()) << std::endl;
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    auto frameangle_single = [&field](procon::NeoExpandedPolygon frame){
+        return true;
+    };
+
+    //複数のframeがある時にその内角を満たす角の組み合わせが存在するか調べる
+    auto about_frameangle = [&field,&frameangle_single](){
+        const int frame_angle_max = 91;
+        for(auto frame : field.getFrame()){
+            if(frameangle_single(frame))return true;
+        }
+        return false;
     };
 
     bool a = about_angle();
