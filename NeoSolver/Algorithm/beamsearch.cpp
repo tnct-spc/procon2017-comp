@@ -310,7 +310,11 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         return false;
     };
 
-    auto frameangle_single = [&field](procon::NeoExpandedPolygon frame){//アルゴリズムに改善の余地があるので一旦中止
+
+
+    //複数のframeがある時にその内角を満たす角の組み合わせが存在するか調べる
+    auto about_frameangle = [&field](){
+        const int frame_angle_max = 90;
 
         auto calculation_rad = [](double a){
             //ラジアン(radian)から角度(degree)に変換
@@ -319,16 +323,44 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
         std::vector<double> frameangle_vec;
         std::vector<double> pieceangle_vec;
-        for(auto& side_angle_ : frame.getSideAngle()){
-            double side_angle = calculation_rad(side_angle_);
-            frameangle_vec.push_back(side_angle);
+        for(auto frame : field.getFrame()){
+            for(auto side_angle_ : frame.getSideAngle()){
+                double side_angle = calculation_rad(side_angle_);
+                frameangle_vec.push_back(side_angle);
+            }
         }
+        std::sort(frameangle_vec.begin(),frameangle_vec.end());
+        frameangle_vec.erase(std::unique(frameangle_vec.begin(),frameangle_vec.end()),frameangle_vec.end());
         for(auto piece : field.getElementaryPieces()){
-            for(auto &side_angle_ : piece.getSideAngle()){
+            for(auto side_angle_ : piece.getSideAngle()){
                 double side_angle = calculation_rad(side_angle_);
                 pieceangle_vec.push_back(side_angle);
             }
         }
+        std::sort(pieceangle_vec.begin(),pieceangle_vec.end());
+        pieceangle_vec.erase(std::unique(pieceangle_vec.begin(),pieceangle_vec.end()),pieceangle_vec.end());
+        std::vector<double> add_vec = pieceangle_vec;
+        bool flag= false;
+        while(!flag){
+            for(int add_count=0;add_count<add_vec.size();++add_count){
+                bool check=false;
+                for(auto piece_angle : pieceangle_vec){
+                    double add_number = add_vec.at(add_count) + piece_angle;
+                    if(add_number < frame_angle_max){
+                        add_vec.push_back(add_number);
+                        check=true;
+                    }
+                    else break;
+                }
+                if(!check){
+                    flag=true;
+                    break;
+                }
+                std::sort(add_vec.begin(),add_vec.end());
+                add_vec.erase(std::unique(add_vec.begin(),add_vec.end()),add_vec.end());
+            }
+        }
+
         std::cout << "frame_vec一覧表示 : ";
         for(auto angle : frameangle_vec){
             std::cout << angle << " ";
@@ -340,24 +372,30 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             std::cout << angle << " ";
         }
         std::cout << std::endl;
-        return true;
-    };
 
-    //複数のframeがある時にその内角を満たす角の組み合わせが存在するか調べる　　　アルゴリズムに改善の余地があるので一旦中止
-    auto about_frameangle = [&field,&frameangle_single](){
-        //const int frame_angle_max = 91;
-        for(auto frame : field.getFrame()){
-            if(frameangle_single(frame))return true;
+        std::cout << "add_vec一覧表示 : ";
+        for(auto angle : add_vec){
+            std::cout << angle << " ";
         }
+        std::cout << std::endl;
+
+        for(auto frame_angle : frameangle_vec){
+            bool check=false;
+            for(auto angle : add_vec){
+                if(frame_angle == angle)check=true;
+            }
+            if(!check)return true;
+        }
+
         return false;
     };
 
     bool a = about_angle();
     bool b = about_side();
-    bool c = about_framesize();
-    bool d = about_distance();
-//    bool e = about_frameangle();
-    return a || b || c || d;
+  //  bool c = about_framesize();
+  //  bool d = about_distance();
+    bool e = about_frameangle();
+    return a;
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
