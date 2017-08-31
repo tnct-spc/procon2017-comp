@@ -236,10 +236,15 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         return size_only && angles;
     };
 
+    auto about_frameangle = [&field](){
+
+    };
+
     bool a = about_angle();
     bool b = about_side();
     bool c = about_framesize();
-    return c;
+    bool d = about_frameangle();
+    return d;
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
