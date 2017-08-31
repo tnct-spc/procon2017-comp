@@ -18,6 +18,9 @@
 //もしデバックモードにしたければ下をコメントアウト
 #define DEBUG_MODE
 
+//同じ状態のフレームの削除
+#define USE_DUPLICATE_FRAME_PRUNE
+
 //std::condition_variable cond;
 
 //PolygonConnector用の
