@@ -20,9 +20,10 @@ TcpMain::~TcpMain()
 void TcpMain::setfield(procon::NeoField input_field)
 {
     field = input_field;
+    make_send_data_piece();
 }
 
-QVector<std::string> TcpMain::make_send_data_piece()
+void TcpMain::make_send_data_piece()
 {
     //piece or frame(1) + range of vector(2) + QPoint(x(3), y(3))
     QVector<QPointF> points;
@@ -32,37 +33,42 @@ QVector<std::string> TcpMain::make_send_data_piece()
         }
     }
 
-    QVector<std::string> send_data;
-    std::ostringstream ss;
-    std::string pointssize = getSupportedString(points.size(), 2);
+    QVector<QString> send_data;
+    QString pointssize = getSupportedString(points.size(), 2);
     for(int i = 0; i < points.size(); ++i){
-        std::string xint = getSupportedString(points[i].x(), 3);
-        std::string yint = getSupportedString(points[i].y(), 3);
-        ss << piece_data << pointssize << xint << yint;
-        send_data[i] = ss.str();
+        QString xint = getSupportedString(points[i].x(), 3);
+        QString yint = getSupportedString(points[i].y(), 3);
+        send_data[i] += QString::number(piece_data);
+        send_data[i] += pointssize;
+        send_data[i] += xint;
+        send_data[i] += yint;
     }
-
-    return send_data;
+    if(!send_data.empty()){
+        QMessageBox msgBox;
+        msgBox.setText(send_data[0]);
+        msgBox.exec();
+    }
 }
 
-QVector<std::string> TcpMain::make_send_data_frame()
+QVector<QString> TcpMain::make_send_data_frame()
 {
     //piece or frame(1) + range of vector(2) + QPoint(x(3), y(3))
-    QVector<QPointF> frames;
-    for(auto& frame : field.getFrame()){
+    QVector<QPointF> points;
+    for(auto& frame : field.getPieces()){
         for(auto point : frame.getPolygon().outer()){
-            frames << getPosition(point);
+            points << getPosition(point);
         }
     }
 
-    QVector<std::string> send_data;
-    std::ostringstream ss;
-    std::string framessize = getSupportedString(frames.size(), 2);
-    for(int i = 0; i < frames.size(); ++i){
-        std::string xint = getSupportedString(frames[i].x(), 3);
-        std::string yint = getSupportedString(frames[i].y(), 3);
-        ss << frame_data << framessize << xint << yint;
-        send_data[i] = ss.str();
+    QVector<QString> send_data;
+    QString pointssize = getSupportedString(points.size(), 2);
+    for(int i = 0; i < points.size(); ++i){
+        QString xint = getSupportedString(points[i].x(), 3);
+        QString yint = getSupportedString(points[i].y(), 3);
+        send_data[i] += QString::number(frame_data);
+        send_data[i] += pointssize;
+        send_data[i] += xint;
+        send_data[i] += yint;
     }
 
     return send_data;
@@ -75,16 +81,19 @@ QPointF TcpMain::getPosition(point_i point)
     return QPointF(pointx, pointy);
 }
 
-std::string TcpMain::getSupportedString(int n, int m)
+QString TcpMain::getSupportedString(int n, int m)
 {
-    std::ostringstream hoge;
-    std::string str;
-    hoge << n;
-    str = hoge.str();
-    if(n < 100 && m == 3)
-        str = '0' + str;
-    if(n < 10 && m <= 3)
-        str = '0' + str;
+    QString str;
+    if(m < 100 && n == 3)
+        str += QString::number(0);
+    if(m < 10){
+        if(n == 3)
+            str += QString::number(0) + QString::number(0);
+        if(n == 2)
+            str += QString::number(0);
+    }
+    str += QString::number(n);
+
     return str;
 }
 
