@@ -140,7 +140,8 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 std::getline(line_stream, y, ',');
                 hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
             }
-            procon::NeoExpandedPolygon polygon(std::stoi(id));
+            int _id = std::stoi(id);
+            procon::NeoExpandedPolygon polygon(_id);
             polygon.resetPolygonForce(hoge);
             import_field.setPiece(polygon);
         }else{
