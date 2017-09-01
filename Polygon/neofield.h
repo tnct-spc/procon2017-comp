@@ -2,6 +2,7 @@
 #define NEOFIELD_H
 
 #include "neoexpandedpolygon.h"
+#include "Evaluation/evaluate.h"
 
 namespace procon {
 class NeoField
@@ -30,6 +31,7 @@ private:
     double total_evaluation = 0;
 
 public:
+    std::vector<Evaluate> evaluate_cache;
     //constructor
     NeoField();
 

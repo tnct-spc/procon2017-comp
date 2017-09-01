@@ -242,6 +242,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
                 }
             });
             if(!flag){
+                field_buf.evaluate_cache.push_back(eval);
                 next_field.push_back(field_buf);
             }
         }else{
