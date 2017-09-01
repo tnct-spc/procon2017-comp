@@ -20,7 +20,7 @@ TcpMain::~TcpMain()
 void TcpMain::setfield(procon::NeoField input_field)
 {
     field = input_field;
-    make_send_data_piece();
+    //make_send_data_piece();
 }
 
 void TcpMain::make_send_data_piece()
