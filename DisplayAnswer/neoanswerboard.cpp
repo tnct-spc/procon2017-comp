@@ -404,5 +404,41 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
+
+        std::vector<procon::NeoExpandedPolygon> frames = field.getFrame();
+        std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
+
+        for(Evaluate eva : field.evaluate_cache) {
+            procon::NeoExpandedPolygon frame = frames.at(static_cast<unsigned int>(eva.frame_index));
+            procon::NeoExpandedPolygon piece = pieces.at(static_cast<unsigned int>(eva.piece_index));
+            polygon_i frame_polygon = frame.getPolygon();
+            polygon_i piece_polygon = piece.getPolygon();
+            std::vector<point_i> frame_outer = frame_polygon.outer();
+            std::vector<point_i> piece_outer = piece_polygon.outer();
+            point_i frame_point = frame_outer.at(static_cast<unsigned int>(eva.connection.frame_point_index));
+            point_i frame_side_point = frame_outer.at(static_cast<unsigned int>(eva.connection.frame_side_index));
+            point_i piece_point = piece_outer.at(static_cast<unsigned int>(eva.connection.polygon_point_index));
+            point_i piece_side_point = piece_outer.at(static_cast<unsigned int>(eva.connection.polygon_side_index));
+
+            auto out_points = [](point_i point1, point_i point2)
+            {
+                auto out_point = [](point_i point)
+                {
+                    std::cout << "(" << point.x() << ", " << point.y() << ")";
+                };
+
+                std::cout << "{";
+                out_point(point1);
+                std::cout << ", ";
+                out_point(point2);
+                std::cout << "}";
+            };
+
+            std::cout << " Connect < " << eva.fields_index << " >  frame : ";
+            out_points(frame_point, frame_side_point);
+            std::cout << " :  piece : ";
+            out_points(piece_point, piece_side_point);
+            std::cout << std::endl;
+        }
     }
 }
