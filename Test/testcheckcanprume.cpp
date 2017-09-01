@@ -252,7 +252,7 @@ bool TestCheckCanPrume::run(){
 
 
     //検査用にProbMakerからテストパターンを引っ張る
-    /*
+
     ProbMaker *PbMaker = new ProbMaker();
     PbMaker->show();
     std::vector<polygon_i> pieces_ = PbMaker->getPieces();
@@ -272,7 +272,7 @@ bool TestCheckCanPrume::run(){
     field.setElementaryPieces(neo_pieces);
     field.setFrame(neo_frame);
 
-*/
+
     //ここまでProbMakerからの部分　使わないならコメントアウトで
 
 
