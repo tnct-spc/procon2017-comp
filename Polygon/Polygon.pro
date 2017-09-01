@@ -31,7 +31,8 @@ SOURCES += \
     form.cpp \
     neofield.cpp \
     polygon.cpp \
-    complexangle.cpp
+    complexangle.cpp \
+    neopolygonio.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -47,7 +48,8 @@ HEADERS += \
     form.h \
     neofield.h \
     polygon.h \
-    complexangle.h
+    complexangle.h \
+    neopolygonio.h
 
 LIBS += -lboost_system -lboost_thread
 LIBS += -L/usr/lib `pkg-config --libs opencv`
