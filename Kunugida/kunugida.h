@@ -7,6 +7,7 @@
 #include "neoanswerdock.h"
 #include "imagerecognition.h"
 #include "neofield.h"
+#include "tcp_main.h"
 
 namespace Ui {
 class Kunugida;
@@ -27,6 +28,7 @@ private:
     std::shared_ptr<spdlog::logger> logger;
     bool is_running = false;
     std::shared_ptr<NeoAnswerBoard> board;
+    std::shared_ptr<TcpMain> tcp;
     void finishedProcess();
     void startProcess();
 
