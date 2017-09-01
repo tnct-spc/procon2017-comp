@@ -93,10 +93,13 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     //bool2file
     std::array<bool, 50> is_placed;
 
-    //polygon_i _frame;
-    //std::getline(input, line_buffer);
+    //doublevector2
+    std::vector<procon::NeoExpandedPolygon> elementary_frame_inner_pice;
+    std::vector<std::vector<procon::NeoExpandedPolygon>> elementary_frame_inner_pices;
+    std::string i;
 
     while(std::getline(input,line_buffer)){
+        //elementary_frame_inner_pices[std::stoi(i)] = elementary_frame_inner_pice;
         polygon_i hoge;
         hoge.clear();
         std::string point_buffer = "";
@@ -115,6 +118,15 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 }
                 ++array;
             }
+        }else if(mode == 1){
+            std::getline(line_stream, i, ',');
+            while(std::getline(line_stream, x, ',')){
+                std::getline(line_stream, y, ',');
+                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
+            }
+            procon::NeoExpandedPolygon polygon;
+            polygon.resetPolygonForce(hoge);
+            elementary_frame_inner_pice.push_back(polygon);
         }else{
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
