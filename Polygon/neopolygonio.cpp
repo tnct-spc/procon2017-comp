@@ -84,11 +84,11 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     std::string x, y;
     procon::NeoField import_field;
 
-    //0 or 2
+    //polygon2string
     std::vector<procon::NeoExpandedPolygon> polygons;
 
-    //1
-    std::vector<std::vector<procon::NeoExpandedPolygon>> polygonss;
+    //bool2file
+    std::array<bool, 50> is_placed;
 
     while(std::getline(input,line_buffer)){
         polygon_i hoge;
@@ -97,7 +97,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
         std::getline(line_stream,point_buffer,',');
         int mode = std::stoi(point_buffer);
 
-        //0 or 2
+        //polygon2string
         if(mode == 0 || mode == 2){
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
@@ -112,14 +112,26 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             }
             if(mode == 0)
                 import_field.setElementaryFrame(polygons);
-            if(mode == 1)
+            if(mode == 2)
                 import_field.setElementaryPieces(polygons);
+            if(mode == 3)
+                import_field.setFrame(polygons);
+            if(mode == 4){
+                for(auto &p : polygons){
+                    import_field.field_pieces.push_back(p);
+                }
+            }
         }
 
-        //1
-        if(mode == 1){
-            while(std::getline(line_stream, x, ',')){
-
+        //bool2file
+        if(mode == 5){
+            int js;
+            while(std::getline(line_stream, js, ',')){
+                if(js == "0"){
+                    is_placed = false;
+                 }else{
+                    is_placed = true;
+                }
             }
         }
 
