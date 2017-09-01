@@ -12,6 +12,8 @@ public:
     ComplexAngle operator /(ComplexAngle angle);
     ComplexAngle operator =(ComplexAngle angle);
     bool operator ==(ComplexAngle angle);
+    double angle();
+    static double angle(ComplexAngle angle);
 };
 
 #endif // COMPLEXANGLE_H
