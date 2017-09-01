@@ -134,7 +134,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
 
 
-        for(auto& frame : field.getFrame() ){
+        for(auto& frame : field.getElementaryFrame() ){
             std::vector<QPointF> frame_points;
             for(auto point : frame.getPolygon().outer()){
                 frame_points.push_back(getPosition(point));
