@@ -1,6 +1,8 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
 
+#include "neopolygonio.h"
+
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NeoAnswerBoard)
@@ -391,5 +393,12 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
         }
         this->update();
+    }
+}
+
+void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::MouseButton::RightButton){
+        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
     }
 }
