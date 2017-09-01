@@ -1,6 +1,7 @@
 #!/bin/sh
 
 devicename=$(cat devicename.txt)
+
 if [ "${devicename}" = ""  ]; then
     # エラー処理
     echo devicename.txtの中身が確認できません
@@ -8,7 +9,7 @@ if [ "${devicename}" = ""  ]; then
 fi
 
 wait
-scanimage --device "${devicename}" --format=png --mode Color --resolution 100 > hoge.png
+scanimage --device "${devicename}" --format=png --mode Color --resolution 100 > $1
 
 if [ $? -gt 0 ]; then
     # エラー処理

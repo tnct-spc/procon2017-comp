@@ -6,6 +6,9 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <cstdlib>
 
 #include <QDebug>
 #include <QPushButton>
@@ -129,12 +132,21 @@ void Kunugida::imageRecognitonTest()
 
 cv::Mat Kunugida::scanImage()
 {
-    char command[256]="sh ../../procon2017-comp/Kunugida/getimage.sh";
+    time_t t = time(NULL);
+    char fileName[256];
+    strcpy(fileName , ctime(&t));
+    for(char &c : fileName) if(c == ' ' || c == '\n') c = '_';
+    strcat(fileName , ".png");
+    std::cout<<fileName<<std::endl;
+
+    char command[256]="sh ../../procon2017-comp/Kunugida/getimage.sh ";
+    strcat(command , fileName);
+
     cv::Mat mat;
     if(system(command)==0){
         //うまくスキャンしたときの処理
-        mat = cv::imread("hoge.png");
         std::cout<<"スキャンできた"<<std::endl;
+        mat = cv::imread(fileName);
     }else{
         //残念ながらスキャンできなかったときの処理
         std::cout<<"スキャンできない"<<std::endl;
