@@ -134,7 +134,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
 
 
-        for(auto& frame : field.getFrame() ){
+        for(auto& frame : field.getElementaryFrame() ){
             std::vector<QPointF> frame_points;
             for(auto point : frame.getPolygon().outer()){
                 frame_points.push_back(getPosition(point));
@@ -155,7 +155,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 //          }
 //          painter.drawPolygon(points,pcount);
             std::vector<QPointF> points;
-            for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
+            for(auto point : polygon_list[pnum].outer()){
                 points.push_back(getPosition(point));
             }
             painter.drawPolygon(&points.front(),points.size());
@@ -189,7 +189,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBackground(QBrush(QColor(list[pnum])));
         painter.setPen(QPen(QBrush(Qt::white), 0.3));
         point_i center;
-        boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+        boost::geometry::centroid(polygon_list[pnum], center);
         QPointF piececenter = getPosition(center);
         piececenter.setX(piececenter.x() - grid_size);
         piececenter.setY(piececenter.y() + grid_size);
@@ -241,7 +241,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     drawFrame();
-    drawDownBackground();
+    //drawDownBackground();
 
     if(single_mode){
         for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
@@ -385,7 +385,11 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         polygon_list.clear();
         std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
         std::sort(pieces.begin(), pieces.end(), [](const procon::NeoExpandedPolygon& a, const procon::NeoExpandedPolygon& b)->bool{
-            return a.getId() < b.getId();
+            point_i center1;
+            point_i center2;
+            boost::geometry::centroid(a.getPolygon(),center1);
+            boost::geometry::centroid(b.getPolygon(),center2);
+            return center1.x() < center2.x();
         });
         for(auto piece : pieces){
             if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
