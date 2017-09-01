@@ -83,6 +83,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     std::string line_buffer = "";
     std::string x, y;
     procon::NeoField import_field;
+    int mode;
 
     //polygon2string
     std::vector<procon::NeoExpandedPolygon> polygons;
@@ -95,49 +96,42 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
         std::string point_buffer = "";
         std::istringstream line_stream(line_buffer);
         std::getline(line_stream,point_buffer,',');
-        int mode = std::stoi(point_buffer);
+        mode = std::stoi(point_buffer);
 
         //polygon2string
-        if(mode == 0 || mode == 2){
+        if(mode == 0 || mode == 2 || mode == 3 || mode == 4){
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
-                hoge.outer().push_back(polygon_i(std::stoi(x), std::stoi(y)));
+                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
             }
-            int count = 0;
-            for(auto &p : hoge){
-                procon::NeoExpandedPolygon polygon(count);
-                polygon.resetPolygonForce(p);
-                polygons.push_back(frame);
-                ++count;
-            }
-            if(mode == 0)
-                import_field.setElementaryFrame(polygons);
-            if(mode == 2)
-                import_field.setElementaryPieces(polygons);
-            if(mode == 3)
-                import_field.setFrame(polygons);
-            if(mode == 4){
-                for(auto &p : polygons){
-                    import_field.field_pieces.push_back(p);
-                }
-            }
+            procon::NeoExpandedPolygon polygon;
+            polygon.resetPolygonForce(hoge);
+            if(mode == 4)
+                import_field.setPiece(polygon);
+            if(mode == 0 || mode == 2 || mode == 3)
+                polygons.push_back(polygon);
         }
 
-        //bool2file
         if(mode == 5){
-            int js;
+            std::string js;
+            int count = 0;
             while(std::getline(line_stream, js, ',')){
                 if(js == "0"){
-                    is_placed = false;
+                    is_placed[count] = false;
                  }else{
-                    is_placed = true;
+                    is_placed[count] = true;
                 }
+                ++count;
             }
         }
-
-
     }
 
+    if(mode == 0)
+        import_field.setElementaryFrame(polygons);
+    if(mode == 2)
+        import_field.setElementaryPieces(polygons);
+    if(mode == 3)
+        import_field.setFrame(polygons);
 }
 
 
