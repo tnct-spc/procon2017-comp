@@ -3,6 +3,8 @@
 #include "qrlibrary.h"
 #include "neofield.h"
 #include "probmaker.h"
+#include "neosolver.h"
+#include "neoexpandedpolygon.h"
 
 #include <iostream>
 
@@ -10,6 +12,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QMessageBox>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
@@ -23,7 +26,9 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     board = std::make_shared<NeoAnswerBoard>();
+    tcp = std::make_shared<TcpMain>();
     board->show();
+    tcp->show();
 }
 
 Kunugida::~Kunugida()
@@ -44,9 +49,28 @@ void Kunugida::run()
         ProbMaker *PbMaker = new ProbMaker();
 
         //もしProbMakerの結果を表示したければ下をコメントアウト
+        //std::string test_text = "test";
+        //board->setText(test_text);
         PbMaker->show();
-        std::vector<polygon_i> pieces = PbMaker->getPieces();
-        polygon_i frame = PbMaker->getFrame();
+        std::vector<polygon_i> pieces_ = PbMaker->getPieces();
+        polygon_i frame_ = PbMaker->getFrame();
+
+        std::vector<procon::NeoExpandedPolygon> pieces;
+        procon::NeoExpandedPolygon frame;
+
+        int id = 1;
+        for(auto& piece : pieces_){
+            procon::NeoExpandedPolygon buf(id);
+            buf.resetPolygonForce(piece);
+            pieces.push_back(buf);
+            ++id;
+            //break;
+        }
+        frame.resetPolygonForce(frame_);
+        std::vector<procon::NeoExpandedPolygon> vec_frame;
+        vec_frame.push_back(frame);
+        field.setElementaryFrame(vec_frame);
+        field.setElementaryPieces(pieces);
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -59,7 +83,17 @@ void Kunugida::run()
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 
+    int algorithm_number = 0;
 
+    if(ui->test_algorithm_button->isChecked()){
+        algorithm_number = 0;
+    } else if (ui->beamsearch_button->isChecked()) {
+        algorithm_number = 1;
+    }
+
+    NeoSolver *solver = new NeoSolver();
+    connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
+    solver->run(field,algorithm_number);
 
 
 //    QRLibrary lib;
@@ -78,6 +112,13 @@ void Kunugida::clickedRunButton()
         //warning
         logger->warn("solving process is already running");
     }
+}
+
+void Kunugida::emitAnswer(procon::NeoField field)
+{
+   logger->info("emitted answer");
+   this->board->setField(field);
+   this->tcp->setfield(field);
 }
 
 void Kunugida::finishedProcess()
