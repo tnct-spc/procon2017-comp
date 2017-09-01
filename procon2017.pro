@@ -7,8 +7,9 @@ SUBDIRS += \
     QRcode \
     DisplayAnswer \
     Solver \
+    NeoSolver \
     ProbMaker \
     Hazama \
-    Test \
     Slave \
-    Kunugida
+    Kunugida \
+    AbilityCheck

@@ -57,6 +57,20 @@ else:unix: LIBS += -L$$OUT_PWD/../Polygon -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
 DEPENDPATH += $$PWD/../Polygon
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ImageRecognition/release/ -lImageRecognition
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ImageRecognition/debug/ -lImageRecognition
+else:unix: LIBS += -L$$OUT_PWD/../ImageRecognition/ -lImageRecognition
+
+INCLUDEPATH += $$PWD/../ImageRecognition
+DEPENDPATH += $$PWD/../ImageRecognition
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/release/ -lDisplayAnswer
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/debug/ -lDisplayAnswer
+else:unix: LIBS += -L$$OUT_PWD/../DisplayAnswer/ -lDisplayAnswer
+
+INCLUDEPATH += $$PWD/../DisplayAnswer
+DEPENDPATH += $$PWD/../DisplayAnswer
+
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
 else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities

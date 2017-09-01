@@ -1,0 +1,12 @@
+#ifndef NEOSOLVER_GLOBAL_H
+#define NEOSOLVER_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(NEOSOLVER_LIBRARY)
+#  define NEOSOLVERSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define NEOSOLVERSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // NEOSOLVER_GLOBAL_H
