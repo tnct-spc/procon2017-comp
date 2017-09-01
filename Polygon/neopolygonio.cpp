@@ -78,28 +78,66 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
 
 procon::NeoField NeoPolygonIO::importField(std::string file_path)
 {
+    //common
+    std::ifstream input(file_path);
+    std::string line_buffer = "";
+    std::string x, y;
     procon::NeoField import_field;
 
-    std::ifstream input(file_path);
+    //polygon2string
+    std::vector<procon::NeoExpandedPolygon> polygons;
 
-    std::string line_buffer = "";
+    //bool2file
+    std::array<bool, 50> is_placed;
 
     while(std::getline(input,line_buffer)){
+        polygon_i hoge;
         std::string point_buffer = "";
         std::istringstream line_stream(line_buffer);
+        std::getline(line_stream,point_buffer,',');
+        int mode = std::stoi(point_buffer);
 
-            std::getline(line_stream,point_buffer,',');
+        //polygon2string
+        if(mode == 0 || mode == 2){
+            while(std::getline(line_stream, x, ',')){
+                std::getline(line_stream, y, ',');
+                hoge.outer().push_back(polygon_i(std::stoi(x), std::stoi(y)));
+            }
+            int count = 0;
+            for(auto &p : hoge){
+                procon::NeoExpandedPolygon polygon(count);
+                polygon.resetPolygonForce(p);
+                polygons.push_back(frame);
+                ++count;
+            }
+            if(mode == 0)
+                import_field.setElementaryFrame(polygons);
+            if(mode == 2)
+                import_field.setElementaryPieces(polygons);
+            if(mode == 3)
+                import_field.setFrame(polygons);
+            if(mode == 4){
+                for(auto &p : polygons){
+                    import_field.field_pieces.push_back(p);
+                }
+            }
+        }
 
-            int mode = std::stoi(point_buffer);
-
-            while(std::getline(line_stream,point_buffer,',')){
-
-
-
+        //bool2file
+        if(mode == 5){
+            int js;
+            while(std::getline(line_stream, js, ',')){
+                if(js == "0"){
+                    is_placed = false;
+                 }else{
+                    is_placed = true;
+                }
             }
         }
 
 
     }
+
+}
 
 
