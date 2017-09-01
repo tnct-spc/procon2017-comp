@@ -460,10 +460,13 @@ void BeamSearch::run(procon::NeoField field)
         //vectorのメモリ解放って頭悪くね？
         std::vector<Evaluate>().swap(ev);
 
-
+        bool flag = false;
         for(auto const& _field : state){
             dock->addAnswer(_field);
-            submitAnswer(_field);
+            if(!flag){
+                submitAnswer(_field);
+                flag = true;
+            }
         }
 
 //        if(piece_num == 40){
