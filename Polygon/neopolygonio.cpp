@@ -89,6 +89,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     std::vector<procon::NeoExpandedPolygon> elementary_frame;
     std::vector<procon::NeoExpandedPolygon> elementary_piece;
     std::vector<procon::NeoExpandedPolygon> frame;
+    std::string id;
 
     //bool2file
     std::array<bool, 50> is_placed;
@@ -127,6 +128,12 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             procon::NeoExpandedPolygon polygon;
             polygon.resetPolygonForce(hoge);
             elementary_frame_inner_pice.push_back(polygon);
+        }else if(mode == 4){
+            std::getline(line_stream, id, ',');
+            while(std::getline(line_stream, x, ',')){
+                std::getline
+            }
+
         }else{
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
