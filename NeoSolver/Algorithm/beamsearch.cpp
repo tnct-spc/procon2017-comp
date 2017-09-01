@@ -463,6 +463,7 @@ void BeamSearch::run(procon::NeoField field)
 
         for(auto const& _field : state){
             dock->addAnswer(_field);
+            submitAnswer(_field);
         }
 
 //        if(piece_num == 40){
