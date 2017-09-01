@@ -74,12 +74,32 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
     export2file(3,field.getFrame());
     export2file(4,field.getPieces());
     exportBool2file(5,field.getIsPlaced());
-
 }
 
 procon::NeoField NeoPolygonIO::importField(std::string file_path)
 {
     procon::NeoField import_field;
 
+    std::ifstream input(file_path);
 
-}
+    std::string line_buffer = "";
+
+    while(std::getline(input,line_buffer)){
+        std::string point_buffer = "";
+        std::istringstream line_stream(line_buffer);
+
+            std::getline(line_stream,point_buffer,',');
+
+            int mode = std::stoi(point_buffer);
+
+            while(std::getline(line_stream,point_buffer,',')){
+
+
+
+            }
+        }
+
+
+    }
+
+
