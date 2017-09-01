@@ -53,14 +53,14 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
 
     auto export2file_with_id = [&](int state,const std::vector<procon::NeoExpandedPolygon> & polygons){
         for(const auto& p : polygons){
-            output << std::to_string(state) << "," << std::to_string(p.getId()) << "," << polygon2string(p.getPolygon()) << std::endl;
+            output << std::to_string(state) << "," << std::to_string(p.getId()) << polygon2string(p.getPolygon()) << std::endl;
         }
     };
 
     auto exportDoubleVector2file = [&](int state,const std::vector<std::vector<procon::NeoExpandedPolygon>> polygonss){
         for (int i = 0; i < polygonss.size(); ++i) {
             for(const auto& p : polygonss[i]){
-            output << std::to_string(state) << "," << i << "," << polygon2string(p.getPolygon()) << std::endl;
+            output << std::to_string(state) << "," << i << polygon2string(p.getPolygon()) << std::endl;
         }
         }
     };
