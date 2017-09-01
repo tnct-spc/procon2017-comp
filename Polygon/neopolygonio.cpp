@@ -51,6 +51,12 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
         }
     };
 
+    auto export2file_with_id = [&](int state,const std::vector<procon::NeoExpandedPolygon> & polygons){
+        for(const auto& p : polygons){
+            output << std::to_string(state) << "," << std::to_string(p.getId()) << "," << polygon2string(p.getPolygon()) << std::endl;
+        }
+    };
+
     auto exportDoubleVector2file = [&](int state,const std::vector<std::vector<procon::NeoExpandedPolygon>> polygonss){
         for (int i = 0; i < polygonss.size(); ++i) {
             for(const auto& p : polygonss[i]){
@@ -72,7 +78,7 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
     exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
     export2file(2,field.getElementaryPieces());
     export2file(3,field.getFrame());
-    export2file(4,field.getPieces());
+    export2file_with_id(4,field.getPieces());
     exportBool2file(5,field.getIsPlaced());
 }
 
