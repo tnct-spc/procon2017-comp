@@ -2,6 +2,7 @@
 #include "ui_neoanswerboard.h"
 
 #include "neopolygonio.h"
+#include "Utils/polygonconnector.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
@@ -404,5 +405,18 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
+    }else if(event->button() == Qt::MouseButton::LeftButton){
+        for(Evaluate i : this->field.evaluate_cache){
+            auto connected = PolygonConnector::connect(this->field.getElementaryFrame().at(i.frame_index),
+                                                       this->field.getElementaryPieces().at(i.piece_index),
+                                                       i.connection);
+            std::cout<<std::get<2>(connected)<<std::endl;
+            if(std::get<2>(connected)){
+                NeoAnswerBoard *nab = new NeoAnswerBoard();
+                nab->setField(field);
+                nab->setSingleMode(true);
+                nab->show();
+            }
+        }
     }
 }
