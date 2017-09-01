@@ -88,7 +88,6 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     //角について枝切りできるかできないか
     auto about_angle = [&field](){
 
-        return false;
 
         double hoge_frame_angle;
         double min_frame_angle = 360;
@@ -98,15 +97,17 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                 if(hoge_frame_angle < min_frame_angle) min_frame_angle = hoge_frame_angle;
             }
         }
+        std::cout << "枠の最小角は " << min_frame_angle << std::endl;
 
         double hoge_piece_angle;
         double min_piece_angle = 360;
-        for(auto const &piece : field.getPieces()){
+        for(auto const &piece : field.getElementaryPieces()){
             for(int pieceangle = 0; pieceangle < piece.getSize(); ++pieceangle){
                 hoge_piece_angle = piece.getSideAngle().at(pieceangle);
                 if(hoge_piece_angle < min_piece_angle) min_piece_angle = hoge_piece_angle;
             }
         }
+        std::cout << "ピースの最小角は " <<min_piece_angle << std::endl;
 
         if(min_frame_angle < min_piece_angle){
             return true;
@@ -114,6 +115,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             return false;
         }
     };
+    /*
     //辺について枝きりできるかできないか
     auto about_side = [&field](){
         //要素数の足し算、引き算
@@ -207,29 +209,26 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
              frame_instance = tool::polygondistance(frame);
              if(most_frame < frame_instance){
                  most_frame = frame_instance;
-                 std::cout <<"枠の最大値変更"<<std::endl;
              }
         }
-        std::cout <<"最も長い枠の距離は " << most_frame<<std::endl;
         for(auto const neopiece : field.getElementaryPieces()){
             polygon_i piece = neopiece.procon::NeoExpandedPolygon::getPolygon();
             piece_instance = tool::polygondistance(piece);
             if(most_piece < piece_instance){
                 most_piece = piece_instance;
-                std::cout <<"ピースの最大値変更"<<std::endl;
             }
         }
-        std::cout <<"最も長いピースの距離は " << most_piece<<std::endl;
         if(most_piece > most_frame){
             return true;
         }
         return false;
     };
+    */
 
     bool a = about_angle();
-    bool b = about_side();
-    bool c = PolygonDistance();
-    return a || b || c;
+    //bool b = about_side();
+    //bool c = PolygonDistance();
+    return a; //|| b || c;
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
