@@ -75,7 +75,7 @@ void Kunugida::run()
         field.setElementaryPieces(pieces);
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -123,7 +123,6 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setField(field);
-   this->tcp->setfield(field);
 }
 
 void Kunugida::finishedProcess()
