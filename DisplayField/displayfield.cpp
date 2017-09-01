@@ -17,8 +17,6 @@ DisplayField::~DisplayField()
     delete ui;
 }
 void DisplayField::runAnswerBoard(){
-    std::cout << field.getElementaryFrame().size() << std::endl;
-    std::cout << field.getElementaryPieces().size() << std::endl;
     board->setField(field);
     board->setSingleMode(true);
     board->update();
