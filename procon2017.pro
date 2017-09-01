@@ -12,4 +12,5 @@ SUBDIRS += \
     Hazama \
     Slave \
     Kunugida \
-    AbilityCheck
+    AbilityCheck \
+    DisplayField
