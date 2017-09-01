@@ -13,5 +13,6 @@ SUBDIRS += \
     Slave \
     Kunugida \
     AbilityCheck \
-    Test
+    Test \
+    FindBug
 
