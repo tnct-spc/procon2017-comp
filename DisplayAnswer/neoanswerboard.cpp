@@ -406,22 +406,27 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
     }else if(event->button() == Qt::MouseButton::LeftButton){
-        auto reset_neo_field = [](procon::NeoField &input_field){
+        auto reset_neo_field = [](procon::NeoField input_field){
             input_field.setFrame(input_field.getElementaryFrame());
             input_field.setPiece(input_field.getElementaryPieces());
             std::array<bool,50> isPlaced;
             isPlaced.fill(false);
             input_field.setIsPlaced(isPlaced);
-        }
-
+            return input_field;
+        };
+        procon::NeoField newField = reset_neo_field(this->field);
         for(Evaluate i : this->field.evaluate_cache){
-            auto connected = PolygonConnector::connect(this->field.getElementaryFrame().at(i.frame_index),
-                                                       this->field.getElementaryPieces().at(i.piece_index),
+            auto connected = PolygonConnector::connect(newField.getElementaryFrame().at(i.frame_index),
+                                                       newField.getElementaryPieces().at(i.piece_index),
                                                        i.connection);
             std::cout<<std::get<2>(connected)<<std::endl;
             if(std::get<2>(connected)){
+                newField.setFrame(std::get<0>(connected));
+                newField.setPiece(std::get<1>(connected));
+                newField.setIsPlaced(i.piece_index);
+
                 NeoAnswerBoard *nab = new NeoAnswerBoard();
-                nab->setField(field);
+                nab->setField(newField);
                 nab->setSingleMode(true);
                 nab->show();
             }
