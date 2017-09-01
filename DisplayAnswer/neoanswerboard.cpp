@@ -17,6 +17,9 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
+void NeoAnswerBoard::setText(std::string text){
+    output_string = QString::fromStdString(text);
+}
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
@@ -208,7 +211,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     };
 
-    //評価値を描画
+    //評価値を描画 設定されたtextもここで描画する
     auto drawEvalution = [&]{
         painter.setBackgroundMode(Qt::TransparentMode);
         QColor evalution_color = {255,0,255};
@@ -229,6 +232,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             jointed_piece_total += frame_.getJointedPieces().size();
         }
         painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+
+        QPointF text_point = evalution_point;
+        text_point.setY(splitedheight);
+        painter.drawText(text_point, output_string);
         //painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
     };
@@ -253,30 +260,30 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             //初期ピース&番号&処理線を描画
             if(point_id == 0){
                 if(field.getPiecesSize() >= 1){
-                    drawAfterPiece(point_id);
-                    drawProcessingLine(point_id, false);
-                    drawPieceId(point_id);
+                    drawAfterPiece(red_id);
+                    drawProcessingLine(red_id, false);
+                    drawPieceId(red_id);
                 }
                 if(field.getPiecesSize() >= 2){
                     ++point_id;
-                    drawAfterPiece(point_id);
-                    drawProcessingLine(point_id, true);
-                    drawPieceId(point_id);
+                    drawAfterPiece(blue_id);
+                    drawProcessingLine(blue_id, true);
+                    drawPieceId(blue_id);
                 }
             }
 
             //キーに合わせてピース&番号&処理線を描画
-            if(point_id > 1){
-                //青
+            if(point_id > 0){
+                //赤
                 if(selecter){
-                    blue_id = point_id;
-                    if(blue_id > red_id){
-                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                    red_id = point_id;
+                    if(red_id > blue_id){
+                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
                             drawAfterPiece(piecenumber);
                             drawPieceId(piecenumber);
                         }
                     }else{
-                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
                             drawAfterPiece(piecenumber);
                             drawPieceId(piecenumber);
                         }
@@ -284,16 +291,16 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
                     drawProcessingLine(blue_id, true);
                     drawProcessingLine(red_id, false);
-                //赤
+                //青
                 }else{
-                    red_id = point_id;
-                    if(blue_id > red_id){
-                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                    blue_id = point_id;
+                    if(red_id > blue_id){
+                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
                             drawAfterPiece(piecenumber);
                             drawPieceId(piecenumber);
                         }
                  }else{
-                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
                             drawAfterPiece(piecenumber);
                             drawPieceId(piecenumber);
                         }
@@ -312,34 +319,52 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     if( !field.getPieces().empty() ){
-        int hoge = field.getPieces().size();
+        int hoge = field.getPieces().size() - 1;
         if(point_id > 0){
-            if(point_id < hoge-1){
-                paintif = true;
-                if(event->key() == Qt::Key_A){
-                    selecter = true;
-                    ++point_id;
-                }
-                if(event->key() == Qt::Key_L){
-                    selecter = false;
-                    ++point_id;
-                }
-                this->update();
-            }
-
             if(point_id < hoge){
-                if(event->key() == Qt::Key_S){
-                    selecter = true;
-                    --point_id;
+                paintif = true;
+                if(red_id < hoge){
+                    if(event->key() == Qt::Key_A){
+                        selecter = true;
+                        ++red_id;
+                        ++point_id;
+                    }
                 }
-                if(event->key() == Qt::Key_K){
-                    selecter = false;
-                    --point_id;
+
+                if(blue_id < hoge){
+                    if(event->key() == Qt::Key_L){
+                        selecter = false;
+                        ++blue_id;
+                        ++point_id;
+                    }
                 }
             }
         }
+
+        if(point_id > 0){
+            if(point_id < hoge + 1){
+                paintif = true;
+                if(red_id > 0){
+                    if(event->key() == Qt::Key_S){
+                        selecter = true;
+                        --red_id;
+                        --point_id;
+                    }
+                }
+
+                if(blue_id > 0){
+                    if(event->key() == Qt::Key_K){
+                        selecter = false;
+                        --blue_id;
+                        --point_id;
+                    }
+                }
+            }
+        }
+            this->update();
     }
 }
+
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
     int pointx = point.x() + frame_margin/2;
