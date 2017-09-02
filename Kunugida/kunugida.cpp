@@ -87,6 +87,9 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
+    }else if(ui->csv_button->isChecked()){
+        //csv date
+
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 

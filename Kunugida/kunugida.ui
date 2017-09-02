@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>831</width>
+    <width>832</width>
     <height>410</height>
    </rect>
   </property>
@@ -68,6 +68,13 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QRadioButton" name="csv_button">
+           <property name="text">
+            <string>RadioButton</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -114,8 +121,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>831</width>
-     <height>30</height>
+     <width>832</width>
+     <height>20</height>
     </rect>
    </property>
   </widget>
