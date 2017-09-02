@@ -231,6 +231,15 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             }
             ++number;
         }
+        painter.setPen(QPen(QBrush(QColor(236,182,138, 200)),0.1));
+        int count=0;
+        for(auto frame : field.getElementaryFrame()){
+            for(auto point : frame.getPolygon().outer()){
+                QPointF text_point = getPosition(point);
+                painter.drawText(text_point,QString::number(count));
+                ++count;
+            }
+        }
         }
     };
 
@@ -338,7 +347,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawEvalution();
 //    drawGrid();
 }
-
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     if( !field.getPieces().empty() ){
