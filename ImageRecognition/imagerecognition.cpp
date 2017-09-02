@@ -56,7 +56,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        //NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
         //error = getError(pieces[i], i+1);
         //printf("%d : %f\n", i, error);
     }
@@ -1235,8 +1235,13 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
     std::vector<procon::NeoExpandedPolygon> neo_pieces;
 
-    for(auto & p : pieces){
+    for(auto& p : pieces){
         boost::geometry::correct(p);
+        if(boost::geometry::area(p) < 0){
+            std::cout << "DSFasdfhashdgkjashklgjhsaljdkghlajkshfg" << std::endl;
+        }
+
+
     }
 
 
@@ -1261,6 +1266,7 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
         for(auto p : pieces[pieces.size() -1 -i].outer()){
             correct_polygon.outer().push_back(point_i(p.x(), p.y() < 0 ? - p.y() : p.y() ));
         }
+        boost::geometry::correct(correct_polygon);
 
         polygon.resetPolygonForce(correct_polygon);
         neo_frame.push_back(polygon);
@@ -1268,6 +1274,20 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
     field.setFrame(neo_frame);
     field.setElementaryFrame(neo_frame);
+
+    double area = 0;
+    for(const auto& p : field.getElementaryPieces()){
+        area += boost::geometry::area(p.getPolygon());
+        std::cout << area << std::endl;
+    }
+
+    for(const auto& f : field.getElementaryFrame()){
+        area -= boost::geometry::area(f.getPolygon());
+    }
+
+    if(area != 0){
+        std::cout << "yabai gosaaaa" << area << std::endl;
+    }
 
     return field;
 }

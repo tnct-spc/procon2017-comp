@@ -460,6 +460,10 @@ void BeamSearch::run(procon::NeoField field)
         //vectorのメモリ解放って頭悪くね？
         std::vector<Evaluate>().swap(ev);
 
+        for(auto& f : state){
+            delete_deplicate_point(f);
+        }
+
         bool flag = false;
         for(auto const& _field : state){
             dock->addAnswer(_field);
