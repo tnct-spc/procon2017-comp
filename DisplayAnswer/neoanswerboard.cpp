@@ -1,6 +1,6 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
-
+#include "neoanswerdock.h"
 #include "neopolygonio.h"
 #include "Utils/polygonconnector.h"
 
@@ -401,6 +401,8 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     }
 }
 
+//#define OUT_FILE
+
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::MouseButton::RightButton){
@@ -415,6 +417,8 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         };
         procon::NeoField newField = reset_neo_field(this->field);
         int count = 0;
+        NeoAnswerDock *nad = new NeoAnswerDock();
+        nad->show();
         for(Evaluate i : this->field.evaluate_cache){
             auto connected = PolygonConnector::connect(newField.getFrame().at(i.frame_index),
                                                        newField.getElementaryPieces().at(i.piece_index),
@@ -424,9 +428,11 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 newField.setFrame(std::get<0>(connected));
                 newField.setPiece(std::get<1>(connected));
                 newField.setIsPlaced(i.piece_index);
-
+#ifdef OUT_FILE
                 std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count++) + ".csv";
                 NeoPolygonIO::exportPolygon(newField , path);
+#endif
+                nad->addAnswer(newField);
             }
         }
     }
