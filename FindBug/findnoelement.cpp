@@ -7,7 +7,7 @@ FindNoElement::FindNoElement()
 }
 
 bool FindNoElement::run(){
-    procon::NeoField field = NeoPolygonIO::importField("/home/yui/Procon/procon2017-comp/debug-field.csv");
+    procon::NeoField field = NeoPolygonIO::importField("/home/yui/Procon/fieldcdv/");
     nab = std::make_shared<NeoAnswerBoard>();
     nab->setField(field);
     nab->show();
