@@ -86,13 +86,21 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-        cv::Mat nocframe = cv::imread("/home/spc/ダウンロード/real_frame3.png", 1);
-        cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece3.png", 1);
+        cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame.png", 1);
+        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pices.png", 1);
 
         ImageRecognition imrec;
-        field = imrec.run(nocframe, nocpieces);
+        field = imrec.run(frame, pieces);
 
         //        imageRecognitonTest();
+    }
+
+    for(auto const& p : field.getPieces()){
+        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
+    }
+
+    for(auto const& p : field.getFrame()){
+        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
     }
     //    TODO: ここまでで各データソースから読み込むようにする
 

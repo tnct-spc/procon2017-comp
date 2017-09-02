@@ -1235,12 +1235,19 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
     std::vector<procon::NeoExpandedPolygon> neo_pieces;
 
+    for(auto & p : pieces){
+        boost::geometry::correct(p);
+    }
+
+
+    int id_count = 1;
     for (unsigned int i=0; i<pieces.size() - (unsigned int)field_num; i++) {
-        procon::NeoExpandedPolygon polygon;
+        procon::NeoExpandedPolygon polygon(id_count);
         polygon.resetPolygonForce(pieces[i]);
         neo_pieces.push_back(polygon);
 
-        field.setPiece(polygon);
+//        field.setPiece(polygon);
+        ++id_count;
     }
 
     field.setElementaryPieces(neo_pieces);
@@ -1249,7 +1256,13 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
     for (int i=0; i<field_num; i++) {
         procon::NeoExpandedPolygon polygon;
-        polygon.resetPolygonForce(pieces[pieces.size() - 1 - i]);
+
+        polygon_i correct_polygon;
+        for(auto p : pieces[pieces.size() -1 -i].outer()){
+            correct_polygon.outer().push_back(point_i(p.x(), p.y() < 0 ? - p.y() : p.y() ));
+        }
+
+        polygon.resetPolygonForce(correct_polygon);
         neo_frame.push_back(polygon);
     }
 
