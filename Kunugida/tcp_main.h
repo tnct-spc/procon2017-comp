@@ -25,8 +25,6 @@ public:
     explicit TcpMain(QWidget *parent = 0);
     ~TcpMain();
     void setfield(procon::NeoField input_field);
-    void make_send_data_piece();
-    QVector<QString> make_send_data_frame();
 
 protected  slots:
     void send();
@@ -39,10 +37,6 @@ private:
     QTcpServer *server;
     Request *request;
     procon::NeoField field;
-    QPointF getPosition(point_i point);
-    QString getSupportedString(int n, int m);
-    const int piece_data = 0;
-    const int frame_data = 1;
 
 };
 
