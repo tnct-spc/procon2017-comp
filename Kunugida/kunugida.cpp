@@ -28,8 +28,9 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     tcp = std::make_shared<TcpMain>();
-    board->show();
     tcp->show();
+    board->setSingleMode(true);
+    board->show();
 }
 
 Kunugida::~Kunugida()

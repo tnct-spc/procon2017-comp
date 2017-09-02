@@ -213,6 +213,26 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            painter.drawLine(aftercentroid, beforecentroid);
         }
     };
+    //頂点番号を描画
+    auto drawPolygonPointNum = [&]{
+        if(single_mode){
+        painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackground(QBrush(Qt::white));
+
+        int number=0;
+        for(auto polygon: polygon_list){
+            int count=0;
+            painter.setPen(QPen(QBrush(QColor(list[number])), 0.1));
+            for(auto point : polygon.outer()){
+                QPointF text_point = getPosition(point);
+                painter.drawText(text_point,QString::number(count));
+                ++count;
+            }
+            ++number;
+        }
+        }
+    };
 
     //評価値を描画 設定されたtextもここで描画する
     auto drawEvalution = [&]{
@@ -259,7 +279,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
 
         if(paintif){
-
             //初期ピース&番号&処理線を描画
             if(point_id == 0){
                 if(field.getPiecesSize() >= 1){
@@ -315,6 +334,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             paintif = false;
         }
     }
+    drawPolygonPointNum();
     drawEvalution();
     drawGrid();
 }
@@ -420,19 +440,25 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         NeoAnswerDock *nad = new NeoAnswerDock();
         nad->show();
         for(Evaluate i : this->field.evaluate_cache){
+            count++;
             auto connected = PolygonConnector::connect(newField.getFrame().at(i.frame_index),
                                                        newField.getElementaryPieces().at(i.piece_index),
                                                        i.connection);
-            std::cout<<std::get<2>(connected)<<std::endl;
             if(std::get<2>(connected)){
                 newField.setFrame(std::get<0>(connected));
                 newField.setPiece(std::get<1>(connected));
                 newField.setIsPlaced(i.piece_index);
+                std::cout<<"----------------"<<count<<"回目-------------------"<<std::endl;
+                std::cout<<"frame_side_index = "<<i.connection.frame_side_index
+                        <<",polygon_side_index = "<<i.connection.polygon_side_index
+                       <<",frame_point_index = "<<i.connection.frame_point_index
+                      <<",polygon_point_index = "<<i.connection.polygon_point_index
+                     <<std::endl;
+                nad->addAnswer(newField);
 #ifdef OUT_FILE
-                std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count++) + ".csv";
+                std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count) + ".csv";
                 NeoPolygonIO::exportPolygon(newField , path);
 #endif
-                nad->addAnswer(newField);
             }
         }
     }
