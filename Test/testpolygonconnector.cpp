@@ -92,7 +92,7 @@ bool TestPolygonConnector::run()
 
             } else {
                 std::cout << "false" << std::endl << "    ";
-                out(result_frames.at(0), "frame");
+                out(frame, "frame");
                 std::cout << std::endl << "    ";
                 out(result_piese, "piese");
             }

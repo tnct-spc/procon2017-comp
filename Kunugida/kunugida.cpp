@@ -30,6 +30,7 @@ Kunugida::Kunugida(QWidget *parent) :
     tcp = std::make_shared<TcpMain>();
     board->show();
     tcp->show();
+    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()

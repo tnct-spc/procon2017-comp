@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     testneoexpandedpolygon.cpp \
     testpolygonconnector.cpp \
     testalgorithmwrapper.cpp \
-    testevaluation.cpp
+    testevaluation.cpp \
+    testcheckoddfield.cpp
 
 HEADERS += testdisplayanswer.h\
     testjoinpolygon.h \
@@ -35,7 +36,8 @@ HEADERS += testdisplayanswer.h\
     testneoexpandedpolygon.h \
     testpolygonconnector.h \
     testalgorithmwrapper.h \
-    testevaluation.h
+    testevaluation.h \
+    testcheckoddfield.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
