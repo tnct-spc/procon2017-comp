@@ -391,14 +391,12 @@ void BeamSearch::init()
 #endif
     this->processor_num = std::thread::hardware_concurrency();
 }
-
 void BeamSearch::run(procon::NeoField field)
 {
     logger->info("beamsearch run");
     dock->addAnswer(field);
 
     std::vector<procon::NeoField> state;
-    state.push_back(field);
 
     //フレームの同じ傾きの頂点を除去
     auto delete_deplicate_point = [](procon::NeoField & field){
@@ -443,8 +441,10 @@ void BeamSearch::run(procon::NeoField field)
         }
     };
 
+
     delete_deplicate_point(field);
 
+    state.push_back(field);
 
 //    ev.resize(2000000);
     for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
