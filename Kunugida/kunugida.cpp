@@ -28,9 +28,9 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     tcp = std::make_shared<TcpMain>();
-    tcp->show();
     board->setSingleMode(true);
     board->show();
+    tcp->show();
 }
 
 Kunugida::~Kunugida()
@@ -78,6 +78,7 @@ void Kunugida::run()
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
         procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
         int i = 1;
+
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
