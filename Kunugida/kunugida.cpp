@@ -5,6 +5,7 @@
 #include "probmaker.h"
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
+#include "neopolygonio.h"
 
 #include <iostream>
 
@@ -65,6 +66,7 @@ void Kunugida::run()
             pieces.push_back(buf);
             ++id;
             //break;
+
         }
         frame.resetPolygonForce(frame_);
         std::vector<procon::NeoExpandedPolygon> vec_frame;
@@ -72,6 +74,9 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
+        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+        int i = 1;
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -117,8 +122,7 @@ void Kunugida::clickedRunButton()
 void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
-   this->board->setField(field);
-   this->tcp->setfield(field);
+   this->board->setField(NeoPolygonIO::importField("../../procon2017-comp/field.csv"));
 }
 
 void Kunugida::finishedProcess()

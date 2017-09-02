@@ -51,6 +51,12 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
         }
     };
 
+    auto export2file_with_id = [&](int state,const std::vector<procon::NeoExpandedPolygon> & polygons){
+        for(const auto& p : polygons){
+            output << std::to_string(state) << "," << std::to_string(p.getId()) << "," << polygon2string(p.getPolygon()) << std::endl;
+        }
+    };
+
     auto exportDoubleVector2file = [&](int state,const std::vector<std::vector<procon::NeoExpandedPolygon>> polygonss){
         for (int i = 0; i < polygonss.size(); ++i) {
             for(const auto& p : polygonss[i]){
@@ -72,7 +78,7 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
     exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
     export2file(2,field.getElementaryPieces());
     export2file(3,field.getFrame());
-    export2file(4,field.getPieces());
+    export2file_with_id(4,field.getPieces());
     exportBool2file(5,field.getIsPlaced());
 }
 
@@ -86,52 +92,79 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     int mode;
 
     //polygon2string
-    std::vector<procon::NeoExpandedPolygon> polygons;
+    std::vector<procon::NeoExpandedPolygon> elementary_frame;
+    std::vector<procon::NeoExpandedPolygon> elementary_piece;
+    std::vector<procon::NeoExpandedPolygon> frame;
+    std::string id;
 
     //bool2file
     std::array<bool, 50> is_placed;
 
+    //doublevector2
+    std::vector<procon::NeoExpandedPolygon> elementary_frame_inner_pice;
+    std::vector<std::vector<procon::NeoExpandedPolygon>> elementary_frame_inner_pices;
+    std::string i;
+
     while(std::getline(input,line_buffer)){
+        //elementary_frame_inner_pices[std::stoi(i)] = elementary_frame_inner_pice;
         polygon_i hoge;
+        hoge.clear();
         std::string point_buffer = "";
         std::istringstream line_stream(line_buffer);
         std::getline(line_stream,point_buffer,',');
         mode = std::stoi(point_buffer);
 
-        //polygon2string
-        if(mode == 0 || mode == 2 || mode == 3 || mode == 4){
+        if(mode == 5){
+            std::string data;
+            int array = 0;
+            while(std::getline(line_stream, data, ',')){
+                if(data == "0"){
+                    is_placed[array] = false;
+                }else{
+                    is_placed[array] = true;
+                }
+                ++array;
+            }
+        }else if(mode == 1){
+            std::getline(line_stream, i, ',');
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
                 hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
             }
             procon::NeoExpandedPolygon polygon;
             polygon.resetPolygonForce(hoge);
-            if(mode == 4)
-                import_field.setPiece(polygon);
-            if(mode == 0 || mode == 2 || mode == 3)
-                polygons.push_back(polygon);
-        }
-
-        if(mode == 5){
-            std::string js;
-            int count = 0;
-            while(std::getline(line_stream, js, ',')){
-                if(js == "0"){
-                    is_placed[count] = false;
-                 }else{
-                    is_placed[count] = true;
-                }
-                ++count;
+            elementary_frame_inner_pice.push_back(polygon);
+        }else if(mode == 4){
+            std::getline(line_stream, id, ',');
+            while(std::getline(line_stream, x, ',')){
+                std::getline(line_stream, y, ',');
+                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
             }
+            int _id = std::stoi(id);
+            procon::NeoExpandedPolygon polygon(_id);
+            polygon.resetPolygonForce(hoge);
+            import_field.setPiece(polygon);
+        }else{
+            while(std::getline(line_stream, x, ',')){
+                std::getline(line_stream, y, ',');
+                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
+            }
+            procon::NeoExpandedPolygon polygon;
+            polygon.resetPolygonForce(hoge);
+            if(mode == 0)
+                elementary_frame.push_back(polygon);
+            if(mode == 2)
+                elementary_piece.push_back(polygon);
+            if(mode == 3)
+                frame.push_back(polygon);
+
         }
     }
+    import_field.setElementaryFrame(elementary_frame);
+    import_field.setElementaryPieces(elementary_piece);
+    import_field.setFrame(frame);
 
-    if(mode == 0)
-        import_field.setElementaryFrame(polygons);
-    if(mode == 2)
-        import_field.setElementaryPieces(polygons);
-    if(mode == 3)
-        import_field.setFrame(polygons);
+    return import_field;
 }
 
 
