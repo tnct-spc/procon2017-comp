@@ -20,7 +20,6 @@ TcpMain::~TcpMain()
 void TcpMain::setfield(procon::NeoField input_field)
 {
     field = input_field;
-    //make_send_data_piece();
 }
 
 QPointF TcpMain::getPosition(point_i point)
@@ -28,22 +27,6 @@ QPointF TcpMain::getPosition(point_i point)
     int pointx = point.x();
     int pointy = point.y();
     return QPointF(pointx, pointy);
-}
-
-QString TcpMain::getSupportedString(int n, int m)
-{
-    QString str;
-    if(m < 100 && n == 3)
-        str += QString::number(0);
-    if(m < 10){
-        if(n == 3)
-            str += QString::number(0) + QString::number(0);
-        if(n == 2)
-            str += QString::number(0);
-    }
-    str += QString::number(n);
-
-    return str;
 }
 
 void TcpMain::send()
