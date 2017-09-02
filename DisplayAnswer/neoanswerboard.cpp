@@ -1,6 +1,8 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
 
+//TODO: is_inversedに対応する（ピースが反転しているか否か可視化）
+
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NeoAnswerBoard)
@@ -15,6 +17,20 @@ NeoAnswerBoard::~NeoAnswerBoard()
 
 void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
+}
+
+void NeoAnswerBoard::setUp()
+{
+    QMessageBox msgBox;
+    msgBox.setText("ピースの表示モードを選択");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setButtonText(QMessageBox::Yes, tr("ピースを順送りにする"));
+    msgBox.setButtonText(QMessageBox::No,  tr("ピースを全て表示する"));
+    msgBox.setIcon(QMessageBox::Warning);
+    int res = msgBox.exec();
+    if(res == QMessageBox::Yes) allif = true;
+    if(res == QMessageBox::No) allif = false;
+    this->setField(field);
 }
 
 void NeoAnswerBoard::setText(std::string text){
