@@ -114,7 +114,7 @@ void Kunugida::clickedRunButton()
 void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
-   this->board->setField(field);
+   this->board->setUp();
    this->dock_board->addAnswer(field);
 }
 

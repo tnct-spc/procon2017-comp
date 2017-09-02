@@ -18,6 +18,7 @@
 #include "neofield.h"
 #include "neoexpandedpolygon.h"
 #include <math.h>
+#include <QMessageBox>
 
 namespace Ui {
 class NeoAnswerBoard;
@@ -33,6 +34,7 @@ public:
     void setField(procon::NeoField input_field);
     void setSingleMode(bool inp);
     void setText(std::string text);
+    void setUp();
 
 private:
     int frame_margin;
@@ -51,6 +53,7 @@ private:
     bool single_mode = false;
     bool singleif = false;
     int piece_size = 1;
+    bool allif = true;
 
     //make id_list
     std::vector<polygon_i> polygon_list;
