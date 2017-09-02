@@ -27,6 +27,7 @@ Kunugida::Kunugida(QWidget *parent) :
     board = std::make_shared<NeoAnswerBoard>();
     dock_board = std::make_shared<NeoAnswerDock>();
     board->show();
+    board->setSingleMode(true);
     dock_board->show();
 
 }

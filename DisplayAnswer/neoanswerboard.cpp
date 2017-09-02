@@ -210,6 +210,26 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            painter.drawLine(aftercentroid, beforecentroid);
         }
     };
+    //頂点番号を描画
+    auto drawPolygonPointNum = [&]{
+        if(single_mode){
+        painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackground(QBrush(Qt::white));
+
+        int number=0;
+        for(auto polygon: polygon_list){
+            int count=0;
+            painter.setPen(QPen(QBrush(QColor(list[number])), 0.1));
+            for(auto point : polygon.outer()){
+                QPointF text_point = getPosition(point);
+                painter.drawText(text_point,QString::number(count));
+                ++count;
+            }
+            ++number;
+        }
+        }
+    };
 
     //評価値を描画 設定されたtextもここで描画する
     auto drawEvalution = [&]{
@@ -256,7 +276,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
 
         if(paintif){
-
             //初期ピース&番号&処理線を描画
             if(point_id == 0){
                 if(field.getPiecesSize() >= 1){
@@ -312,6 +331,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             paintif = false;
         }
     }
+    drawPolygonPointNum();
     drawEvalution();
     drawGrid();
 }
