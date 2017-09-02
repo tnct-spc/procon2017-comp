@@ -74,12 +74,26 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
         output << std::endl;
     };
 
+    auto exportEvaluateFile = [&](int state,const Evaluate ev){
+        output << std::to_string(state) << ",";
+
+        output << std::to_string(ev.fields_index) << "," << std::to_string(ev.frame_index) << ","
+               << (ev.is_inversed ? "0": "1") << "," << std::to_string(ev.piece_index) << "," << std::to_string(ev.score) << ","
+               << std::to_string(ev.connection.frame_point_index) << "," << std::to_string(ev.connection.frame_side_index) << ","
+               << std::to_string(ev.connection.polygon_point_index) << "," << std::to_string(ev.connection.polygon_side_index)
+               << std::endl;
+    };
+
     export2file(0,field.getElementaryFrame());
     exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
     export2file(2,field.getElementaryPieces());
     export2file(3,field.getFrame());
     export2file_with_id(4,field.getPieces());
     exportBool2file(5,field.getIsPlaced());
+
+    for(auto e : field.evaluate_cache){
+        exportEvaluateFile(6,e);
+    }
 }
 
 procon::NeoField NeoPolygonIO::importField(std::string file_path)
