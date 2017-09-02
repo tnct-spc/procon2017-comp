@@ -17,6 +17,7 @@
 #include <boost/geometry/io/wkt/wkt.hpp>
 #include <boost/geometry/multi/io/wkt/wkt.hpp>
 
+
 //もしデバックモードにしたければ下をコメントアウト
 #define DEBUG_MODE
 
@@ -85,6 +86,8 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
 bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 {
+    clock_t a1,a2,c1,c2,d1,d2,e1,e2;
+
     //角について枝切りできるかできないか
     auto about_angle = [&field](){
 
@@ -116,7 +119,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         }
     };
     //辺について枝きりできるかできないか
-    auto about_side = [&field](){
+    /*auto about_side = [&field](){
         //要素数の足し算、引き算
         auto calculation_nep = [](const procon::NeoExpandedPolygon &nep , int index , int cal){
             index = index + cal;
@@ -178,6 +181,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         bool angles = (std::get<1>(frame_sides.at(0)) < M_PI) || (std::get<2>(frame_sides.at(0)) < M_PI);
         return size_only && angles;
     };
+    */
     //対角線で枝きりできるか否か
     auto about_distance = [&field](){
         struct tool{                //関数内関数のための構造体
@@ -218,8 +222,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             }
         }
         if(most_piece > most_frame){
+            std::cout <<"対角線で枝きり"<<std::endl;
             return true;
         }
+        std::cout <<"対角線では無理だった"<<std::endl;
         return false;
     };
 
@@ -450,13 +456,36 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
         return true;
     };
-
-    //bool a = about_angle();
-    //bool b = about_side();
-    //bool c = about_framesize();
-    //bool d = about_distance();
+    //枝切り関数の時間計測部分
+/*
+    a1 = clock();
+    bool a = about_angle();
+    a2 = clock();
+    c1 = clock();
+    bool c = about_framesize();
+    c2 = clock();
+    d1 = clock();
+    bool d = about_distance();
+    d2 = clock();
+    e1 = clock();
     bool e = about_frameangle();//ここまで進んだ後に何も出力されず終了　多分これ動いてないぞ
-    return e;
+    e2 = clock();
+    std::cout << "aの実行時間は " << a2 - a1 <<std::endl;
+    std::cout << "cの実行時間は " << c2 - c1 <<std::endl;
+    std::cout << "dの実行時間は " << d2 - d1 <<std::endl;
+    std::cout << "eの実行時間は " << e2 - e1 <<std::endl;
+    return a || c || d || e;
+    */
+    //枝切り関数の時間計測終わり使わないときはコメントアウトで
+    bool a = about_distance();
+    if(a)return a;
+    bool b = about_angle();
+    if(b)return b;
+    bool c = about_framesize();
+    if(c)return c;
+    bool d = about_frameangle();
+    if(d)return d;
+    return false;
 }
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
@@ -545,3 +574,4 @@ void BeamSearch::run(procon::NeoField field)
         break;
     }
 }
+

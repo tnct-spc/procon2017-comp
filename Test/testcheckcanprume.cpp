@@ -96,7 +96,7 @@ procon::NeoField TestCheckCanPrume::makeField(){
     epNEP.resetPolygonForce(epPolygon_i);
     elementarypieces.push_back(epNEP);
     //isplaced true
-    bg::exterior_ring(epPolygon_i) = boost::assign::list_of<point_i>(0,0)(5,0)(5,1)(2,2)(0,2)(0,0);
+    bg::exterior_ring(epPolygon_i) = boost::assign::list_of<point_i>(0,0)(6,0)(6,1)(2,2)(0,2)(0,0);
     epNEP.resetPolygonForce(epPolygon_i);
     elementarypieces.push_back(epNEP);
     bg::exterior_ring(epPolygon_i) = boost::assign::list_of<point_i>(6,0)(9,0)(9,2)(6,2)(6,0);
@@ -207,7 +207,7 @@ bool TestCheckCanPrume::run(){
     nep.resetPolygonForce(boostPolygon_i);
     frame.push_back(nep);
 
-    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(5,0)(5,3)(3,5)(0,0);
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(0,0)(6,0)(6,3)(3,6)(0,0);
     bg::correct(boostPolygon_i);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Frame",false);
     nep.resetPolygonForce(boostPolygon_i);
@@ -241,7 +241,7 @@ bool TestCheckCanPrume::run(){
     nep.resetPolygonForce(boostPolygon_i);
     pieces.push_back(nep);
 
-    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(5,0)(0,0)(5,3)(5,0);
+    bg::exterior_ring(boostPolygon_i) = boost::assign::list_of<point_i>(7,0)(0,0)(7,3)(7,0);
     bg::correct(boostPolygon_i);
     NeoPolygonViewer::getInstance().displayPolygon(boostPolygon_i,"Piece",false);
     nep.resetPolygonForce(boostPolygon_i);
@@ -252,7 +252,7 @@ bool TestCheckCanPrume::run(){
 
 
     //検査用にProbMakerからテストパターンを引っ張る
-
+/*
     ProbMaker *PbMaker = new ProbMaker();
     PbMaker->show();
     std::vector<polygon_i> pieces_ = PbMaker->getPieces();
@@ -271,7 +271,7 @@ bool TestCheckCanPrume::run(){
 
     field.setElementaryPieces(neo_pieces);
     field.setFrame(neo_frame);
-
+*/
 
     //ここまでProbMakerからの部分　使わないならコメントアウトで
 
