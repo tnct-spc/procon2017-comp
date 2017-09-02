@@ -22,7 +22,7 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
 
-//    imageRecognitonTest();
+    //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
@@ -30,7 +30,7 @@ Kunugida::Kunugida(QWidget *parent) :
     tcp = std::make_shared<TcpMain>();
     board->show();
     tcp->show();
-//    board->setSingleMode(true);
+    //    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -75,8 +75,8 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
-//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-//        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+        //        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+        //        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -86,11 +86,15 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-    }else if(ui->ImageRecognitonTestCheckBox->isChecked()){
-        logger->info("Selected ImageRecognition");
-        imageRecognitonTest();
+        cv::Mat nocframe = cv::imread("/home/spc/ダウンロード/real_frame3.png", 1);
+        cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece3.png", 1);
+
+        ImageRecognition imrec;
+        field = imrec.run(nocframe, nocpieces);
+
+        //        imageRecognitonTest();
     }
-//    TODO: ここまでで各データソースから読み込むようにする
+    //    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
 
@@ -105,9 +109,9 @@ void Kunugida::run()
     solver->run(field,algorithm_number);
 
 
-//    QRLibrary lib;
-//    lib.Decoder(true);
-    
+    //    QRLibrary lib;
+    //    lib.Decoder(true);
+
     this->finishedProcess();
 }
 
