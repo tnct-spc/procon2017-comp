@@ -5,8 +5,10 @@
 #include "spdlog/spdlog.h"
 #include "Utils/polygonconnector.h"
 #include "Evaluation/evaluation.h"
+#include "Evaluation/evaluate.h"
 #include "neoanswerdock.h"
 
+/*
 class Evaluate {
 public:
     double score = -1;
@@ -16,6 +18,7 @@ public:
     int fields_index = -1;
     bool is_inversed = false;
 };
+*/
 
 class LightField
 {
