@@ -408,8 +408,9 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         int i = 0;
         for(const Evaluate &eva : field.evaluate_cache) {
             const std::vector<procon::NeoExpandedPolygon> &frames = (i == 0) ? field.getElementaryFrame() : field.getFrame();
+            const std::vector<procon::NeoExpandedPolygon> &pieces = eva.is_inversed ? field.getElementaryPieces() : field.getElementaryInversePieces();
             const procon::NeoExpandedPolygon &frame = frames.at(static_cast<unsigned int>(eva.frame_index));
-            const procon::NeoExpandedPolygon &piece = field.getElementaryPieces().at(static_cast<unsigned int>(eva.piece_index));
+            const procon::NeoExpandedPolygon &piece = pieces.at(static_cast<unsigned int>(eva.piece_index));
             const polygon_i &frame_polygon = frame.getPolygon();
             const polygon_i &piece_polygon = piece.getPolygon();
             const std::vector<point_i> &frame_outer = frame_polygon.outer();
@@ -439,20 +440,15 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
             out_points(piece_point, piece_side_point, eva.connection.polygon_point_index, eva.connection.polygon_side_index, false);
             std::cout << std::endl;
 
-            const std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> &result =
-                    PolygonConnector::connect(frame,
-                                              eva.is_inversed ?
-                                                  field.getElementaryPieces().at(static_cast<unsigned int>(eva.piece_index)) :
-                                                  field.getElementaryInversePieces().at(static_cast<unsigned int>(eva.piece_index)),
-                                              eva.connection);
+            const std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> result = PolygonConnector::connect(frame, piece, eva.connection);
 
             if(std::get<2>(result)) {
                 std::vector<procon::NeoExpandedPolygon> frames_buff = (i == 0) ? field.getElementaryFrame() : field.getFrame();
-                frames_buff.erase(std::begin(frames) + eva.frame_index);
 
                 for(const procon::NeoExpandedPolygon &result_frame : std::get<0>(result)) {
                     frames_buff.push_back(result_frame);
                 }
+                frames_buff.erase(frames.begin() + eva.frame_index);
                 field.setFrame(frames_buff);
                 field.setPiece(std::get<1>(result));
 
