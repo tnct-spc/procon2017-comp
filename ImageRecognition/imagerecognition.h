@@ -27,6 +27,12 @@ public:
         return raw_random_colors;
     }
 
+    typedef struct {
+        int x;
+        int y;
+        double error;
+    } error_t;
+
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
     std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
