@@ -210,8 +210,8 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
         procon::NeoField field_buf = fields[eval.fields_index];
         ConnectedResult connect_result = PolygonConnector::connect(fields[eval.fields_index].getFrame()[eval.frame_index]
                 ,eval.is_inversed
-                    ? fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
-                    : fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
+                    ? fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
+                    : fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
                 ,eval.connection
         );
 
