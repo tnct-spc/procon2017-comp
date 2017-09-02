@@ -336,7 +336,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     }
     drawPolygonPointNum();
     drawEvalution();
-    drawGrid();
+//    drawGrid();
 }
 
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
