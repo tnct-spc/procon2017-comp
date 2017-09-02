@@ -220,20 +220,20 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setBackground(QBrush(Qt::white));
 
-        int number=0;
-        for(auto polygon: polygon_list){
-            int count=0;
-            painter.setPen(QPen(QBrush(QColor(list[number])), 0.1));
-            for(auto point : polygon.outer()){
-                QPointF text_point = getPosition(point);
-                painter.drawText(text_point,QString::number(count));
-                ++count;
-            }
-            ++number;
-        }
+//        int number=0;
+//        for(auto polygon: polygon_list){
+//            int count=0;
+//            painter.setPen(QPen(QBrush(QColor(list[number])), 0.1));
+//            for(auto point : polygon.outer()){
+//                QPointF text_point = getPosition(point);
+//                painter.drawText(text_point,QString::number(count));
+//                ++count;
+//            }
+//            ++number;
+//        }
         painter.setPen(QPen(QBrush(QColor(236,182,138, 200)),0.1));
         int count=0;
-        for(auto frame : field.getElementaryFrame()){
+        for(auto frame : field.getFrame()){
             for(auto point : frame.getPolygon().outer()){
                 QPointF text_point = getPosition(point);
                 painter.drawText(text_point,QString::number(count));
