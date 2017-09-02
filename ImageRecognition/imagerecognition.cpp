@@ -56,7 +56,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        //NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
         //error = getError(pieces[i], i+1);
         //printf("%d : %f\n", i, error);
     }
