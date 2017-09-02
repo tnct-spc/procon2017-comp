@@ -405,24 +405,25 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
 
-        std::vector<procon::NeoExpandedPolygon> frames = field.getFrame();
-        std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
+        const std::vector<procon::NeoExpandedPolygon> &pieces = field.getElementaryPieces();
 
-        for(Evaluate eva : field.evaluate_cache) {
-            procon::NeoExpandedPolygon frame = frames.at(static_cast<unsigned int>(eva.frame_index));
-            procon::NeoExpandedPolygon piece = pieces.at(static_cast<unsigned int>(eva.piece_index));
-            polygon_i frame_polygon = frame.getPolygon();
-            polygon_i piece_polygon = piece.getPolygon();
-            std::vector<point_i> frame_outer = frame_polygon.outer();
-            std::vector<point_i> piece_outer = piece_polygon.outer();
-            point_i frame_point = frame_outer.at(static_cast<unsigned int>(eva.connection.frame_point_index));
-            point_i frame_side_point = frame_outer.at(static_cast<unsigned int>(eva.connection.frame_side_index));
-            point_i piece_point = piece_outer.at(static_cast<unsigned int>(eva.connection.polygon_point_index));
-            point_i piece_side_point = piece_outer.at(static_cast<unsigned int>(eva.connection.polygon_side_index));
+        int i = 0;
+        for(const Evaluate &eva : field.evaluate_cache) {
+            const std::vector<procon::NeoExpandedPolygon> &frames = (i == 0) ? field.getElementaryFrame() : field.getFrame();
+            const procon::NeoExpandedPolygon &frame = frames.at(static_cast<unsigned int>(eva.frame_index));
+            const procon::NeoExpandedPolygon &piece = pieces.at(static_cast<unsigned int>(eva.piece_index));
+            const polygon_i &frame_polygon = frame.getPolygon();
+            const polygon_i &piece_polygon = piece.getPolygon();
+            const std::vector<point_i> &frame_outer = frame_polygon.outer();
+            const std::vector<point_i> &piece_outer = piece_polygon.outer();
+            const point_i &frame_point = frame_outer.at(static_cast<unsigned int>(eva.connection.frame_point_index));
+            const point_i &frame_side_point = frame_outer.at(static_cast<unsigned int>(eva.connection.frame_side_index));
+            const point_i &piece_point = piece_outer.at(static_cast<unsigned int>(eva.connection.polygon_point_index));
+            const point_i &piece_side_point = piece_outer.at(static_cast<unsigned int>(eva.connection.polygon_side_index));
 
-            auto out_points = [](point_i point1, point_i point2)
+            auto out_points = [](const point_i &point1, const point_i &point2)
             {
-                auto out_point = [](point_i point)
+                auto out_point = [](const point_i &point)
                 {
                     std::cout << "(" << point.x() << ", " << point.y() << ")";
                 };
@@ -439,6 +440,22 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
             std::cout << " :  piece : ";
             out_points(piece_point, piece_side_point);
             std::cout << std::endl;
+
+            const std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> &result = PolygonConnector::connect(frame, piece, eva.connection);
+            if(std::get<2>(result)) {
+                std::vector<procon::NeoExpandedPolygon> frames_buff = (i == 0) ? field.getElementaryFrame() : field.getFrame();
+                frames_buff.erase(std::begin(frames) + eva.frame_index);
+                for(const procon::NeoExpandedPolygon &result_frame : std::get<0>(result)) {
+                    frames_buff.push_back(result_frame);
+                }
+                field.setFrame(frames_buff);
+                field.setPiece(std::get<1>(result));
+                this->show();
+            } else {
+                std::cout << "結合に失敗しました。" << std::endl;
+                break;
+            }
+            ++i;
         }
     }
 }
