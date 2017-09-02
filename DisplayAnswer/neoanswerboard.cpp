@@ -3,6 +3,7 @@
 #include "neoanswerdock.h"
 #include "neopolygonio.h"
 #include "Utils/polygonconnector.h"
+#include "neopolygonviewer.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
@@ -449,12 +450,14 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         nad->show();
         for(Evaluate i : this->field.evaluate_cache){
             count++;
-            auto connected = PolygonConnector::connect(newField.getFrame().at(i.frame_index),
+            std::tuple<std::vector<procon::NeoExpandedPolygon> , procon::NeoExpandedPolygon , bool> connected = PolygonConnector::connect(newField.getFrame().at(i.frame_index),
                                                        newField.getElementaryPieces().at(i.piece_index),
                                                        i.connection);
             if(std::get<2>(connected)){
                 newField.setFrame(std::get<0>(connected));
                 newField.setPiece(std::get<1>(connected));
+                procon::NeoExpandedPolygon nep = std::get<1>(connected);
+                NeoPolygonViewer::getInstance().displayPolygon(nep.getPolygon(),"hello",false);
                 newField.setIsPlaced(i.piece_index);
                 std::cout<<"----------------"<<count<<"回目-------------------"<<std::endl;
                 std::cout<<"frame_side_index = "<<i.connection.frame_side_index
