@@ -16,8 +16,8 @@
 #include <QStringList>
 #include <QVector>
 #include "neofield.h"
+#include "expandedpolygon.h"
 #include "neoexpandedpolygon.h"
-#include <math.h>
 #include <QMessageBox>
 
 namespace Ui {
@@ -34,12 +34,14 @@ public:
     void setField(procon::NeoField input_field);
     void setSingleMode(bool inp);
     void setText(std::string text);
+    void setScannedPieces(std::vector<procon::ExpandedPolygon> vec);
     void setUp();
 
 private:
     int frame_margin;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
+    QPointF getPiecePosition(point_t point);
     void setField();
     QPointF getPosition(point_i point);
     void firstField();
@@ -47,6 +49,7 @@ private:
     int grid_size;
     int top_bottom_margin;
     int down_up_y;
+    std::vector<procon::ExpandedPolygon> scanned_poly;
     procon::NeoField field;
 
     // Only field mode
@@ -73,6 +76,7 @@ protected:
     void beforePolygon();
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // NEOANSWERBOARD_H

@@ -1,7 +1,6 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
-
-//TODO: is_inversedに対応する（ピースが反転しているか否か可視化）
+#include "neopolygonio.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
@@ -187,15 +186,15 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     //処理前ピースを描画
-    auto drawBeforePiece = [&](int pnum){
-        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
-        painter.setBrush(QBrush(QColor(list[pnum])));
-        int pcount = field.getPiece(pnum).getSize();
-        QPointF points[pcount];
-        for(int locate = 0; locate < pcount; locate++){
-            points[locate] = getPiecePosition(field.getPiece(pnum).getPolygon().outer().at(locate));
-        }
-        painter.drawPolygon(points,pcount);
+    auto drawBeforePiece = [&](procon::ExpandedPolygon expanded_poly){
+            polygon_t poly = expanded_poly.getPolygon();
+            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+            painter.setBrush(QBrush(QColor(expanded_poly.getId())));
+            std::vector<QPointF> points;
+            for(auto point : poly.outer()){
+                points.push_back(getPiecePosition(point));
+            }
+            painter.drawPolygon(&points.front(),points.size());
     };
 
     //ピースIdを描画
@@ -296,7 +295,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
 
     }else{
-
+        for(auto poly : scanned_poly){
+            drawBeforePiece(poly);
+        }
         for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
             drawBeforePiece(piece_num);
         }
@@ -411,6 +412,9 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
+    scanned_poly = vec;
+}
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
     int pointx = point.x() + frame_margin/2;
@@ -419,6 +423,12 @@ QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgrid�
 }
 
 QPointF NeoAnswerBoard::getPiecePosition(point_i point){//point_iを下画面の枠と対応させるようにQPointFに変換する
+    int pointx = point.x() + frame_margin/2;
+    int pointy = point.y() + frame_margin/2;
+    return QPointF(left_right_margin + pointx * grid_size, down_up_y + pointy * grid_size);
+}
+
+QPointF NeoAnswerBoard::getPiecePosition(point_t point){//point_iを下画面の枠と対応させるようにQPointFに変換する
     int pointx = point.x() + frame_margin/2;
     int pointy = point.y() + frame_margin/2;
     return QPointF(left_right_margin + pointx * grid_size, down_up_y + pointy * grid_size);
@@ -441,5 +451,12 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
         }
         this->update();
+    }
+}
+
+void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::MouseButton::RightButton){
+        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
     }
 }

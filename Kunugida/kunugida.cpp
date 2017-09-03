@@ -5,6 +5,7 @@
 #include "probmaker.h"
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
+#include "neopolygonio.h"
 
 #include <iostream>
 
@@ -12,6 +13,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QMessageBox>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
@@ -25,11 +27,10 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     board = std::make_shared<NeoAnswerBoard>();
-    dock_board = std::make_shared<NeoAnswerDock>();
+    tcp = std::make_shared<TcpMain>();
     board->show();
-    board->setSingleMode(true);
-    dock_board->show();
-
+    tcp->show();
+//    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -66,12 +67,31 @@ void Kunugida::run()
             pieces.push_back(buf);
             ++id;
             //break;
+
         }
         frame.resetPolygonForce(frame_);
         std::vector<procon::NeoExpandedPolygon> vec_frame;
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
+        std::vector<procon::ExpandedPolygon> expanded_pieces;
+        for(auto &piece_i : pieces_){
+            polygon_t piece_t;
+            for(auto &point : piece_i.outer()){
+                int double_point_x = point.x();
+                int double_point_y = point.y();
+                piece_t.outer().push_back(point_t(double_point_x,double_point_y));
+            }
+            bg::correct(piece_t);
+
+            procon::ExpandedPolygon ex_poly;
+            ex_poly.resetPolygonForce(piece_t);
+            expanded_pieces.push_back(ex_poly);
+        }
+        board->setScannedPieces(expanded_pieces);
+
+//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+//        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -81,16 +101,23 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
+    }else if(ui->ImageRecognitonTestCheckBox->isChecked()){
+        logger->info("Selected ImageRecognition");
+        imageRecognitonTest();
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 
-//    TODO: algorithm_numberをGUIで選択できるようにする
     int algorithm_number = 0;
 
+    if(ui->test_algorithm_button->isChecked()){
+        algorithm_number = 0;
+    } else if (ui->beamsearch_button->isChecked()) {
+        algorithm_number = 1;
+    }
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
-    solver->run(field,0);
+    solver->run(field,algorithm_number);
 
 
 //    QRLibrary lib;
@@ -115,7 +142,7 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setUp();
-   this->dock_board->addAnswer(field);
+   this->board->setField(field);
 }
 
 void Kunugida::finishedProcess()
@@ -132,9 +159,9 @@ void Kunugida::imageRecognitonTest()
 {
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
-    cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/piece3.png", 1);
+    cv::Mat nocframe = cv::imread("/home/spc/ダウンロード/real_frame3.png", 1);
+    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece3.png", 1);
 
     ImageRecognition imrec;
-    procon::Field PDATA = imrec.run(nocframe, nocpieces);
+    procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
 }
