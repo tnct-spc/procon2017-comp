@@ -22,7 +22,7 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
 
-//    imageRecognitonTest();
+    //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
@@ -30,7 +30,7 @@ Kunugida::Kunugida(QWidget *parent) :
     tcp = std::make_shared<TcpMain>();
     board->show();
     tcp->show();
-//    board->setSingleMode(true);
+    //    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -92,8 +92,8 @@ void Kunugida::run()
         }
         board->setScannedPieces(expanded_pieces);
 
-//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-//        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+        //        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+        //        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -103,11 +103,23 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-    }else if(ui->ImageRecognitonTestCheckBox->isChecked()){
-        logger->info("Selected ImageRecognition");
-        imageRecognitonTest();
+        cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame.png", 1);
+        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pices.png", 1);
+
+        ImageRecognition imrec;
+        field = imrec.run(frame, pieces);
+
+        //        imageRecognitonTest();
     }
-//    TODO: ここまでで各データソースから読み込むようにする
+
+    for(auto const& p : field.getPieces()){
+        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
+    }
+
+    for(auto const& p : field.getFrame()){
+        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
+    }
+    //    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
 
@@ -122,9 +134,9 @@ void Kunugida::run()
     solver->run(field,algorithm_number);
 
 
-//    QRLibrary lib;
-//    lib.Decoder(true);
-    
+    //    QRLibrary lib;
+    //    lib.Decoder(true);
+
     this->finishedProcess();
 }
 
