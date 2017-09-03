@@ -51,6 +51,7 @@ private:
     polygon_i placeGrid(polygon_t vertex);
     double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
+    std::vector<procon::ExpandedPolygon> getPolygonPosition();
 
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;
@@ -60,6 +61,8 @@ private:
     static constexpr double cutting_allowance = 0.0;
     std::vector<int> area;
     int field_num;
+    std::vector<procon::ExpandedPolygon> position;
+    int id = 0;
 };
 
 #endif // IMAGERECOGNITION_H

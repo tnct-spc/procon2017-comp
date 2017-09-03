@@ -62,6 +62,8 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     error = getError(pieces);
 
+    std::vector<procon::ExpandedPolygon> test = getPolygonPosition();
+
     // fieldクラスのデータに変換
     procon::NeoField field = makeNeoField(pieces);
 
@@ -914,6 +916,12 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     }
     polygon.push_back(polygon.at(0));
 
+    // 確認用
+    procon::ExpandedPolygon pos(id);
+    pos.resetPolygonForce(vertex);
+    position.push_back(pos);
+    id++;
+
     // ９０度の角を持つピースはそこを基準に計算
     bool right_angle = false;
 
@@ -1156,7 +1164,7 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
     std::vector<procon::NeoExpandedPolygon> neo_pieces;
 
     for (unsigned int i=0; i<pieces.size() - (unsigned int)field_num; i++) {
-        procon::NeoExpandedPolygon polygon;
+        procon::NeoExpandedPolygon polygon(i);
         polygon.resetPolygonForce(pieces[i]);
         neo_pieces.push_back(polygon);
 
@@ -1191,4 +1199,13 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
     field.setElementaryFrame(neo_frame);
 
     return field;
+}
+
+std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
+{
+    if (position.size() > 0) {
+        position.pop_back();
+    }
+
+    return position;
 }
