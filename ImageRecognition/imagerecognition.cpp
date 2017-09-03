@@ -1168,6 +1168,20 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
     std::vector<procon::NeoExpandedPolygon> neo_frame;
 
     for (int i=0; i<field_num; i++) {
+
+        int smallest_x = 0;
+        int smallest_y = 0;
+        auto& outer = pieces[pieces.size() - 1 - i].outer();
+
+        for (unsigned int j=0; j<outer.size(); j++) {
+            if (smallest_x > outer.at(j).x()) smallest_x = outer.at(j).x();
+            if (smallest_y > outer.at(j).y()) smallest_y = outer.at(j).y();
+        }
+
+        for (unsigned int j=0; j<outer.size(); j++) {
+            outer.at(j) = point_i(outer.at(j).x() - smallest_x, outer.at(j).y() - smallest_y);
+        }
+
         procon::NeoExpandedPolygon polygon;
         polygon.resetPolygonForce(pieces[pieces.size() - 1 - i]);
         neo_frame.push_back(polygon);
