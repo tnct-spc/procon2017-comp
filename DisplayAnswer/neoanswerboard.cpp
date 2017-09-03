@@ -189,7 +189,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     auto drawBeforePiece = [&](procon::ExpandedPolygon expanded_poly){
             polygon_t poly = expanded_poly.getPolygon();
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
-            painter.setBrush(QBrush(QColor(expanded_poly.getId())));
+            painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
             std::vector<QPointF> points;
             for(auto point : poly.outer()){
                 points.push_back(getPiecePosition(point));

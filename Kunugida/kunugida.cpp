@@ -75,6 +75,7 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
         std::vector<procon::ExpandedPolygon> expanded_pieces;
+        id = 1;
         for(auto &piece_i : pieces_){
             polygon_t piece_t;
             for(auto &point : piece_i.outer()){
@@ -84,9 +85,10 @@ void Kunugida::run()
             }
             bg::correct(piece_t);
 
-            procon::ExpandedPolygon ex_poly;
+            procon::ExpandedPolygon ex_poly(id);
             ex_poly.resetPolygonForce(piece_t);
             expanded_pieces.push_back(ex_poly);
+            id++;
         }
         board->setScannedPieces(expanded_pieces);
 
@@ -164,4 +166,5 @@ void Kunugida::imageRecognitonTest()
 
     ImageRecognition imrec;
     procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
+    board->setScannedPieces(imrec.getPolygonPosition());
 }

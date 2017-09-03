@@ -14,6 +14,7 @@ class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 
 public:
     procon::NeoField run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
+    std::vector<procon::ExpandedPolygon> getPolygonPosition();
 
     const cv::Mat& getRawPiecesPic(){
         return raw_colored_pic;
@@ -51,7 +52,6 @@ private:
     polygon_i placeGrid(polygon_t vertex);
     double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
-    std::vector<procon::ExpandedPolygon> getPolygonPosition();
 
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;
