@@ -89,7 +89,8 @@ void Kunugida::run()
 
     }else if(ui->csv_button->isChecked()){
         //csv date
-
+        std::string pieces_path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
+        field = NeoPolygonIO::importField(pieces_path);
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 
