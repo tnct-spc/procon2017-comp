@@ -437,6 +437,15 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
     }else if(event->button() == Qt::MouseButton::LeftButton){
+        static bool haveCame = false;
+        if(haveCame) return;
+        haveCame = true;
+
+        NeoAnswerDock *nad = new NeoAnswerDock();
+        nad->setWindowTitle("career");
+        nad->show();
+
+        //fieldのリセット
         auto reset_neo_field = [](procon::NeoField input_field){
             procon::NeoField output_field;
             output_field.setFrame(input_field.getElementaryFrame());
@@ -445,9 +454,8 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
             return output_field;
         };
         procon::NeoField newField = reset_neo_field(this->field);
+
         int count = 0;
-        NeoAnswerDock *nad = new NeoAnswerDock();
-        nad->show();
         for(Evaluate i : this->field.evaluate_cache){
             count++;
             std::tuple<std::vector<procon::NeoExpandedPolygon> , procon::NeoExpandedPolygon , bool> connected = PolygonConnector::connect(newField.getFrame().at(i.frame_index),

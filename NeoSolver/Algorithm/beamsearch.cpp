@@ -470,9 +470,9 @@ void BeamSearch::run(procon::NeoField field)
             }
         }
 
-//        if(piece_num == 40){
-//            break;
-//        }
+        if(piece_num == 2){
+            break;
+        }
     }
 
     //    neo = std::make_shared<NeoAnswerDock>();
