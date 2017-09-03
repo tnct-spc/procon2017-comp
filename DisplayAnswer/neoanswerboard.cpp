@@ -437,6 +437,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
     }else if(event->button() == Qt::MouseButton::LeftButton){
+        //二回目以上クリックされたら困る
         static bool haveCame = false;
         if(haveCame) return;
         haveCame = true;
@@ -458,9 +459,13 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         int count = 0;
         for(Evaluate i : this->field.evaluate_cache){
             count++;
-            std::tuple<std::vector<procon::NeoExpandedPolygon> , procon::NeoExpandedPolygon , bool> connected = PolygonConnector::connect(newField.getFrame().at(i.frame_index),
-                                                       newField.getElementaryPieces().at(i.piece_index),
-                                                       i.connection);
+            std::tuple<std::vector<procon::NeoExpandedPolygon> , procon::NeoExpandedPolygon , bool> connected = PolygonConnector::connect(
+                        newField.getFrame().at(i.frame_index),
+                        i.is_inversed
+                            ? newField.getElementaryInversePieces().at(i.piece_index)
+                            : newField.getElementaryPieces().at(i.piece_index),
+                        i.connection
+            );
             if(std::get<2>(connected)){
                 newField.setFrame(std::get<0>(connected));
                 newField.setPiece(std::get<1>(connected));
