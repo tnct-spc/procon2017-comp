@@ -38,6 +38,7 @@ public:
     void setUp();
 
 private:
+    double poly_size;
     int frame_margin;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
