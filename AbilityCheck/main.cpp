@@ -11,6 +11,7 @@
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
 
+
 namespace bg = boost::geometry;
 
 typedef bg::model::d2::point_xy<int> point;
@@ -64,9 +65,6 @@ int main(int argc, char *argv[])
     for(auto& th : threads){
 //        th = std::
     }
-
-
-
 
     return 0;
 }

@@ -5,6 +5,7 @@
 #include "probmaker.h"
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
+#include "neopolygonio.h"
 
 #include <iostream>
 
@@ -29,6 +30,7 @@ Kunugida::Kunugida(QWidget *parent) :
     tcp = std::make_shared<TcpMain>();
     board->show();
     tcp->show();
+//    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -65,12 +67,16 @@ void Kunugida::run()
             pieces.push_back(buf);
             ++id;
             //break;
+
         }
         frame.resetPolygonForce(frame_);
         std::vector<procon::NeoExpandedPolygon> vec_frame;
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
+
+//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+//        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner

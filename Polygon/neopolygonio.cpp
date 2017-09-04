@@ -51,6 +51,12 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
         }
     };
 
+    auto export2file_with_id = [&](int state,const std::vector<procon::NeoExpandedPolygon> & polygons){
+        for(const auto& p : polygons){
+            output << std::to_string(state) << "," << std::to_string(p.getId()) << "," << polygon2string(p.getPolygon()) << std::endl;
+        }
+    };
+
     auto exportDoubleVector2file = [&](int state,const std::vector<std::vector<procon::NeoExpandedPolygon>> polygonss){
         for (int i = 0; i < polygonss.size(); ++i) {
             for(const auto& p : polygonss[i]){
@@ -72,7 +78,7 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
     exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
     export2file(2,field.getElementaryPieces());
     export2file(3,field.getFrame());
-    export2file(4,field.getPieces());
+    export2file_with_id(4,field.getPieces());
     exportBool2file(5,field.getIsPlaced());
 }
 
@@ -83,60 +89,62 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     std::string line_buffer = "";
     std::string x, y;
     procon::NeoField import_field;
+    int mode;
 
     //polygon2string
-    std::vector<procon::NeoExpandedPolygon> polygons;
+    std::vector<procon::NeoExpandedPolygon> elementary_frame;
+    std::vector<procon::NeoExpandedPolygon> elementary_piece;
+    std::vector<procon::NeoExpandedPolygon> frame;
 
     //bool2file
     std::array<bool, 50> is_placed;
 
+    //polygon_i _frame;
+    //std::getline(input, line_buffer);
+
     while(std::getline(input,line_buffer)){
         polygon_i hoge;
+        hoge.clear();
         std::string point_buffer = "";
         std::istringstream line_stream(line_buffer);
         std::getline(line_stream,point_buffer,',');
-        int mode = std::stoi(point_buffer);
+        mode = std::stoi(point_buffer);
 
-        //polygon2string
-        if(mode == 0 || mode == 2){
+        if(mode == 5){
+            std::string data;
+            int array = 0;
+            while(std::getline(line_stream, data, ',')){
+                if(data == "0"){
+                    is_placed[array] = false;
+                }else{
+                    is_placed[array] = true;
+                }
+                ++array;
+            }
+        }else{
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
-                hoge.outer().push_back(polygon_i(std::stoi(x), std::stoi(y)));
+                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
             }
-            int count = 0;
-            for(auto &p : hoge){
-                procon::NeoExpandedPolygon polygon(count);
-                polygon.resetPolygonForce(p);
-                polygons.push_back(frame);
-                ++count;
-            }
+            procon::NeoExpandedPolygon polygon;
+            polygon.resetPolygonForce(hoge);
+            if(mode == 4)
+                import_field.setPiece(polygon);
             if(mode == 0)
-                import_field.setElementaryFrame(polygons);
+                elementary_frame.push_back(polygon);
             if(mode == 2)
-                import_field.setElementaryPieces(polygons);
+                elementary_piece.push_back(polygon);
             if(mode == 3)
-                import_field.setFrame(polygons);
-            if(mode == 4){
-                for(auto &p : polygons){
-                    import_field.field_pieces.push_back(p);
-                }
-            }
+                frame.push_back(polygon);
+
         }
-
-        //bool2file
-        if(mode == 5){
-            int js;
-            while(std::getline(line_stream, js, ',')){
-                if(js == "0"){
-                    is_placed = false;
-                 }else{
-                    is_placed = true;
-                }
-            }
-        }
-
-
     }
+    import_field.setElementaryFrame(elementary_frame);
+    import_field.setElementaryPieces(elementary_piece);
+    import_field.setFrame(frame);
+
+    return import_field;
+}
 
 }
 

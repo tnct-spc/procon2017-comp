@@ -70,6 +70,7 @@ protected:
     void beforePolygon();
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // NEOANSWERBOARD_H
