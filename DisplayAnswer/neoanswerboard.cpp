@@ -467,7 +467,13 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                         i.connection
             );
             if(std::get<2>(connected)){
-                newField.setFrame(std::get<0>(connected));
+                std::vector<procon::NeoExpandedPolygon> field_frame = field.getFrame();
+                std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
+                for(procon::NeoExpandedPolygon nep : newframe){
+                    field_frame.push_back(nep);
+                }
+                field_frame.erase(field_frame.begin() + i.frame_index);
+                newField.setFrame(field_frame);
                 newField.setPiece(std::get<1>(connected));
                 procon::NeoExpandedPolygon nep = std::get<1>(connected);
                 NeoPolygonViewer::getInstance().displayPolygon(nep.getPolygon(),"hello",false);
