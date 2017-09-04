@@ -7,6 +7,7 @@
 #include "neoanswerdock.h"
 #include "imagerecognition.h"
 #include "neofield.h"
+#include "http/request_mapper.h"
 
 namespace Ui {
 class Kunugida;
@@ -29,6 +30,12 @@ private:
     std::shared_ptr<NeoAnswerBoard> board;
     void finishedProcess();
     void startProcess();
+
+    // Network
+    RequestMapper request_mapper;
+    procon::NeoField PDATA;
+    bool first_answer_flag = true;
+    procon::NeoField best_answer;
 
 private slots:
     void clickedRunButton();

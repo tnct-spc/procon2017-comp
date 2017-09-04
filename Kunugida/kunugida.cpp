@@ -41,7 +41,9 @@ void Kunugida::run()
     logger->info("Run Button Clicked");
 
     procon::NeoField field;
-    TcpServer server;
+
+    // Server
+    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker

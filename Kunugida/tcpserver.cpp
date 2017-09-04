@@ -12,6 +12,8 @@ TcpServer::TcpServer(QObject *parent) :
     }else{
         qDebug() << "Server started.";
     }
+
+    connect(this, SIGNAL(request()), this, SLOT(send()));
 }
 
 void TcpServer::newConnection()
@@ -20,4 +22,19 @@ void TcpServer::newConnection()
     socket->write("Welcome");
     socket->flush();
     socket->waitForBytesWritten(3000);
+}
+
+void TcpServer::getRequest()
+{
+    emit request();
+}
+
+void TcpServer::send()
+{
+    NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/field.csv");
+}
+
+void TcpServer::setField(procon::NeoField input_field)
+{
+    field = input_field;
 }
