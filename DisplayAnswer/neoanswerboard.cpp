@@ -187,14 +187,15 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //処理前ピースを描画
     auto drawBeforePiece = [&](procon::ExpandedPolygon expanded_poly){
-            polygon_t poly = expanded_poly.getPolygon();
-            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
-            painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
-            std::vector<QPointF> points;
-            for(auto point : poly.outer()){
-                points.push_back(getPiecePosition(point));
-            }
-            painter.drawPolygon(&points.front(),points.size());
+        polygon_t poly = expanded_poly.getPolygon();
+        std::cout << bg::dsv(poly) << std::endl;
+        painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+        painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
+        std::vector<QPointF> points;
+        for(auto point : poly.outer()){
+            points.push_back(getPiecePosition(point));
+        }
+        painter.drawPolygon(&points.front(),points.size());
     };
 
     //ピースIdを描画
@@ -298,9 +299,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         for(auto poly : scanned_poly){
             drawBeforePiece(poly);
         }
-        for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
-            drawBeforePiece(piece_num);
-        }
+        std::cout << "end" << std::endl << std::endl;
+      //  for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
+      //      drawBeforePiece(piece_num);
+      //  }
 
         if(paintif){
             //初期ピース&番号&処理線を描画
@@ -414,6 +416,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
     scanned_poly = vec;
+    std::cout << "scannedpieces set  " << vec.size() << std::endl;
 }
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
@@ -451,6 +454,14 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
         }
         this->update();
+    }
+
+    for(auto frame :field.getElementaryFrame()){
+        std::cout << "frame data : " << bg::dsv(frame.getPolygon()) << std::endl;
+        for(auto point : frame.getPolygon().outer()){
+            if(point.x() > 101 || point.x() < 0)std::cout << "framepoint x error!!!!!!!!!!" << std::endl;
+            if(point.y() > 65 || point.y() < 0)std::cout << "framepoint y error!!!!!!!!!!" << std::endl;
+        }
     }
 }
 
