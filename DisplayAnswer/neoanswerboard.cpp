@@ -191,7 +191,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         polygon_t trans_poly;
 
 
-        bg::strategy::transform::scale_transformer<double , 2, 2> trans_scale(0.03);//適当に設定
+        bg::strategy::transform::scale_transformer<double , 2, 2> trans_scale(1 / poly_size);//逆数を使って適当に設定
         bg::transform(poly,trans_poly,trans_scale);
         //std::cout << bg::dsv(poly) << std::endl;
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
