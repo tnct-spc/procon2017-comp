@@ -6,6 +6,7 @@
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
+#include "tcpserver.h"
 
 #include <iostream>
 
@@ -27,9 +28,7 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     board = std::make_shared<NeoAnswerBoard>();
-    tcp = std::make_shared<TcpMain>();
     board->show();
-    tcp->show();
 }
 
 Kunugida::~Kunugida()
@@ -42,6 +41,7 @@ void Kunugida::run()
     logger->info("Run Button Clicked");
 
     procon::NeoField field;
+    TcpServer server;
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
