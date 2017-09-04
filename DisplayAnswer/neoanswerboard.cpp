@@ -302,20 +302,20 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
       //  for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
       //      drawBeforePiece(piece_num);
       //  }
-        /*
+
         if(paintif){
             //初期ピース&番号&処理線を描画
             if(point_id == 0){
                 if(field.getPiecesSize() >= 1){
-                    drawAfterPiece(red_id);
+                    drawAfterPiece(field.getPiece(red_id));
                    // drawProcessingLine(red_id, false);
-                    drawPieceId(red_id);
+                    drawPieceId(field.getPiece(red_id));
                 }
                 if(field.getPiecesSize() >= 2){
                     ++point_id;
-                    drawAfterPiece(blue_id);
+                    drawAfterPiece(field.getPiece(blue_id));
                    // drawProcessingLine(blue_id, true);
-                    drawPieceId(blue_id);
+                    drawPieceId(field.getPiece(blue_id));
                 }
             }
 
@@ -326,38 +326,38 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                     red_id = point_id;
                     if(red_id > blue_id){
                         for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                            drawAfterPiece(piecenumber);
-                            drawPieceId(piecenumber);
+                            drawAfterPiece(field.getPiece(piecenumber));
+                            drawPieceId(field.getPiece(piecenumber));
                         }
                     }else{
                         for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                            drawAfterPiece(piecenumber);
-                            drawPieceId(piecenumber);
+                            drawAfterPiece(field.getPiece(piecenumber));
+                            drawPieceId(field.getPiece(piecenumber));
                         }
                     }
 
-                    drawProcessingLine(blue_id, true);
-                    drawProcessingLine(red_id, false);
+                    drawProcessingLine(field.getPiece(blue_id), true);
+                    drawProcessingLine(field.getPiece(red_id), false);
                 //青
                 }else{
                     blue_id = point_id;
                     if(red_id > blue_id){
                         for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                            drawAfterPiece(piecenumber);
-                            drawPieceId(piecenumber);
+                            drawAfterPiece(field.getPiece(piecenumber));
+                            drawPieceId(field.getPiece(piecenumber));
                         }
                  }else{
                         for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                            drawAfterPiece(piecenumber);
-                            drawPieceId(piecenumber);
+                            drawAfterPiece(field.getPiece(piecenumber));
+                            drawPieceId(field.getPiece(piecenumber));
                         }
                     }
-                    drawProcessingLine(red_id, false);
-                    drawProcessingLine(blue_id, true);
+                    drawProcessingLine(field.getPiece(red_id), false);
+                    drawProcessingLine(field.getPiece(blue_id), true);
                 }
             }
             paintif = false;
-        }*/
+        }
     }
     drawPolygonPointNum();
     drawEvalution();
