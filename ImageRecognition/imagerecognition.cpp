@@ -790,6 +790,9 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
         }
     }
 
+    cv::Mat resize_image;
+    cv::resize(piece_image, resize_image, cv::Size(), n, n);
+
     return piece_image;
 }
 
