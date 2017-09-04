@@ -711,6 +711,47 @@ polygon_i ProbMaker::getFrame()
 {
     return frame;
 }
+int ProbMaker::retRnd(int num){
+    std::random_device rand;
+    std::mt19937 mt(rand());
+    std::uniform_int_distribution<int> rnd(0,num-1);//randomを返すだけ
+    return rnd(mt);
+}
+void ProbMaker::makeHint(){
+    double instanceHintsNumber = print_polygons.size() * 0.8;
+    std::vector<polygon_i> piece = print_polygons;
+    int HintsNumber = instanceHintsNumber;
+    while(HintsNumber % 4 != 0){
+        HintsNumber++;
+    }
+    HintsNumber = HintsNumber / 4;
+    //ヒント一段階目
+    for(int i = 0; i < HintsNumber;i++){
+        int rnd = retRnd(piece.size());
+       polygon_i instancepiece = piece.at(rnd);
+       piece.erase(piece.begin() + rnd);
+       int counter = 0;
+       for(auto point_a : instancepiece.outer()){
+           int point_x = point_a.x();
+           int point_y = point_a.y();
+           if(counter != 0){
+               if(counter == 1){
+                   disposition1 += ":";
+                   disposition1 += std::to_string(point_x);
+                   disposition1 += " ";
+                   disposition1 += std::to_string(point_y);
+               }
+               if(counter != 1){
+                   disposition1 += " ";
+                   disposition1 += std::to_string(point_x);
+                   disposition1 += " ";
+                   disposition1 += std::to_string(point_y);
+               }
+           }
+           counter++;
+                }
+            }
+}
 
 void ProbMaker::paintEvent(QPaintEvent *)
 {

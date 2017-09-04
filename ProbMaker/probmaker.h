@@ -19,6 +19,10 @@ public:
     void GA();
     std::vector<polygon_i> getPieces();
     polygon_i getFrame();
+    void makeHint();
+    std::string  shapeHints;
+    std::string disposition1,disposition2,disposition3,disposition4;
+    int retRnd(int num);
 
 private:
     Ui::ProbMaker *ui;
