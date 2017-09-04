@@ -104,7 +104,6 @@ ProbMaker::ProbMaker(QWidget *parent) :
     GA();
     makeHint();
     std::cout <<disposition1<<std::endl;
-    std::cout <<disposition2<<std::endl;
 }
 
 ProbMaker::~ProbMaker()
