@@ -180,14 +180,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //処理前ピースを描画
     auto drawBeforePiece = [&](procon::ExpandedPolygon expanded_poly){
         polygon_t poly = expanded_poly.getPolygon();
-        std::cout << bg::dsv(poly) << std::endl;//ここは実行できてますねぇ
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
-        std::cout << "drawbefore" << std::endl;
         painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
         std::vector<QPointF> points;
-        std::cout << "drawbefore" << std::endl;
         for(auto point : poly.outer()){
-            std::cout << bg::dsv(point) << std::endl;
             points.push_back(getPiecePosition(point));
         }
         painter.drawPolygon(&points.front(),points.size());
@@ -292,7 +288,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     }else{
         for(auto poly : scanned_poly){
-        std::cout << "scanned" << std::endl;
             drawBeforePiece(poly);
         }
       //  for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
@@ -415,7 +410,6 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
     for(auto expanded_poly : scanned_poly){
 
         polygon_t poly = expanded_poly.getPolygon();
-        std::cout << "テスト用" << std::endl;
         double max_x=-10000;//ここ頭悪い
         double max_y=-10000;
         for(auto point : poly.outer()){
@@ -431,9 +425,7 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
 
         if(check_poly_size>poly_size)poly_size = check_poly_size;
     }
-    std::cout << "poly_size : " << poly_size << std::endl;
     for(auto& expanded_poly : scanned_poly){
-        std::cout << "テスト用" << std::endl;
         polygon_t poly = expanded_poly.getPolygon();
 
         polygon_t trans_poly;
@@ -483,7 +475,6 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     }
 
     for(auto frame :field.getElementaryFrame()){
-        std::cout << "frame data : " << bg::dsv(frame.getPolygon()) << std::endl;
         for(auto point : frame.getPolygon().outer()){
             if(point.x() > 101 || point.x() < 0)std::cout << "framepoint x error!!!!!!!!!!" << std::endl;
             if(point.y() > 65 || point.y() < 0)std::cout << "framepoint y error!!!!!!!!!!" << std::endl;
