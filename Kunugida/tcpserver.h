@@ -17,10 +17,12 @@ public:
 
 signals:
     void request();
+    void ready();
 
 public slots:
     void newConnection();
     void send();
+    void receive();
 
 private:
     QTcpServer *server;
