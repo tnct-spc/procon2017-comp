@@ -146,6 +146,4 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     return import_field;
 }
 
-}
-
 
