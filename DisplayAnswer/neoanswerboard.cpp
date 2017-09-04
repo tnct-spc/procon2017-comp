@@ -489,6 +489,11 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count) + ".csv";
                 NeoPolygonIO::exportPolygon(newField , path);
 #endif
+            } else {
+                std::cout << "結合失敗" << std::endl;
+                nad->deleteLater();
+                QMessageBox::warning(nad, tr("エラー"), tr("結合失敗！"));
+                break;
             }
         }
     }
