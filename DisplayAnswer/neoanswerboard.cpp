@@ -176,29 +176,18 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             painter.drawPolygon(&points.front(),points.size());
     };
 
-    //下画面フレームを描画
-    auto drawDownBackground = [&]{
-        painter.setBrush(QBrush(QColor(Qt::white)));
-        painter.drawRect(QRect(left_right_margin,
-                               down_up_y,
-                               grid_col*grid_size,
-                               grid_row*grid_size));
-    };
 
     //処理前ピースを描画
     auto drawBeforePiece = [&](procon::ExpandedPolygon expanded_poly){
         polygon_t poly = expanded_poly.getPolygon();
-        polygon_t trans_poly;
-
-
-        bg::strategy::transform::scale_transformer<double , 2, 2> trans_scale(1 / poly_size);//逆数を使って適当に設定
-        bg::transform(poly,trans_poly,trans_scale);
-        //std::cout << bg::dsv(poly) << std::endl;
+        std::cout << bg::dsv(poly) << std::endl;//ここは実行できてますねぇ
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+        std::cout << "drawbefore" << std::endl;
         painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
         std::vector<QPointF> points;
-        for(auto point : trans_poly.outer()){
-       //     std::cout << bg::dsv(point) << std::endl;
+        std::cout << "drawbefore" << std::endl;
+        for(auto point : poly.outer()){
+            std::cout << bg::dsv(point) << std::endl;
             points.push_back(getPiecePosition(point));
         }
         painter.drawPolygon(&points.front(),points.size());
@@ -303,6 +292,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     }else{
         for(auto poly : scanned_poly){
+        std::cout << "scanned" << std::endl;
             drawBeforePiece(poly);
         }
       //  for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
@@ -421,9 +411,11 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
     scanned_poly = vec;
-    poly_size=0;
+    double poly_size=0;
     for(auto expanded_poly : scanned_poly){
+
         polygon_t poly = expanded_poly.getPolygon();
+        std::cout << "テスト用" << std::endl;
         double max_x=-10000;//ここ頭悪い
         double max_y=-10000;
         for(auto point : poly.outer()){
@@ -440,6 +432,17 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
         if(check_poly_size>poly_size)poly_size = check_poly_size;
     }
     std::cout << "poly_size : " << poly_size << std::endl;
+    for(auto& expanded_poly : scanned_poly){
+        std::cout << "テスト用" << std::endl;
+        polygon_t poly = expanded_poly.getPolygon();
+
+        polygon_t trans_poly;
+        bg::strategy::transform::scale_transformer<double , 2, 2> trans_scale(1 / poly_size);//逆数を使って適当に設定
+        bg::transform(poly,trans_poly,trans_scale);
+        procon::ExpandedPolygon buf(expanded_poly.getId());//一時的に格納して後でpush_backするやつ
+        buf.resetPolygonForce(trans_poly);
+        expanded_poly = buf;
+    }
 }
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
