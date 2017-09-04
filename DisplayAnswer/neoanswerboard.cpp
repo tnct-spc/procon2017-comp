@@ -203,20 +203,30 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawText(piececenter, QString(QString::number(expanded_poly.getId())));
     };
 
-  /*  auto drawProcessingLine = [&](int pnum, bool color){
+    auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直し
         if(!single_mode){
-           point_i center;
-           boost::geometry::centroid(polygon_list[pnum], center);
-           QPointF aftercentroid = getPosition(center);
-           QPointF beforecentroid = getPiecePosition(center);
+           int poly_id = neoexpanded_poly.getId();
+           point_i up_center;
+           point_t down_center;
+           procon::ExpandedPolygon expanded_poly;
+           for(auto sc_poly : scanned_poly){
+               if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
+           }
+           bg::centroid(neoexpanded_poly.getPolygon(), up_center);
+           bg::centroid(expanded_poly.getPolygon(), down_center);
+
+
+           QPointF aftercentroid = getPosition(up_center);
+           QPointF beforecentroid = getPiecePosition(down_center);
            if(color){
                painter.setPen(QPen(QBrush(Qt::blue), 2.0));
            }else{
                painter.setPen(QPen(QBrush(Qt::red), 2.0));
            }
            painter.drawLine(aftercentroid, beforecentroid);
+
         }
-    };*/
+    };
     //頂点番号を描画
     auto drawPolygonPointNum = [&]{
         if(single_mode){
@@ -285,14 +295,14 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             drawPieceId(poly);
         }
 
-    }  /*else{
+    }else{
         for(auto poly : scanned_poly){
             drawBeforePiece(poly);
         }
       //  for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
       //      drawBeforePiece(piece_num);
       //  }
-
+        /*
         if(paintif){
             //初期ピース&番号&処理線を描画
             if(point_id == 0){
@@ -347,8 +357,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 }
             }
             paintif = false;
-        }
-    }*/
+        }*/
+    }
     drawPolygonPointNum();
     drawEvalution();
     drawGrid();
@@ -478,6 +488,31 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             if(point.x() > 101 || point.x() < 0)std::cout << "framepoint x error!!!!!!!!!!" << std::endl;
             if(point.y() > 65 || point.y() < 0)std::cout << "framepoint y error!!!!!!!!!!" << std::endl;
         }
+    }
+
+    for(auto expanded_poly : field.getPieces()){//sorted_polyにgetPiecesの中身をソートして投入する
+        polygon_i poly = expanded_poly.getPolygon();
+        point_i centroid_point;
+        bg::centroid(poly,centroid_point);
+        bool flag=false;
+        for(int count=0;count<sorted_poly.size();++count){
+            procon::NeoExpandedPolygon sort_poly = sorted_poly.at(count);
+            point_i sort_centroid_point;
+            bg::centroid(sort_poly.getPolygon(),sort_centroid_point);
+            if(centroid_point.x() < sort_centroid_point.x()){
+                sorted_poly.insert(sorted_poly.begin() + count,expanded_poly);
+                flag=true;
+                break;
+            }
+        }
+        if(!flag)sorted_poly.push_back(expanded_poly);
+    }
+    std::cout << "sorted_poly size : " << sorted_poly.size() << std::endl;
+
+    for(auto poly : sorted_poly){
+        point_i center_point;
+        bg::centroid (poly.getPolygon(),center_point);
+        std::cout << bg::dsv(center_point) << std::endl;
     }
 }
 

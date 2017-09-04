@@ -62,6 +62,7 @@ private:
     std::vector<polygon_i> polygon_list;
 
     //draw processingLine
+    std::vector<procon::NeoExpandedPolygon> sorted_poly; //画面の右側から順番にソートしたやつ
     point_i center;
     int point_id = 0;
     int blue_id = 1;
