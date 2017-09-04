@@ -225,13 +225,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBackground(QBrush(Qt::white));
 
         int number=0;
-        for(auto polygon: polygon_list){
-            int count=0;
-            painter.setPen(QPen(QBrush(QColor(list[number])), 0.1));
-            for(auto point : polygon.outer()){
+        for(auto expanded_polygon: field.getPieces()){
+            polygon_i poly = expanded_polygon.getPolygon();
+            painter.setPen(QPen(QBrush(QColor(list[expanded_polygon.getId()])), 0.1));
+            for(auto point : poly.outer()){
                 QPointF text_point = getPosition(point);
-                painter.drawText(text_point,QString::number(count));
-                ++count;
+                painter.drawText(text_point,QString::number(expanded_polygon.getId()));
             }
             ++number;
         }
