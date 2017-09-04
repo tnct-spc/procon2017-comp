@@ -160,9 +160,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     //処理後ピースを描画
-    auto drawAfterPiece = [&](int pnum){
+    auto drawAfterPiece = [&](procon::NeoExpandedPolygon expanded_poly){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            painter.setBrush(QBrush(QColor(list[pnum])));
+            painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
 //          int pcount = field.getPiece(pnum).getSize();
 //          QPointF points[pcount];
 //          for(int tes = 0;tes < pcount; tes++){
@@ -170,7 +170,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 //          }
 //          painter.drawPolygon(points,pcount);
             std::vector<QPointF> points;
-            for(auto point : polygon_list[pnum].outer()){
+            for(auto point : expanded_poly.getPolygon().outer()){
                 points.push_back(getPosition(point));
             }
             painter.drawPolygon(&points.front(),points.size());
@@ -190,20 +190,20 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     //ピースIdを描画
-    auto drawPieceId = [&](int pnum){
+    auto drawPieceId = [&](procon::NeoExpandedPolygon expanded_poly){
         painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
-        painter.setBackground(QBrush(QColor(list[pnum])));
+        painter.setBackground(QBrush(QColor(list[expanded_poly.getId()])));
         painter.setPen(QPen(QBrush(Qt::white), 0.3));
         point_i center;
-        boost::geometry::centroid(polygon_list[pnum], center);
+        boost::geometry::centroid(expanded_poly.getPolygon(), center);
         QPointF piececenter = getPosition(center);
         piececenter.setX(piececenter.x() - grid_size);
         piececenter.setY(piececenter.y() + grid_size);
-        painter.drawText(piececenter, QString(QString::number(field.getPiece(pnum).getId())));
+        painter.drawText(piececenter, QString(QString::number(expanded_poly.getId())));
     };
 
-    auto drawProcessingLine = [&](int pnum, bool color){
+  /*  auto drawProcessingLine = [&](int pnum, bool color){
         if(!single_mode){
            point_i center;
            boost::geometry::centroid(polygon_list[pnum], center);
@@ -216,7 +216,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            }
            painter.drawLine(aftercentroid, beforecentroid);
         }
-    };
+    };*/
     //頂点番号を描画
     auto drawPolygonPointNum = [&]{
         if(single_mode){
@@ -281,12 +281,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //drawDownBackground();
 
     if(single_mode){
-        for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
-            drawAfterPiece(piece_num);
-            drawPieceId(piece_num);
+        for(auto poly : field.getPieces()){
+            drawAfterPiece(poly);
+            drawPieceId(poly);
         }
 
-    }else{
+    }  /*else{
         for(auto poly : scanned_poly){
             drawBeforePiece(poly);
         }
@@ -299,13 +299,13 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             if(point_id == 0){
                 if(field.getPiecesSize() >= 1){
                     drawAfterPiece(red_id);
-                    drawProcessingLine(red_id, false);
+                   // drawProcessingLine(red_id, false);
                     drawPieceId(red_id);
                 }
                 if(field.getPiecesSize() >= 2){
                     ++point_id;
                     drawAfterPiece(blue_id);
-                    drawProcessingLine(blue_id, true);
+                   // drawProcessingLine(blue_id, true);
                     drawPieceId(blue_id);
                 }
             }
@@ -349,7 +349,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             }
             paintif = false;
         }
-    }
+    }*/
     drawPolygonPointNum();
     drawEvalution();
     drawGrid();
