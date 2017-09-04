@@ -102,6 +102,9 @@ ProbMaker::ProbMaker(QWidget *parent) :
     //ドロネーの三角形分割
     delaunay_triangulation();
     GA();
+    makeHint();
+    std::cout <<disposition1<<std::endl;
+    std::cout <<disposition2<<std::endl;
 }
 
 ProbMaker::~ProbMaker()
@@ -691,14 +694,11 @@ void ProbMaker::step()
     for(auto polygon: this->print_polygons){
         ++counnnter;
     }
-
     this->update();
 
 //    QEventLoop event;
 //    connect(this,&ProbMaker::nextLoop,&event,&QEventLoop::quit);
 //    event.exec();
-
-    
 
 }
 
@@ -725,6 +725,8 @@ void ProbMaker::makeHint(){
         HintsNumber++;
     }
     HintsNumber = HintsNumber / 4;
+    std::string example = std::to_string(HintsNumber);
+    disposition1 += example;
     //ヒント一段階目
     for(int i = 0; i < HintsNumber;i++){
         int rnd = retRnd(piece.size());
@@ -746,6 +748,87 @@ void ProbMaker::makeHint(){
                    disposition1 += std::to_string(point_x);
                    disposition1 += " ";
                    disposition1 += std::to_string(point_y);
+               }
+           }
+           counter++;
+                }
+            }
+    //ヒント二段階目
+    disposition2 += example;
+    for(int a = 0; a < HintsNumber;a++){
+        int rnd = retRnd(piece.size());
+       polygon_i instancepiece = piece.at(rnd);
+       piece.erase(piece.begin() + rnd);
+       int counter = 0;
+       for(auto point_a : instancepiece.outer()){
+           int point_x = point_a.x();
+           int point_y = point_a.y();
+           if(counter != 0){
+               if(counter == 1){
+                   disposition2 += ":";
+                   disposition2 += std::to_string(point_x);
+                   disposition2 += " ";
+                   disposition2 += std::to_string(point_y);
+               }
+               if(counter != 1){
+                   disposition2 += " ";
+                   disposition2 += std::to_string(point_x);
+                   disposition2 += " ";
+                   disposition2 += std::to_string(point_y);
+               }
+           }
+           counter++;
+                }
+            }
+    //ヒント三段階目
+    disposition3 += example;
+    for(int b = 0; b < HintsNumber;b++){
+        int rnd = retRnd(piece.size());
+       polygon_i instancepiece = piece.at(rnd);
+       piece.erase(piece.begin() + rnd);
+       int counter = 0;
+       for(auto point_a : instancepiece.outer()){
+           int point_x = point_a.x();
+           int point_y = point_a.y();
+           if(counter != 0){
+               if(counter == 1){
+                   disposition3 += ":";
+                   disposition3 += std::to_string(point_x);
+                   disposition3 += " ";
+                   disposition3 += std::to_string(point_y);
+               }
+               if(counter != 1){
+                   disposition3 += " ";
+                   disposition3 += std::to_string(point_x);
+                   disposition3 += " ";
+                   disposition3 += std::to_string(point_y);
+               }
+           }
+           counter++;
+                }
+            }
+    //ヒント四段階目
+    disposition4 += example;
+    for(int c = 0; c < HintsNumber;c++){
+        int rnd = retRnd(piece.size());
+       polygon_i instancepiece = piece.at(rnd);
+       piece.erase(piece.begin() + rnd);
+       int counter = 0;
+       for(auto point_a : instancepiece.outer()){
+           int point_x = point_a.x();
+           int point_y = point_a.y();
+           if(counter != 0){
+               if(counter == 1){
+                   disposition4 += ":";
+                   disposition4 += std::to_string(point_x);
+                   disposition4 += " ";
+                   disposition4 += std::to_string(point_y);
+               }
+               if(counter != 1){
+                   disposition4 += " ";
+                   disposition4 += std::to_string(point_x);
+                   disposition4 += " ";
+                   disposition4 += std::to_string(point_y);
                }
            }
            counter++;
