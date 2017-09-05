@@ -13,7 +13,7 @@ class TcpServer : public QObject
     Q_OBJECT
 public:
     explicit TcpServer(QObject * parent = 0);
-    void getRequest();
+    void getRequest(procon::NeoField input_field);
 
 signals:
     void request();
@@ -26,6 +26,7 @@ public slots:
 
 private:
     QTcpServer *server;
+    QTcpSocket *socket;
     procon::NeoField field;
     void setField(procon::NeoField input_field);
     void getFieldCSV();

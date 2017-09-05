@@ -3,6 +3,7 @@
 TcpServer::TcpServer(QObject *parent) :
     QObject(parent)
 {
+    socket = new QTcpSocket(this);
     server = new QTcpServer(this);
 
     connect(server, SIGNAL(newConnection()), this, SLOT(newConnection()));
@@ -13,7 +14,6 @@ TcpServer::TcpServer(QObject *parent) :
         qDebug() << "Server started.";
     }
 
-    connect(this, SIGNAL(request()), this, SLOT(send()));
     connect(this, SIGNAL(ready()), this, SLOT(receive()));
 }
 
@@ -25,9 +25,10 @@ void TcpServer::newConnection()
     socket->waitForBytesWritten(3000);
 }
 
-void TcpServer::getRequest()
+void TcpServer::getRequest(procon::NeoField input_field)
 {
-    emit request();
+    field = input_field;
+    TcpServer::send();
 }
 
 void TcpServer::send()
@@ -35,24 +36,34 @@ void TcpServer::send()
     QTcpSocket *client = server->nextPendingConnection();
     QDataStream out(client);
     out.setVersion(QDataStream::Qt_5_8);
+
     std::string file_path = "../../procon2017-comp/field.csv";
     NeoPolygonIO::exportPolygon(field, file_path);
     std::ifstream input(file_path);
     std::string line_buffer = "";
+    QString f;
     while(std::getline(input, line_buffer)){
-        QString f = f + QString::fromStdString(line_buffer);
+        f = f + QString::fromStdString(line_buffer);
     }
-    qint16 blocksize = f.size();
+
+    quint16 blocksize = f.size();
     out << blocksize << f;
     emit ready();
 }
 
-void receive()
+void TcpServer::receive()
 {
+    quint16 blocksize;
+    socket = new QTcpSocket(this);
+    QDataStream in(socket);
+    in.setVersion(QDataStream::Qt_5_8);
 
-}
+    in >> blocksize;
+    QString s;
+    in >> s;
 
-void TcpServer::setField(procon::NeoField input_field)
-{
-    field = input_field;
+    std::string file_path = "../../procon2017-comp/fieldd.csv";
+    std::ofstream output(file_path);
+    std::string ss = s.toStdString();
+    output << ss << std::endl;
 }

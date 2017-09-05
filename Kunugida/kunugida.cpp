@@ -29,6 +29,7 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     board->show();
+    server = std::make_shared<TcpServer>();
 }
 
 Kunugida::~Kunugida()
@@ -43,7 +44,7 @@ void Kunugida::run()
     procon::NeoField field;
 
     // Server
-    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
+    server->getRequest(field);
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
