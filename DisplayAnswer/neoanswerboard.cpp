@@ -4,6 +4,8 @@
 
 #include "neopolygonio.h"
 
+#include "neopolygonio.h"
+
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NeoAnswerBoard)
