@@ -213,7 +213,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
            }
            bg::centroid(neoexpanded_poly.getPolygon(), up_center);
-           bg::centroid(expanded_poly.getPolygon(), down_center);
+           std::cout<<bg::dsv(up_center) << std::endl;
+           bg::centroid(expanded_poly.getPolygon(), down_center);//ここでも死んでるぞおおおおおおおおおお
 
 
            QPointF aftercentroid = getPosition(up_center);
@@ -326,34 +327,34 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                     red_id = point_id;
                     if(red_id > blue_id){
                         for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                            drawAfterPiece(field.getPiece(piecenumber));
-                            drawPieceId(field.getPiece(piecenumber));
+                            drawAfterPiece(sorted_poly.at(piecenumber));
+                            drawPieceId(sorted_poly.at(piecenumber));
                         }
                     }else{
                         for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                            drawAfterPiece(field.getPiece(piecenumber));
-                            drawPieceId(field.getPiece(piecenumber));
+                            drawAfterPiece(sorted_poly.at(piecenumber));
+                            drawPieceId(sorted_poly.at(piecenumber));
                         }
                     }
 
-                    drawProcessingLine(field.getPiece(blue_id), true);
-                    drawProcessingLine(field.getPiece(red_id), false);
+                    drawProcessingLine(sorted_poly.at(blue_id), true);//ここも死んでる:
+                    drawProcessingLine(sorted_poly.at(red_id), false);
                 //青
                 }else{
                     blue_id = point_id;
                     if(red_id > blue_id){
                         for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                            drawAfterPiece(field.getPiece(piecenumber));
-                            drawPieceId(field.getPiece(piecenumber));
+                            drawAfterPiece(sorted_poly.at(piecenumber));
+                            drawPieceId(sorted_poly.at(piecenumber));
                         }
                  }else{
                         for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                            drawAfterPiece(field.getPiece(piecenumber));
-                            drawPieceId(field.getPiece(piecenumber));
+                            drawAfterPiece(sorted_poly.at(piecenumber));//この行で荒ぶってる…blue_idがまずいのかもしれない
+                            drawPieceId(sorted_poly.at(piecenumber));
                         }
                     }
-                    drawProcessingLine(field.getPiece(red_id), false);
-                    drawProcessingLine(field.getPiece(blue_id), true);
+                    drawProcessingLine(sorted_poly.at(red_id), false);
+                    drawProcessingLine(sorted_poly.at(blue_id), true);//ここも荒ぶってる　当たり前のようにエラー吐くのやめませんか
                 }
             }
             paintif = false;
@@ -414,6 +415,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 }
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
+    std::cout << "setScannedPieces run" << std::endl;
     scanned_poly = vec;
     double poly_size=0;
     for(auto expanded_poly : scanned_poly){
@@ -495,7 +497,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         point_i centroid_point;
         bg::centroid(poly,centroid_point);
         bool flag=false;
-        for(int count=0;count<sorted_poly.size();++count){
+        for(unsigned int count=0;count<sorted_poly.size();++count){
             procon::NeoExpandedPolygon sort_poly = sorted_poly.at(count);
             point_i sort_centroid_point;
             bg::centroid(sort_poly.getPolygon(),sort_centroid_point);
