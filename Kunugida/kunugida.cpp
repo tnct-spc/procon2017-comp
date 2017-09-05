@@ -6,6 +6,7 @@
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
+#include "polygonio.h"
 
 #include <iostream>
 
@@ -111,6 +112,10 @@ void Kunugida::run()
         board->setScannedPieces(imrec.getPolygonPosition());
 
         //        imageRecognitonTest();
+    }else if(ui->csv_button->isChecked()){
+        //CSV date
+        std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
+        field = NeoPolygonIO::importField(path);
     }
 
     for(auto const& p : field.getPieces()){
