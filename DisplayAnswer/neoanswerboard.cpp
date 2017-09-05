@@ -1,7 +1,9 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
-
+#include "neoanswerdock.h"
 #include "neopolygonio.h"
+#include "Utils/polygonconnector.h"
+#include "neopolygonviewer.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
@@ -212,6 +214,35 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            painter.drawLine(aftercentroid, beforecentroid);
         }
     };
+    //頂点番号を描画
+    auto drawPolygonPointNum = [&]{
+        if(single_mode){
+        painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackground(QBrush(Qt::white));
+
+//        int number=0;
+//        for(auto polygon: polygon_list){
+//            int count=0;
+//            painter.setPen(QPen(QBrush(QColor(list[number])), 0.1));
+//            for(auto point : polygon.outer()){
+//                QPointF text_point = getPosition(point);
+//                painter.drawText(text_point,QString::number(count));
+//                ++count;
+//            }
+//            ++number;
+//        }
+        painter.setPen(QPen(QBrush(QColor(236,182,138, 200)),0.1));
+        int count=0;
+        for(auto frame : field.getFrame()){
+            for(auto point : frame.getPolygon().outer()){
+                QPointF text_point = getPosition(point);
+                painter.drawText(text_point,QString::number(count));
+                ++count;
+            }
+        }
+        }
+    };
 
     //評価値を描画 設定されたtextもここで描画する
     auto drawEvalution = [&]{
@@ -258,7 +289,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
 
         if(paintif){
-
             //初期ピース&番号&処理線を描画
             if(point_id == 0){
                 if(field.getPiecesSize() >= 1){
@@ -314,10 +344,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             paintif = false;
         }
     }
+    drawPolygonPointNum();
     drawEvalution();
-    drawGrid();
+//    drawGrid();
 }
-
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     if( !field.getPieces().empty() ){
@@ -400,68 +430,71 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     }
 }
 
+//#define OUT_FILE
+
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::MouseButton::RightButton){
-        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
+        NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
+    }else if(event->button() == Qt::MouseButton::LeftButton){
+//        //二回目以上クリックされたら困る
+//        static bool haveCame = false;
+//        if(haveCame) return;
+//        haveCame = true;
 
-        int i = 0;
-        for(const Evaluate &eva : field.evaluate_cache) {
-            const std::vector<procon::NeoExpandedPolygon> &frames = (i == 0) ? field.getElementaryFrame() : field.getFrame();
-            const std::vector<procon::NeoExpandedPolygon> &pieces = eva.is_inversed ? field.getElementaryPieces() : field.getElementaryInversePieces();
-            const procon::NeoExpandedPolygon &frame = frames.at(static_cast<unsigned int>(eva.frame_index));
-            const procon::NeoExpandedPolygon &piece = pieces.at(static_cast<unsigned int>(eva.piece_index));
-            const polygon_i &frame_polygon = frame.getPolygon();
-            const polygon_i &piece_polygon = piece.getPolygon();
-            const std::vector<point_i> &frame_outer = frame_polygon.outer();
-            const std::vector<point_i> &piece_outer = piece_polygon.outer();
-            const point_i &frame_point = frame_outer.at(static_cast<unsigned int>(eva.connection.frame_point_index));
-            const point_i &frame_side_point = frame_outer.at(static_cast<unsigned int>(eva.connection.frame_side_index));
-            const point_i &piece_point = piece_outer.at(static_cast<unsigned int>(eva.connection.polygon_point_index));
-            const point_i &piece_side_point = piece_outer.at(static_cast<unsigned int>(eva.connection.polygon_side_index));
+        NeoAnswerDock *nad = new NeoAnswerDock();
+        nad->setWindowTitle("career");
+        nad->show();
 
-            auto out_points = [](const point_i &point1, const point_i &point2, int index1, int index2, bool isFrame)
-            {
-                std::string name = isFrame ? "frame" : "polygon";
-                auto out_point = [](const point_i &point)
-                {
-                    std::cout << "(" << point.x() << ", " << point.y() << ")";
-                };
+        //fieldのリセット
+        auto reset_neo_field = [](procon::NeoField input_field){
+            procon::NeoField output_field;
+            output_field.setFrame(input_field.getElementaryFrame());
+            output_field.setElementaryFrame(input_field.getElementaryFrame());
+            output_field.setElementaryPieces(input_field.getElementaryPieces());
+            return output_field;
+        };
+        procon::NeoField newField = reset_neo_field(this->field);
 
-                std::cout << name << "_point_index " << index1;
-                out_point(point1);
-                std::cout << ", " << name << "_side_index " << index2;
-                out_point(point2);
-            };
-
-            std::cout << " Connect < " << eva.fields_index << " >  frame : ";
-            out_points(frame_point, frame_side_point, eva.connection.frame_point_index, eva.connection.frame_side_index, true);
-            std::cout << " :  piece : ";
-            out_points(piece_point, piece_side_point, eva.connection.polygon_point_index, eva.connection.polygon_side_index, false);
-            std::cout << std::endl;
-
-            const std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> result = PolygonConnector::connect(frame, piece, eva.connection);
-
-            if(std::get<2>(result)) {
-                std::vector<procon::NeoExpandedPolygon> frames_buff = (i == 0) ? field.getElementaryFrame() : field.getFrame();
-
-                for(const procon::NeoExpandedPolygon &result_frame : std::get<0>(result)) {
-                    frames_buff.push_back(result_frame);
+        int count = 0;
+        for(Evaluate i : this->field.evaluate_cache){
+            count++;
+            std::tuple<std::vector<procon::NeoExpandedPolygon> , procon::NeoExpandedPolygon , bool> connected = PolygonConnector::connect(
+                        newField.getFrame().at(i.frame_index),
+                        i.is_inversed
+                            ? newField.getElementaryInversePieces().at(i.piece_index)
+                            : newField.getElementaryPieces().at(i.piece_index),
+                        i.connection
+            );
+            if(std::get<2>(connected)){
+                std::vector<procon::NeoExpandedPolygon> field_frame = field.getFrame();
+                std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
+                for(procon::NeoExpandedPolygon nep : newframe){
+                    field_frame.push_back(nep);
                 }
-                frames_buff.erase(frames.begin() + eva.frame_index);
-                field.setFrame(frames_buff);
-                field.setPiece(std::get<1>(result));
-
-                std::array<bool,50> is_placed = field.getIsPlaced();
-                is_placed.at(static_cast<unsigned int>(eva.piece_index)) = true;
-                field.setIsPlaced(is_placed);
-
-                this->show();
+                field_frame.erase(field_frame.begin() + i.frame_index);
+                newField.setFrame(field_frame);
+                newField.setPiece(std::get<1>(connected));
+                procon::NeoExpandedPolygon nep = std::get<1>(connected);
+                NeoPolygonViewer::getInstance().displayPolygon(nep.getPolygon(),"hello",false);
+                newField.setIsPlaced(i.piece_index);
+                std::cout<<"----------------"<<count<<"回目-------------------"<<std::endl;
+                std::cout<<"frame_side_index = "<<i.connection.frame_side_index
+                        <<",polygon_side_index = "<<i.connection.polygon_side_index
+                       <<",frame_point_index = "<<i.connection.frame_point_index
+                      <<",polygon_point_index = "<<i.connection.polygon_point_index
+                     <<std::endl;
+                nad->addAnswer(newField);
+#ifdef OUT_FILE
+                std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count) + ".csv";
+                NeoPolygonIO::exportPolygon(newField , path);
+#endif
             } else {
-                std::cout << "結合に失敗しました。" << std::endl;
+                std::cout << "結合失敗" << std::endl;
+                nad->deleteLater();
+                QMessageBox::warning(nad, tr("エラー"), tr("結合失敗！"));
                 break;
             }
-            ++i;
         }
     }
 }

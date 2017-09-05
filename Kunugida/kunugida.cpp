@@ -28,6 +28,7 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     tcp = std::make_shared<TcpMain>();
+    board->setSingleMode(true);
     board->show();
     tcp->show();
 }
@@ -77,6 +78,7 @@ void Kunugida::run()
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
         procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
         int i = 1;
+
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -85,6 +87,10 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
+    }else if(ui->csv_button->isChecked()){
+        //csv date
+        std::string pieces_path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
+        field = NeoPolygonIO::importField(pieces_path);
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 

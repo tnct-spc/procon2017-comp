@@ -210,8 +210,8 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
         procon::NeoField field_buf = fields[eval.fields_index];
         ConnectedResult connect_result = PolygonConnector::connect(fields[eval.fields_index].getFrame()[eval.frame_index]
                 ,eval.is_inversed
-                    ? fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
-                    : fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
+                    ? fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
+                    : fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
                 ,eval.connection
         );
 
@@ -392,14 +392,12 @@ void BeamSearch::init()
 #endif
     this->processor_num = std::thread::hardware_concurrency();
 }
-
 void BeamSearch::run(procon::NeoField field)
 {
     logger->info("beamsearch run");
     dock->addAnswer(field);
 
     std::vector<procon::NeoField> state;
-    state.push_back(field);
 
     //フレームの同じ傾きの頂点を除去
     auto delete_deplicate_point = [](procon::NeoField & field){
@@ -444,8 +442,10 @@ void BeamSearch::run(procon::NeoField field)
         }
     };
 
+
     delete_deplicate_point(field);
 
+    state.push_back(field);
 
 //    ev.resize(2000000);
     for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
@@ -454,7 +454,7 @@ void BeamSearch::run(procon::NeoField field)
         evaluateNextState(state,ev);
         makeNextState(state,ev);
 
-        std::cout << "now" << field.getElementaryPieces().size() << "/" << piece_num << std::endl;
+        std::cout << "now" << field.getElementaryPieces().size() << "/" << (piece_num + 1) << std::endl;
         std::cout << "evaluated state size:" << ev.size() << std::endl;
         std::cout << "field size:" << state.size() << std::endl;
 
@@ -470,9 +470,9 @@ void BeamSearch::run(procon::NeoField field)
             }
         }
 
-//        if(piece_num == 40){
-//            break;
-//        }
+        if(piece_num == 2){
+            break;
+        }
     }
 
     //    neo = std::make_shared<NeoAnswerDock>();
