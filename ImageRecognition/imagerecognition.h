@@ -37,7 +37,7 @@ public:
     int field_num;
     std::vector<procon::ExpandedPolygon> position;
     int id = 0;
-    int n = 2;
+    int n = 1.8;
 
 private:
     cv::Mat preprocessingFrame(cv::Mat image);

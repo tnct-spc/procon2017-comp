@@ -5,6 +5,8 @@
 #include "utilities.h"
 #include "neosinglepolygondisplay.h"
 
+#include "polygonviewer.h"
+
 #include "math.h"
 
 procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
@@ -21,9 +23,6 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         cv::imshow("piece" + std::to_string(i),pieces_images[i]);
     }
     */
-
-    cv::namedWindow("piece" + std::to_string(0));
-    cv::imshow("piece" + std::to_string(0),pieces_images[0]);
 
     // つなげてるだけ
     std::vector<cv::Mat> images;
@@ -55,13 +54,12 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        //NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
         //error = getError(pieces[i], i+1);
         //printf("%d : %f\n", i, error);
     }
 
     error = getError(pieces);
-
     std::vector<procon::ExpandedPolygon> test = getPolygonPosition();
 
     // fieldクラスのデータに変換
@@ -333,7 +331,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
         //LSD直線検出 引数の"scale"が重要！！！
         //cv::LSD_REFINE_STD,threshold::LSDthrehold
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.85);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.8);
         lsd->detect(image, pieces_lines[count]);
 
         //描画
@@ -595,7 +593,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
                 }
 
                 //許容幅20mm(要検証)
-                constexpr double weight_threshold = 20; // 20->90
+                constexpr double weight_threshold = 20;
 
                 if (distance > weight_threshold) {
                     rings.push_back(ring);
@@ -793,7 +791,10 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     cv::Mat resize_image;
     cv::resize(piece_image, resize_image, cv::Size(), n, n);
 
-    return piece_image;
+    cv::namedWindow("resize", CV_WINDOW_NORMAL);
+    cv::imshow("resize", resize_image);
+
+    return resize_image;
 }
 
 // 画像を分ける
@@ -939,7 +940,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         // 配列を循環
         if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
             double hori = hypot(vec[2], vec[3]) * scale / 2.5;
-            if (fabs(hori - round(hori)) < 0.1) {
+            if (fabs(hori - round(hori)) < 0.05) {
                 polygon.pop_back();
                 polygon_t spin;
                 for (unsigned int j = 0; j < polygon.size(); j++) {
@@ -961,7 +962,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         // 一番長い辺を探す
         double long_len = 0;
 
-        unsigned int longgest;
+        unsigned int longgest = 0;
         unsigned int match;
         double error = 1;
         for (unsigned int i = 0; i < polygon.size()-1; i++) {
@@ -986,13 +987,15 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
 
         // 配列を循環
+        if (longgest != 0) {
         vertex.outer().pop_back();
-        polygon_t longer;
-        for (unsigned int i = 0; i < polygon.size(); i++) {
-            longer.outer().push_back(vertex.outer().at((i+longgest)%polygon.size()));
+            polygon_t longer;
+            for (unsigned int i = 0; i < polygon.size(); i++) {
+                longer.outer().push_back(vertex.outer().at((i+longgest)%polygon.size()));
+            }
+            longer.outer().push_back(longer.outer().at(0));
+            vertex = longer;
         }
-        longer.outer().push_back(longer.outer().at(0));
-        vertex = longer;
     }
 
     // 最初の辺の長さをグリッド基準で計算
@@ -1207,7 +1210,11 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
 {
     if (position.size() > 0) {
-        position.pop_back();
+        //position.pop_back();
+    }
+
+    for (unsigned int i=0; i<position.size(); i++) {
+        PolygonViewer::getInstance().pushPolygon(position[i],std::to_string(i));
     }
 
     return position;
