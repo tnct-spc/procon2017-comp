@@ -243,6 +243,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
             bool flag = false;
             const std::string now_hash = hashField(field_buf);
 
+            //check field is ok
             std::for_each(next_field.begin(),next_field.end(),[&](procon::NeoField f){
                 if(!flag){
                     if(now_hash == hashField(f)){
@@ -250,10 +251,15 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
                     }
                 }
             });
-            if(!flag){
+
+        if(!flag){
+            if(!this->checkCanPrune(field_buf)){
                 next_field.push_back(field_buf);
             }
-        }else{
+        }
+            }
+
+        /*else{
             std::array<bool,50> is_placed = field_buf.getIsPlaced();
             is_placed[eval.piece_index] = true;
             field_buf.setIsPlaced(is_placed);
@@ -261,7 +267,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
             field_buf.setPiece(std::get<1>(connect_result));
 
             debug_field.push_back(field_buf);
-        }
+        }*/
     };
 
 #ifdef DEBUG_MODE
@@ -681,10 +687,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     if(a)return a;
     bool b = about_angle();
     if(b)return b;
-    bool c = about_framesize();
-    if(c)return c;
-    bool d = about_frameangle();
-    if(d)return d;
+//    bool c = about_framesize();
+//    if(c)return c;
+//    bool d = about_frameangle();
+//    if(d)return d;
     return false;
     //OKならfalseを返す
 }
