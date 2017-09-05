@@ -805,7 +805,6 @@ void BeamSearch::init()
 #endif
     this->processor_num = std::thread::hardware_concurrency();
 }
-
 void BeamSearch::run(procon::NeoField field)
 {
     logger->info("beamsearch run");
@@ -813,7 +812,6 @@ void BeamSearch::run(procon::NeoField field)
 //    logger->info("beamsearch run");
 
     std::vector<procon::NeoField> state;
-    state.push_back(field);
 
     //フレームの同じ傾きの頂点を除去
     auto delete_deplicate_point = [](procon::NeoField & field){
@@ -858,8 +856,10 @@ void BeamSearch::run(procon::NeoField field)
         }
     };
 
+
     delete_deplicate_point(field);
 
+    state.push_back(field);
 
 //    ev.resize(2000000);
     for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
@@ -868,12 +868,16 @@ void BeamSearch::run(procon::NeoField field)
         evaluateNextState(state,ev);
         makeNextState(state,ev);
 
-        std::cout << "now" << field.getElementaryPieces().size() << "/" << piece_num << std::endl;
+        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() << std::endl;
         std::cout << "evaluated state size:" << ev.size() << std::endl;
         std::cout << "field size:" << state.size() << std::endl;
 
         //vectorのメモリ解放って頭悪くね？
         std::vector<Evaluate>().swap(ev);
+
+        for(auto& f : state){
+            delete_deplicate_point(f);
+        }
 
         bool flag = false;
         for(auto const& _field : state){
