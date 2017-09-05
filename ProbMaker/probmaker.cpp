@@ -103,7 +103,6 @@ ProbMaker::ProbMaker(QWidget *parent) :
     delaunay_triangulation();
     GA();
     makeHint();
-    std::cout <<disposition1<<std::endl;
 }
 
 ProbMaker::~ProbMaker()
@@ -717,17 +716,22 @@ int ProbMaker::retRnd(int num){
     return rnd(mt);
 }
 void ProbMaker::makeHint(){
-    double instanceHintsNumber = print_polygons.size() * 0.8;
+    double mostinstanceHintsNumber = print_polygons.size() * 0.9;
+    double miminstanceHintsNumber = print_polygons.size() * 0.8;
     std::vector<polygon_i> piece = print_polygons;
-    int HintsNumber = instanceHintsNumber;
-    while(HintsNumber % 4 != 0){
-        HintsNumber++;
-    }
-    HintsNumber = HintsNumber / 4;
-    std::string example = std::to_string(HintsNumber);
+    int mostHintsNumber = mostinstanceHintsNumber;
+    int mimHintsNumber = miminstanceHintsNumber;
+    int HintsNumber1,HintsNumber2,HintsNumber3,HintsNumber4;
+    do{
+    HintsNumber1 = retRnd(100) + 1;
+    HintsNumber2 = retRnd(100) + 1;
+    HintsNumber3 = retRnd(100) + 1;
+    HintsNumber4 = retRnd(100) + 1;
+    }while((HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4) < mimHintsNumber || (HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4) > mostHintsNumber);
+    std::string example = std::to_string(HintsNumber1);
     disposition1 += example;
     //ヒント一段階目
-    for(int i = 0; i < HintsNumber;i++){
+    for(int i = 0; i < HintsNumber1;i++){
         int rnd = retRnd(piece.size());
        polygon_i instancepiece = piece.at(rnd);
        piece.erase(piece.begin() + rnd);
@@ -753,8 +757,9 @@ void ProbMaker::makeHint(){
                 }
             }
     //ヒント二段階目
+    example = std::to_string(HintsNumber2);
     disposition2 += example;
-    for(int a = 0; a < HintsNumber;a++){
+    for(int a = 0; a < HintsNumber2;a++){
         int rnd = retRnd(piece.size());
        polygon_i instancepiece = piece.at(rnd);
        piece.erase(piece.begin() + rnd);
@@ -780,8 +785,9 @@ void ProbMaker::makeHint(){
                 }
             }
     //ヒント三段階目
+    example = std::to_string(HintsNumber3);
     disposition3 += example;
-    for(int b = 0; b < HintsNumber;b++){
+    for(int b = 0; b < HintsNumber3;b++){
         int rnd = retRnd(piece.size());
        polygon_i instancepiece = piece.at(rnd);
        piece.erase(piece.begin() + rnd);
@@ -807,8 +813,9 @@ void ProbMaker::makeHint(){
                 }
             }
     //ヒント四段階目
+    example = std::to_string(HintsNumber4);
     disposition4 += example;
-    for(int c = 0; c < HintsNumber;c++){
+    for(int c = 0; c < HintsNumber4;c++){
         int rnd = retRnd(piece.size());
        polygon_i instancepiece = piece.at(rnd);
        piece.erase(piece.begin() + rnd);
@@ -833,6 +840,8 @@ void ProbMaker::makeHint(){
            counter++;
                 }
             }
+    std::cout<<print_polygons.size()<<" "<<mimHintsNumber<<std::endl;
+    std::cout<<HintsNumber1<<" "<<HintsNumber2<<" "<<HintsNumber3<<" "<<HintsNumber4<<" "<< HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4 <<std::endl;
 }
 
 void ProbMaker::paintEvent(QPaintEvent *)
