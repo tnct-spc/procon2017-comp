@@ -80,8 +80,16 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
         int y_buf = enlarged_polygon ? grid_size * polygon.outer()[a].y() + top_buttom_margin : grid_size * (polygon.outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
         polygon_points.push_back(QPoint(x_buf,y_buf));
     }
-    painter.setPen(QPen(QColor("#00FFFF")));
+    painter.setPen(QPen(QColor("#99CC00")));
     painter.drawPolygon(&polygon_points.front(),polygon_points.size());
+
+    painter.setPen(QPen(QColor("#F15A22")));
+    QFont font;
+    font.setPixelSize(20);
+    painter.setFont(font);
+    for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
+        painter.drawText(polygon_points[point_index] ,QString::number(point_index));
+    }
 
     painter.setPen(QPen(QColor("#000000")));
     for (int current_col = 0; current_col < grid_col + 1; ++current_col) {

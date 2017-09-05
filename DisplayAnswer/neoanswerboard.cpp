@@ -1,6 +1,8 @@
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
 
+#include "neopolygonio.h"
+
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NeoAnswerBoard)
@@ -15,6 +17,10 @@ NeoAnswerBoard::~NeoAnswerBoard()
 
 void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
+}
+
+void NeoAnswerBoard::setText(std::string text){
+    output_string = QString::fromStdString(text);
 }
 
 void NeoAnswerBoard::paintEvent(QPaintEvent *event)
@@ -130,7 +136,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
 
 
-        for(auto& frame : field.getFrame() ){
+        for(auto& frame : field.getElementaryFrame() ){
             std::vector<QPointF> frame_points;
             for(auto point : frame.getPolygon().outer()){
                 frame_points.push_back(getPosition(point));
@@ -151,7 +157,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 //          }
 //          painter.drawPolygon(points,pcount);
             std::vector<QPointF> points;
-            for(auto point : field.getPieces().at(pnum).getPolygon().outer()){
+            for(auto point : polygon_list[pnum].outer()){
                 points.push_back(getPosition(point));
             }
             painter.drawPolygon(&points.front(),points.size());
@@ -185,7 +191,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBackground(QBrush(QColor(list[pnum])));
         painter.setPen(QPen(QBrush(Qt::white), 0.3));
         point_i center;
-        boost::geometry::centroid(field.getPiece(pnum).getPolygon(),center);
+        boost::geometry::centroid(polygon_list[pnum], center);
         QPointF piececenter = getPosition(center);
         piececenter.setX(piececenter.x() - grid_size);
         piececenter.setY(piececenter.y() + grid_size);
@@ -206,8 +212,38 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            painter.drawLine(aftercentroid, beforecentroid);
         }
     };
+    //頂点番号を描画
+    auto drawPolygonPointNum = [&]{
+        if(single_mode){
+        painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackground(QBrush(Qt::white));
 
-    //評価値を描画
+        int number=0;
+        for(auto polygon: polygon_list){
+            int count=0;
+            painter.setPen(QPen(QBrush(QColor(list[number])), 0.1));
+            for(auto point : polygon.outer()){
+                QPointF text_point = getPosition(point);
+                painter.drawText(text_point,QString::number(count));
+                ++count;
+            }
+            ++number;
+        }
+        painter.setPen(QPen(QBrush(QColor(236,182,138, 200)),0.1));
+        int count=0;
+        for(auto frame : field.getElementaryFrame()){
+            for(auto point : frame.getPolygon().outer()){
+                QPointF text_point = getPosition(point);
+                painter.drawText(text_point,QString::number(count));
+                ++count;
+            }
+        }
+
+        }
+    };
+
+    //評価値を描画 設定されたtextもここで描画する
     auto drawEvalution = [&]{
         painter.setBackgroundMode(Qt::TransparentMode);
         QColor evalution_color = {255,0,255};
@@ -227,75 +263,87 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         for(auto frame_ : frame__){
             jointed_piece_total += frame_.getJointedPieces().size();
         }
-        painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+        painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+
+        QPointF text_point = evalution_point;
+        text_point.setY(splitedheight);
+        painter.drawText(text_point, output_string);
         //painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
     };
 
     drawFrame();
-    drawDownBackground();
+    //drawDownBackground();
 
-    for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
-        drawBeforePiece(piece_num);
-    }
-
-    if(paintif){
-
-        //初期ピース&番号&処理線を描画
-        if(point_id == 0){
-            if(field.getPiecesSize() >= 1){
-                drawAfterPiece(point_id);
-                drawProcessingLine(point_id, false);
-                drawPieceId(point_id);
-            }
-            if(field.getPiecesSize() >= 2){
-                ++point_id;
-                drawAfterPiece(point_id);
-                drawProcessingLine(point_id, true);
-                drawPieceId(point_id);
-            }
+    if(single_mode){
+        for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
+            drawAfterPiece(piece_num);
+            drawPieceId(piece_num);
         }
 
-        //キーに合わせてピース&番号&処理線を描画
-        if(point_id > 1){
-            //青
-            if(selecter){
-                blue_id = point_id;
-                if(blue_id > red_id){
-                    for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                        drawAfterPiece(piecenumber);
-                        drawPieceId(piecenumber);
-                    }
-                }else{
-                    for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                        drawAfterPiece(piecenumber);
-                        drawPieceId(piecenumber);
-                    }
-                }
+    }else{
 
-                drawProcessingLine(blue_id, true);
-                drawProcessingLine(red_id, false);
-            //赤
-            }else{
-                red_id = point_id;
-                if(blue_id > red_id){
-                    for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                        drawAfterPiece(piecenumber);
-                        drawPieceId(piecenumber);
-                    }
-                }else{
-                    for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                        drawAfterPiece(piecenumber);
-                        drawPieceId(piecenumber);
-                    }
-                }
-                drawProcessingLine(red_id, false);
-                drawProcessingLine(blue_id, true);
-            }
+        for(unsigned int piece_num = 0; piece_num < field.getPieces().size(); ++piece_num){
+            drawBeforePiece(piece_num);
         }
-        paintif = false;
-    }
 
+        if(paintif){
+            //初期ピース&番号&処理線を描画
+            if(point_id == 0){
+                if(field.getPiecesSize() >= 1){
+                    drawAfterPiece(red_id);
+                    drawProcessingLine(red_id, false);
+                    drawPieceId(red_id);
+                }
+                if(field.getPiecesSize() >= 2){
+                    ++point_id;
+                    drawAfterPiece(blue_id);
+                    drawProcessingLine(blue_id, true);
+                    drawPieceId(blue_id);
+                }
+            }
+
+            //キーに合わせてピース&番号&処理線を描画
+            if(point_id > 0){
+                //赤
+                if(selecter){
+                    red_id = point_id;
+                    if(red_id > blue_id){
+                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                            drawAfterPiece(piecenumber);
+                            drawPieceId(piecenumber);
+                        }
+                    }else{
+                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                            drawAfterPiece(piecenumber);
+                            drawPieceId(piecenumber);
+                        }
+                    }
+
+                    drawProcessingLine(blue_id, true);
+                    drawProcessingLine(red_id, false);
+                //青
+                }else{
+                    blue_id = point_id;
+                    if(red_id > blue_id){
+                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
+                            drawAfterPiece(piecenumber);
+                            drawPieceId(piecenumber);
+                        }
+                 }else{
+                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
+                            drawAfterPiece(piecenumber);
+                            drawPieceId(piecenumber);
+                        }
+                    }
+                    drawProcessingLine(red_id, false);
+                    drawProcessingLine(blue_id, true);
+                }
+            }
+            paintif = false;
+        }
+    }
+    drawPolygonPointNum();
     drawEvalution();
     drawGrid();
 }
@@ -303,34 +351,52 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     if( !field.getPieces().empty() ){
-        int hoge = field.getPieces().size();
+        int hoge = field.getPieces().size() - 1;
         if(point_id > 0){
-            if(point_id < hoge-1){
-                paintif = true;
-                if(event->key() == Qt::Key_A){
-                    selecter = true;
-                    ++point_id;
-                }
-                if(event->key() == Qt::Key_L){
-                    selecter = false;
-                    ++point_id;
-                }
-                this->update();
-            }
-
             if(point_id < hoge){
-                if(event->key() == Qt::Key_S){
-                    selecter = true;
-                    --point_id;
+                paintif = true;
+                if(red_id < hoge){
+                    if(event->key() == Qt::Key_A){
+                        selecter = true;
+                        ++red_id;
+                        ++point_id;
+                    }
                 }
-                if(event->key() == Qt::Key_K){
-                    selecter = false;
-                    --point_id;
+
+                if(blue_id < hoge){
+                    if(event->key() == Qt::Key_L){
+                        selecter = false;
+                        ++blue_id;
+                        ++point_id;
+                    }
                 }
             }
         }
+
+        if(point_id > 0){
+            if(point_id < hoge + 1){
+                paintif = true;
+                if(red_id > 0){
+                    if(event->key() == Qt::Key_S){
+                        selecter = true;
+                        --red_id;
+                        --point_id;
+                    }
+                }
+
+                if(blue_id > 0){
+                    if(event->key() == Qt::Key_K){
+                        selecter = false;
+                        --blue_id;
+                        --point_id;
+                    }
+                }
+            }
+        }
+            this->update();
     }
 }
+
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
     int pointx = point.x() + frame_margin/2;
@@ -351,11 +417,22 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         polygon_list.clear();
         std::vector<procon::NeoExpandedPolygon> pieces = field.getPieces();
         std::sort(pieces.begin(), pieces.end(), [](const procon::NeoExpandedPolygon& a, const procon::NeoExpandedPolygon& b)->bool{
-            return a.getId() < b.getId();
+            point_i center1;
+            point_i center2;
+            boost::geometry::centroid(a.getPolygon(),center1);
+            boost::geometry::centroid(b.getPolygon(),center2);
+            return center1.x() < center2.x();
         });
         for(auto piece : pieces){
             if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
         }
         this->update();
+    }
+}
+
+void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::MouseButton::RightButton){
+        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
     }
 }

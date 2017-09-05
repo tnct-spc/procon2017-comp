@@ -32,6 +32,7 @@ public:
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
     void setSingleMode(bool inp);
+    void setText(std::string text);
 
 private:
     int frame_margin;
@@ -48,6 +49,8 @@ private:
 
     // Only field mode
     bool single_mode = false;
+    bool singleif = false;
+    int piece_size = 1;
 
     //make id_list
     std::vector<polygon_i> polygon_list;
@@ -56,15 +59,18 @@ private:
     point_i center;
     int point_id = 0;
     int blue_id = 1;
-    int red_id = 1;
+    int red_id = 0;
     bool selecter;//true = left, false = right
     bool pre = false;
     bool paintif = false;
+
+    QString output_string;//ここのメンバ変数に入ってる文字列をAnswerBoardの画面下に表示するようにする
 
 protected:
     void beforePolygon();
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // NEOANSWERBOARD_H

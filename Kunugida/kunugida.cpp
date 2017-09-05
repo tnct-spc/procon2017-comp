@@ -5,6 +5,7 @@
 #include "probmaker.h"
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
+#include "neopolygonio.h"
 
 #include <iostream>
 
@@ -12,6 +13,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QMessageBox>
 
 Kunugida::Kunugida(QWidget *parent) :
     QMainWindow(parent),
@@ -25,10 +27,10 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     board = std::make_shared<NeoAnswerBoard>();
-    dock_board = std::make_shared<NeoAnswerDock>();
+    tcp = std::make_shared<TcpMain>();
     board->show();
-    dock_board->show();
-
+    tcp->show();
+//    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -49,6 +51,8 @@ void Kunugida::run()
         ProbMaker *PbMaker = new ProbMaker();
 
         //もしProbMakerの結果を表示したければ下をコメントアウト
+        //std::string test_text = "test";
+        //board->setText(test_text);
         PbMaker->show();
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();
@@ -63,12 +67,16 @@ void Kunugida::run()
             pieces.push_back(buf);
             ++id;
             //break;
+
         }
         frame.resetPolygonForce(frame_);
         std::vector<procon::NeoExpandedPolygon> vec_frame;
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
+
+//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+//        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -81,13 +89,17 @@ void Kunugida::run()
     }
 //    TODO: ここまでで各データソースから読み込むようにする
 
-//    TODO: algorithm_numberをGUIで選択できるようにする
     int algorithm_number = 0;
 
+    if(ui->test_algorithm_button->isChecked()){
+        algorithm_number = 0;
+    } else if (ui->beamsearch_button->isChecked()) {
+        algorithm_number = 1;
+    }
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
-    solver->run(field,0);
+    solver->run(field,algorithm_number);
 
 
 //    QRLibrary lib;
@@ -112,7 +124,6 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setField(field);
-   this->dock_board->addAnswer(field);
 }
 
 void Kunugida::finishedProcess()
