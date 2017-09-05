@@ -56,6 +56,12 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/release/ -lNeoSolver
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/debug/ -lNeoSolver
+else:unix: LIBS += -L$$OUT_PWD/../NeoSolver/ -lNeoSolver
+
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver
 
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
