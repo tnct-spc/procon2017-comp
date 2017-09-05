@@ -44,6 +44,7 @@ HEADERS += neosolver.h\
     Algorithm/testalgortithm.h \
     Algorithm/beamsearch.h \
     Evaluation/evaluation.h \
+    Evaluation/evaluate.h \
     Utils/polygonconnector.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
