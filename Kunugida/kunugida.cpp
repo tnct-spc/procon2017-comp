@@ -9,7 +9,6 @@
 #include "http/request_mapper.h"
 
 #include <iostream>
-
 #include <QDebug>
 #include <QPushButton>
 #include <QCheckBox>
@@ -26,6 +25,7 @@ Kunugida::Kunugida(QWidget *parent) :
 //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
+    manager = new QNetworkAccessManager(this);
 
     board = std::make_shared<NeoAnswerBoard>();
     board->show();
@@ -77,6 +77,7 @@ void Kunugida::run()
         field.setElementaryPieces(pieces);
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+        Kunugida::pleaseCSV();
         NeoPolygonIO::importField("../../procon2017-comp/field.csv");
         int i = 1;
     }else if(ui->scanner_button->isChecked()){
@@ -146,4 +147,33 @@ void Kunugida::imageRecognitonTest()
 
     ImageRecognition imrec;
     procon::Field PDATA = imrec.run(nocframe, nocpieces);
+}
+
+Kunugida::pleaseCSV()
+{
+    connect(manager, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(replyFinished(QNetworkReply*)));
+
+    file.setFileName("../../procon2017-comp/receivedfield.csv");
+    if(!file.open(QIODevice::WriteOnly))
+        return;
+    manager->get(QNetworkRequest(QUrl("http://localhost:8016/get")));
+}
+
+void Kunugida::replyFinished(QNetworkReply *reply)
+{
+    QString str;
+    str = "[Network]";
+    if(reply->error() == QNetworkReply::NoError){
+        str += tr("download success.");
+        file.write(reply->readAll());
+        file.close();
+    }else{
+        str = reply->errorString();
+        str += tr("      download failed.");
+        file.close();
+    }
+    qDebug() << str;
+
+    emit done();
 }
