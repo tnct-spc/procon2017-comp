@@ -45,6 +45,32 @@ void Kunugida::run()
 
     procon::NeoField field;
 
+
+
+    auto polygoniToExpanded = [](std::vector<polygon_i> pieces_){
+
+
+        std::vector<procon::ExpandedPolygon> expanded_pieces;
+        int id = 1;
+        for(auto &piece_i : pieces_){
+            polygon_t piece_t;
+            for(auto &point : piece_i.outer()){
+                int double_point_x = point.x();
+                int double_point_y = point.y();
+                piece_t.outer().push_back(point_t(double_point_x,double_point_y));
+            }
+            bg::correct(piece_t);
+
+            procon::ExpandedPolygon ex_poly(id);
+            ex_poly.resetPolygonForce(piece_t);
+            expanded_pieces.push_back(ex_poly);
+            id++;
+        }
+
+        return expanded_pieces;
+
+    };
+
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
         logger->info("Selected ProbMaker DataSource");
@@ -75,22 +101,8 @@ void Kunugida::run()
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
-        std::vector<procon::ExpandedPolygon> expanded_pieces;
-        id = 1;
-        for(auto &piece_i : pieces_){
-            polygon_t piece_t;
-            for(auto &point : piece_i.outer()){
-                int double_point_x = point.x();
-                int double_point_y = point.y();
-                piece_t.outer().push_back(point_t(double_point_x,double_point_y));
-            }
-            bg::correct(piece_t);
 
-            procon::ExpandedPolygon ex_poly(id);
-            ex_poly.resetPolygonForce(piece_t);
-            expanded_pieces.push_back(ex_poly);
-            id++;
-        }
+        std::vector<procon::ExpandedPolygon> expanded_pieces =  polygoniToExpanded(pieces_);
         board->setScannedPieces(expanded_pieces);
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
@@ -117,6 +129,14 @@ void Kunugida::run()
         //CSV date
         std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
         field = NeoPolygonIO::importField(path);
+        std::cout << "おいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい" << field.getPieces().size() << std::endl;
+        std::vector<polygon_i> poly_pieces;
+        for(auto poly : field.getPieces()){
+            polygon_i i_poly = poly.getPolygon();
+            poly_pieces.push_back(i_poly);
+        }
+        board->setScannedPieces(polygoniToExpanded(poly_pieces));
+
     }
 
     for(auto const& p : field.getPieces()){

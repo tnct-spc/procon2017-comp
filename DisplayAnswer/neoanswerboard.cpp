@@ -214,6 +214,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
                scan_id.push_back(sc_poly.getId());
            }
+           std::cout << "down  ";
 
            std::sort(scan_id.begin(),scan_id.end());
            for(auto id : scan_id){
@@ -227,7 +228,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         //       if(poly.getId() == 38)std::cout << "faaaaaaaaaaaaaaaaaaaaaaaa38888888888888888 : " << bg::dsv(poly.getPolygon()) << std::endl;
            }
            std::sort(neo_id.begin(),neo_id.end());
-
+           std::cout << "up  ";
            for(auto id : neo_id){
                std::cout << id << " ";
            }
@@ -240,7 +241,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            bg::centroid(neoexpanded_poly.getPolygon(), up_center);
            bg::centroid(expanded_poly.getPolygon(), down_center);//ここでcentroidくんがちゃんと出せてない感じあります
 
-           std::cout<<bg::dsv(up_center) << "  " << bg::dsv(down_center) << std::endl;
+           std::cout << "up : " << bg::dsv(up_center) << "  down : " << bg::dsv(down_center) << std::endl;
 
            QPointF aftercentroid = getPosition(up_center);
            QPointF beforecentroid = getPiecePosition(down_center);
