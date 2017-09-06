@@ -215,7 +215,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
                scan_id.push_back(sc_poly.getId());
            }
-           std::cout << "down  ";
+           std::cout << "down  ";//ここで40が大量に出てる→scan_polyのID振りができてなさげ
 
            std::sort(scan_id.begin(),scan_id.end());
            for(auto id : scan_id){

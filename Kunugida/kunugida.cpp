@@ -136,14 +136,14 @@ void Kunugida::run()
         std::cout << "おいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい" << field.getPieces().size() << std::endl;
         std::vector<polygon_i> poly_pieces;
         std::vector<int> id_list;
-        for(const auto poly : field.getPieces()){//ここの変換過程でIDが振れていないのが問題になりうる
-            id_list.push_back(field.getPieces().size());
+        for(const auto poly : field.getElementaryPieces()){//ここの変換過程でIDが振れていないのが問題になりうる
+            id_list.push_back(poly.getId());
             polygon_i i_poly = poly.getPolygon();
             poly_pieces.push_back(i_poly);
         }
         std::cout << "ウボアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアア" << poly_pieces.size() << std::endl;//ここのpush_backは正常
         std::vector<procon::ExpandedPolygon> ex_poly = polygoniToExpanded(poly_pieces , id_list);
-        std::cout << "あああああ" << std::endl;
+        std::cout << "あああああ" << ex_poly.size() << std::endl;
         board->setScannedPieces(ex_poly);
 
     }
