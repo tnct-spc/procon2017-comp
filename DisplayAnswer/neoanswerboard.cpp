@@ -410,6 +410,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
     std::cout << "setScannedPieces run" << std::endl;
+    std::cout << vec.size();
     scanned_poly = vec;
     std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
     double poly_size=0;
@@ -431,7 +432,6 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
 
         if(check_poly_size>poly_size)poly_size = check_poly_size;
     }
-    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
     for(auto& expanded_poly : scanned_poly){
         polygon_t poly = expanded_poly.getPolygon();
 
@@ -442,7 +442,6 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
         buf.resetPolygonForce(trans_poly);
         expanded_poly = buf;
     }
-    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
 }
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する

@@ -47,11 +47,11 @@ void Kunugida::run()
 
 
 
-    auto polygoniToExpanded = [](std::vector<polygon_i> pieces_){
+    auto polygoniToExpanded = [](std::vector<polygon_i> pieces_,std::vector<int> id_list){
 
 
         std::vector<procon::ExpandedPolygon> expanded_pieces;
-        int id = 1;
+        int id = 0;
         for(auto &piece_i : pieces_){
             polygon_t piece_t;
             for(auto &point : piece_i.outer()){
@@ -61,7 +61,7 @@ void Kunugida::run()
             }
             bg::correct(piece_t);
 
-            procon::ExpandedPolygon ex_poly(id);
+            procon::ExpandedPolygon ex_poly(id_list.at(id));
             ex_poly.resetPolygonForce(piece_t);
             expanded_pieces.push_back(ex_poly);
             id++;
@@ -87,7 +87,7 @@ void Kunugida::run()
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
 
-        int id = 1;
+        int id = 0;
         for(auto& piece : pieces_){
             procon::NeoExpandedPolygon buf(id);
             buf.resetPolygonForce(piece);
@@ -102,7 +102,11 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
-        std::vector<procon::ExpandedPolygon> expanded_pieces =  polygoniToExpanded(pieces_);
+        std::vector<int> id_list;
+        for(int i=0;i<pieces_.size();++i){
+            id_list.push_back(i);
+        }
+        std::vector<procon::ExpandedPolygon> expanded_pieces =  polygoniToExpanded(pieces_,id_list);
         board->setScannedPieces(expanded_pieces);
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
@@ -131,11 +135,16 @@ void Kunugida::run()
         field = NeoPolygonIO::importField(path);
         std::cout << "おいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい" << field.getPieces().size() << std::endl;
         std::vector<polygon_i> poly_pieces;
-        for(auto poly : field.getPieces()){
+        std::vector<int> id_list;
+        for(const auto poly : field.getPieces()){//ここの変換過程でIDが振れていないのが問題になりうる
+            id_list.push_back(field.getPieces().size());
             polygon_i i_poly = poly.getPolygon();
             poly_pieces.push_back(i_poly);
         }
-        board->setScannedPieces(polygoniToExpanded(poly_pieces));
+        std::cout << "ウボアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアア" << poly_pieces.size() << std::endl;//ここのpush_backは正常
+        std::vector<procon::ExpandedPolygon> ex_poly = polygoniToExpanded(poly_pieces , id_list);
+        std::cout << "あああああ" << std::endl;
+        board->setScannedPieces(ex_poly);
 
     }
 
