@@ -209,13 +209,37 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            point_i up_center;
            point_t down_center;
            procon::ExpandedPolygon expanded_poly;
+           std::vector<int> scan_id;
            for(auto sc_poly : scanned_poly){
                if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
+               scan_id.push_back(sc_poly.getId());
            }
-           bg::centroid(neoexpanded_poly.getPolygon(), up_center);
-           std::cout<<bg::dsv(up_center) << std::endl;
-           bg::centroid(expanded_poly.getPolygon(), down_center);//ここでも死んでるぞおおおおおおおおおお
 
+           std::sort(scan_id.begin(),scan_id.end());
+           for(auto id : scan_id){
+               std::cout << id << " ";
+           }
+           std::cout << "参照してるIDは" << poly_id << std::endl;
+
+           std::vector<int> neo_id;
+           for(auto poly : field.getPieces()){
+               neo_id.push_back(poly.getId());
+           }
+           std::sort(neo_id.begin(),neo_id.end());
+
+           for(auto id : neo_id){
+               std::cout << id << " ";
+           }
+           std::cout << std::endl;
+
+
+
+           std::cout << "polygon id : " << poly_id << "   expanded : " << bg::dsv(expanded_poly.getPolygon()) << std::endl;
+           std::cout << sorted_poly.size() << "  " <<  scanned_poly.size() << std::endl;
+           bg::centroid(neoexpanded_poly.getPolygon(), up_center);
+           bg::centroid(expanded_poly.getPolygon(), down_center);//ここでcentroidくんがちゃんと出せてない感じあります
+
+           std::cout<<bg::dsv(up_center) << "  " << bg::dsv(down_center) << std::endl;
 
            QPointF aftercentroid = getPosition(up_center);
            QPointF beforecentroid = getPiecePosition(down_center);
@@ -368,11 +392,11 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
             --red_id;
         }
         if(event->key() == Qt::Key_S){
-            if(red_id == blue_id - 1)++red_id;
+            if(red_id != blue_id - 1)++red_id;
         }
 
         if(event->key() == Qt::Key_K){
-            if(red_id == blue_id - 1)--blue_id;
+            if(red_id != blue_id - 1)--blue_id;
         }
         if(event->key() == Qt::Key_L && blue_id!=sorted_poly.size() - 1){
             ++blue_id;
@@ -465,6 +489,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             if(point.y() > 65 || point.y() < 0)std::cout << "framepoint y error!!!!!!!!!!" << std::endl;
         }
     }
+    sorted_poly.clear();
 
     for(auto expanded_poly : field.getPieces()){//sorted_polyにgetPiecesの中身をソートして投入する
         polygon_i poly = expanded_poly.getPolygon();
