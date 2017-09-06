@@ -327,6 +327,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         if(blue_id != -1){
                     drawProcessingLine(sorted_poly.at(blue_id), true);//ここも死んでる:
                     drawProcessingLine(sorted_poly.at(red_id), false);
+                    //めも　field.csvからの読み込み時はscanned_pieceのサイズが0になってる
+                    //めも　debug_field.csvからの読み込み時はfield.getPieceのサイズが80になってて対応するピースが出てない
         }
     }
     drawPolygonPointNum();
