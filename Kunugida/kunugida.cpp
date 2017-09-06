@@ -149,7 +149,7 @@ void Kunugida::imageRecognitonTest()
     procon::Field PDATA = imrec.run(nocframe, nocpieces);
 }
 
-Kunugida::pleaseCSV()
+void Kunugida::pleaseCSV()
 {
     connect(manager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(replyFinished(QNetworkReply*)));
@@ -174,6 +174,4 @@ void Kunugida::replyFinished(QNetworkReply *reply)
         file.close();
     }
     qDebug() << str;
-
-    emit done();
 }
