@@ -140,7 +140,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 }
                 ++array;
             }
-        }else if(mode == 1 || mode == 2){
+        }else if(mode == 1){
             std::getline(line_stream, i, ',');
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
@@ -149,7 +149,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             procon::NeoExpandedPolygon polygon;
             polygon.resetPolygonForce(hoge);
             elementary_frame_inner_pice.push_back(polygon);
-        }else if(mode == 4){
+        }else if(mode == 4 || mode == 2){
             std::getline(line_stream, id, ',');
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
