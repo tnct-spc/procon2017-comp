@@ -14,7 +14,7 @@ void checkSomething::check_calcSideAngle()
     for(polygon_i polygon : polygons) {
         procon::NeoExpandedPolygon neoPolygon;
         neoPolygon.resetPolygonForce(polygon);
-        std::vector<double> angles = neoPolygon.getSideAngle();
+        std::vector<double> angles = neoPolygon.getSideAngle_degree();
         std::cout << "polygon <" << i << ">" << std::endl;
         for(double angle : angles) {
             std::cout << angle << ", ";
