@@ -14,12 +14,14 @@ void checkSomething::check_calcSideAngle()
     for(polygon_i polygon : polygons) {
         procon::NeoExpandedPolygon neoPolygon;
         neoPolygon.resetPolygonForce(polygon);
-        std::vector<double> angles = neoPolygon.getSideAngle_degree();
+        std::vector<double> angles = neoPolygon.getSideAngle();
         std::cout << "polygon <" << i << ">" << std::endl;
         for(double angle : angles) {
             std::cout << angle << ", ";
         }
         std::cout << std::endl << std::endl;
+        if(angles.at(2) == 0.0) std::cout << "0" << std::endl;
+        if(angles.at(6) == M_PI) std::cout << "M_PI" << std::endl;
         ++i;
     }
 }
