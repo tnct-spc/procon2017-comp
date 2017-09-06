@@ -6,7 +6,7 @@
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
-#include "tcpserver.h"
+#include "http/request_mapper.h"
 
 #include <iostream>
 
@@ -29,7 +29,6 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     board->show();
-    server = std::make_shared<TcpServer>();
 }
 
 Kunugida::~Kunugida()
@@ -126,8 +125,6 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setField(NeoPolygonIO::importField("../../procon2017-comp/field.csv"));
-   // Server
-   server->getRequest(field);
 }
 
 void Kunugida::finishedProcess()

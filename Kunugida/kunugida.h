@@ -8,7 +8,6 @@
 #include "imagerecognition.h"
 #include "neofield.h"
 #include "http/request_mapper.h"
-#include "tcpserver.h"
 
 namespace Ui {
 class Kunugida;
@@ -29,7 +28,6 @@ private:
     std::shared_ptr<spdlog::logger> logger;
     bool is_running = false;
     std::shared_ptr<NeoAnswerBoard> board;
-    std::shared_ptr<TcpServer> server;
     void finishedProcess();
     void startProcess();
 
