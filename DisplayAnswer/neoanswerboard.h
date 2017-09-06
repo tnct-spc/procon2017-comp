@@ -65,7 +65,7 @@ private:
     std::vector<procon::NeoExpandedPolygon> sorted_poly; //画面の右側から順番にソートしたやつ
     point_i center;
     int point_id = 0;
-    int blue_id = 1;
+    int blue_id=-1;
     int red_id = 0;
     bool selecter;//true = left, false = right
     bool pre = false;

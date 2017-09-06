@@ -209,12 +209,38 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            point_i up_center;
            point_t down_center;
            procon::ExpandedPolygon expanded_poly;
+           std::vector<int> scan_id;
            for(auto sc_poly : scanned_poly){
                if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
+               scan_id.push_back(sc_poly.getId());
            }
-           bg::centroid(neoexpanded_poly.getPolygon(), up_center);
-           bg::centroid(expanded_poly.getPolygon(), down_center);
 
+           std::sort(scan_id.begin(),scan_id.end());
+           for(auto id : scan_id){
+               std::cout << id << " ";
+           }
+           std::cout << "参照してるIDは" << poly_id << std::endl;
+
+           std::vector<int> neo_id;
+           for(auto poly : field.getPieces()){
+               neo_id.push_back(poly.getId());
+        //       if(poly.getId() == 38)std::cout << "faaaaaaaaaaaaaaaaaaaaaaaa38888888888888888 : " << bg::dsv(poly.getPolygon()) << std::endl;
+           }
+           std::sort(neo_id.begin(),neo_id.end());
+
+           for(auto id : neo_id){
+               std::cout << id << " ";
+           }
+           std::cout << std::endl;
+
+
+
+           std::cout << "polygon id : " << poly_id << "   expanded : " << bg::dsv(expanded_poly.getPolygon()) << std::endl;
+           std::cout << sorted_poly.size() << "  " <<  scanned_poly.size() << std::endl;
+           bg::centroid(neoexpanded_poly.getPolygon(), up_center);
+           bg::centroid(expanded_poly.getPolygon(), down_center);//ここでcentroidくんがちゃんと出せてない感じあります
+
+           std::cout<<bg::dsv(up_center) << "  " << bg::dsv(down_center) << std::endl;
 
            QPointF aftercentroid = getPosition(up_center);
            QPointF beforecentroid = getPiecePosition(down_center);
@@ -271,13 +297,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         QPointF evalution_point;
         evalution_point.setX(grid_size);
         evalution_point.setY(evalution_size * 2);
-        int jointed_piece_total = 0;
-        std::vector<procon::NeoExpandedPolygon> frame__;
-        frame__ = field.getFrame();
-        for(auto frame_ : frame__){
-            jointed_piece_total += frame_.getJointedPieces().size();
-        }
-        painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+       painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
 
         QPointF text_point = evalution_point;
         text_point.setY(splitedheight);
@@ -289,13 +309,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     //drawDownBackground();
 
-    if(single_mode){
-        for(auto poly : field.getPieces()){
+
+    for(auto poly : field.getPieces()){//ここの描画はsingle_modeやキーの状況に問わずやるらしい
             drawAfterPiece(poly);
             drawPieceId(poly);
-        }
-
-    }else{
+    }
+    if(!single_mode){
         for(auto poly : scanned_poly){
             drawBeforePiece(poly);
         }
@@ -303,60 +322,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
       //      drawBeforePiece(piece_num);
       //  }
 
-        if(paintif){
-            //初期ピース&番号&処理線を描画
-            if(point_id == 0){
-                if(field.getPiecesSize() >= 1){
-                    drawAfterPiece(field.getPiece(red_id));
-                   // drawProcessingLine(red_id, false);
-                    drawPieceId(field.getPiece(red_id));
-                }
-                if(field.getPiecesSize() >= 2){
-                    ++point_id;
-                    drawAfterPiece(field.getPiece(blue_id));
-                   // drawProcessingLine(blue_id, true);
-                    drawPieceId(field.getPiece(blue_id));
-                }
-            }
-
             //キーに合わせてピース&番号&処理線を描画
-            if(point_id > 0){
-                //赤
-                if(selecter){
-                    red_id = point_id;
-                    if(red_id > blue_id){
-                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                            drawAfterPiece(field.getPiece(piecenumber));
-                            drawPieceId(field.getPiece(piecenumber));
-                        }
-                    }else{
-                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                            drawAfterPiece(field.getPiece(piecenumber));
-                            drawPieceId(field.getPiece(piecenumber));
-                        }
-                    }
-
-                    drawProcessingLine(field.getPiece(blue_id), true);
-                    drawProcessingLine(field.getPiece(red_id), false);
-                //青
-                }else{
-                    blue_id = point_id;
-                    if(red_id > blue_id){
-                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                            drawAfterPiece(field.getPiece(piecenumber));
-                            drawPieceId(field.getPiece(piecenumber));
-                        }
-                 }else{
-                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                            drawAfterPiece(field.getPiece(piecenumber));
-                            drawPieceId(field.getPiece(piecenumber));
-                        }
-                    }
-                    drawProcessingLine(field.getPiece(red_id), false);
-                    drawProcessingLine(field.getPiece(blue_id), true);
-                }
-            }
-            paintif = false;
+        if(blue_id != -1){
+                    drawProcessingLine(sorted_poly.at(blue_id), true);//ここも死んでる:
+                    drawProcessingLine(sorted_poly.at(red_id), false);
         }
     }
     drawPolygonPointNum();
@@ -367,6 +336,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     if( !field.getPieces().empty() ){
+        /*
         int hoge = field.getPieces().size() - 1;
         if(point_id > 0){
             if(point_id < hoge){
@@ -408,13 +378,39 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
                     }
                 }
             }
+        }*/
+        if(event->key() == Qt::Key_0){
+            std::cout << "push 0" << red_id << "   " << blue_id << std::endl;
         }
-            this->update();
+
+        if(event->key() == Qt::Key_A && red_id!=0){
+            --red_id;
+        }
+        if(event->key() == Qt::Key_S){
+            if(red_id != blue_id - 1)++red_id;
+        }
+
+        if(event->key() == Qt::Key_K){
+            if(red_id != blue_id - 1)--blue_id;
+        }
+        if(event->key() == Qt::Key_L && blue_id!=sorted_poly.size() - 1){
+            ++blue_id;
+        }
     }
+
+
+    this->update();
+
+
+
+
+
 }
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
+    std::cout << "setScannedPieces run" << std::endl;
     scanned_poly = vec;
+    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
     double poly_size=0;
     for(auto expanded_poly : scanned_poly){
 
@@ -434,6 +430,7 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
 
         if(check_poly_size>poly_size)poly_size = check_poly_size;
     }
+    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
     for(auto& expanded_poly : scanned_poly){
         polygon_t poly = expanded_poly.getPolygon();
 
@@ -444,6 +441,7 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
         buf.resetPolygonForce(trans_poly);
         expanded_poly = buf;
     }
+    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
 }
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
@@ -489,13 +487,14 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             if(point.y() > 65 || point.y() < 0)std::cout << "framepoint y error!!!!!!!!!!" << std::endl;
         }
     }
+    sorted_poly.clear();
 
     for(auto expanded_poly : field.getPieces()){//sorted_polyにgetPiecesの中身をソートして投入する
         polygon_i poly = expanded_poly.getPolygon();
         point_i centroid_point;
         bg::centroid(poly,centroid_point);
         bool flag=false;
-        for(int count=0;count<sorted_poly.size();++count){
+        for(unsigned int count=0;count<sorted_poly.size();++count){
             procon::NeoExpandedPolygon sort_poly = sorted_poly.at(count);
             point_i sort_centroid_point;
             bg::centroid(sort_poly.getPolygon(),sort_centroid_point);
@@ -514,6 +513,8 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         bg::centroid (poly.getPolygon(),center_point);
         std::cout << bg::dsv(center_point) << std::endl;
     }
+
+    blue_id = sorted_poly.size()-1;
 }
 
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)

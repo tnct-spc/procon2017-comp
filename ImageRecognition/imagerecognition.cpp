@@ -62,7 +62,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     error = getError(pieces);
 
-    std::vector<procon::ExpandedPolygon> test = getPolygonPosition();
+ //   std::vector<procon::ExpandedPolygon> test = getPolygonPosition();
 
     // fieldクラスのデータに変換
     procon::NeoField field = makeNeoField(pieces);
@@ -1173,7 +1173,7 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
     }
 
 
-    int id_count = 1;
+    int id_count = 0;
     for (unsigned int i=0; i<pieces.size() - (unsigned int)field_num; i++) {
         procon::NeoExpandedPolygon polygon(id_count);
         polygon.resetPolygonForce(pieces[i]);
@@ -1236,7 +1236,8 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
 std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
 {
-    if (position.size() > 0) {
+//    TODO: いい感じの変数を用意してsizeの比較を行う
+    if (position.size() == area.size()) {
         position.pop_back();
     }
 

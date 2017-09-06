@@ -109,6 +109,7 @@ void Kunugida::run()
 
         ImageRecognition imrec;
         field = imrec.run(frame, pieces);
+        std::cout << "出力しますか" << std::endl;
         board->setScannedPieces(imrec.getPolygonPosition());
 
         //        imageRecognitonTest();
