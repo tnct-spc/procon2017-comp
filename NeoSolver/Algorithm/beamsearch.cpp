@@ -857,7 +857,9 @@ void BeamSearch::run(procon::NeoField field)
     };
 
 
+#ifdef DEBUG_MODE
     delete_deplicate_point(field);
+#endif
 
     state.push_back(field);
 
