@@ -1,7 +1,8 @@
 #ifndef EVALUATE_H
 #define EVALUATE_H
 
-#include "Utils/polygonconnector.h"
+//相対パスにしたらビルド通りました
+#include "../NeoSolver/Utils/polygonconnector.h"
 
 class Evaluate
 {
