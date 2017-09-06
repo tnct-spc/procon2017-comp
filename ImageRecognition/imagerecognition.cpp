@@ -1173,7 +1173,7 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
     }
 
 
-    int id_count = 1;
+    int id_count = 0;
     for (unsigned int i=0; i<pieces.size() - (unsigned int)field_num; i++) {
         procon::NeoExpandedPolygon polygon(id_count);
         polygon.resetPolygonForce(pieces[i]);
