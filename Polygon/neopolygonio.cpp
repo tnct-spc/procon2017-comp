@@ -150,7 +150,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             procon::NeoExpandedPolygon polygon;
             polygon.resetPolygonForce(hoge);
             elementary_frame_inner_pice.push_back(polygon);
-        }else if(mode == 4 || mode == 2){
+        }else if(mode == 4){
             std::getline(line_stream, id, ',');
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
@@ -161,7 +161,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             polygon.resetPolygonForce(hoge);
             import_field.setPiece(polygon);
 
-        }else if(mode == 6){
+//        }else if(mode == 6){
 //            std::string field_index, frame_index, is_inversed, piece_index, score, frame_point_index, frame_side_index, polygon_point_index, polygon_side_index;
 //            bool _is_inversed;
 //            std::getline(line_stream, field_index, ',');
@@ -188,6 +188,16 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
 //            ev.connection.polygon_point_index = std::stoi(polygon_point_index);
 //            ev.connection.polygon_side_index = std::stoi(polygon_side_index);
 //            import_field.evaluate_cache.push_back(ev);
+        }else if(mode == 2){
+            std::getline(line_stream, id, ',');
+            while(std::getline(line_stream, x, ',')){
+                std::getline(line_stream, y, ',');
+                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
+            }
+            int _id = std::stoi(id);
+            procon::NeoExpandedPolygon polygon(_id);
+            polygon.resetPolygonForce(hoge);
+            elementary_piece.push_back(polygon);
 
         }else{
             while(std::getline(line_stream, x, ',')){
