@@ -37,7 +37,7 @@ void TcpServer::send()
     QDataStream out(client);
     out.setVersion(QDataStream::Qt_5_8);
 
-    std::string file_path = "../../procon2017-comp/field.csv";
+    std::string file_path = "../../procon2017-comp/fieldd.csv";
     NeoPolygonIO::exportPolygon(field, file_path);
     std::ifstream input(file_path);
     std::string line_buffer = "";
@@ -55,6 +55,7 @@ void TcpServer::receive()
 {
     quint16 blocksize;
     socket = new QTcpSocket(this);
+    socket->connectToHost(QHostAddress("127.0.0.1"), 9999);
     QDataStream in(socket);
     in.setVersion(QDataStream::Qt_5_8);
 

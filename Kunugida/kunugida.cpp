@@ -44,7 +44,7 @@ void Kunugida::run()
     procon::NeoField field;
 
     // Server
-    server->getRequest(field);
+    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
@@ -126,6 +126,8 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    this->board->setField(NeoPolygonIO::importField("../../procon2017-comp/field.csv"));
+   // Server
+   server->getRequest(field);
 }
 
 void Kunugida::finishedProcess()
