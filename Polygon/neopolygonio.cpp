@@ -160,7 +160,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             polygon.resetPolygonForce(hoge);
             import_field.setPiece(polygon);
 
-        }else if(mode == 6){
+        /*}else if(mode == 6){
             std::string field_index, frame_index, is_inversed, piece_index, score, frame_point_index, frame_side_index, polygon_point_index, polygon_side_index;
             bool _is_inversed;
             std::getline(line_stream, field_index, ',');
@@ -186,7 +186,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             ev.connection.frame_side_index = std::stoi(frame_side_index);
             ev.connection.polygon_point_index = std::stoi(polygon_point_index);
             ev.connection.polygon_side_index = std::stoi(polygon_side_index);
-            import_field.evaluate_cache.push_back(ev);
+            import_field.evaluate_cache.push_back(ev);*/
 
         }else{
             while(std::getline(line_stream, x, ',')){
