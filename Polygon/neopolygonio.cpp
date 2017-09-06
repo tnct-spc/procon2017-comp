@@ -140,7 +140,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 }
                 ++array;
             }
-        }else if(mode == 1){
+        }else if(mode == 1 || mode == 2){
             std::getline(line_stream, i, ',');
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
@@ -160,33 +160,33 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             polygon.resetPolygonForce(hoge);
             import_field.setPiece(polygon);
 
-        /*}else if(mode == 6){
-            std::string field_index, frame_index, is_inversed, piece_index, score, frame_point_index, frame_side_index, polygon_point_index, polygon_side_index;
-            bool _is_inversed;
-            std::getline(line_stream, field_index, ',');
-            std::getline(line_stream, frame_index, ',');
-            std::getline(line_stream, is_inversed, ',');
-            std::getline(line_stream, piece_index, ',');
-            std::getline(line_stream, score, ',');
-            std::getline(line_stream, frame_point_index, ',');
-            std::getline(line_stream, frame_side_index, ',');
-            std::getline(line_stream, polygon_point_index, ',');
-            std::getline(line_stream, polygon_side_index, ',');
-            Evaluate ev;
-            ev.fields_index = std::stoi(field_index);
-            ev.frame_index = std::stoi(frame_index);
-            if(is_inversed == "0")
-                _is_inversed = false;
-            if(is_inversed == "1")
-                _is_inversed =true;
-            ev.is_inversed = _is_inversed;
-            ev.piece_index = std::stoi(piece_index);
-            ev.score = std::stod(score);
-            ev.connection.frame_point_index = std::stoi(frame_point_index);
-            ev.connection.frame_side_index = std::stoi(frame_side_index);
-            ev.connection.polygon_point_index = std::stoi(polygon_point_index);
-            ev.connection.polygon_side_index = std::stoi(polygon_side_index);
-            import_field.evaluate_cache.push_back(ev);*/
+        }else if(mode == 6){
+//            std::string field_index, frame_index, is_inversed, piece_index, score, frame_point_index, frame_side_index, polygon_point_index, polygon_side_index;
+//            bool _is_inversed;
+//            std::getline(line_stream, field_index, ',');
+//            std::getline(line_stream, frame_index, ',');
+//            std::getline(line_stream, is_inversed, ',');
+//            std::getline(line_stream, piece_index, ',');
+//            std::getline(line_stream, score, ',');
+//            std::getline(line_stream, frame_point_index, ',');
+//            std::getline(line_stream, frame_side_index, ',');
+//            std::getline(line_stream, polygon_point_index, ',');
+//            std::getline(line_stream, polygon_side_index, ',');
+//            Evaluate ev;
+//            ev.fields_index = std::stoi(field_index);
+//            ev.frame_index = std::stoi(frame_index);
+//            if(is_inversed == "0")
+//                _is_inversed = false;
+//            if(is_inversed == "1")
+//                _is_inversed =true;
+//            ev.is_inversed = _is_inversed;
+//            ev.piece_index = std::stoi(piece_index);
+//            ev.score = std::stod(score);
+//            ev.connection.frame_point_index = std::stoi(frame_point_index);
+//            ev.connection.frame_side_index = std::stoi(frame_side_index);
+//            ev.connection.polygon_point_index = std::stoi(polygon_point_index);
+//            ev.connection.polygon_side_index = std::stoi(polygon_side_index);
+//            import_field.evaluate_cache.push_back(ev);
 
         }else{
             while(std::getline(line_stream, x, ',')){
@@ -197,8 +197,6 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             polygon.resetPolygonForce(hoge);
             if(mode == 0)
                 elementary_frame.push_back(polygon);
-            if(mode == 2)
-                elementary_piece.push_back(polygon);
             if(mode == 3)
                 frame.push_back(polygon);
 
