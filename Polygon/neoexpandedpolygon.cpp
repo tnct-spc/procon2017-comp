@@ -241,7 +241,7 @@ std::vector<double> const& procon::NeoExpandedPolygon::getSideAngle() const
     return side_angle;
 }
 
-std::vector<double> const& procon::NeoExpandedPolygon::getSideAngle_degree() const
+std::vector<double> const procon::NeoExpandedPolygon::getSideAngle_degree() const
 {
     std::vector<double> side_angle_degree;
     for(const double angle : this->side_angle) {
