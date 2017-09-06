@@ -1236,7 +1236,8 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
 std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
 {
-    if (position.size() > 0) {
+//    TODO: いい感じの変数を用意してsizeの比較を行う
+    if (position.size() == area.size()) {
         position.pop_back();
     }
 
