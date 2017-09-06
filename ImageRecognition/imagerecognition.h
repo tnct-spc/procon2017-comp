@@ -41,7 +41,7 @@ public:
     std::vector<procon::ExpandedPolygon> position;
     int id = 0;
     int n = 1.8;
-    std::array<std::array<double, 65>, 101> table;
+    std::map<point_i, double> tab;
 
 private:
     cv::Mat preprocessingFrame(cv::Mat image);

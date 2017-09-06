@@ -1012,31 +1012,40 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     double first_x = polygon.at(1).x() - polygon.at(0).x();
     double first_y = polygon.at(1).y() - polygon.at(0).y();
     double len = hypot(first_x, first_y) * scale / 2.5;
+    double to_ver_rad = std::atan(first_y/ first_x);
     point_i smallest;
     
     if (right_angle) {
         smallest = point_i((int)round(len), 0);
     } else {
+
         // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
         std::vector<point_i> first_point;
-    
-        for (int i=0; i<101; i++) {
-            for (int j=0; j<65; j++) {
-                if (pow((len - table[i][j]), 2) < 0.05) {
-                    first_point.push_back(point_i(i, j));
-                }
+
+        int x_count = 0;
+        int y_count = 0;
+        while (tab[point_i(x_count, y_count)] < len + 1) {
+            if (pow(tab[point_i(x_count, y_count)] - len, 2.0) < 0.05) {
+                first_point.push_back(point_i(x_count, y_count));
+            }
+
+            if (y_count == 64) {
+                x_count++;
+                y_count= 0;
+            } else {
+                y_count++;
             }
         }
-    
+
         // 可能性のあるものから相好の誤差が最も小さいものを確認
         std::vector<double> difs;
         int smallest_dif = 100;
 
         for (auto pi : first_point) {
-            double rad = atan(pi.y() / pi.x());
-            trans::rotate_transformer<boost::geometry::radian,double,2,2> deg(std::atan(pi.y() / pi.x()));
+            double to_po_rad = std::atan(pi.y() / pi.x());
+            trans::rotate_transformer<boost::geometry::radian,double,2,2> rad(to_po_rad - to_ver_rad);
             polygon_t rotate;
-            bg::transform(vertex, rotate, deg);
+            bg::transform(vertex, rotate, rad);
             double dif = 0;
             for (unsigned int i=1; i<rotate.outer().size(); i++) {
                 double x = rotate.outer().at(i).x() - rotate.outer().at(0).x();
@@ -1044,7 +1053,9 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                 double dif_len = hypot(x-round(x), y-round(y)) * scale / 2.5;
                 dif += dif_len;
             }
+
             difs.push_back(dif / (rotate.outer().size() - 1));
+
             if (smallest_dif > dif) {
                 smallest_dif = dif;
                 smallest = pi;
@@ -1052,7 +1063,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     }
 
-
+    double theta = std::atan(smallest.y() / smallest.x()) - to_ver_rad;
 
     /*
     double dif_min = 1.0;
@@ -1095,7 +1106,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             }
         }
     }
-    */
 
     // 回転角を算出
     double theta_1;
@@ -1105,12 +1115,10 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         theta_1 = atan(first_y / first_x) - M_PI;
     } else {
         theta_1 = atan(first_y / first_x);
-    }
+    }pi.y() / pi.x()
     double theta_2 = atan(smallest.y() / smallest.x());
     double theta = theta_2 - theta_1;
 
-
-    /*
     // 2つの角度から選ぶ
     if (theta_2 != 0) {
 
@@ -1283,7 +1291,18 @@ void ImageRecognition::makeTable()
     // 存在しうる全ての辺の長さを作る
     for (int i=0; i<101; i++) {
         for (int j=0; j<65; j++) {
-            table[i][j] = hypot(i, j);
+            tab[point_i(i, j)] = hypot(i, j);
+        }
+    }
+
+    // sortb
+    for (int i=0; i<101*65-1; i++) {
+        for (int j=101*65-1; j>i; j--) {
+            if (tab[point_i((int)j/65, j%65)] > tab[point_i((int)(j+1)/65, (j+1)%65)]) {
+                auto box = tab[point_i((int)j/65, j%65)];
+                tab[point_i((int)j/65, j%65)] = tab[point_i((int)(j+1)/65, (j+1)%65)];
+                tab[point_i((int)(j+1)/65, (j+1)%65)] = box;
+            }
         }
     }
 }
