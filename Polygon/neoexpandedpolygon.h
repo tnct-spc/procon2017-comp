@@ -51,6 +51,7 @@ public:
     //int getInnerSize() const;
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
+    std::vector<double> const& getSideAngle_degree() const;
     std::vector<double> const& getSideSlope() const;
     //std::vector<std::vector<double>> const& getInnersSideLength() const;
     //std::vector<std::vector<double>> const& getInnersSideAngle() const;
