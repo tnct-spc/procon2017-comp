@@ -36,7 +36,8 @@ SOURCES += neosolver.cpp \
     Algorithm/testalgortithm.cpp \
     Algorithm/beamsearch.cpp \
     Evaluation/evaluation.cpp \
-    Utils/polygonconnector.cpp
+    Utils/polygonconnector.cpp \
+    Evaluation/evaluate.cpp
 
 HEADERS += neosolver.h\
     neosolver_global.h \
@@ -44,8 +45,8 @@ HEADERS += neosolver.h\
     Algorithm/testalgortithm.h \
     Algorithm/beamsearch.h \
     Evaluation/evaluation.h \
-    Evaluation/evaluate.h \
-    Utils/polygonconnector.h
+    Utils/polygonconnector.h \
+    Evaluation/evaluate.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
