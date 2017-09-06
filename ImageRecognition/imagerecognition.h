@@ -9,6 +9,9 @@
 #include "neoexpandedpolygon.h"
 #include "singlepolygondisplay.h"
 
+namespace trans = bg::strategy::transform;
+using degree_t = trans::rotate_transformer<boost::geometry::radian,double,2,2>;
+
 class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
 
@@ -38,6 +41,7 @@ public:
     std::vector<procon::ExpandedPolygon> position;
     int id = 0;
     int n = 1.8;
+    std::array<std::array<double, 65>, 101> table;
 
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
@@ -58,6 +62,7 @@ private:
     double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
     std::vector<procon::ExpandedPolygon> getPolygonPosition();
+    void makeTable();
 
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;

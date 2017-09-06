@@ -35,6 +35,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
+    /*
+    for (unsigned int i=0; i<polygons.size(); i++) {
+        procon::ExpandedPolygon ex;
+        ex.resetPolygonForce(polygons[i]);
+        PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
+    }
+    */
+
     // frameのinnersをouterに入れ替える
     field_num = polygons[0].inners().size();
     for (int i=0; i<field_num; i++) {
@@ -48,13 +56,15 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // 元のフレームは削除
     polygons.erase(polygons.begin());
 
+    makeTable();
+
     // Gridに乗せる
     std::vector<polygon_i> pieces;
     double error;
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        //NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
         //error = getError(pieces[i], i+1);
         //printf("%d : %f\n", i, error);
     }
@@ -940,7 +950,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         // 配列を循環
         if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
             double hori = hypot(vec[2], vec[3]) * scale / 2.5;
-            if (fabs(hori - round(hori)) < 0.05) {
+            if (fabs(hori - round(hori)) < 0.1) {
                 polygon.pop_back();
                 polygon_t spin;
                 for (unsigned int j = 0; j < polygon.size(); j++) {
@@ -1002,7 +1012,49 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     double first_x = polygon.at(1).x() - polygon.at(0).x();
     double first_y = polygon.at(1).y() - polygon.at(0).y();
     double len = hypot(first_x, first_y) * scale / 2.5;
+    point_i smallest;
+    
+    if (right_angle) {
+        smallest = point_i((int)round(len), 0);
+    } else {
+        // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
+        std::vector<point_i> first_point;
+    
+        for (int i=0; i<101; i++) {
+            for (int j=0; j<65; j++) {
+                if (pow((len - table[i][j]), 2) < 0.05) {
+                    first_point.push_back(point_i(i, j));
+                }
+            }
+        }
+    
+        // 可能性のあるものから相好の誤差が最も小さいものを確認
+        std::vector<double> difs;
+        int smallest_dif = 100;
 
+        for (auto pi : first_point) {
+            double rad = atan(pi.y() / pi.x());
+            trans::rotate_transformer<boost::geometry::radian,double,2,2> deg(std::atan(pi.y() / pi.x()));
+            polygon_t rotate;
+            bg::transform(vertex, rotate, deg);
+            double dif = 0;
+            for (unsigned int i=1; i<rotate.outer().size(); i++) {
+                double x = rotate.outer().at(i).x() - rotate.outer().at(0).x();
+                double y = rotate.outer().at(i).y() - rotate.outer().at(0).y();
+                double dif_len = hypot(x-round(x), y-round(y)) * scale / 2.5;
+                dif += dif_len;
+            }
+            difs.push_back(dif / (rotate.outer().size() - 1));
+            if (smallest_dif > dif) {
+                smallest_dif = dif;
+                smallest = pi;
+            }
+        }
+    }
+
+
+
+    /*
     double dif_min = 1.0;
     double dy;
     int p[2];
@@ -1043,6 +1095,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             }
         }
     }
+    */
 
     // 回転角を算出
     double theta_1;
@@ -1053,9 +1106,11 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     } else {
         theta_1 = atan(first_y / first_x);
     }
-    double theta_2 = atan((double)p[1] / (double)p[0]);
+    double theta_2 = atan(smallest.y() / smallest.x());
     double theta = theta_2 - theta_1;
 
+
+    /*
     // 2つの角度から選ぶ
     if (theta_2 != 0) {
 
@@ -1100,6 +1155,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             theta = theta_2 -theta_1;
         }
     }
+    */
 
     // 全ての点を回転後のいちに移動
     polygon_t turn;
@@ -1210,12 +1266,24 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
 {
     if (position.size() > 0) {
-        //position.pop_back();
+        position.pop_back();
     }
 
+    /*
     for (unsigned int i=0; i<position.size(); i++) {
         PolygonViewer::getInstance().pushPolygon(position[i],std::to_string(i));
     }
+    */
 
     return position;
+}
+
+void ImageRecognition::makeTable()
+{
+    // 存在しうる全ての辺の長さを作る
+    for (int i=0; i<101; i++) {
+        for (int j=0; j<65; j++) {
+            table[i][j] = hypot(i, j);
+        }
+    }
 }
