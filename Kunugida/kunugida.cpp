@@ -57,6 +57,28 @@ void Kunugida::run()
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();
 
+#define SHOW_ANGLE
+#ifdef SHOW_ANGLE
+        std::cout << "angles ->" << std::endl;
+        std::vector<double> angles;
+        for(polygon_i piece : pieces_) {
+            procon::NeoExpandedPolygon neoPiece;
+            neoPiece.resetPolygonForce(piece);
+            for(double angle : neoPiece.getSideAngle()) {
+                angle = (angle / M_PI) * 180;
+                angles.push_back(angle);
+            }
+        }
+
+        std::sort(angles.begin(), angles.end());
+
+        for(double angle : angles) {
+            std::cout << angle << ", ";
+        }
+        std::cout << std::endl << std::endl;
+    }
+#else
+
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
 
@@ -105,7 +127,7 @@ void Kunugida::run()
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
     solver->run(field,algorithm_number);
-
+#endif
 
 //    QRLibrary lib;
 //    lib.Decoder(true);
