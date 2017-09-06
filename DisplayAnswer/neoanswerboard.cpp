@@ -466,8 +466,20 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                             : newField.getElementaryPieces().at(i.piece_index),
                         i.connection
             );
+            std::cout<<"----------------"<<count<<"回目-------------------"<<std::endl;
+            std::cout<<"frame_side_index = "<<i.connection.frame_side_index
+                    <<",polygon_side_index = "<<i.connection.polygon_side_index
+                   <<",frame_point_index = "<<i.connection.frame_point_index
+                  <<",polygon_point_index = "<<i.connection.polygon_point_index
+                 <<std::endl;
+
+            std::vector<procon::NeoExpandedPolygon> field_frame = newField.getFrame();
+            int j = 0;
+            for(procon::NeoExpandedPolygon frame : field_frame) {
+                NeoPolygonViewer::getInstance().displayPolygon(frame.getPolygon(),"frame <" + std::to_string(j) + ">",false);
+            }
+
             if(std::get<2>(connected)){
-                std::vector<procon::NeoExpandedPolygon> field_frame = field.getFrame();
                 std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
                 for(procon::NeoExpandedPolygon nep : newframe){
                     field_frame.push_back(nep);
@@ -478,12 +490,6 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 procon::NeoExpandedPolygon nep = std::get<1>(connected);
                 NeoPolygonViewer::getInstance().displayPolygon(nep.getPolygon(),"hello",false);
                 newField.setIsPlaced(i.piece_index);
-                std::cout<<"----------------"<<count<<"回目-------------------"<<std::endl;
-                std::cout<<"frame_side_index = "<<i.connection.frame_side_index
-                        <<",polygon_side_index = "<<i.connection.polygon_side_index
-                       <<",frame_point_index = "<<i.connection.frame_point_index
-                      <<",polygon_point_index = "<<i.connection.polygon_point_index
-                     <<std::endl;
                 nad->addAnswer(newField);
 #ifdef OUT_FILE
                 std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count) + ".csv";
@@ -493,6 +499,10 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 std::cout << "結合失敗" << std::endl;
                 nad->deleteLater();
                 QMessageBox::warning(nad, tr("エラー"), tr("結合失敗！"));
+                NeoPolygonViewer::getInstance().displayPolygon(i.is_inversed
+                                                               ? newField.getElementaryInversePieces().at(i.piece_index).getPolygon()
+                                                               : newField.getElementaryPieces().at(i.piece_index).getPolygon(),
+                                                               "hello", false);
                 break;
             }
         }
