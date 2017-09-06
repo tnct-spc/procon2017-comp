@@ -303,33 +303,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
       //      drawBeforePiece(piece_num);
       //  }
 
-        if(paintif){
-            //初期ピース&番号&処理線を描画      この辺りをまるごと書き直していく
-            if(point_id == 0){
-                if(field.getPiecesSize() >= 1){
-                    drawProcessingLine(sorted_poly.at(red_id), false);
-                }
-                if(field.getPiecesSize() >= 2){
-                    ++point_id;
-                    drawProcessingLine(sorted_poly.at(blue_id), true);
-                }
-            }
-
             //キーに合わせてピース&番号&処理線を描画
-            if(point_id > 0){
-                //赤
-                if(selecter){
-                    red_id = point_id;
-
+        if(blue_id != -1){
                     drawProcessingLine(sorted_poly.at(blue_id), true);//ここも死んでる:
                     drawProcessingLine(sorted_poly.at(red_id), false);
-                //青
-                }else{
-                    drawProcessingLine(sorted_poly.at(red_id), false);
-                    drawProcessingLine(sorted_poly.at(blue_id), true);//ここも荒ぶってる　当たり前のようにエラー吐くのやめませんか
-                }
-            }
-            paintif = false;
         }
     }
     drawPolygonPointNum();
@@ -340,6 +317,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 {
     if( !field.getPieces().empty() ){
+        /*
         int hoge = field.getPieces().size() - 1;
         if(point_id > 0){
             if(point_id < hoge){
@@ -381,9 +359,33 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
                     }
                 }
             }
+        }*/
+        if(event->key() == Qt::Key_0){
+            std::cout << "push 0" << red_id << "   " << blue_id << std::endl;
         }
-            this->update();
+
+        if(event->key() == Qt::Key_A && red_id!=0){
+            --red_id;
+        }
+        if(event->key() == Qt::Key_S){
+            if(red_id == blue_id - 1)++red_id;
+        }
+
+        if(event->key() == Qt::Key_K){
+            if(red_id == blue_id - 1)--blue_id;
+        }
+        if(event->key() == Qt::Key_L && blue_id!=sorted_poly.size() - 1){
+            ++blue_id;
+        }
     }
+
+
+    this->update();
+
+
+
+
+
 }
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
@@ -488,6 +490,8 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         bg::centroid (poly.getPolygon(),center_point);
         std::cout << bg::dsv(center_point) << std::endl;
     }
+
+    blue_id = sorted_poly.size()-1;
 }
 
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
