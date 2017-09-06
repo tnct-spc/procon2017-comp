@@ -205,6 +205,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直し
         if(!single_mode){
+
            int poly_id = neoexpanded_poly.getId();
            point_i up_center;
            point_t down_center;
@@ -238,8 +239,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
            std::cout << "polygon id : " << poly_id << "   expanded : " << bg::dsv(expanded_poly.getPolygon()) << std::endl;
            std::cout << sorted_poly.size() << "  " <<  scanned_poly.size() << std::endl;
-           bg::centroid(neoexpanded_poly.getPolygon(), up_center);
-           bg::centroid(expanded_poly.getPolygon(), down_center);//ここでcentroidくんがちゃんと出せてない感じあります
+
+   //        bg::centroid(neoexpanded_poly.getPolygon(), up_center);
+   //        bg::centroid(expanded_poly.getPolygon(), down_center);//ここでcentroidくんがちゃんと出せてない感じあります
 
            std::cout << "up : " << bg::dsv(up_center) << "  down : " << bg::dsv(down_center) << std::endl;
 
@@ -250,7 +252,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            }else{
                painter.setPen(QPen(QBrush(Qt::red), 2.0));
            }
-           painter.drawLine(aftercentroid, beforecentroid);
+     //      painter.drawLine(aftercentroid, beforecentroid);
+
 
         }
     };
@@ -412,7 +415,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
     std::cout << "setScannedPieces run" << std::endl;
-    std::cout << vec.size();
+    std::cout << vec.size() << std::endl;
     scanned_poly = vec;
     std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
     double poly_size=0;
