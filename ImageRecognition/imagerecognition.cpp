@@ -62,7 +62,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     error = getError(pieces);
 
-    std::vector<procon::ExpandedPolygon> test = getPolygonPosition();
+ //   std::vector<procon::ExpandedPolygon> test = getPolygonPosition();
 
     // fieldクラスのデータに変換
     procon::NeoField field = makeNeoField(pieces);
