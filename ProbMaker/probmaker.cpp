@@ -736,26 +736,21 @@ void ProbMaker::makeHint(){
        polygon_i instancepiece = piece.at(rnd);
        piece.erase(piece.begin() + rnd);
        int counter = 0;
+       disposition1 += ":";
+       disposition1 += std::to_string(instancepiece.outer().size() - 1);
        for(auto point_a : instancepiece.outer()){
            int point_x = point_a.x();
            int point_y = point_a.y();
            if(counter != 0){
-               if(counter == 1){
-                   disposition1 += ":";
-                   disposition1 += std::to_string(point_x);
-                   disposition1 += " ";
-                   disposition1 += std::to_string(point_y);
-               }
-               if(counter != 1){
                    disposition1 += " ";
                    disposition1 += std::to_string(point_x);
                    disposition1 += " ";
                    disposition1 += std::to_string(point_y);
                }
-           }
            counter++;
+           }\
                 }
-            }
+
     //ヒント二段階目
     example = std::to_string(HintsNumber2);
     disposition2 += example;
@@ -764,26 +759,21 @@ void ProbMaker::makeHint(){
        polygon_i instancepiece = piece.at(rnd);
        piece.erase(piece.begin() + rnd);
        int counter = 0;
+       disposition2 += ":";
+       disposition2 += std::to_string(instancepiece.outer().size() -1);
        for(auto point_a : instancepiece.outer()){
            int point_x = point_a.x();
            int point_y = point_a.y();
            if(counter != 0){
-               if(counter == 1){
-                   disposition2 += ":";
-                   disposition2 += std::to_string(point_x);
-                   disposition2 += " ";
-                   disposition2 += std::to_string(point_y);
-               }
-               if(counter != 1){
                    disposition2 += " ";
                    disposition2 += std::to_string(point_x);
                    disposition2 += " ";
                    disposition2 += std::to_string(point_y);
                }
-           }
            counter++;
+           }
                 }
-            }
+
     //ヒント三段階目
     example = std::to_string(HintsNumber3);
     disposition3 += example;
@@ -792,22 +782,16 @@ void ProbMaker::makeHint(){
        polygon_i instancepiece = piece.at(rnd);
        piece.erase(piece.begin() + rnd);
        int counter = 0;
+       disposition3 += ":";
+       disposition3 += std::to_string(instancepiece.outer().size() - 1);
        for(auto point_a : instancepiece.outer()){
            int point_x = point_a.x();
            int point_y = point_a.y();
            if(counter != 0){
-               if(counter == 1){
-                   disposition3 += ":";
-                   disposition3 += std::to_string(point_x);
-                   disposition3 += " ";
-                   disposition3 += std::to_string(point_y);
-               }
-               if(counter != 1){
                    disposition3 += " ";
                    disposition3 += std::to_string(point_x);
                    disposition3 += " ";
                    disposition3 += std::to_string(point_y);
-               }
            }
            counter++;
                 }
@@ -820,28 +804,73 @@ void ProbMaker::makeHint(){
        polygon_i instancepiece = piece.at(rnd);
        piece.erase(piece.begin() + rnd);
        int counter = 0;
+       disposition4 += ":";
+       disposition4 += std::to_string(instancepiece.outer().size() - 1);
        for(auto point_a : instancepiece.outer()){
            int point_x = point_a.x();
            int point_y = point_a.y();
            if(counter != 0){
-               if(counter == 1){
-                   disposition4 += ":";
-                   disposition4 += std::to_string(point_x);
-                   disposition4 += " ";
-                   disposition4 += std::to_string(point_y);
-               }
-               if(counter != 1){
                    disposition4 += " ";
                    disposition4 += std::to_string(point_x);
                    disposition4 += " ";
                    disposition4 += std::to_string(point_y);
                }
+                   counter++;
            }
-           counter++;
                 }
-            }
+
     std::cout<<print_polygons.size()<<" "<<mimHintsNumber<<std::endl;
     std::cout<<HintsNumber1<<" "<<HintsNumber2<<" "<<HintsNumber3<<" "<<HintsNumber4<<" "<< HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4 <<std::endl;
+    std::cout <<disposition4<<std::endl;
+    //ここから形状情報
+    /*
+    std::vector<polygon_i> shapepiece;
+    shapeHints += std::to_string(print_polygons.size());
+    shapeHints += ':';
+    polygon_i polygon2;
+    bool result;
+    for(polygon_i shape : print_polygons){
+        polygon2.clear();
+        int random_x = retRnd(10000);
+        int random_y = retRnd(10000);
+        do{
+        for(point_i shapepoint : shape.outer()){
+            int point_x = shapepoint.x();
+            int point_y = shapepoint.y();
+            point_x = point_x + random_x;
+            point_y = point_y + random_y;
+            polygon2.outer().push_back(point_i(point_x,point_y));
+            }
+        for(polygon_i poly : shapepiece){
+            result = bg::disjoint(poly,polygon2);
+            if(result)break;
+            }
+        }while(result);
+        shapepiece.push_back(polygon2);
+    }
+    for(polygon_i polygonZ : shapepiece){
+        int counter = 0;
+        for(point_i pointZ : polygonZ){
+            int shape_x = pointZ.x();
+            int shape_y = pointZ.y();
+            if(counter != 0){
+                if(counter == 1){
+                    shapeHints += ":";
+                    shapeHints += std::to_string(shape_x);
+                    shapeHints += " ";
+                    shapeHints += std::to_string(shape_y);
+                }
+                if(counter != 1){
+                    shapeHints += " ";
+                    shapeHints += std::to_string(shape_x);
+                    shapeHints += " ";
+                    shapeHints += std::to_string(shape_y);
+                }
+            }
+            counter++;
+        }
+    }
+    */
 }
 
 void ProbMaker::paintEvent(QPaintEvent *)
