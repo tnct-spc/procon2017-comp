@@ -224,6 +224,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            std::vector<int> neo_id;
            for(auto poly : field.getPieces()){
                neo_id.push_back(poly.getId());
+        //       if(poly.getId() == 38)std::cout << "faaaaaaaaaaaaaaaaaaaaaaaa38888888888888888 : " << bg::dsv(poly.getPolygon()) << std::endl;
            }
            std::sort(neo_id.begin(),neo_id.end());
 
@@ -302,7 +303,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         for(auto frame_ : frame__){
             jointed_piece_total += frame_.getJointedPieces().size();
         }
-        painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+       painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
 
         QPointF text_point = evalution_point;
         text_point.setY(splitedheight);
@@ -415,6 +416,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
     std::cout << "setScannedPieces run" << std::endl;
     scanned_poly = vec;
+    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
     double poly_size=0;
     for(auto expanded_poly : scanned_poly){
 
@@ -434,6 +436,7 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
 
         if(check_poly_size>poly_size)poly_size = check_poly_size;
     }
+    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
     for(auto& expanded_poly : scanned_poly){
         polygon_t poly = expanded_poly.getPolygon();
 
@@ -444,6 +447,7 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
         buf.resetPolygonForce(trans_poly);
         expanded_poly = buf;
     }
+    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
 }
 
 QPointF NeoAnswerBoard::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
