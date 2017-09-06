@@ -297,13 +297,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         QPointF evalution_point;
         evalution_point.setX(grid_size);
         evalution_point.setY(evalution_size * 2);
-        int jointed_piece_total = 0;
-        std::vector<procon::NeoExpandedPolygon> frame__;
-        frame__ = field.getFrame();
-        for(auto frame_ : frame__){
-            jointed_piece_total += frame_.getJointedPieces().size();
-        }
-       painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(jointed_piece_total)+"/"+QString::number(field.getElementaryPieces().size()));
+       painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
 
         QPointF text_point = evalution_point;
         text_point.setY(splitedheight);
