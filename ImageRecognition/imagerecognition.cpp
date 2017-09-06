@@ -11,6 +11,8 @@
 
 procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
+    makeTable();
+
     raw_pieces_pic = raw_pieces_image;
 
     // ピースに分割
@@ -56,7 +58,6 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // 元のフレームは削除
     polygons.erase(polygons.begin());
 
-    makeTable();
 
     // Gridに乗せる
     std::vector<polygon_i> pieces;
@@ -1022,20 +1023,21 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
         std::vector<point_i> first_point;
 
-        int x_count = 0;
-        int y_count = 0;
-        while (tab[point_i(x_count, y_count)] < len + 1) {
-            if (pow(tab[point_i(x_count, y_count)] - len, 2.0) < 0.05) {
-                first_point.push_back(point_i(x_count, y_count));
-            }
 
-            if (y_count == 64) {
-                x_count++;
-                y_count= 0;
-            } else {
-                y_count++;
-            }
-        }
+
+//        double length_buf = tab[point_i(x_count,y_count)];
+//        while (tab[point_i(x_count, y_count)] < len + 1) {
+//            if (pow(tab[point_i(x_count, y_count)] - len, 2.0) < 0.05) {
+//                first_point.push_back(point_i(x_count, y_count));
+//            }
+
+//            if (y_count == 64) {
+//                x_count++;
+//                y_count= 0;
+//            } else {
+//                y_count++;
+//            }
+//        }
 
         // 可能性のあるものから相好の誤差が最も小さいものを確認
         std::vector<double> difs;
@@ -1288,6 +1290,7 @@ std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
 
 void ImageRecognition::makeTable()
 {
+/*
     // 存在しうる全ての辺の長さを作る
     for (int i=0; i<101; i++) {
         for (int j=0; j<65; j++) {
@@ -1305,4 +1308,15 @@ void ImageRecognition::makeTable()
             }
         }
     }
+    */
+
+    int x_count = 0;
+    int y_count = 0;
+
+    for (int x_count = 0; x_count < 101; ++x_count) {
+        for (int y_count = 0; y_count < 65; ++y_count) {
+            this->length_table.push_back(std::make_pair(point_i(x_count,y_count),static_cast<double>(x_count * x_count + y_count * y_count)));
+        }
+    }
+
 }

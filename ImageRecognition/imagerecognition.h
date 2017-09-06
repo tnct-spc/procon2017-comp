@@ -41,7 +41,6 @@ public:
     std::vector<procon::ExpandedPolygon> position;
     int id = 0;
     int n = 1.8;
-    std::map<point_i, double> tab;
 
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
@@ -70,6 +69,8 @@ private:
     std::vector<cv::Vec3b> raw_random_colors;
     double scale;
     static constexpr double cutting_allowance = 0.0;
+
+    std::vector<std::pair<point_i,double>> length_table;
 };
 
 #endif // IMAGERECOGNITION_H
