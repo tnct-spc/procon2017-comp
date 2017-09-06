@@ -87,7 +87,8 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
 
     export2file(0,field.getElementaryFrame());
     exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
-    export2file(2,field.getElementaryPieces());
+//    export2file(2,field.getElementaryPieces());
+    export2file_with_id(2,field.getElementaryPieces());
     export2file(3,field.getFrame());
     export2file_with_id(4,field.getPieces());
     exportBool2file(5,field.getIsPlaced());
@@ -140,7 +141,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 }
                 ++array;
             }
-        }else if(mode == 1 || mode == 2){
+        }else if(mode == 1){
             std::getline(line_stream, i, ',');
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
@@ -149,7 +150,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             procon::NeoExpandedPolygon polygon;
             polygon.resetPolygonForce(hoge);
             elementary_frame_inner_pice.push_back(polygon);
-        }else if(mode == 4){
+        }else if(mode == 4 || mode == 2){
             std::getline(line_stream, id, ',');
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
