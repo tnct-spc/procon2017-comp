@@ -290,13 +290,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     //drawDownBackground();
 
-    if(single_mode){
-        for(auto poly : field.getPieces()){
+
+    for(auto poly : field.getPieces()){//ここの描画はsingle_modeやキーの状況に問わずやるらしい
             drawAfterPiece(poly);
             drawPieceId(poly);
-        }
-
-    }else{
+    }
+    if(!single_mode){
         for(auto poly : scanned_poly){
             drawBeforePiece(poly);
         }
@@ -305,18 +304,14 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
       //  }
 
         if(paintif){
-            //初期ピース&番号&処理線を描画
+            //初期ピース&番号&処理線を描画      この辺りをまるごと書き直していく
             if(point_id == 0){
                 if(field.getPiecesSize() >= 1){
-                    drawAfterPiece(field.getPiece(red_id));
-                   // drawProcessingLine(red_id, false);
-                    drawPieceId(field.getPiece(red_id));
+                    drawProcessingLine(sorted_poly.at(red_id), false);
                 }
                 if(field.getPiecesSize() >= 2){
                     ++point_id;
-                    drawAfterPiece(field.getPiece(blue_id));
-                   // drawProcessingLine(blue_id, true);
-                    drawPieceId(field.getPiece(blue_id));
+                    drawProcessingLine(sorted_poly.at(blue_id), true);
                 }
             }
 
@@ -325,34 +320,11 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 //赤
                 if(selecter){
                     red_id = point_id;
-                    if(red_id > blue_id){
-                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                            drawAfterPiece(sorted_poly.at(piecenumber));
-                            drawPieceId(sorted_poly.at(piecenumber));
-                        }
-                    }else{
-                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                            drawAfterPiece(sorted_poly.at(piecenumber));
-                            drawPieceId(sorted_poly.at(piecenumber));
-                        }
-                    }
 
                     drawProcessingLine(sorted_poly.at(blue_id), true);//ここも死んでる:
                     drawProcessingLine(sorted_poly.at(red_id), false);
                 //青
                 }else{
-                    blue_id = point_id;
-                    if(red_id > blue_id){
-                        for(int piecenumber = 0; piecenumber <= red_id; ++piecenumber){
-                            drawAfterPiece(sorted_poly.at(piecenumber));
-                            drawPieceId(sorted_poly.at(piecenumber));
-                        }
-                 }else{
-                        for(int piecenumber = 0; piecenumber <= blue_id; ++piecenumber){
-                            drawAfterPiece(sorted_poly.at(piecenumber));//この行で荒ぶってる…blue_idがまずいのかもしれない
-                            drawPieceId(sorted_poly.at(piecenumber));
-                        }
-                    }
                     drawProcessingLine(sorted_poly.at(red_id), false);
                     drawProcessingLine(sorted_poly.at(blue_id), true);//ここも荒ぶってる　当たり前のようにエラー吐くのやめませんか
                 }
