@@ -43,3 +43,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver

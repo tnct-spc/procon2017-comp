@@ -242,6 +242,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
                 }
             });
             if(!flag){
+                field_buf.evaluate_cache.push_back(eval);
                 next_field.push_back(field_buf);
             }
         }else{
@@ -453,12 +454,16 @@ void BeamSearch::run(procon::NeoField field)
         evaluateNextState(state,ev);
         makeNextState(state,ev);
 
-        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size()   << std::endl;
+        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() << std::endl;
         std::cout << "evaluated state size:" << ev.size() << std::endl;
         std::cout << "field size:" << state.size() << std::endl;
 
         //vectorのメモリ解放って頭悪くね？
         std::vector<Evaluate>().swap(ev);
+
+        for(auto& f : state){
+            delete_deplicate_point(f);
+        }
 
         bool flag = false;
         for(auto const& _field : state){
