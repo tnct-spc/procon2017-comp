@@ -22,7 +22,7 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
 
-    //    imageRecognitonTest();
+//    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
@@ -31,7 +31,7 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board->show();
     tcp->show();
-   //     board->setSingleMode(true);
+//    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -97,26 +97,9 @@ void Kunugida::run()
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
-        std::vector<procon::ExpandedPolygon> expanded_pieces;
-        id = 1;
-        for(auto &piece_i : pieces_){
-            polygon_t piece_t;
-            for(auto &point : piece_i.outer()){
-                int double_point_x = point.x();
-                int double_point_y = point.y();
-                piece_t.outer().push_back(point_t(double_point_x,double_point_y));
-            }
-            bg::correct(piece_t);
 
-            procon::ExpandedPolygon ex_poly(id);
-            ex_poly.resetPolygonForce(piece_t);
-            expanded_pieces.push_back(ex_poly);
-            id++;
-        }
-        board->setScannedPieces(expanded_pieces);
-
-        //        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        //        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+//        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -126,25 +109,12 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-        cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame.png", 1);
-        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pices.png", 1);
-
-        ImageRecognition imrec;
-        field = imrec.run(frame, pieces);
-        std::cout << "出力しますか" << std::endl;
-        board->setScannedPieces(imrec.getPolygonPosition());
-
-        //        imageRecognitonTest();
+    }else if(ui->csv_button->isChecked()){
+        //csv date
+        std::string pieces_path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
+        field = NeoPolygonIO::importField(pieces_path);
     }
-
-    for(auto const& p : field.getPieces()){
-        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
-    }
-
-    for(auto const& p : field.getFrame()){
-        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
-    }
-    //    TODO: ここまでで各データソースから読み込むようにする
+//    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
 
@@ -159,9 +129,9 @@ void Kunugida::run()
     solver->run(field,algorithm_number);
 #endif
 
-    //    QRLibrary lib;
-    //    lib.Decoder(true);
-
+//    QRLibrary lib;
+//    lib.Decoder(true);
+    
     this->finishedProcess();
 }
 
@@ -180,12 +150,7 @@ void Kunugida::clickedRunButton()
 void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
-<<<<<<< HEAD
    this->board->setField(NeoPolygonIO::importField("../../procon2017-comp/field.csv"));
-=======
- //  this->board->setUp();
-   this->board->setField(field);
->>>>>>> feature/NeoDisplayAnswer
 }
 
 void Kunugida::finishedProcess()
@@ -202,10 +167,9 @@ void Kunugida::imageRecognitonTest()
 {
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
-    cv::Mat nocframe = cv::imread("/home/spc/ダウンロード/real_frame3.png", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece3.png", 1);
+    cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
+    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/piece3.png", 1);
 
     ImageRecognition imrec;
-    procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
-    board->setScannedPieces(imrec.getPolygonPosition());
+    procon::Field PDATA = imrec.run(nocframe, nocpieces);
 }
