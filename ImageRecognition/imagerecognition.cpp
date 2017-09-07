@@ -36,6 +36,21 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
     /*
+    cv::Mat line_image;
+    line_image = cv::imread("/home/spc/workspace/procon2017-image/and_image.png", 1);
+    int count = 0;
+    for (auto pol : polygons) {
+        if (count == 0) {
+            for (int i=0; i<pol.inners().at(0).size()-1; i++) {
+                cv::line(line_image, cv::Point(pol.inners().at(0).at(i).x(),pol.inners().at(0).at(i).y()), cv::Point(pol.inners().at(0).at(i+1).x(),pol.inners().at(0).at(i+1).y()), cv::Scalar(200.0), 3,CV_AA);
+            }
+        }
+        count++;
+    }
+    cv::imwrite("/home/spc/workspace/procon2017-image/topiece_image.png", line_image);
+    */
+
+    /*
     for (unsigned int i=0; i<polygons.size(); i++) {
         procon::ExpandedPolygon ex;
         ex.resetPolygonForce(polygons[i]);
@@ -55,6 +70,16 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // 元のフレームは削除
     polygons.erase(polygons.begin());
+
+    double big_len = 0;
+    auto outer = polygons[polygons.size()-1].outer();
+    for (int i=0; i<outer.size()-1; i++) {
+        double x = outer.at(i).x() - outer.at(i+1).x();
+        double y = outer.at(i).y() - outer.at(i+1).y();
+        double len = hypot(x, y);
+        if (big_len  < len) big_len= len;
+    }
+    double real_len = big_len * scale;
 
     //makeTable();
 
@@ -335,27 +360,42 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 {
     std::vector<std::vector<cv::Vec4f>> pieces_lines;
 
+    /*
+    cv::Mat and_image;
+    and_image = cv::imread("/home/spc/workspace/procon2017-image/and_image.png", 1);
+*/
+
     int count = 0;
     for(auto &image : images){
         pieces_lines.push_back(std::vector<cv::Vec4f>());
 
         //LSD直線検出 引数の"scale"が重要！！！
         //cv::LSD_REFINE_STD,threshold::LSDthrehold
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.8);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.85);
         lsd->detect(image, pieces_lines[count]);
 
+        /*
         //描画
-        cv::Mat pic(image);
-        lsd->drawSegments(pic, pieces_lines[count]);
+        cv::Mat pic(and_image);
+        if (count == 0) {
+            for (auto line : pieces_lines[count]) {
+                cv::line(and_image, cv::Point(line[0],line[1]), cv::Point(line[2],line[3]),cv::Scalar(1.0), 3,CV_AA);
+
+//                cv::imwrite("/home/spc/workspace/procon2017-image/line_image.png", and_image);
+            }
+        }
+
+//        lsd->drawSegments(and_image, pieces_lines[count]);
         // Debug
-        //if (count < 10) {
+//        if (count < 10) {
 //            cv::namedWindow(std::to_string(count+1));
 //            cv::imshow(std::to_string(count+1), pic);
-        //}
+//        }*/
         count++;
     }
 
     //cv::waitKey(0);
+
 
     return std::move(pieces_lines);
 }
@@ -780,9 +820,9 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     cv::Mat channels[3];
     cv::split(hsv_image, channels);
 
-    // 色相と彩度から色抽出
-    int width = hsv_image.cols;
-    int height = hsv_image.rows;
+    // 色相と彩度から色抽出int
+    int width = src_image.cols;
+    int height = src_image.rows;
     cv::Mat piece_image = cv::Mat(cv::Size(width, height), CV_8UC1);
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
@@ -798,40 +838,43 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
         }
     }
 
-    cv::Mat resize_image;
-    cv::resize(piece_image, resize_image, cv::Size(), n, n);
+    //cv::Mat resize_image;
+    //cv::resize(piece_image, resize_image, cv::Size(), n, n);
 
-    cv::namedWindow("resize", CV_WINDOW_NORMAL);
-    cv::imshow("resize", resize_image);
+    //cv::namedWindow("resize", CV_WINDOW_NORMAL);
+    //cv::imshow("resize", resize_image);
 
-    return resize_image;
+    return piece_image;
 }
 
 // 画像を分ける
 std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 {
-    int width = src_image.cols;
-    int height = src_image.rows;
-
-    cv::Mat origin_image;
-    cv::cvtColor(src_image,origin_image, CV_8UC1);
+    const int width = src_image.cols;
+    const int height = src_image.rows;
 
     // ぼかし（ノイズ削減）
     cv::GaussianBlur(src_image, src_image, cv::Size(5,5), 0);
 
     // 2値化
-    cv::Mat bainary_image = HSVDetection(src_image);
-
+    cv::Mat binary_image = HSVDetection(src_image);
+/*
+    cv::Mat origin_image;
+    cv::Mat channel[3];
+    cv::split(src_image, channel);
+    channel[0].convertTo(origin_image, CV_8UC1);
     cv::Mat and_image;
-    cv::bitwise_xor(origin_image, bainary_image, and_image);
+    cv::bitwise_or(origin_image, binary_image, and_image);
     cv::namedWindow("and", CV_WINDOW_NORMAL);
     cv::imshow("and", and_image);
 
+    cv::imwrite("/home/spc/workspace/procon2017-image/and_image.png", and_image);
+*/
     // ラベリング
     cv::Mat label_Image(cv::Size(width, height), CV_32S);
     cv::Mat stats;
     cv::Mat center;
-    int pieces_num = cv::connectedComponentsWithStats(bainary_image, label_Image, stats, center, 4, CV_32S);
+    int pieces_num = cv::connectedComponentsWithStats(binary_image, label_Image, stats, center, 4, CV_32S);
 
     // ノイズの除去＆分割
     std::vector<cv::Mat> pieces_images;
