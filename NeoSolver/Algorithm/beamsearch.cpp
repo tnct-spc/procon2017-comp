@@ -214,7 +214,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                  most_frame = frame_instance;
              }
         }
-        for(auto const neopiece : field.getElementaryPieces()){
+        for(auto const neopiece : field.getPieces()){
             polygon_i piece = neopiece.procon::NeoExpandedPolygon::getPolygon();
             piece_instance = tool::polygondistance(piece);
             if(most_piece < piece_instance){
