@@ -6,6 +6,7 @@
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
+#include "polygonio.h"
 
 #include <iostream>
 
@@ -44,6 +45,32 @@ void Kunugida::run()
 
     procon::NeoField field;
 
+
+
+    auto polygoniToExpanded = [](std::vector<polygon_i> pieces_,std::vector<int> id_list){
+
+
+        std::vector<procon::ExpandedPolygon> expanded_pieces;
+        int id = 0;
+        for(auto &piece_i : pieces_){
+            polygon_t piece_t;
+            for(auto &point : piece_i.outer()){
+                int double_point_x = point.x();
+                int double_point_y = point.y();
+                piece_t.outer().push_back(point_t(double_point_x,double_point_y));
+            }
+            bg::correct(piece_t);
+
+            procon::ExpandedPolygon ex_poly(id_list.at(id));
+            ex_poly.resetPolygonForce(piece_t);
+            expanded_pieces.push_back(ex_poly);
+            id++;
+        }
+
+        return expanded_pieces;
+
+    };
+
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
         logger->info("Selected ProbMaker DataSource");
@@ -60,7 +87,7 @@ void Kunugida::run()
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
 
-        int id = 1;
+        int id = 0;
         for(auto& piece : pieces_){
             procon::NeoExpandedPolygon buf(id);
             buf.resetPolygonForce(piece);
@@ -74,27 +101,17 @@ void Kunugida::run()
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
-        std::vector<procon::ExpandedPolygon> expanded_pieces;
-        id = 1;
-        for(auto &piece_i : pieces_){
-            polygon_t piece_t;
-            for(auto &point : piece_i.outer()){
-                int double_point_x = point.x();
-                int double_point_y = point.y();
-                piece_t.outer().push_back(point_t(double_point_x,double_point_y));
-            }
-            bg::correct(piece_t);
 
-            procon::ExpandedPolygon ex_poly(id);
-            ex_poly.resetPolygonForce(piece_t);
-            expanded_pieces.push_back(ex_poly);
-            id++;
+        std::vector<int> id_list;
+        for(int i=0;i<pieces_.size();++i){
+            id_list.push_back(i);
         }
+        std::vector<procon::ExpandedPolygon> expanded_pieces =  polygoniToExpanded(pieces_,id_list);
         board->setScannedPieces(expanded_pieces);
 
-        //        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        //        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
-
+        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+        int i = 1;
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -108,10 +125,23 @@ void Kunugida::run()
 
         ImageRecognition imrec;
         field = imrec.run(frame, pieces);
-        std::cout << "出力しますか" << std::endl;
         board->setScannedPieces(imrec.getPolygonPosition());
 
         //        imageRecognitonTest();
+    }else if(ui->csv_button->isChecked()){
+        //CSV date
+        std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
+        field = NeoPolygonIO::importField(path);
+        std::vector<polygon_i> poly_pieces;
+        std::vector<int> id_list;
+        for(const auto poly : field.getElementaryPieces()){
+            id_list.push_back(poly.getId());
+            polygon_i i_poly = poly.getPolygon();
+            poly_pieces.push_back(i_poly);
+        }
+        std::vector<procon::ExpandedPolygon> ex_poly = polygoniToExpanded(poly_pieces , id_list);
+        board->setScannedPieces(ex_poly);
+
     }
 
     for(auto const& p : field.getPieces()){
@@ -133,7 +163,9 @@ void Kunugida::run()
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
+    std::cout << "before solver " << field.getPieces().size() << std::endl;
     solver->run(field,algorithm_number);
+    std::cout << "after solver " << field.getPieces().size() << std::endl;
 
 
     //    QRLibrary lib;
@@ -157,7 +189,7 @@ void Kunugida::clickedRunButton()
 void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
- //  this->board->setUp();
+   std::cout << field.getPieces().size() << std::endl;
    this->board->setField(field);
 }
 
