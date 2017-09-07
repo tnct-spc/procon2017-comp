@@ -494,9 +494,80 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     blue_id = sorted_poly.size()-1;
 }
 
+//#define OUT_FILE
+
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::MouseButton::RightButton){
-        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
+        NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
+    }else if(event->button() == Qt::MouseButton::LeftButton){
+//        //二回目以上クリックされたら困る
+//        static bool haveCame = false;
+//        if(haveCame) return;
+//        haveCame = true;
+
+        NeoAnswerDock *nad = new NeoAnswerDock();
+        nad->setWindowTitle("career");
+        nad->show();
+
+        //fieldのリセット
+        auto reset_neo_field = [](procon::NeoField input_field){
+            procon::NeoField output_field;
+            output_field.setFrame(input_field.getElementaryFrame());
+            output_field.setElementaryFrame(input_field.getElementaryFrame());
+            output_field.setElementaryPieces(input_field.getElementaryPieces());
+            return output_field;
+        };
+        procon::NeoField newField = reset_neo_field(this->field);
+
+        int count = 0;
+        for(Evaluate i : this->field.evaluate_cache){
+            count++;
+            std::tuple<std::vector<procon::NeoExpandedPolygon> , procon::NeoExpandedPolygon , bool> connected = PolygonConnector::connect(
+                        newField.getFrame().at(i.frame_index),
+                        i.is_inversed
+                            ? newField.getElementaryInversePieces().at(i.piece_index)
+                            : newField.getElementaryPieces().at(i.piece_index),
+                        i.connection
+            );
+            std::cout<<"----------------"<<count<<"回目-------------------"<<std::endl;
+            std::cout<<"frame_side_index = "<<i.connection.frame_side_index
+                    <<",polygon_side_index = "<<i.connection.polygon_side_index
+                   <<",frame_point_index = "<<i.connection.frame_point_index
+                  <<",polygon_point_index = "<<i.connection.polygon_point_index
+                 <<std::endl;
+
+            std::vector<procon::NeoExpandedPolygon> field_frame = newField.getFrame();
+            int j = 0;
+            for(procon::NeoExpandedPolygon frame : field_frame) {
+                NeoPolygonViewer::getInstance().displayPolygon(frame.getPolygon(),"frame <" + std::to_string(j) + ">",false);
+            }
+
+            if(std::get<2>(connected)){
+                std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
+                for(procon::NeoExpandedPolygon nep : newframe){
+                    field_frame.push_back(nep);
+                }
+                field_frame.erase(field_frame.begin() + i.frame_index);
+                newField.setFrame(field_frame);
+                newField.setPiece(std::get<1>(connected));
+                procon::NeoExpandedPolygon nep = std::get<1>(connected);
+                NeoPolygonViewer::getInstance().displayPolygon(nep.getPolygon(),"hello",false);
+                newField.setIsPlaced(i.piece_index);
+                nad->addAnswer(newField);
+#ifdef OUT_FILE
+                std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count) + ".csv";
+                NeoPolygonIO::exportPolygon(newField , path);
+#endif
+            } else {
+                std::cout << "結合失敗" << std::endl;
+                nad->deleteLater();
+                QMessageBox::warning(nad, tr("エラー"), tr("結合失敗！"));
+                NeoPolygonViewer::getInstance().displayPolygon(i.is_inversed
+                                                               ? newField.getElementaryInversePieces().at(i.piece_index).getPolygon()
+                                                               : newField.getElementaryPieces().at(i.piece_index).getPolygon(),
+                                                               "hello", false);
+                break;
+            }
+        }
     }
-}
