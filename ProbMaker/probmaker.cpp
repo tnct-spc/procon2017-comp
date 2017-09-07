@@ -852,7 +852,7 @@ void ProbMaker::makeHint(){
     std::cout <<"あははははは一段階目クリアだよ"<<std::endl;
     for(polygon_i polygonZ : shapepiece){
         shapeHints += ":";
-        shapeHints += std::to_string(polygonZ.outer().size());
+        shapeHints += std::to_string(polygonZ.outer().size() - 1);
         int counter = 0;
         for(point_i pointZ : polygonZ.outer()){
             int shape_x = pointZ.x();
@@ -882,7 +882,7 @@ void ProbMaker::makeHint(){
     }while(!result_moke);
     int counter = 0;
     shapeHints += ":";
-    shapeHints += std::to_string(neoframe.outer().size());
+    shapeHints += std::to_string(neoframe.outer().size() - 1);
     for(point_i point :neoframe.outer()){
         if(counter != 0){
             shapeHints += " ";
