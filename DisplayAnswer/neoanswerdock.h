@@ -31,8 +31,7 @@ public:
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;
-    procon::NeoField pieces;
-    std::vector<std::unique_ptr<NeoSinglePolygonDisplay>> temp;
+    std::vector<procon::NeoField> pieces;
 };
 
 #endif // NEOANSWERDOCK_H

@@ -12,6 +12,7 @@ NeoAnswerDock::NeoAnswerDock(QWidget *parent) :
     QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
     scene->addItem(pic);
     ui->Picture->setScene(scene);
+    this->setWindowTitle("Answer Progress");
 }
 
 NeoAnswerDock::~NeoAnswerDock()
@@ -33,10 +34,18 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
 //Add single piece
 void NeoAnswerDock::makePieceList(const procon::NeoField &field)
 {
+    this->setWindowTitle("Piece List");
+    this->ui->gridLayout_3->setSpacing(5);
+    this->show();
+
     int i = 0;
+
     for(auto piece : field.getPieces()){
-       NeoSinglePolygonDisplay* piece_list = new NeoSinglePolygonDisplay;
-       piece_list->createInstance(piece.getPolygon(), "Piece", false);
-       ui->board_container->addWidget(piece_list, i / 3, i % 3);
+       NeoPolygonViewer* piece_list = new NeoPolygonViewer;
+       piece_list->getInstance().displayPolygon(piece.getPolygon(), "Piece", true);
+       this->ui->board_container->addWidget(piece_list, i / 3, i % 3);
+       i++;
+       this->update();
+       std::cout << "i";
     }
 }

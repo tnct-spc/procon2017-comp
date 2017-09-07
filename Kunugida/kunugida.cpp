@@ -99,7 +99,6 @@ void Kunugida::run()
 
 //   Show piece list
     list->makePieceList(field);
-    list->show();
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
