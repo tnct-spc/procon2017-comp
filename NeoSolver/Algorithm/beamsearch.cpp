@@ -482,4 +482,3 @@ void BeamSearch::run(procon::NeoField field)
     //    test();
 }
 
-

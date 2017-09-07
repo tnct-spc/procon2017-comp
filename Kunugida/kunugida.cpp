@@ -7,6 +7,7 @@
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
 #include "http/request_mapper.h"
+#include "Algorithm/beamsearch.h"
 
 #include <iostream>
 #include <QDebug>
@@ -103,6 +104,8 @@ void Kunugida::run()
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
+    connect(solver, SIGNAL(requestCSV()), this, SLOT(getCSV()));
+    connect(this, SIGNAL(requestCSVcomplete()), solver, SLOT(requestCSVcomplete()));
     solver->run(field,algorithm_number);
 
 

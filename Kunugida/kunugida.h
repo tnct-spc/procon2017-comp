@@ -47,10 +47,12 @@ private:
     bool first_answer_flag = true;
     procon::NeoField best_answer;
 
+public slots:
+    void getCSV();
+
 private slots:
     void clickedRunButton();
     void emitAnswer(procon::NeoField field);
-    void getCSV();
     void replyFinished(QNetworkReply* reply);
 };
 
