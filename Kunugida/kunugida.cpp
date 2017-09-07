@@ -97,6 +97,10 @@ void Kunugida::run()
         algorithm_number = 1;
     }
 
+//   Show piece list
+    list->makePieceList(field);
+    list->show();
+
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
     solver->run(field,algorithm_number);

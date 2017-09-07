@@ -26,12 +26,13 @@ public:
     explicit NeoAnswerDock(QWidget *parent = 0);
     ~NeoAnswerDock();
     void addAnswer(procon::NeoField const& field);
-    void addPiece(procon::NeoField const& pieces);
+    void makePieceList(procon::NeoField const& field);
 
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;
-    std::vector<procon::NeoField> pieces;
+    procon::NeoField pieces;
+    std::vector<std::unique_ptr<NeoSinglePolygonDisplay>> temp;
 };
 
 #endif // NEOANSWERDOCK_H
