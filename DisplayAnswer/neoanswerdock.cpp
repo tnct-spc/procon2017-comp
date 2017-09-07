@@ -30,7 +30,7 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
     this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 3, (fields.size() - 1 ) % 3);
 }
 
-void NeoAnswerDock::addAnswer(const procon::NeoField &field , const std::string text){
+void NeoAnswerDock::addAnswer(const procon::NeoField &field , const std::string &text){
     fields.push_back(field);
     NeoAnswerBoard* answer_board = new NeoAnswerBoard();
     answer_board->setField(field);
