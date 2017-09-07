@@ -1,6 +1,9 @@
+#include <string>
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
 #include "neopolygonio.h"
+#include "neoanswerdock.h"
+#include "neopolygonviewer.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
@@ -530,12 +533,11 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                             : newField.getElementaryPieces().at(i.piece_index),
                         i.connection
             );
-            std::cout<<"----------------"<<count<<"回目-------------------"<<std::endl;
-            std::cout<<"frame_side_index = "<<i.connection.frame_side_index
-                    <<",polygon_side_index = "<<i.connection.polygon_side_index
-                   <<",frame_point_index = "<<i.connection.frame_point_index
-                  <<",polygon_point_index = "<<i.connection.polygon_point_index
-                 <<std::endl;
+            std::string text = "----------------" + std::to_string(count) + "回目-------------------\n" +
+                                "frame_side_index = " + std::to_string(i.connection.frame_side_index) + "\n" +
+                                "polygon_side_index = " + std::to_string(i.connection.polygon_side_index) + "\n" +
+                                "frame_point_index = " + std::to_string(i.connection.frame_point_index) + "\n" +
+                                "polygon_point_index = " + std::to_string(i.connection.polygon_point_index) + "\n";
 
             std::vector<procon::NeoExpandedPolygon> field_frame = newField.getFrame();
             int j = 0;
@@ -554,7 +556,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 procon::NeoExpandedPolygon nep = std::get<1>(connected);
                 NeoPolygonViewer::getInstance().displayPolygon(nep.getPolygon(),"hello",false);
                 newField.setIsPlaced(i.piece_index);
-                nad->addAnswer(newField);
+                nad->addAnswer(newField , text);
 #ifdef OUT_FILE
                 std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count) + ".csv";
                 NeoPolygonIO::exportPolygon(newField , path);
@@ -571,3 +573,4 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
             }
         }
     }
+}

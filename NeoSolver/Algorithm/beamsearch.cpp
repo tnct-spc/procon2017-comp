@@ -470,7 +470,7 @@ void BeamSearch::run(procon::NeoField field)
             }
         }
 
-        if(piece_num == 2){
+        if(piece_num == 5){
             break;
         }
     }
