@@ -217,6 +217,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     import_field.setElementaryFrame(elementary_frame);
     import_field.setElementaryPieces(elementary_piece);
     import_field.setFrame(frame);
+    import_field.setIsPlaced(is_placed);
 
     return import_field;
 }
