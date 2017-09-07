@@ -6,6 +6,8 @@
 #include "Evaluation/evaluate.h"
 #include "Utils/polygonconnector.h"
 
+#include "neopolygonio.h"
+
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NeoAnswerBoard)

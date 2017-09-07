@@ -57,11 +57,9 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -l
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
 else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/release/ -lNeoSolver
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/debug/ -lNeoSolver
 else:unix: LIBS += -L$$OUT_PWD/../NeoSolver/ -lNeoSolver
 
 INCLUDEPATH += $$PWD/../NeoSolver
 DEPENDPATH += $$PWD/../NeoSolver
-

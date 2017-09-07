@@ -36,12 +36,21 @@
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="0" column="0">
-      <layout class="QGridLayout" name="board_container">
+      <layout class="QGridLayout" name="board_container" rowstretch="0" columnstretch="0">
+       <property name="topMargin">
+        <number>3</number>
+       </property>
        <property name="rightMargin">
         <number>0</number>
        </property>
-       <property name="spacing">
+       <property name="bottomMargin">
         <number>3</number>
+       </property>
+       <property name="horizontalSpacing">
+        <number>3</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>100</number>
        </property>
       </layout>
      </item>

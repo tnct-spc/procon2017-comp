@@ -443,7 +443,7 @@ void BeamSearch::run(procon::NeoField field)
     };
 
 
-    delete_deplicate_point(field);
+//    delete_deplicate_point(field);
 
     state.push_back(field);
 
@@ -454,7 +454,7 @@ void BeamSearch::run(procon::NeoField field)
         evaluateNextState(state,ev);
         makeNextState(state,ev);
 
-        std::cout << "now" << field.getElementaryPieces().size() << "/" << (piece_num + 1) << std::endl;
+        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size()   << std::endl;
         std::cout << "evaluated state size:" << ev.size() << std::endl;
         std::cout << "field size:" << state.size() << std::endl;
 

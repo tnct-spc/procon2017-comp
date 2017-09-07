@@ -53,7 +53,7 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
 
     auto export2file_with_id = [&](int state,const std::vector<procon::NeoExpandedPolygon> & polygons){
         for(const auto& p : polygons){
-            output << std::to_string(state) << "," << std::to_string(p.getId()) << polygon2string(p.getPolygon()) << std::endl;
+            output << std::to_string(state) << "," << std::to_string(p.getId()) << "," << polygon2string(p.getPolygon()) << std::endl;
         }
     };
 
@@ -95,18 +95,14 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     std::vector<procon::NeoExpandedPolygon> elementary_frame;
     std::vector<procon::NeoExpandedPolygon> elementary_piece;
     std::vector<procon::NeoExpandedPolygon> frame;
-    std::string id;
 
     //bool2file
     std::array<bool, 50> is_placed;
 
-    //doublevector2
-    std::vector<procon::NeoExpandedPolygon> elementary_frame_inner_pice;
-    std::vector<std::vector<procon::NeoExpandedPolygon>> elementary_frame_inner_pices;
-    std::string i;
+    //polygon_i _frame;
+    //std::getline(input, line_buffer);
 
     while(std::getline(input,line_buffer)){
-        //elementary_frame_inner_pices[std::stoi(i)] = elementary_frame_inner_pice;
         polygon_i hoge;
         hoge.clear();
         std::string point_buffer = "";
@@ -125,24 +121,6 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 }
                 ++array;
             }
-        }else if(mode == 1){
-            std::getline(line_stream, i, ',');
-            while(std::getline(line_stream, x, ',')){
-                std::getline(line_stream, y, ',');
-                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
-            }
-            procon::NeoExpandedPolygon polygon;
-            polygon.resetPolygonForce(hoge);
-            elementary_frame_inner_pice.push_back(polygon);
-        }else if(mode == 4){
-            std::getline(line_stream, id, ',');
-            while(std::getline(line_stream, x, ',')){
-                std::getline(line_stream, y, ',');
-                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
-            }
-            procon::NeoExpandedPolygon polygon(std::stoi(id));
-            polygon.resetPolygonForce(hoge);
-            import_field.setPiece(polygon);
         }else{
             while(std::getline(line_stream, x, ',')){
                 std::getline(line_stream, y, ',');
@@ -150,6 +128,8 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             }
             procon::NeoExpandedPolygon polygon;
             polygon.resetPolygonForce(hoge);
+            if(mode == 4)
+                import_field.setPiece(polygon);
             if(mode == 0)
                 elementary_frame.push_back(polygon);
             if(mode == 2)

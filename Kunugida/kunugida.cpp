@@ -28,9 +28,10 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     tcp = std::make_shared<TcpMain>();
-    board->setSingleMode(true);
+
     board->show();
     tcp->show();
+//    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -57,7 +58,7 @@ void Kunugida::run()
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();
 
-#define SHOW_ANGLE
+//#define SHOW_ANGLE
 #ifdef SHOW_ANGLE
         std::cout << "angles ->" << std::endl;
         std::vector<double> angles;
@@ -97,9 +98,8 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
-        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
-        int i = 1;
+//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+//        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
