@@ -72,6 +72,9 @@ DEPENDPATH += $$PWD/../Utilities
 
 include(qhttpserver/qhttpserver.pri)
 
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver
+
 unix {
     target.path = /usr/local/bin
     INSTALLS += target

@@ -60,3 +60,5 @@ DEPENDPATH += $$PWD/../Utilities
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
 
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver

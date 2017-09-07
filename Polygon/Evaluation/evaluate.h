@@ -1,6 +1,7 @@
 #ifndef EVALUATE_H
 #define EVALUATE_H
 
+//相対パスにしたらビルド通りました
 #include "Utils/polygonconnector.h"
 
 class Evaluate
