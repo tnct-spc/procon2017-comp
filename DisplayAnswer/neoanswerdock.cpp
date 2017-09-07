@@ -27,5 +27,17 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
     answer_board->setField(field);
     answer_board->setSingleMode(true);
     answer_board->setFixedSize(400, 400);
+    addPiece(field);
     this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 3, (fields.size() - 1 ) % 3);
+}
+
+//Add single piece
+void NeoAnswerDock::addPiece(const procon::NeoField &field)
+{
+    for(auto piece : field.getPieces()){
+        NeoPolygonViewer::getInstance().displayPolygon(piece.getPolygon(),"piece",false);
+    }
+
+    //piece_list->setFixedSize(400, 400);
+    //this->ui->board_container->addwidget(piece_list, (pieces.size() - 1 ) / 3, (fields.size() - 1 ) % 3);
 }
