@@ -16,7 +16,7 @@ void TestAlgortithm::run(procon::NeoField field)
     field.setFrame(field.getElementaryFrame());
 
     for(auto piece : field.getElementaryPieces()){
-        field.setPiece(piece);
+       field.setPiece(piece);
     }
 
     submitAnswer(field);
