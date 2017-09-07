@@ -132,6 +132,15 @@ void Kunugida::run()
         //CSV date
         std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
         field = NeoPolygonIO::importField(path);
+
+
+    for(auto placed : field.getIsPlaced()){
+        std::string place = (placed
+                             ? "CSV : placed"
+                             : "CSV : not placed");
+        std::cout << place << std::endl;
+    }
+
         std::vector<polygon_i> poly_pieces;
         std::vector<int> id_list;
         for(const auto poly : field.getElementaryPieces()){

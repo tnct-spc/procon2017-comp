@@ -203,47 +203,21 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawText(piececenter, QString(QString::number(expanded_poly.getId())));
     };
 
-    auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直し
+    auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直した
         if(!single_mode){
 
            int poly_id = neoexpanded_poly.getId();
            point_i up_center;
            point_t down_center;
            procon::ExpandedPolygon expanded_poly;
-           std::vector<int> scan_id;
            for(auto sc_poly : scanned_poly){
                if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
-               scan_id.push_back(sc_poly.getId());
            }
-           std::cout << "down  ";//ここで40が大量に出てる→scan_polyのID振りができてなさげ
-
-           std::sort(scan_id.begin(),scan_id.end());
-           for(auto id : scan_id){
-               std::cout << id << " ";
-           }
-           std::cout << "参照してるIDは" << poly_id << std::endl;
-
-           std::vector<int> neo_id;
-           for(auto poly : field.getPieces()){
-               neo_id.push_back(poly.getId());
-        //       if(poly.getId() == 38)std::cout << "faaaaaaaaaaaaaaaaaaaaaaaa38888888888888888 : " << bg::dsv(poly.getPolygon()) << std::endl;
-           }
-           std::sort(neo_id.begin(),neo_id.end());
-           std::cout << "up  ";
-           for(auto id : neo_id){
-               std::cout << id << " ";
-           }
-           std::cout << std::endl;
 
 
-
-           std::cout << "polygon id : " << poly_id << "   expanded : " << bg::dsv(expanded_poly.getPolygon()) << std::endl;
-           std::cout << sorted_poly.size() << "  " <<  scanned_poly.size() << std::endl;
 
            bg::centroid(neoexpanded_poly.getPolygon(), up_center);
            bg::centroid(expanded_poly.getPolygon(), down_center);//ここでcentroidくんがちゃんと出せてない感じあります
-
-           std::cout << "up : " << bg::dsv(up_center) << "  down : " << bg::dsv(down_center) << std::endl;
 
            QPointF aftercentroid = getPosition(up_center);
            QPointF beforecentroid = getPiecePosition(down_center);
@@ -313,8 +287,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     //drawDownBackground();
 
-    std::cout << "getPiecesizeeeeeeeeee" << field.getPieces().size() << std::endl;//ここでPieceが40個ある事がおかしい
-
     for(auto poly : field.getPieces()){//ここの描画はsingle_modeやキーの状況に問わずやるらしい
             drawAfterPiece(poly);
             drawPieceId(poly);
@@ -327,12 +299,9 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
       //      drawBeforePiece(piece_num);
       //  }
 
-            //キーに合わせてピース&番号&処理線を描画
         if(blue_id != -1){
-                    drawProcessingLine(sorted_poly.at(blue_id), true);//ここも死んでる:
+                    drawProcessingLine(sorted_poly.at(blue_id), true);
                     drawProcessingLine(sorted_poly.at(red_id), false);
-                    //めも　field.csvからの読み込み時はscanned_pieceのサイズが0になってる
-                    //めも　debug_field.csvからの読み込み時はfield.getPieceのサイズが80になってて対応するピースが出てない
         }
     }
     drawPolygonPointNum();
@@ -415,10 +384,8 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 }
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
-    std::cout << "setScannedPieces run" << std::endl;
     std::cout << vec.size() << std::endl;
     scanned_poly = vec;
-    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << field.getPieces().size() << std::endl;
     double poly_size=0;
     for(auto expanded_poly : scanned_poly){
 
@@ -470,9 +437,14 @@ QPointF NeoAnswerBoard::getPiecePosition(point_t point){//point_tを下画面の
 
 void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
 
-    std::cout << "setField start" << input_field.getPieces().size() << std::endl;//ここが80になってたりいろいろ変
     field=input_field;
-    std::cout << "setField start" << field.getPieces().size() << std::endl;//二回目のemitAnswerでPieceが存在するfieldが渡されてる
+
+    for(auto placed : field.getIsPlaced()){
+        std::string place = (placed
+                             ? "placed"
+                             : "not placed");
+        std::cout << place << std::endl;
+    }
     /*
     if( !field.getPieces().empty() ){
         paintif = true;
@@ -516,7 +488,6 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         }
         if(!flag)sorted_poly.push_back(expanded_poly);
     }
-    std::cout << "sorted_poly size : " << sorted_poly.size() << std::endl;
 
     for(auto poly : sorted_poly){
         point_i center_point;
