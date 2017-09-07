@@ -823,16 +823,15 @@ void ProbMaker::makeHint(){
     std::cout<<HintsNumber1<<" "<<HintsNumber2<<" "<<HintsNumber3<<" "<<HintsNumber4<<" "<< HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4 <<std::endl;
     std::cout <<disposition4<<std::endl;
     //ここから形状情報
-    /*
     std::vector<polygon_i> shapepiece;
+    polygon_i neoframe;
     shapeHints += std::to_string(print_polygons.size());
-    shapeHints += ':';
     polygon_i polygon2;
     bool result;
     for(polygon_i shape : print_polygons){
         polygon2.clear();
-        int random_x = retRnd(10000);
-        int random_y = retRnd(10000);
+        int random_x = retRnd(1000000);
+        int random_y = retRnd(1000000);
         do{
         for(point_i shapepoint : shape.outer()){
             int point_x = shapepoint.x();
@@ -841,36 +840,59 @@ void ProbMaker::makeHint(){
             point_y = point_y + random_y;
             polygon2.outer().push_back(point_i(point_x,point_y));
             }
+        result = true;
+        std::cout<<"うふふ"<<std::endl;
         for(polygon_i poly : shapepiece){
             result = bg::disjoint(poly,polygon2);
-            if(result)break;
+            if(!result)break;
             }
-        }while(result);
+        }while(!result);
         shapepiece.push_back(polygon2);
     }
+    std::cout <<"あははははは一段階目クリアだよ"<<std::endl;
     for(polygon_i polygonZ : shapepiece){
+        shapeHints += ":";
+        shapeHints += std::to_string(polygonZ.outer().size());
         int counter = 0;
-        for(point_i pointZ : polygonZ){
+        for(point_i pointZ : polygonZ.outer()){
             int shape_x = pointZ.x();
             int shape_y = pointZ.y();
             if(counter != 0){
-                if(counter == 1){
-                    shapeHints += ":";
-                    shapeHints += std::to_string(shape_x);
-                    shapeHints += " ";
-                    shapeHints += std::to_string(shape_y);
-                }
-                if(counter != 1){
                     shapeHints += " ";
                     shapeHints += std::to_string(shape_x);
                     shapeHints += " ";
                     shapeHints += std::to_string(shape_y);
-                }
             }
             counter++;
         }
     }
-    */
+    std::cout<<"あはは二段階目クリアだよ"<<std::endl;
+    bool result_moke = false;
+    do{
+        int random_x = retRnd(1000000);
+        int random_y = retRnd(1000000);
+        neoframe.clear();
+    for(point_i framepoint : frame.outer()){
+        neoframe.outer().push_back(point_i(framepoint.x() + random_x ,framepoint.y() + random_y ));
+        }
+    for(polygon_i poly2 : shapepiece){
+        result_moke = bg::disjoint(poly2,neoframe);
+        if(!result_moke)break;
+    }
+    }while(!result_moke);
+    int counter = 0;
+    shapeHints += ":";
+    shapeHints += std::to_string(neoframe.outer().size());
+    for(point_i point :neoframe.outer()){
+        if(counter != 0){
+            shapeHints += " ";
+            shapeHints += std::to_string(point.x());
+            shapeHints += " ";
+            shapeHints += std::to_string(point.y());
+        }
+        counter++;
+    }
+    std::cout <<shapeHints<<std::endl;
 }
 
 void ProbMaker::paintEvent(QPaintEvent *)
