@@ -30,7 +30,9 @@ SOURCES += \
     neopolygonviewer.cpp \
     form.cpp \
     neofield.cpp \
-    polygon.cpp
+    polygon.cpp \
+    complexangle.cpp \
+    neopolygonio.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -45,7 +47,9 @@ HEADERS += \
     neopolygonviewer.h \
     form.h \
     neofield.h \
-    polygon.h
+    polygon.h \
+    complexangle.h \
+    neopolygonio.h
 
 LIBS += -lboost_system -lboost_thread
 LIBS += -L/usr/lib `pkg-config --libs opencv`
@@ -71,3 +75,6 @@ DEPENDPATH += $$PWD/../Utilities
 
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
+
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver

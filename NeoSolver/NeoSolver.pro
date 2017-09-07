@@ -29,15 +29,24 @@ CONFIG   += precompile_header
 CONFIG += c++14
 
 LIBS += -L/usr/lib `pkg-config --libs opencv`
+LIBS += -lboost_system -lboost_thread
 
 SOURCES += neosolver.cpp \
     Algorithm/algorithmwrapper.cpp \
-    Algorithm/testalgortithm.cpp
+    Algorithm/testalgortithm.cpp \
+    Algorithm/beamsearch.cpp \
+    Evaluation/evaluation.cpp \
+    Utils/polygonconnector.cpp \
+    Evaluation/evaluate.cpp
 
 HEADERS += neosolver.h\
-        neosolver_global.h \
+    neosolver_global.h \
     Algorithm/algorithmwrapper.h \
-    Algorithm/testalgortithm.h
+    Algorithm/testalgortithm.h \
+    Algorithm/beamsearch.h \
+    Evaluation/evaluation.h \
+    Utils/polygonconnector.h \
+    Evaluation/evaluate.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
@@ -52,6 +61,9 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+INCLUDEPATH += $$PWD/../DisplayAnswer
+DEPENDPATH += $$PWD/../DisplayAnswer
 
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
