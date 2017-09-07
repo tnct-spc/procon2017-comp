@@ -176,4 +176,5 @@ void Kunugida::replyFinished(QNetworkReply *reply)
         file.close();
     }
     qDebug() << str;
+    emit requestCSVcomplete();
 }

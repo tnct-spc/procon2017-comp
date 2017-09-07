@@ -31,6 +31,7 @@ public:
 
 signals:
     void requestCSV();
+    void requestCSVcomplete();
 
 private:
     Ui::Kunugida *ui;
