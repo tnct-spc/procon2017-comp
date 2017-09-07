@@ -36,13 +36,6 @@ public:
         double error;
     } error_t;
 
-    std::vector<int> area;
-    int field_num;
-    std::vector<procon::ExpandedPolygon> position;
-    int id = 0;
-    int n = 1.8;
-    std::map<point_i, double> tab;
-
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
     std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
@@ -70,6 +63,13 @@ private:
     std::vector<cv::Vec3b> raw_random_colors;
     double scale;
     static constexpr double cutting_allowance = 0.0;
+    std::vector<int> area;
+    int field_num;
+    int pieces_num;
+    std::vector<procon::ExpandedPolygon> position;
+    int id = 0;
+    int n = 1;
+    std::map<point_i, double> tab;
 };
 
 #endif // IMAGERECOGNITION_H
