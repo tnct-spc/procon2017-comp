@@ -282,7 +282,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
         QPointF text_point = evalution_point;
         painter.setFont(QFont("Deciratuve",10,QFont::AnyStyle));
-        text_point.setY(splitedheight);
+        text_point.setY(splitedheight - 60);
         evalution_color = {0,0,0};
         painter.setPen(QPen(QBrush(evalution_color),10));
         painter.drawText(text_point, output_string);
