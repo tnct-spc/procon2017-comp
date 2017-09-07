@@ -241,16 +241,16 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setBackground(QBrush(Qt::white));
 
-        int number=0;
-        for(auto expanded_polygon: field.getPieces()){
-            polygon_i poly = expanded_polygon.getPolygon();
-            painter.setPen(QPen(QBrush(QColor(list[expanded_polygon.getId()])), 0.1));
-            for(auto point : poly.outer()){
-                QPointF text_point = getPosition(point);
-                painter.drawText(text_point,QString::number(expanded_polygon.getId()));
-            }
-            ++number;
-        }
+//        int number=0;
+//        for(auto expanded_polygon: field.getPieces()){
+//            polygon_i poly = expanded_polygon.getPolygon();
+//            painter.setPen(QPen(QBrush(QColor(list[expanded_polygon.getId()])), 0.1));
+//            for(auto point : poly.outer()){
+//                QPointF text_point = getPosition(point);
+//                painter.drawText(text_point,QString::number(expanded_polygon.getId()));
+//            }
+//            ++number;
+//        }
         painter.setPen(QPen(QBrush(QColor(236,182,138, 200)),0.1));
         int count=0;
         for(auto frame : field.getFrame()){
