@@ -38,14 +38,14 @@ public:
 
     std::vector<procon::NeoField> debug_field;
 
-    static std::string hashField(procon::NeoField field);
+    static std::string hashField(const procon::NeoField& field);
 
 private:
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;
     std::shared_ptr<NeoAnswerDock> neo;
-    unsigned int processor_num = 0;
-    unsigned int beam_width = 200;
+    unsigned int cpu_num = 0;
+    unsigned int beam_width = 400;
 };
 
 #endif // BEAMSEARCH_H

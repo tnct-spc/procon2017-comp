@@ -24,12 +24,13 @@
 #include <boost/geometry/multi/io/wkt/wkt.hpp>
 
 //もしデバックモードにしたければ下をコメントアウト
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 //同じ状態のフレームの削除
 #define USE_DUPLICATE_FRAME_PRUNE
 
 //std::condition_variable cond;
+std::mutex mtx;
 
 //PolygonConnector用の
 typedef std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> ConnectedResult;
@@ -134,9 +135,11 @@ BeamSearch::BeamSearch()
 //    logger = spdlog::get("beamsearch");
     dock = std::make_shared<NeoAnswerDock>();
     dock->show();
+
+    cpu_num = std::thread::hardware_concurrency();
 }
 
-std::string BeamSearch::hashField(procon::NeoField field){
+std::string BeamSearch::hashField(const procon::NeoField& field){
     std::vector<procon::NeoExpandedPolygon> polygons = field.getFrame();
     std::vector<procon::NeoExpandedPolygon> frame = field.getElementaryFrame();
     //polygonのvectorをすべてpointのvectorにまとめる
@@ -215,78 +218,178 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 {
     std::vector<procon::NeoField> next_field;
 
+#ifdef DEBUG_MODE
     auto makeNextFieldFromEvaluate = [&](Evaluate eval){
-        procon::NeoField field_buf = fields[eval.fields_index];
-        ConnectedResult connect_result = PolygonConnector::connect(fields[eval.fields_index].getFrame()[eval.frame_index]
-                ,eval.is_inversed
-                    ? fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
-                    : fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
-                ,eval.connection
-        );
+        if(next_field.size() <= beam_width){
 
-        if(std::get<2>(connect_result)){
-            std::array<bool,50> is_placed = field_buf.getIsPlaced();
-            is_placed[eval.piece_index] = true;
-            field_buf.setIsPlaced(is_placed);
+            procon::NeoField field_buf = fields[eval.fields_index];
+            ConnectedResult connect_result = PolygonConnector::connect(fields[eval.fields_index].getFrame()[eval.frame_index]
+                    ,eval.is_inversed
+                        ? fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
+                        : fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
+                    ,eval.connection
+            );
 
-            field_buf.setPiece(std::get<1>(connect_result));
+            if(std::get<2>(connect_result)){
+                std::array<bool,50> is_placed = field_buf.getIsPlaced();
+                is_placed[eval.piece_index] = true;
+                field_buf.setIsPlaced(is_placed);
 
-            std::vector<procon::NeoExpandedPolygon> frames_buf = fields[eval.fields_index].getFrame();
-            frames_buf.erase(frames_buf.begin() + eval.frame_index);
-            for (auto frame_polygon : std::get<0>(connect_result)){
-                frames_buf.push_back(frame_polygon);
-            }
+                field_buf.setPiece(std::get<1>(connect_result));
 
-            field_buf.setFrame(frames_buf);
+                std::vector<procon::NeoExpandedPolygon> frames_buf = fields[eval.fields_index].getFrame();
+                frames_buf.erase(frames_buf.begin() + eval.frame_index);
+                for (auto frame_polygon : std::get<0>(connect_result)){
+                    frames_buf.push_back(frame_polygon);
+                }
 
-            //deplicacte flag
-            bool flag = false;
-            const std::string now_hash = hashField(field_buf);
+                field_buf.setFrame(frames_buf);
 
-            //check field is ok
-            std::for_each(next_field.begin(),next_field.end(),[&](procon::NeoField f){
+                //deplicacte flag
+                bool flag = false;
+                const std::string now_hash = hashField(field_buf);
+
+                //check field is ok
+                std::for_each(next_field.begin(),next_field.end(),[&](procon::NeoField f){
+                    if(!flag){
+                        if(now_hash == hashField(f)){
+                            flag = true;
+                        }
+                    }
+                });
+
                 if(!flag){
-                    if(now_hash == hashField(f)){
-                        flag = true;
+                    if(!this->checkCanPrune(field_buf)){
+                        next_field.push_back(field_buf);
                     }
                 }
-            });
-
-        if(!flag){
-            if(!this->checkCanPrune(field_buf)){
-                next_field.push_back(field_buf);
             }
+
+            /*else{
+                std::array<bool,50> is_placed = field_buf.getIsPlaced();
+                is_placed[eval.piece_index] = true;
+                field_buf.setIsPlaced(is_placed);
+
+                field_buf.setPiece(std::get<1>(connect_result));
+
+                debug_field.push_back(field_buf);
+            }*/
         }
-            }
-
-        /*else{
-            std::array<bool,50> is_placed = field_buf.getIsPlaced();
-            is_placed[eval.piece_index] = true;
-            field_buf.setIsPlaced(is_placed);
-
-            field_buf.setPiece(std::get<1>(connect_result));
-
-            debug_field.push_back(field_buf);
-        }*/
     };
 
-#ifdef DEBUG_MODE
     std::sort(evaluations.begin(),evaluations.end(),[](Evaluate l,Evaluate r){
         return l.score > r.score;
     });
 
     for(auto const& eval : evaluations){
         makeNextFieldFromEvaluate(eval);
-
-        //ビーム幅を超えたらああああ終わりです。
-        if(next_field.size() == this->beam_width){
-            break;
-        }
     }
     fields.clear();
     std::copy(next_field.begin(),next_field.end(),std::back_inserter(fields));
-#elif
-    std::cout << "hogehoge"
+#else
+    //mulutithread mode
+
+    auto makeNextFieldFromEvaluate = [&](){
+
+        while(true){
+
+            Evaluate eval;
+
+            {
+                std::lock_guard<decltype(mtx)> lock(mtx);
+                if(evaluations.empty()){
+                    return;
+                }else if(next_field.size() >= beam_width){
+                    return;
+                }
+
+                eval = evaluations[evaluations.size() - 1];
+                evaluations.pop_back();
+            }
+
+            logger->info("evaluating");
+
+            procon::NeoField field_buf = fields[eval.fields_index];
+            ConnectedResult connect_result = PolygonConnector::connect(fields[eval.fields_index].getFrame()[eval.frame_index]
+                    ,eval.is_inversed
+                        ? fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
+                        : fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
+                    ,eval.connection
+            );
+
+            if(std::get<2>(connect_result)){
+                std::array<bool,50> is_placed = field_buf.getIsPlaced();
+                is_placed[eval.piece_index] = true;
+                field_buf.setIsPlaced(is_placed);
+
+                field_buf.setPiece(std::get<1>(connect_result));
+
+                std::vector<procon::NeoExpandedPolygon> frames_buf = fields[eval.fields_index].getFrame();
+                frames_buf.erase(frames_buf.begin() + eval.frame_index);
+                for (auto frame_polygon : std::get<0>(connect_result)){
+                    frames_buf.push_back(frame_polygon);
+                }
+
+                field_buf.setFrame(frames_buf);
+
+                //deplicacte flag
+                bool flag = false;
+                const std::string now_hash = hashField(field_buf);
+
+                //check field is ok
+                {
+                    std::lock_guard<decltype(mtx)> lock(mtx);
+                std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
+                    if(!flag){
+                        if(now_hash == hashField(f)){
+                            flag = true;
+                        }
+                    }
+                });
+                }
+
+                if(!flag){
+//                    if(!this->checkCanPrune(field_buf)){
+                        {
+                            std::lock_guard<decltype(mtx)> lock(mtx);
+                            next_field.push_back(field_buf);
+//                        }
+                    }
+                }
+            }
+
+            /*else{
+                std::array<bool,50> is_placed = field_buf.getIsPlaced();
+                is_placed[eval.piece_index] = true;
+                field_buf.setIsPlaced(is_placed);
+
+                field_buf.setPiece(std::get<1>(connect_result));
+
+                debug_field.push_back(field_buf);
+            }*/
+
+
+        }
+    };
+
+
+    std::sort(evaluations.begin(),evaluations.end(),[](Evaluate l,Evaluate r){
+        return l.score < r.score;
+    });
+
+    std::vector<std::thread> threads(cpu_num);
+    for(auto& th : threads){
+        th = std::thread(makeNextFieldFromEvaluate);
+    }
+
+    for(auto& th : threads){
+        th.join();
+    }
+
+    logger->info("thread joined");
+
+    fields.clear();
+    std::copy(next_field.begin(),next_field.end(),std::back_inserter(fields));
 #endif
 }
 
@@ -792,6 +895,11 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
         ++field_index;
     }
 #else
+    int field_index = 0;
+    for(auto const& f : fields){
+        evaluateNextState(f,field_index);
+        ++field_index;
+    }
 
 #endif
 }
@@ -803,7 +911,6 @@ void BeamSearch::init()
 #else
     logger->info("efficient mode");
 #endif
-    this->processor_num = std::thread::hardware_concurrency();
 }
 void BeamSearch::run(procon::NeoField field)
 {
@@ -867,8 +974,15 @@ void BeamSearch::run(procon::NeoField field)
     for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
         std::vector<Evaluate> ev;
 
+        logger->info("next step start");
+
         evaluateNextState(state,ev);
+
+        logger->info("evaluating field process has finished");
+
         makeNextState(state,ev);
+
+        logger->info("making field process has finished");
 
         std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() << std::endl;
         std::cout << "evaluated state size:" << ev.size() << std::endl;
