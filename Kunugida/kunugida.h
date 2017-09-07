@@ -29,6 +29,9 @@ public:
     void imageRecognitonTest();
     ~Kunugida();
 
+signals:
+    void requestCSV();
+
 private:
     Ui::Kunugida *ui;
     std::shared_ptr<spdlog::logger> logger;
@@ -42,11 +45,11 @@ private:
     procon::NeoField PDATA;
     bool first_answer_flag = true;
     procon::NeoField best_answer;
-    void pleaseCSV();
 
 private slots:
     void clickedRunButton();
     void emitAnswer(procon::NeoField field);
+    void getCSV();
     void replyFinished(QNetworkReply* reply);
 };
 

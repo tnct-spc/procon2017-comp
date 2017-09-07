@@ -25,6 +25,8 @@ Kunugida::Kunugida(QWidget *parent) :
 //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
+
+    connect(this, SIGNAL(requestCSV()), this, SLOT(getCSV()));
     manager = new QNetworkAccessManager(this);
 
     board = std::make_shared<NeoAnswerBoard>();
@@ -77,7 +79,7 @@ void Kunugida::run()
         field.setElementaryPieces(pieces);
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        Kunugida::pleaseCSV();
+        emit requestCSV();
         NeoPolygonIO::importField("../../procon2017-comp/field.csv");
         int i = 1;
     }else if(ui->scanner_button->isChecked()){
@@ -149,7 +151,7 @@ void Kunugida::imageRecognitonTest()
     procon::Field PDATA = imrec.run(nocframe, nocpieces);
 }
 
-void Kunugida::pleaseCSV()
+void Kunugida::getCSV()
 {
     connect(manager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(replyFinished(QNetworkReply*)));
