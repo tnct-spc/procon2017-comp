@@ -24,8 +24,8 @@ public:
 private:
     Ui::ProbMaker *ui;
 
-    const bool usePieceDataToFrame = false;//これがtrueだったらピースのデータを元に枠を生成するようにする
-    const bool onlySplitRightAngle = false;//これがfalseだったらピースの分割を斜めに行うようにする
+    const bool usePieceDataToFrame = true;//これがtrueだったらピースのデータを元に枠を生成するようにする
+    const bool onlySplitRightAngle = true;//これがfalseだったらピースの分割を斜めに行うようにする
     const int frame_size = 4500;
 
     void createPiece(polygon_i& argument_frame);

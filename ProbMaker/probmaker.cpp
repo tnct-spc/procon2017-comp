@@ -251,7 +251,7 @@ void ProbMaker::angulated_graphic(){
     setInnerFrame(frame);// 初期状態のFrameをInnerFrameに投入
     for(int count = 0;count<200;++count){
         createPiece(check_frame);//どうやらここでcreatePieceを無限実行してるのが不具合になってたみたい 上限を設けて不具合を回避した
-        if(bg::area(check_frame) < 400 || print_polygons.size() > 48)break;
+        if(bg::area(check_frame) < 700 || print_polygons.size() > 48)break;
 
     }
     //枠の残り部分をそのままピースとして出力する
@@ -268,7 +268,7 @@ void ProbMaker::angulated_graphic(){
 
         flag=false;
         for(auto poly : print_polygons){
-            if(bg::area(poly) > bg::area(frame) / 8){flag=true;//ここでピースの大きさの最大値を設定している
+            if(bg::area(poly) > bg::area(frame) / 5){flag=true;//ここでピースの大きさの最大値を設定している
             std::cout << "ピースの大きさが限界値を超えています" << std::endl;}
         }
         if(congruenceCheck())flag=true;
@@ -379,7 +379,7 @@ void ProbMaker::createFrame(){//枠の生成　const定数で挙動の変更を�
 
 void ProbMaker::createFrameFromPiece(){
     setInnerFrame(frame);
-    while(bg::area(frame) > frame_size + 1000){
+    while(bg::area(frame) > frame_size + 1500){
     for(unsigned int count = 0;count < print_polygons.size();++count){//要素そのものを削除する都合上for eachは使わない方向で
         //setInnerFrame(frame);
         if(bg::intersects(inner_frame,print_polygons.at(count)) && !retRnd(8)){//frameと接触している時に一定確率で
@@ -453,7 +453,7 @@ bool ProbMaker::splitPiece(){
     for(int count=0;count < 15;count++){//分割できないパターンでの無限ループ防止
     flag=true;
     for(unsigned int poly_num =0;poly_num<print_polygons.size();++poly_num){//for eachから変更したら問題を起こさなくなった
-        if(bg::area(print_polygons[poly_num]) > 200){//ピースの大きさが一定を超えているなら
+        if(bg::area(print_polygons[poly_num]) > 600){//ピースの大きさが一定を超えているなら
             if(onlySplitRightAngle) createPiece(print_polygons[poly_num]);
             else splitDiagonally(print_polygons[poly_num]);
             flag=false;
@@ -462,12 +462,12 @@ bool ProbMaker::splitPiece(){
     }
     if(print_polygons.size() > 49)break;
     for(auto poly : print_polygons){
-        if(bg::area(poly) > 200) flag = false;
+        if(bg::area(poly) > 600) flag = false;
     }
     if(flag)break;
     }
     for(auto poly : print_polygons){
-        if(bg::area(poly) > bg::area(frame) / 8) return false;
+        if(bg::area(poly) > bg::area(frame) / 5) return false;
     }
         return true;
 }
@@ -536,12 +536,12 @@ void ProbMaker::jointPiece(){
             if(check)break;
             int check_cou = 0;//結合先のpieceの番号
             for(auto check_poly : print_polygons){
-                if(bg::area(poly) < 50 && bg::intersects(poly,check_poly) && !bg::equals(poly,check_poly)){//面積が一定以下で他のピースと隣接していたなら結合
+                if(bg::area(poly) < 400 && bg::intersects(poly,check_poly) && !bg::equals(poly,check_poly)){//面積が一定以下で他のピースと隣接していたなら結合
 
                     std::vector<polygon_i> union_poly;
                     bg::union_(poly,check_poly,union_poly);
                     if(!bg::num_interior_rings(union_poly[0]) && union_poly.size() == 1 ){//結合後にinnerが存在してしまうようなら結合しない
-                        if(bg::area(union_poly[0]) < 550 || count == 29 ){
+                        if(bg::area(union_poly[0]) < 400 || count == 29 ){
                             print_polygons[piece_cou] = union_poly[0];
                             print_polygons.erase(print_polygons.begin() + check_cou);
                             check=true;
