@@ -384,7 +384,6 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 }
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
-    std::cout << vec.size() << std::endl;
     scanned_poly = vec;
     double poly_size=0;
     for(auto expanded_poly : scanned_poly){
@@ -439,12 +438,6 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
 
     field=input_field;
 
-    for(auto placed : field.getIsPlaced()){
-        std::string place = (placed
-                             ? "placed"
-                             : "not placed");
-        std::cout << place << std::endl;
-    }
     /*
     if( !field.getPieces().empty() ){
         paintif = true;

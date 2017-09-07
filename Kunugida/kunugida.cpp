@@ -134,12 +134,6 @@ void Kunugida::run()
         field = NeoPolygonIO::importField(path);
 
 
-    for(auto placed : field.getIsPlaced()){
-        std::string place = (placed
-                             ? "CSV : placed"
-                             : "CSV : not placed");
-        std::cout << place << std::endl;
-    }
 
         std::vector<polygon_i> poly_pieces;
         std::vector<int> id_list;
@@ -172,9 +166,7 @@ void Kunugida::run()
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
-    std::cout << "before solver " << field.getPieces().size() << std::endl;
     solver->run(field,algorithm_number);
-    std::cout << "after solver " << field.getPieces().size() << std::endl;
 
 
     //    QRLibrary lib;
