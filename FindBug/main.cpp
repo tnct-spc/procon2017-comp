@@ -3,6 +3,7 @@
 #include "findnoelement.h"
 #include "neopolygonviewer.h"
 #include "checksomething.h"
+#include "lastpiece.h"
 
 int Test()
 {
@@ -10,7 +11,8 @@ int Test()
 
     std::vector<BugFinderWrapper*> TESTER;
     //TESTER.push_back(new FindNoElement);
-    TESTER.push_back(new checkSomething);
+//    TESTER.push_back(new checkSomething);
+    TESTER.push_back(new LastPiece);
 
     for(auto tester : TESTER){
         if(!tester->run()){
