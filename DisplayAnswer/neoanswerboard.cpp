@@ -240,8 +240,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            std::cout << "polygon id : " << poly_id << "   expanded : " << bg::dsv(expanded_poly.getPolygon()) << std::endl;
            std::cout << sorted_poly.size() << "  " <<  scanned_poly.size() << std::endl;
 
-   //        bg::centroid(neoexpanded_poly.getPolygon(), up_center);
-   //        bg::centroid(expanded_poly.getPolygon(), down_center);//ここでcentroidくんがちゃんと出せてない感じあります
+           bg::centroid(neoexpanded_poly.getPolygon(), up_center);
+           bg::centroid(expanded_poly.getPolygon(), down_center);//ここでcentroidくんがちゃんと出せてない感じあります
 
            std::cout << "up : " << bg::dsv(up_center) << "  down : " << bg::dsv(down_center) << std::endl;
 
@@ -252,7 +252,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            }else{
                painter.setPen(QPen(QBrush(Qt::red), 2.0));
            }
-     //      painter.drawLine(aftercentroid, beforecentroid);
+           painter.drawLine(aftercentroid, beforecentroid);
 
 
         }
@@ -313,6 +313,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     drawFrame();
     //drawDownBackground();
 
+    std::cout << "getPiecesizeeeeeeeeee" << field.getPieces().size() << std::endl;//ここでPieceが40個ある事がおかしい
 
     for(auto poly : field.getPieces()){//ここの描画はsingle_modeやキーの状況に問わずやるらしい
             drawAfterPiece(poly);
@@ -417,7 +418,7 @@ void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){
     std::cout << "setScannedPieces run" << std::endl;
     std::cout << vec.size() << std::endl;
     scanned_poly = vec;
-    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << scanned_poly.size() << std::endl;
+    std::cout << "ooooooooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiiiiIII!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      ::::::::" << field.getPieces().size() << std::endl;
     double poly_size=0;
     for(auto expanded_poly : scanned_poly){
 
@@ -461,14 +462,18 @@ QPointF NeoAnswerBoard::getPiecePosition(point_i point){//point_iを下画面の
     return QPointF(left_right_margin + pointx * grid_size, down_up_y + pointy * grid_size);
 }
 
-QPointF NeoAnswerBoard::getPiecePosition(point_t point){//point_iを下画面の枠と対応させるようにQPointFに変換する
+QPointF NeoAnswerBoard::getPiecePosition(point_t point){//point_tを下画面の枠と対応させるようにQPointFに変換する
     int pointx = point.x() + frame_margin/2;
     int pointy = point.y() + frame_margin/2;
     return QPointF(left_right_margin + pointx * grid_size, down_up_y + pointy * grid_size);
 }
 
 void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
+
+    std::cout << "setField start" << input_field.getPieces().size() << std::endl;//ここが80になってたりいろいろ変
     field=input_field;
+    std::cout << "setField start" << field.getPieces().size() << std::endl;//二回目のemitAnswerでPieceが存在するfieldが渡されてる
+    /*
     if( !field.getPieces().empty() ){
         paintif = true;
         polygon_list.clear();
@@ -484,7 +489,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
         }
         this->update();
-    }
+    }*/
 
     for(auto frame :field.getElementaryFrame()){
         for(auto point : frame.getPolygon().outer()){

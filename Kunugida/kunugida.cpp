@@ -167,7 +167,9 @@ void Kunugida::run()
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
+    std::cout << "before solver " << field.getPieces().size() << std::endl;
     solver->run(field,algorithm_number);
+    std::cout << "after solver " << field.getPieces().size() << std::endl;//ここも問題ないそうなのでemitAnswerの問題っぽい…
 
 
     //    QRLibrary lib;
@@ -191,6 +193,7 @@ void Kunugida::clickedRunButton()
 void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
+   std::cout << field.getPieces().size() << std::endl;
    this->board->setField(field);
 }
 

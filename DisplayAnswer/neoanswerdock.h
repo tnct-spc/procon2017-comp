@@ -24,6 +24,7 @@ public:
     explicit NeoAnswerDock(QWidget *parent = 0);
     ~NeoAnswerDock();
     void addAnswer(procon::NeoField const& field);
+    void addAnswer(procon::NeoField const& field, std::string str);
 
 private:
     Ui::NeoAnswerDock *ui;
