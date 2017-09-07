@@ -278,7 +278,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
        painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
 
         QPointF text_point = evalution_point;
+        painter.setFont(QFont("Deciratuve",18,QFont::AnyStyle));
         text_point.setY(splitedheight);
+        evalution_color = {0,0,0};
+        painter.setPen(QPen(QBrush(evalution_color),10));
         painter.drawText(text_point, output_string);
         //painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
