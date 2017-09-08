@@ -918,6 +918,23 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 
 polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 {    
+    struct {
+        int operator() (const std::vector<std::pair<point_i, double>> &tab, const int &start, const int &end, const double &target)
+        {
+            if (start > end) return -1;
+
+            int middle = (start + end) * 0.5;
+
+            if (fabs(tab.at(middle).second - target) <= 0.2) return middle;
+
+            int p;
+            if (tab.at(middle).second - target > 0.2) p = (*this)(tab, start, middle-1, target);
+            else if (tab.at(middle).second - target < -0.2) p = (*this)(tab, middle+1, end, target);
+
+            return p;
+        }
+    } binarySearch;
+
     auto& polygon = vertex.outer();
 
     // グリッドの点番号で保存
@@ -1039,56 +1056,56 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     }
 
-    // ９０度がなかったら横になる辺か一番長い辺を最初に持ってくる
-    if (!right_angle) {
+//    // ９０度がなかったら横になる辺か一番長い辺を最初に持ってくる
+//    if (!right_angle) {
 
-        // 一番長い辺を探す
-        double long_len = 0;
+//        // 一番長い辺を探す
+//        double long_len = 0;
 
-        unsigned int longgest = 0;
-        unsigned int match;
-        double error = 1;
-        for (unsigned int i = 0; i < polygon.size()-1; i++) {
-            double x = polygon.at(i+1).x() - polygon.at(i).x();
-            double y = polygon.at(i+1).y() - polygon.at(i).y();
-            double it_len = hypot(x, y);
+//        unsigned int longgest = 0;
+//        unsigned int match;
+//        double error = 1;
+//        for (unsigned int i = 0; i < polygon.size()-1; i++) {
+//            double x = polygon.at(i+1).x() - polygon.at(i).x();
+//            double y = polygon.at(i+1).y() - polygon.at(i).y();
+//            double it_len = hypot(x, y);
 
-            // もし、辺の長さが横軸のグリッドにのるなら、それを先頭に計算
-            double grid_len = it_len;
-            if (fabs(grid_len - round(grid_len)) < error) {
-                error = fabs(grid_len - round(grid_len));
-                match = i;
-            } else if (long_len < it_len) {
-                long_len = it_len;
-                longgest = i;
-            }
-        }
+//            // もし、辺の長さが横軸のグリッドにのるなら、それを先頭に計算
+//            double grid_len = it_len;
+//            if (fabs(grid_len - round(grid_len)) < error) {
+//                error = fabs(grid_len - round(grid_len));
+//                match = i;
+//            } else if (long_len < it_len) {
+//                long_len = it_len;
+//                longgest = i;
+//            }
+//        }
 
-        if (error < 0.03) {
-            longgest = match;
-            right_angle = true;
-        }
+//        if (error < 0.03) {
+//            longgest = match;
+//            right_angle = true;
+//        }
 
-        // 配列を循環
-        if (longgest != 0) {
-        vertex.outer().pop_back();
-            polygon_t longer;
-            for (unsigned int i = 0; i < polygon.size(); i++) {
-                longer.outer().push_back(vertex.outer().at((i+longgest)%polygon.size()));
-            }
-            longer.outer().push_back(longer.outer().at(0));
-            vertex = longer;
-        }
-    }
+//        // 配列を循環
+//        if (longgest != 0) {
+//        vertex.outer().pop_back();
+//            polygon_t longer;
+//            for (unsigned int i = 0; i < polygon.size(); i++) {
+//                longer.outer().push_back(vertex.outer().at((i+longgest)%polygon.size()));
+//            }
+//            longer.outer().push_back(longer.outer().at(0));
+//            vertex = longer;
+//        }
+//    }
 
     // 最初の辺の長さをグリッド基準で計算
     double first_x = polygon.at(1).x() - polygon.at(0).x();
     double first_y = polygon.at(1).y() - polygon.at(0).y();
     double len = hypot(first_x, first_y);
-    double to_ver_rad = std::atan(first_y/ first_x);
+    double to_ver_rad = std::atan2(first_y, first_x);
     point_i smallest;
     
-    /*
+
     if (right_angle) {
         smallest = point_i((int)round(len), 0);
     } else {
@@ -1096,7 +1113,30 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
         std::vector<point_i> first_point;
 
+        // binary search table
+        int match = binarySearch(this->length_table, 0, this->length_table.size()-1, len);
 
+        int shorter = match;
+        int longer = match + 1;
+        bool s_check = true;
+        bool l_check = true;
+        while (s_check || l_check) {
+
+            if (fabs(this->length_table.at(shorter).second - len) < 0.25) {
+                first_point.push_back(this->length_table.at(shorter).first);
+            } else {
+                s_check = false;
+            }
+
+            if (fabs(this->length_table.at(longer).second - len) < 0.25) {
+                first_point.push_back(this->length_table.at(longer).first);
+            } else {
+                l_check = false;
+            }
+
+            shorter++;
+            longer++;
+        }
 
 //        double length_buf = tab[point_i(x_count,y_count)];
 //        while (tab[point_i(x_count, y_count)] < len + 1) {
@@ -1117,7 +1157,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         int smallest_dif = 100;
 
         for (auto pi : first_point) {
-            double to_po_rad = std::atan(pi.y() / pi.x());
+            double to_po_rad = std::atan2(pi.y() , pi.x());
             trans::rotate_transformer<boost::geometry::radian,double,2,2> rad(to_po_rad - to_ver_rad);
             polygon_t rotate;
             bg::transform(vertex, rotate, rad);
@@ -1138,103 +1178,102 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     }
 
-    double theta = std::atan(smallest.y() / smallest.x()) - to_ver_rad;
-    */
+    double theta = std::atan2(smallest.y(), smallest.x()) - to_ver_rad;
 
-    double dif_min = 1.0;
-    double dy;
-    std::vector<error_t> errors;
+//    double dif_min = 1.0;
+//    double dy;
+//    std::vector<error_t> errors;
 
-    if (right_angle) {
-        smallest = point_i((int)round(len), 0);
-    } else {
-        // 45度の範囲から辺の長さの誤差がもっとも小さいものをピックアップ
-        for (int x = ceil(len); x >= floor(len * sqrt(0.5)); x--) {
+//    if (right_angle) {
+//        smallest = point_i((int)round(len), 0);
+//    } else {
+//        // 45度の範囲から辺の長さの誤差がもっとも小さいものをピックアップ
+//        for (int x = ceil(len); x >= floor(len * sqrt(0.5)); x--) {
 
-            if (len < x) {
-                dy = 0;
-            } else {
-                dy = sqrt(pow(len, 2.0) - pow(x, 2.0));
-            }
+//            if (len < x) {
+//                dy = 0;
+//            } else {
+//                dy = sqrt(pow(len, 2.0) - pow(x, 2.0));
+//            }
 
-            double error = fabs(hypot(round(dy), x) - len);
+//            double error = fabs(hypot(round(dy), x) - len);
 
-            error_t box = {x, (int)round(dy), error};
-            errors.push_back(box);
+//            error_t box = {x, (int)round(dy), error};
+//            errors.push_back(box);
 
-            if (dif_min > error) {
-                dif_min = error;
-                smallest = point_i(x, (int)round(dy));
-            }
-        }
+//            if (dif_min > error) {
+//                dif_min = error;
+//                smallest = point_i(x, (int)round(dy));
+//            }
+//        }
 
-        for (unsigned int i=0 ; i<errors.size()-1; i++) {
-            for (unsigned int j=i; j<errors.size()-1; j++) {
-                if (errors.at(j).error > errors.at(j+1).error) {
-                    error_t box = errors.at(j);
-                    errors.at(j) = errors.at(j+1);
-                    errors.at(j+1) = box;
-                }
-            }
-        }
-    }
+//        for (unsigned int i=0 ; i<errors.size()-1; i++) {
+//            for (unsigned int j=i; j<errors.size()-1; j++) {
+//                if (errors.at(j).error > errors.at(j+1).error) {
+//                    error_t box = errors.at(j);
+//                    errors.at(j) = errors.at(j+1);
+//                    errors.at(j+1) = box;
+//                }
+//            }
+//        }
+//    }
 
-    // 回転角を算出
-    double theta_1;
-    if (first_x < 0 && first_y > 0) {
-        theta_1 = atan(first_y / first_x) + M_PI;
-    } else if (first_x < 0 && first_y <0) {
-        theta_1 = atan(first_y / first_x) - M_PI;
-    } else {
-        theta_1 = atan(first_y / first_x);
-    }
-    double theta_2 = atan(smallest.y() / smallest.x());
-    double theta = theta_2 - theta_1;
+//    // 回転角を算出
+//    double theta_1;
+//    if (first_x < 0 && first_y > 0) {
+//        theta_1 = atan(first_y / first_x) + M_PI;
+//    } else if (first_x < 0 && first_y <0) {
+//        theta_1 = atan(first_y / first_x) - M_PI;
+//    } else {
+//        theta_1 = atan(first_y / first_x);
+//    }
+//    double theta_2 = atan(smallest.y() / smallest.x());
+//    double theta = theta_2 - theta_1;
 
-    // 2つの角度から選ぶ
-    if (theta_2 != 0) {
+//    // 2つの角度から選ぶ
+//    if (theta_2 != 0) {
 
-        double dacute_len;
-        double dobtuse_len;
-        double shortest = 1;
-        bool turn = false;
-        double test_theta = theta_2;
-        int count = 0;
+//        double dacute_len;
+//        double dobtuse_len;
+//        double shortest = 1;
+//        bool turn = false;
+//        double test_theta = theta_2;
+//        int count = 0;
 
-        do {
+//        do {
 
-            double sec_x = polygon.at(2).x() - polygon.at(0).x();
-            double sec_y = polygon.at(2).y() - polygon.at(0).y();
-            len = hypot(sec_x, sec_y) * scale / 2.5;
-            double acute_x = (sec_x * cos(test_theta - theta_1) - sec_y * sin(test_theta - theta_1)) * scale / 2.5;
-            double acute_y = (sec_x * sin(test_theta - theta_1) + sec_y * cos(test_theta - theta_1)) * scale / 2.5;
-            double obtuse_x = (sec_x * cos(M_PI/2-test_theta-theta_1) - sec_y * sin(M_PI/2-test_theta-theta_1)) * scale / 2.5;
-            double obtuse_y = (sec_x * sin(M_PI/2-test_theta-theta_1) + sec_y * cos(M_PI/2-test_theta-theta_1)) * scale / 2.5;
-            dacute_len = fabs(hypot(round(acute_x), round(acute_y)) - len);
-            dobtuse_len = fabs(hypot(round(obtuse_x), round(obtuse_y)) - len);
+//            double sec_x = polygon.at(2).x() - polygon.at(0).x();
+//            double sec_y = polygon.at(2).y() - polygon.at(0).y();
+//            len = hypot(sec_x, sec_y) * scale / 2.5;
+//            double acute_x = (sec_x * cos(test_theta - theta_1) - sec_y * sin(test_theta - theta_1)) * scale / 2.5;
+//            double acute_y = (sec_x * sin(test_theta - theta_1) + sec_y * cos(test_theta - theta_1)) * scale / 2.5;
+//            double obtuse_x = (sec_x * cos(M_PI/2-test_theta-theta_1) - sec_y * sin(M_PI/2-test_theta-theta_1)) * scale / 2.5;
+//            double obtuse_y = (sec_x * sin(M_PI/2-test_theta-theta_1) + sec_y * cos(M_PI/2-test_theta-theta_1)) * scale / 2.5;
+//            dacute_len = fabs(hypot(round(acute_x), round(acute_y)) - len);
+//            dobtuse_len = fabs(hypot(round(obtuse_x), round(obtuse_y)) - len);
 
-            if (shortest > dacute_len) {
-                theta_2 = test_theta;
-                shortest = dacute_len;
-                turn = false;
-            } else if (shortest > dobtuse_len) {
-                theta_2 = test_theta;
-                shortest = dobtuse_len;
-                turn = true;
-            }
+//            if (shortest > dacute_len) {
+//                theta_2 = test_theta;
+//                shortest = dacute_len;
+//                turn = false;
+//            } else if (shortest > dobtuse_len) {
+//                theta_2 = test_theta;
+//                shortest = dobtuse_len;
+//                turn = true;
+//            }
 
-            count++;
+//            count++;
 
-            test_theta = atan((double)errors.at(count).y / (double)errors.at(count).x);
+//            test_theta = atan((double)errors.at(count).y / (double)errors.at(count).x);
 
-        } while (count < errors.size() * 0.5);
+//        } while (count < errors.size() * 0.5);
 
-        if (turn) {
-            theta = M_PI / 2 - theta_2 - theta_1;
-        } else {
-            theta = theta_2 -theta_1;
-        }
-    }
+//        if (turn) {
+//            theta = M_PI / 2 - theta_2 - theta_1;
+//        } else {
+//            theta = theta_2 -theta_1;
+//        }
+//    }
 
     // 全ての点を回転後のいちに移動
     for (unsigned int i=1; i<polygon.size(); i++) {
