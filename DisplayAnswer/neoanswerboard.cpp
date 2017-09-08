@@ -504,10 +504,8 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
     }else if(event->button() == Qt::MouseButton::LeftButton){
-//        //二回目以上クリックされたら困る
-//        static bool haveCame = false;
-//        if(haveCame) return;
-//        haveCame = true;
+        //二回目以上クリックされたら困る
+        if(this->field.evaluate_cache.empty()) return;
 
         NeoAnswerDock *nad = new NeoAnswerDock();
         nad->setWindowTitle("career");
