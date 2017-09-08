@@ -28,6 +28,8 @@ public:
     void addAnswer(procon::NeoField const& field);
     void makePieceList(procon::NeoField const& field);
 
+    void addAnswer(const procon::NeoField &field , const std::string &text);
+
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;

@@ -23,6 +23,57 @@ void TcpMain::setfield(procon::NeoField input_field)
     //make_send_data_piece();
 }
 
+void TcpMain::make_send_data_piece()
+{
+    //piece or frame(1) + range of vector(2) + QPoint(x(3), y(3))
+    QVector<QPointF> points;
+    for(auto& piece : field.getPieces()){
+        for(auto point : piece.getPolygon().outer()){
+            points << getPosition(point);
+        }
+    }
+
+    QVector<QString> send_data;
+    QString pointssize = getSupportedString(points.size(), 2);
+    for(int i = 0; i < points.size(); ++i){
+        QString xint = getSupportedString(points[i].x(), 3);
+        QString yint = getSupportedString(points[i].y(), 3);
+        send_data[i] += QString::number(piece_data);
+        send_data[i] += pointssize;
+        send_data[i] += xint;
+        send_data[i] += yint;
+    }
+    if(!send_data.empty()){
+        QMessageBox msgBox;
+        msgBox.setText(send_data[0]);
+        msgBox.exec();
+    }
+}
+
+QVector<QString> TcpMain::make_send_data_frame()
+{
+    //piece or frame(1) + range of vector(2) + QPoint(x(3), y(3))
+    QVector<QPointF> points;
+    for(auto& frame : field.getPieces()){
+        for(auto point : frame.getPolygon().outer()){
+            points << getPosition(point);
+        }
+    }
+
+    QVector<QString> send_data;
+    QString pointssize = getSupportedString(points.size(), 2);
+    for(int i = 0; i < points.size(); ++i){
+        QString xint = getSupportedString(points[i].x(), 3);
+        QString yint = getSupportedString(points[i].y(), 3);
+        send_data[i] += QString::number(frame_data);
+        send_data[i] += pointssize;
+        send_data[i] += xint;
+        send_data[i] += yint;
+    }
+
+    return send_data;
+}
+
 QPointF TcpMain::getPosition(point_i point)
 {
     int pointx = point.x();

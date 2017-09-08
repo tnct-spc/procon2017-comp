@@ -972,7 +972,6 @@ void BeamSearch::run(procon::NeoField field)
 #ifdef DEBUG_MODE
 //    delete_deplicate_point(field);
 #endif
-
     state.push_back(field);
 
 //    ev.resize(2000000);
@@ -1009,7 +1008,7 @@ void BeamSearch::run(procon::NeoField field)
             }
         }
 
-//        if(piece_num == 40){
+//        if(piece_num == 4){
 //            break;
 //        }
     }

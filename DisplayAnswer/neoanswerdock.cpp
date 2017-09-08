@@ -54,3 +54,13 @@ void NeoAnswerDock::makePieceList(const procon::NeoField &field)
        std::cout << "i";
     }
 }
+
+void NeoAnswerDock::addAnswer(const procon::NeoField &field , const std::string &text){
+    fields.push_back(field);
+    NeoAnswerBoard* answer_board = new NeoAnswerBoard();
+    answer_board->setField(field);
+    answer_board->setSingleMode(true);
+    answer_board->setFixedSize(400, 400);
+    answer_board->setText(text);
+    this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 3, (fields.size() - 1 ) % 3);
+}

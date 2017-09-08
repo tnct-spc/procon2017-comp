@@ -230,7 +230,7 @@ void Hazama::run()
         }
 
         // Image detect
-        // PDATA = imrec.run(raw_frame, nocpieces);
+        PDATA = imrec.run(raw_frame, nocpieces);
 
         // Set raw image data
         AnswerBoard::setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
