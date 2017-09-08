@@ -413,7 +413,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                 if(hoge_frame_angle < min_frame_angle) min_frame_angle = hoge_frame_angle;
             }
         }
-        std::cout << "枠の最小角は " << min_frame_angle << std::endl;
+//        std::cout << "枠の最小角は " << min_frame_angle << std::endl;
 
         double hoge_piece_angle;
         double min_piece_angle = 360;
@@ -423,7 +423,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                 if(hoge_piece_angle < min_piece_angle) min_piece_angle = hoge_piece_angle;
             }
         }
-        std::cout << "ピースの最小角は " <<min_piece_angle << std::endl;
+//        std::cout << "ピースの最小角は " <<min_piece_angle << std::endl;
 
         if(min_frame_angle < min_piece_angle){
             return true;
@@ -535,10 +535,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             }
         }
         if(most_piece > most_frame){
-            std::cout <<"対角線で枝きり"<<std::endl;
+//            std::cout <<"対角線で枝きり"<<std::endl;
             return true;
         }
-        std::cout <<"対角線では無理だった"<<std::endl;
+//        std::cout <<"対角線では無理だった"<<std::endl;
         return false;
     };
 
@@ -588,10 +588,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         std::vector<double> piecearea_vec;
         for(auto piece : field.getElementaryPieces()){
             piecearea_vec.push_back(bg::area(piece.getPolygon()));
-            std::cout << bg::area(piece.getPolygon());
+//            std::cout << bg::area(piece.getPolygon());
         }
 
-        std::cout << field.getElementaryPieces().size() << std::endl;
+//        std::cout << field.getElementaryPieces().size() << std::endl;
         const int piece_cou = field.getElementaryPieces().size();
         for(int cou=0;cou < std::pow(2,piece_cou );++cou){
             double add_number = 0;//ここの数値に対応する値を加算していく
@@ -601,7 +601,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                     add_number += piecearea_vec.at(digit);
                 }
             }
-            std::cout << add_number << "  " << bg::area(frame.getPolygon()) << std::endl;
+//            std::cout << add_number << "  " << bg::area(frame.getPolygon()) << std::endl;
            // std::cout << std::pow(2,piece_cou) << " " << cou << std::endl;
             if(add_number == bg::area(frame.getPolygon()))return false;
         }
@@ -613,11 +613,11 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
     //複数のFrameがあるときにピースと面積が合致するか
     auto about_framesize = [&field,&framesize_single](){
         const int frame_size_max = 1000;//これより大きい面積のframeは判定しない(処理に時間がかかるため)
-        std::cout << "frame_size : " << field.getFrame().size() << std::endl;
+//        std::cout << "frame_size : " << field.getFrame().size() << std::endl;
         for(auto frame : field.getFrame()){
             if(bg::area(frame.getPolygon()) < frame_size_max){
                 if(framesize_single(frame)){
-                    std::cout << "問題の原因になったframe : " << bg::dsv(frame.getPolygon()) << std::endl;
+//                    std::cout << "問題の原因になったframe : " << bg::dsv(frame.getPolygon()) << std::endl;
                     return true;
                 }
             }
@@ -643,7 +643,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                     double frame_angle = frameangle_vec.at(count);
                     if(frame_angle < angle + 0.01 && frame_angle > angle - 0.01){
                         frameangle_vec.erase(frameangle_vec.begin() + count,frameangle_vec.end());
-                        std::cout << "frameangle_vec.size : " << frameangle_vec.size() << std::endl;
+//                        std::cout << "frameangle_vec.size : " << frameangle_vec.size() << std::endl;
                         if(frameangle_vec.size())return true;
                         break;
                     }
@@ -660,9 +660,9 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                     for(auto angle : add_vec){
 //                        std::cout << "frame_angle : " << frame_angle << "  " << angle << std::endl;
                         if(frame_angle < angle + 0.01 && frame_angle > angle - 0.01){
-                            std::cout << "かぶってます" << frame_angle << "  " << angle << std::endl;
+//                            std::cout << "かぶってます" << frame_angle << "  " << angle << std::endl;
                             frameangle_vec.erase(frameangle_vec.begin() + count,frameangle_vec.end());
-                            std::cout << "frameangle_vec.size : " << frameangle_vec.size() << std::endl;
+//                            std::cout << "frameangle_vec.size : " << frameangle_vec.size() << std::endl;
                             flag=false;
                             break;
                         }else if(frame_angle < angle + 0.01)break;
@@ -679,7 +679,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
             for(auto side_angle_ : frame.getSideAngle()){
                 double side_angle = calculation_rad(side_angle_);
-                std::cout << side_angle << std::endl;
+//                std::cout << side_angle << std::endl;
                 if(side_angle < frame_angle_max)frameangle_vec.push_back(side_angle);
             }
         }
@@ -694,7 +694,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
         std::cout << "frame_vec一覧表示 : ";
         for(auto angle : frameangle_vec){
-            std::cout << angle << " ";
+//            std::cout << angle << " ";
         }
         std::cout << std::endl;
 
@@ -710,17 +710,17 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         add_vec = pieceangle_vec;
         if(erase_frame_vec())return false;
 
-        std::cout << "frame_vec一覧表示 : ";
-        for(auto angle : frameangle_vec){
-            std::cout << angle << " ";
-        }
-        std::cout << std::endl;
+//        std::cout << "frame_vec一覧表示 : ";
+//        for(auto angle : frameangle_vec){
+//            std::cout << angle << " ";
+//        }
+//        std::cout << std::endl;
 
-        std::cout << "piece_vec一覧表示 : ";
-        for(auto angle : pieceangle_vec){
-            std::cout << angle << " ";
-        }
-        std::cout << std::endl;
+//        std::cout << "piece_vec一覧表示 : ";
+//        for(auto angle : pieceangle_vec){
+//            std::cout << angle << " ";
+//        }
+//        std::cout << std::endl;
 
 
         bool flag= false;
@@ -747,22 +747,22 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
             if(flag)break;
         }
 
-        std::cout << "frame_vec一覧表示 : ";
-        for(auto angle : frameangle_vec){
-            std::cout << angle << " ";
-        }
-        std::cout << std::endl;
+//        std::cout << "frame_vec一覧表示 : ";
+//        for(auto angle : frameangle_vec){
+//            std::cout << angle << " ";
+//        }
+//        std::cout << std::endl;
 
-        std::cout << "piece_vec一覧表示 : ";
-        for(auto angle : pieceangle_vec){
-            std::cout << angle << " ";
-        }
-        std::cout << std::endl;
+//        std::cout << "piece_vec一覧表示 : ";
+//        for(auto angle : pieceangle_vec){
+//            std::cout << angle << " ";
+//        }
+//        std::cout << std::endl;
 
-        std::cout << "add_vec一覧表示 : ";
-        for(auto angle : add_vec){
-            std::cout << angle << " ";
-        }
+//        std::cout << "add_vec一覧表示 : ";
+//        for(auto angle : add_vec){
+//            std::cout << angle << " ";
+//        }
         std::cout << std::endl;
 
         if(erase_frame_vec())return false;
