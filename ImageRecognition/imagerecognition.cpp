@@ -48,7 +48,8 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
             }
         }
         count++;
-    }
+    });
+
     cv::imwrite("/home/spc/workspace/procon2017-image/topiece_image.png", line_image);
     */
 
@@ -73,7 +74,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // 元のフレームは削除
     polygons.erase(polygons.begin());
 
-    // makeNeofield();
+//    for (unsigned int i=0; i<polygons.at(polygons.size()-1).outer().size()-1; i++) {
+//        double x = polygons.at(polygons.size()-1).outer().at(i).x() - polygons.at(polygons.size()-1).outer().at(i+1).x();
+//        double y = polygons.at(polygons.size()-1).outer().at(i).y() - polygons.at(polygons.size()-1).outer().at(i+1).y();
+//        double len = hypot(x, y) * scale;
+//        printf("len : %f\n", len);
+//    }
+
+//    makeNeofield();
 
     // change vector's scale to grid
     for (auto& piece : polygons) {
@@ -81,6 +89,8 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
             side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
         }
     }
+
+    makeTable();
 
     // Gridに乗せる
     std::vector<polygon_i> pieces;
@@ -926,7 +936,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
         double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
 
-        printf("%f\n", acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI);
+//        printf("%f\n", acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI);
 
         if (len < 1.0) {
 
@@ -981,7 +991,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                     i--;
                 }
             }
-        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 10) {
+        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 7) {
 
             polygon.erase(polygon.begin() + (i + 2) % polygon.size());
             i--;
@@ -1353,12 +1363,21 @@ std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
 
 void ImageRecognition::makeTable()
 {
-    int x_count = 0;
-    int y_count = 0;
+    struct {
+        bool operator() (const std::pair<point_i, double> &First, const std::pair<point_i, double> &Second)
+        {
+            return First.second < Second.second;
+        }
+    } waySort;
 
     for (int x_count = 0; x_count < 101; ++x_count) {
         for (int y_count = 0; y_count < 65; ++y_count) {
-            this->length_table.push_back(std::make_pair(point_i(x_count,y_count),static_cast<double>(x_count * x_count + y_count * y_count)));
+            this->length_table.push_back(std::make_pair(point_i(x_count,y_count),static_cast<double>(hypot(x_count, y_count))));
         }
     }
+
+    // sort
+    std::sort(this->length_table.begin(), this->length_table.end(), waySort);
+
+    return;
 }
