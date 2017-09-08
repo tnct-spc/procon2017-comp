@@ -535,7 +535,8 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                             : newField.getElementaryPieces().at(i.piece_index),
                         i.connection
             );
-            std::string text =  "fs:" + std::to_string(i.connection.frame_side_index) +
+            std::string text =  std::to_string(count) + "回目" +
+                                ",fs:" + std::to_string(i.connection.frame_side_index) +
                                 ",ps:" + std::to_string(i.connection.polygon_side_index) +
                                 ",fp:" + std::to_string(i.connection.frame_point_index) +
                                 ",pp:" + std::to_string(i.connection.polygon_point_index);
