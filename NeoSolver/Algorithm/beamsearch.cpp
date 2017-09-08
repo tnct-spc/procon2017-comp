@@ -288,6 +288,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
     std::copy(next_field.begin(),next_field.end(),std::back_inserter(fields));
 #else
     //mulutithread mode
+    int evaluate_counter = 0;
 
     auto makeNextFieldFromEvaluate = [&](){
 
@@ -305,6 +306,9 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 eval = evaluations[evaluations.size() - 1];
                 evaluations.pop_back();
+
+                ++evaluate_counter;
+                logger->info("evaluate counter:" + std::to_string(evaluate_counter));
             }
 
             logger->info("evaluating");
@@ -349,11 +353,11 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
                 }
 
                 if(!flag){
-//                    if(!this->checkCanPrune(field_buf)){
+                    if(!this->checkCanPrune(field_buf)){
                         {
                             std::lock_guard<decltype(mtx)> lock(mtx);
                             next_field.push_back(field_buf);
-//                        }
+                        }
                     }
                 }
             }
@@ -965,7 +969,7 @@ void BeamSearch::run(procon::NeoField field)
 
 
 #ifdef DEBUG_MODE
-    delete_deplicate_point(field);
+//    delete_deplicate_point(field);
 #endif
 
     state.push_back(field);
