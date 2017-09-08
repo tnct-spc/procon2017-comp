@@ -7,6 +7,7 @@
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsRectItem>
+#include <QFont>
 #include "neofield.h"
 #include "neosinglepolygondisplay.h"
 #include "utilities.h"
@@ -26,7 +27,7 @@ public:
     explicit NeoAnswerDock(QWidget *parent = 0);
     ~NeoAnswerDock();
     void addAnswer(procon::NeoField const& field);
-    void makePieceList(procon::NeoField pieces);
+    void makePieceList(procon::NeoField field);
 
 private:
     Ui::NeoAnswerDock *ui;
