@@ -26,12 +26,11 @@ public:
     explicit NeoAnswerDock(QWidget *parent = 0);
     ~NeoAnswerDock();
     void addAnswer(procon::NeoField const& field);
-    void makePieceList(procon::NeoField const& field);
+    void makePieceList(procon::NeoField pieces);
 
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;
-    std::vector<procon::NeoField> pieces;
 };
 
 #endif // NEOANSWERDOCK_H

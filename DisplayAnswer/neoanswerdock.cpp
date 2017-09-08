@@ -23,12 +23,13 @@ NeoAnswerDock::~NeoAnswerDock()
 //Add piece and frame
 void NeoAnswerDock::addAnswer(const procon::NeoField &field)
 {
+    int S = 260;
     fields.push_back(field);
     NeoAnswerBoard* answer_board = new NeoAnswerBoard();
     answer_board->setField(field);
     answer_board->setSingleMode(true);
-    answer_board->setFixedSize(300, 300);
-    this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 5, (fields.size() - 1 ) % 5);
+    answer_board->setFixedSize(S, S);
+    this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 6, (fields.size() - 1 ) % 6);
 
     QEventLoop loop;
     QTimer::singleShot(2, &loop, SLOT(quit()));
@@ -36,7 +37,7 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
 }
 
 //Add single piece
-void NeoAnswerDock::makePieceList(const procon::NeoField &field)
+void NeoAnswerDock::makePieceList(procon::NeoField pieces)
 {
     this->setWindowTitle("Piece List");
     this->ui->gridLayout_3->setSpacing(5);
@@ -44,9 +45,9 @@ void NeoAnswerDock::makePieceList(const procon::NeoField &field)
 
     int i = 0;
 
-    for(auto piece : field.getElementaryPieces()){
+    for(auto piece : pieces.getElementaryPieces()){
        NeoPolygonViewer* piece_list = new NeoPolygonViewer;
-       piece_list->getInstance().displayPolygon(piece.getPolygon(), "Piece", true);
+       piece_list->getInstance().displayPolygon(piece.getPolygon(), "Piece", 0);
        piece_list->setFixedSize(500, 500);
        this->ui->board_container->addWidget(piece_list, i / 3, i % 3);
        i++;

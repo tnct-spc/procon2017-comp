@@ -75,6 +75,9 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
+        //   Show piece list
+        list->makePieceList(field);
+
 //        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
 //        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
 
@@ -97,8 +100,6 @@ void Kunugida::run()
         algorithm_number = 1;
     }
 
-//   Show piece list
-    list->makePieceList(field);
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);

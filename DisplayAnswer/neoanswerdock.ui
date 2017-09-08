@@ -18,7 +18,7 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>1520</width>
+     <width>1610</width>
      <height>1061</height>
     </rect>
    </property>
@@ -30,8 +30,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1516</width>
-      <height>1057</height>
+      <width>1608</width>
+      <height>1059</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
@@ -50,7 +50,7 @@
         <number>3</number>
        </property>
        <property name="verticalSpacing">
-        <number>100</number>
+        <number>60</number>
        </property>
       </layout>
      </item>
@@ -60,7 +60,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>1570</x>
+     <x>1630</x>
      <y>0</y>
      <width>331</width>
      <height>211</height>
@@ -106,7 +106,7 @@
    <property name="font">
     <font>
      <family>Cantarell</family>
-     <pointsize>36</pointsize>
+     <pointsize>30</pointsize>
      <weight>50</weight>
      <italic>true</italic>
      <bold>false</bold>
@@ -125,9 +125,9 @@
   <widget class="QGraphicsView" name="Picture">
    <property name="geometry">
     <rect>
-     <x>1530</x>
+     <x>1620</x>
      <y>19</y>
-     <width>391</width>
+     <width>301</width>
      <height>1031</height>
     </rect>
    </property>
@@ -136,7 +136,7 @@
    <property name="geometry">
     <rect>
      <x>1810</x>
-     <y>140</y>
+     <y>120</y>
      <width>261</width>
      <height>91</height>
     </rect>
