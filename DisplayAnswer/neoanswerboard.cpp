@@ -1,6 +1,10 @@
 #include <string>
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
+// TODO:painteventが呼ばれるとピースが描画されなくなるバグを修正
+
+#include "neopolygonio.h"
+
 #include "neopolygonio.h"
 #include "neoanswerdock.h"
 #include "neopolygonviewer.h"

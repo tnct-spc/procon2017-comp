@@ -18,7 +18,7 @@ int Test()
     int ERROR_CNT = 0;
 
     std::vector<TesterWraper*> TESTER;
-//    TESTER.push_back(new TestNeoExpandedPolygon)
+//    TESTER.push_back(new TestNeoExpandedPolygon);
 //    TESTER.push_back(new TesterWraper);
 //    TESTER.push_back(new TestDisplayAnswer);
 //    TESTER.push_back(new TestJoinPolygon);
@@ -26,6 +26,7 @@ int Test()
 //    TESTER.push_back(new TestAlgorithmWrapper);
 //    TESTER.push_back(new TestEvaluation);
 //    TESTER.push_back(new TestPolygonConnector);
+//    TESTER.push_back(new TestCheckCanPrume);
 //    TESTER.push_back(new testCheckOddField);
 //    TESTER.push_back(new TestCheckCanPrume);
 
