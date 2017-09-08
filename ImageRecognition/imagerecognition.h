@@ -4,9 +4,9 @@
 #include "imagerecognition_global.h"
 
 #include "field.h"
+#include "neofield.h"
 #include "expandedpolygon.h"
 #include "neoexpandedpolygon.h"
-#include "neofield.h"
 #include "singlepolygondisplay.h"
 
 namespace trans = bg::strategy::transform;
@@ -55,7 +55,6 @@ private:
         int ch2Lower, int ch2Upper,
         int ch3Lower, int ch3Upper
         );
-    std::vector<cv::Vec4f> houghLine(cv::Mat src_image);
     cv::Mat HSVDetection(cv::Mat src_image);
     std::vector<cv::Mat> dividePiece(cv::Mat src_image);
     polygon_i placeGrid(polygon_t vertex);
