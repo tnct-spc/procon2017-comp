@@ -30,18 +30,27 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1299</width>
-      <height>1059</height>
+      <width>1297</width>
+      <height>1057</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
+     <property name="verticalSpacing">
+      <number>10</number>
+     </property>
      <item row="0" column="0">
       <layout class="QGridLayout" name="board_container">
        <property name="rightMargin">
         <number>0</number>
        </property>
-       <property name="spacing">
+       <property name="bottomMargin">
+        <number>10</number>
+       </property>
+       <property name="horizontalSpacing">
         <number>3</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>100</number>
        </property>
       </layout>
      </item>
