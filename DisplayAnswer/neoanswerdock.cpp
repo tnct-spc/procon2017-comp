@@ -26,12 +26,12 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
     NeoAnswerBoard* answer_board = new NeoAnswerBoard();
     answer_board->setField(field);
     answer_board->setSingleMode(true);
-    answer_board->setFixedSize(400, 400);
-    this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 3, (fields.size() - 1 ) % 3);
+    answer_board->setFixedSize(300, 300);
+    this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 4, (fields.size() - 1 ) % 4);
 
     // Wait 1msec
     QEventLoop loop;
-    QTimer::singleShot(5, &loop, SLOT(quit()));
+    QTimer::singleShot(2, &loop, SLOT(quit()));
     loop.exec();
 
 }
