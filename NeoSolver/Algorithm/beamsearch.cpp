@@ -260,10 +260,11 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 if(!flag){
                     if(!this->checkCanPrune(field_buf)){
+                        field_buf.evaluate_cache.push_back(eval);
                         next_field.push_back(field_buf);
                     }
                 }
-            }
+            });
 
             /*else{
                 std::array<bool,50> is_placed = field_buf.getIsPlaced();
