@@ -75,6 +75,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // makeNeofield();
 
+    // change vector's scale to grid
+    for (auto& piece : polygons) {
+        for (auto& side : piece.outer()) {
+            side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
+        }
+    }
+
     // Gridに乗せる
     std::vector<polygon_i> pieces;
     double error;
@@ -363,7 +370,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
         //LSD直線検出 引数の"scale"が重要！！！
         //cv::LSD_REFINE_STD,threshold::LSDthrehold
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.85);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.8);
         lsd->detect(image, pieces_lines[count]);
 
         /*
@@ -914,7 +921,12 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         double x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
         double y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
 
-        double len = hypot(x, y) * scale / 2.5;
+        double len = hypot(x, y);
+
+        double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
+        double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
+
+        printf("%f\n", acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI);
 
         if (len < 1.0) {
 
@@ -969,6 +981,10 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                     i--;
                 }
             }
+        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 10) {
+
+            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+            i--;
         }
     }
     polygon.push_back(polygon.at(0));
@@ -995,7 +1011,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
             // 配列を循環
             if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
-                double hori = hypot(vec[2], vec[3]) * scale / 2.5;
+                double hori = hypot(vec[2], vec[3]);
                 if (fabs(hori - round(hori)) < 0.1) {
                     polygon.pop_back();
                     polygon_t spin;
@@ -1028,7 +1044,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             double it_len = hypot(x, y);
 
             // もし、辺の長さが横軸のグリッドにのるなら、それを先頭に計算
-            double grid_len = it_len * scale / 2.5;
+            double grid_len = it_len;
             if (fabs(grid_len - round(grid_len)) < error) {
                 error = fabs(grid_len - round(grid_len));
                 match = i;
@@ -1058,7 +1074,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     // 最初の辺の長さをグリッド基準で計算
     double first_x = polygon.at(1).x() - polygon.at(0).x();
     double first_y = polygon.at(1).y() - polygon.at(0).y();
-    double len = hypot(first_x, first_y) * scale / 2.5;
+    double len = hypot(first_x, first_y);
     double to_ver_rad = std::atan(first_y/ first_x);
     point_i smallest;
     
@@ -1117,7 +1133,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     double dif_min = 1.0;
     double dy;
-    int p[2];
     std::vector<error_t> errors;
 
     if (right_angle) {
@@ -1212,38 +1227,38 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     }
 
     // 全ての点を回転後のいちに移動
-    polygon_t turn;
-    turn.outer().push_back(point_t(0,0));
     for (unsigned int i=1; i<polygon.size(); i++) {
         double x = polygon.at(i).x() - polygon.at(0).x();
         double y = polygon.at(i).y() - polygon.at(0).y();
         double move_x = x * cos(theta) - y * sin(theta);
         double move_y = x * sin(theta) + y * cos(theta);
-        turn.outer().push_back(point_t(move_x,move_y));
-    }
-
-    // 全ての点の座標をグリッドに変換
-    for (unsigned int i=1; i<turn.outer().size(); i++) {
-        double x = turn.outer().at(i).x() * scale / 2.5;
-        double y = turn.outer().at(i).y() * scale / 2.5;
-        grid_piece.outer().push_back(point_i(round(x),round(y)));
+        grid_piece.outer().push_back(point_i(round(move_x), round(move_y)));
     }
 
 //    procon::ExpandedPolygon ex;
 //    ex.resetPolygonForce(turn);
 //    bPolygonViewer::getInstance().pushPolygon(ex,std::to_string(id));
 
-    // 残骸を排除
-    for (unsigned int i=0; i<turn.outer().size()-1; i++) {
-        double x1 = grid_piece.outer().at(i).x() - grid_piece.outer().at(i+1).x();
-        double y1 = grid_piece.outer().at(i).y() - grid_piece.outer().at(i+1).y();
-        double x2 = grid_piece.outer().at((i+2)%(turn.outer().size()-1)).x() - grid_piece.outer().at(i+1).x();
-        double y2 = grid_piece.outer().at((i+2)%(turn.outer().size()-1)).y() - grid_piece.outer().at(i+1).y();
-        if (acos((x1 * x2 + y1 * y2) / (hypot(x1, y1) * hypot(x2, y2))) == M_PI) {
-            grid_piece.outer().erase(grid_piece.outer().begin() + i + 1);
-            turn.outer().erase(turn.outer().begin() + i + 1);
-        }
-    }
+     // 残骸を排除
+//    grid_piece.outer().pop_back();
+//    for (unsigned int i=0; i<grid_piece.outer().size(); i++) {
+//        double x1 = grid_piece.outer().at(i).x() - grid_piece.outer().at((i+1)%grid_piece.outer().size()).x();
+//        double y1 = grid_piece.outer().at(i).y() - grid_piece.outer().at((i+1)%grid_piece.outer().size()).y();
+//        double x2 = grid_piece.outer().at((i+2)%grid_piece.outer().size()).x() - grid_piece.outer().at((i+1)%grid_piece.outer().size()).x();
+//        double y2 = grid_piece.outer().at((i+2)%grid_piece.outer().size()).y() - grid_piece.outer().at((i+1)%grid_piece.outer().size()).y();
+//        if (acos((x1 * x2 + y1 * y2) / (hypot(x1, y1) * hypot(x2, y2))) == M_PI) {
+//            double ax = polygon.at(i).x() - polygon.at((i+1)%grid_piece.outer().size()).x();
+//            double ay = polygon.at(i).y() - polygon.at((i+1)%grid_piece.outer().size()).y();
+//            double bx = polygon.at((i+2)%(grid_piece.outer().size()-1)).x() - polygon.at((i+1)%grid_piece.outer().size()).x();
+//            double by = polygon.at((i+2)%(grid_piece.outer().size()-1)).y() - polygon.at((i+1)%grid_piece.outer().size()).y();
+//            double error_deg = acos((ax * bx + by * ay) / (hypot(ax,ay) * hypot(bx,by))) * 180 / M_PI;
+//            printf("%f/n", error_deg);
+//            grid_piece.outer().erase(grid_piece.outer().begin() + (i + 1)%grid_piece.outer().size());
+//            polygon.erase(polygon.begin() + (i + 1)%grid_piece.outer().size());
+//            i--;
+//        }
+//    }
+//    grid_piece.outer().push_back(grid_piece.outer().at(0));
 
     return grid_piece;
 }
