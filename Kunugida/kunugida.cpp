@@ -23,7 +23,7 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
 
-//    imageRecognitonTest();
+    //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
@@ -173,7 +173,11 @@ void Kunugida::run()
     for(auto const& p : field.getPieces()){
         std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
     }
-//    TODO: ここまでで各データソースから読み込むようにする
+
+    for(auto const& p : field.getFrame()){
+        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
+    }
+    //    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
 
@@ -188,9 +192,9 @@ void Kunugida::run()
     solver->run(field,algorithm_number);
 #endif
 
-//    QRLibrary lib;
-//    lib.Decoder(true);
-    
+    //    QRLibrary lib;
+    //    lib.Decoder(true);
+
     this->finishedProcess();
 }
 
