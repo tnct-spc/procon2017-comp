@@ -63,6 +63,7 @@ private:
     std::vector<cv::Vec3b> raw_random_colors;
     double scale;
     static constexpr double cutting_allowance = 0.0;
+
     std::vector<int> area;
     int field_num;
     int pieces_num;
@@ -70,6 +71,8 @@ private:
     int id = 0;
     int n = 1;
     std::map<point_i, double> tab;
+
+    std::vector<std::pair<point_i,double>> length_table;
 };
 
 #endif // IMAGERECOGNITION_H
