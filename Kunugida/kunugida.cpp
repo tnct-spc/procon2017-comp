@@ -230,7 +230,7 @@ void Kunugida::imageRecognitonTest()
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
     cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/piece3.png", 1);
+    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece5", 1);
 
     ImageRecognition imrec;
     procon::Field PDATA = imrec.run(nocframe, nocpieces);
