@@ -10,6 +10,12 @@
     <height>1070</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>1650</width>
+    <height>600</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>

@@ -32,6 +32,8 @@ public:
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;
+private slots:
+
 };
 
 #endif // NEOANSWERDOCK_H
