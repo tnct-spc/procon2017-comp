@@ -1,4 +1,5 @@
 #include "qrtranslatetopolygon.h"
+#include "neofield.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,7 +9,7 @@
 #include <boost/geometry/strategies/transform.hpp>
 #include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
-#include "../Polygon/neoexpandedpolygon.h"
+#include "neoexpandedpolygon.h"
 
 
 QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
@@ -94,8 +95,13 @@ void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i
     polygon.outer().push_back(point_i(intvec[1],intvec[2]));
 }
 
-void QrTranslateToPolygon::translateToCSV()
+void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> polygon)
 {
+    procon::NeoField field;
+    for(auto p : polygon){
+        field.setPiece(p);
+    }
+
 
 }
 
