@@ -27,18 +27,25 @@ CONFIG += c++14
 
 
 SOURCES += main.cpp\
-        kunugida.cpp
+        kunugida.cpp \
+    tcp_main.cpp \
+    request.cpp
 
-HEADERS  += kunugida.h
+HEADERS  += kunugida.h \
+    tcp_main.h \
+    request.h
 
 FORMS    += kunugida.ui
 
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
-unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
+else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
+
 INCLUDEPATH += $$PWD/../Polygon
 DEPENDPATH += $$PWD/../Polygon
 
@@ -56,13 +63,6 @@ else:unix: LIBS += -L$$OUT_PWD/../DisplayAnswer/ -lDisplayAnswer
 INCLUDEPATH += $$PWD/../DisplayAnswer
 DEPENDPATH += $$PWD/../DisplayAnswer
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Solver/release/ -lSolver
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Solver/debug/ -lSolver
-else:unix: LIBS += -L$$OUT_PWD/../Solver/ -lSolver
-
-INCLUDEPATH += $$PWD/../Solver
-DEPENDPATH += $$PWD/../Solver
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
 else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
@@ -79,3 +79,19 @@ else:unix: LIBS += -L$$OUT_PWD/../QRcode/ -lQRcode
 
 INCLUDEPATH += $$PWD/../QRcode
 DEPENDPATH += $$PWD/../QRCode
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/release/ -lProbMaker
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/debug/ -lProbMaker
+else:unix: LIBS += -L$$OUT_PWD/../ProbMaker/ -lProbMaker
+
+INCLUDEPATH += $$PWD/../ProbMaker
+DEPENDPATH += $$PWD/../ProbMaker
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/release/ -lNeoSolver
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/debug/ -lNeoSolver
+else:unix: LIBS += -L$$OUT_PWD/../NeoSolver/ -lNeoSolver
+
+include(qhttpserver/qhttpserver.pri)
+
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver
