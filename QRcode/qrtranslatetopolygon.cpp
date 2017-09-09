@@ -1,4 +1,3 @@
-
 #include "qrtranslatetopolygon.h"
 #include <iostream>
 #include <string>
@@ -56,7 +55,8 @@ std::vector<polygon_i> QrTranslateToPolygon::getPieceData()
     return polygon;
 }
 
-polygon_i QrTranslateToPolygon::getFrameData(){
+polygon_i QrTranslateToPolygon::getFrameData()
+{
     return framepolygon;
 }
 
@@ -68,7 +68,8 @@ void QrTranslateToPolygon::splitQrInput()
     }
 }
 
-void QrTranslateToPolygon::splitBasisOfSpace(std::string &str,std::vector<int> &qrvec){
+void QrTranslateToPolygon::splitBasisOfSpace(std::string &str,std::vector<int> &qrvec)
+{
         int cou=0;
         FIND:
         for(unsigned int num=0;num<=str.size();num++){
@@ -85,11 +86,17 @@ void QrTranslateToPolygon::splitBasisOfSpace(std::string &str,std::vector<int> &
         }
         qrvec.resize(qrvec[0]*2+1);
 }
-void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i &polygon){
+void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i &polygon)
+{
     for(unsigned int tes=0;tes<intvec.size()/2;tes++){
         polygon.outer().push_back(point_i(intvec[tes*2+1],intvec[tes*2+2]));
     }
     polygon.outer().push_back(point_i(intvec[1],intvec[2]));
+}
+
+void QrTranslateToPolygon::translateToCSV()
+{
+
 }
 
 /*
