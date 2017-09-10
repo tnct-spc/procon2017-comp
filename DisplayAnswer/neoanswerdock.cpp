@@ -29,16 +29,16 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
 //  size setting
     answer_board->setFixedSize(305, 300);
 
-    //  remove texts
+//  remove texts
         if(c == 1)
             this->ui->tab1T->hide();
-        else if(c == 10000)
+        else if(c == 10001)
             this->ui->tab2T->hide();
-        else if(c == 20000)
+        else if(c == 20001)
             this->ui->tab3T->hide();
-        else if(c == 30000)
+        else if(c == 30001)
             this->ui->tab4T->hide();
-        else if(c == 40000)
+        else if(c == 40001)
             this->ui->tab5T->hide();
 
 //  select tab
@@ -58,7 +58,6 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
         this->ui->board_container_5->addWidget(answer_board, (fields.size() - 1 ) / 5, (fields.size() - 1 ) % 5);
     }
     c++;
-    std::cout << c << " ";
 
     QEventLoop loop;
     QTimer::singleShot(1, &loop, SLOT(quit()));
