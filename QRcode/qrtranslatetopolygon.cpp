@@ -10,6 +10,7 @@
 #include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
 #include "neoexpandedpolygon.h"
+#include "neopolygonio.h"
 
 
 QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
@@ -27,6 +28,7 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
         translateToPolygon(qrvector[tes],polygon[tes]);
     }
     if(useframedata)translateToPolygon(framevector,framepolygon);
+    translateToCSV(polygon);
 }
 
 void QrTranslateToPolygon::findColon()
@@ -95,14 +97,13 @@ void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i
     polygon.outer().push_back(point_i(intvec[1],intvec[2]));
 }
 
-void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> polygon)
+void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> &polygon)
 {
     procon::NeoField field;
     for(auto p : polygon){
         field.setPiece(p);
     }
-
-
+    NeoPolygonIO::exportPolygon(field, "fromQRcode.csv");
 }
 
 /*
