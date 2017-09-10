@@ -7,6 +7,7 @@
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsRectItem>
+#include <QSizePolicy>
 #include <QFont>
 #include "neofield.h"
 #include "neosinglepolygondisplay.h"
@@ -32,6 +33,7 @@ public:
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;
+    int c = 1;
 private slots:
 
 };

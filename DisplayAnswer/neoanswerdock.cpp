@@ -12,7 +12,6 @@ NeoAnswerDock::NeoAnswerDock(QWidget *parent) :
     QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
     scene->addItem(pic);
     ui->Picture->setScene(scene);
-    this->setWindowTitle("Answer Progress");
 }
 
 NeoAnswerDock::~NeoAnswerDock()
@@ -23,16 +22,46 @@ NeoAnswerDock::~NeoAnswerDock()
 //Add piece and frame
 void NeoAnswerDock::addAnswer(const procon::NeoField &field)
 {
-    int S = 260;
     fields.push_back(field);
     NeoAnswerBoard* answer_board = new NeoAnswerBoard();
     answer_board->setField(field);
     answer_board->setSingleMode(true);
-    answer_board->setFixedSize(S, 300);
-    this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 6, (fields.size() - 1 ) % 6);
+//  size setting
+    answer_board->setFixedSize(305, 300);
+
+    //  remove texts
+        if(c == 1)
+            this->ui->tab1T->hide();
+        else if(c == 10000)
+            this->ui->tab2T->hide();
+        else if(c == 20000)
+            this->ui->tab3T->hide();
+        else if(c == 30000)
+            this->ui->tab4T->hide();
+        else if(c == 40000)
+            this->ui->tab5T->hide();
+
+//  select tab
+    if(c <= 10000){
+        this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 5, (fields.size() - 1 ) % 5);
+    }
+    else if(c <= 20000){
+        this->ui->board_container_2->addWidget(answer_board, (fields.size() - 1 ) / 5, (fields.size() - 1 ) % 5);
+    }
+    else if(c <= 30000){
+        this->ui->board_container_3->addWidget(answer_board, (fields.size() - 1 ) / 5, (fields.size() - 1 ) % 5);
+    }
+    else if(c <= 40000){
+        this->ui->board_container_4->addWidget(answer_board, (fields.size() - 1 ) / 5, (fields.size() - 1 ) % 5);
+    }
+    else if(c <= 50000){
+        this->ui->board_container_5->addWidget(answer_board, (fields.size() - 1 ) / 5, (fields.size() - 1 ) % 5);
+    }
+    c++;
+    std::cout << c << " ";
 
     QEventLoop loop;
-    QTimer::singleShot(2, &loop, SLOT(quit()));
+    QTimer::singleShot(1, &loop, SLOT(quit()));
     loop.exec();
 }
 
@@ -47,14 +76,18 @@ void NeoAnswerDock::makePieceList(procon::NeoField field)
     font.setPointSize(46);
     this->ui->label->setFont(font);
     this->ui->label_2->hide();
+    this->ui->tab1T->hide();
     this->show();
     int i = 0;
 
+//  make piece list
     for(auto piece : field.getElementaryPieces()){
        NeoSinglePolygonDisplay* piece_list = new NeoSinglePolygonDisplay();
        piece_list->setPolygon(piece.getPolygon());
        piece_list->setIsEnlargedPolygon(false);
-       piece_list->setFixedSize(520, 520);
+       piece_list->setFixedWidth(520);
+       piece_list->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+       piece_list->setFixedHeight(1000);
        this->ui->board_container->addWidget(piece_list , i / 3, i % 3);
        i++;
     }
