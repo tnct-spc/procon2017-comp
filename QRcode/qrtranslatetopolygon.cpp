@@ -100,8 +100,10 @@ void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i
 void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> &polygon)
 {
     procon::NeoField field;
+    procon::NeoExpandedPolygon expandedpolygon;
     for(auto p : polygon){
-        field.setPiece(p);
+        expandedpolygon.resetPolygonForce(p);
+        field.setPiece(expandedpolygon);
     }
     NeoPolygonIO::exportPolygon(field, "fromQRcode.csv");
 }
