@@ -6,6 +6,7 @@
 #include "neoanswerboard.h"
 #include "neoanswerdock.h"
 #include "imagerecognition.h"
+#include "qrlibrary.h"
 #include "neofield.h"
 #include "tcp_main.h"
 
@@ -31,6 +32,7 @@ private:
     std::shared_ptr<TcpMain> tcp;
     void finishedProcess();
     void startProcess();
+    QRLibrary QR;
 
 private slots:
     void clickedRunButton();
