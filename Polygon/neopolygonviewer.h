@@ -11,9 +11,10 @@ class NeoPolygonViewer : public QWidget
 public:
     static NeoPolygonViewer& getInstance();
     void displayPolygon(polygon_i const& polygon, std::string wname, bool enlarged_polygon);
+    NeoPolygonViewer(QWidget *parent = 0);
 
 private:
-    explicit NeoPolygonViewer(QWidget *parent = 0);
+
     std::vector<std::unique_ptr<NeoSinglePolygonDisplay>> viewers;
 };
 
