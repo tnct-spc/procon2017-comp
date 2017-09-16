@@ -7,9 +7,10 @@
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
 #include "polygonio.h"
+#include "http/request_mapper.h"
+#include "Algorithm/beamsearch.h"
 
 #include <iostream>
-
 #include <QDebug>
 #include <QPushButton>
 #include <QCheckBox>
@@ -26,6 +27,9 @@ Kunugida::Kunugida(QWidget *parent) :
     //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
+
+    connect(this, SIGNAL(requestCSV()), this, SLOT(getCSV()));
+    manager = new QNetworkAccessManager(this);
 
     board = std::make_shared<NeoAnswerBoard>();
     tcp = std::make_shared<TcpMain>();
@@ -47,6 +51,7 @@ void Kunugida::run()
 
     procon::NeoField field;
 
+<<<<<<< HEAD
 
 
     auto polygoniToExpanded = [](std::vector<polygon_i> pieces_,std::vector<int> id_list){
@@ -72,6 +77,10 @@ void Kunugida::run()
         return expanded_pieces;
 
     };
+=======
+    // Server
+    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
+>>>>>>> feature/network
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
@@ -126,6 +135,13 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
+<<<<<<< HEAD
+=======
+        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
+        emit requestCSV();
+        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+        int i = 1;
+>>>>>>> feature/network
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -187,6 +203,8 @@ void Kunugida::run()
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
+    connect(solver, SIGNAL(requestCSV()), this, SLOT(getCSV()));
+    connect(this, SIGNAL(requestCSVcomplete()), solver, SLOT(requestCSVcomplete()));
     solver->run(field,algorithm_number);
 #endif
 
@@ -234,4 +252,32 @@ void Kunugida::imageRecognitonTest()
 
     ImageRecognition imrec;
     procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
+}
+
+void Kunugida::getCSV()
+{
+    connect(manager, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(replyFinished(QNetworkReply*)));
+
+    file.setFileName("../../procon2017-comp/receivedfield.csv");
+    if(!file.open(QIODevice::WriteOnly))
+        return;
+    manager->get(QNetworkRequest(QUrl("http://localhost:8016/get")));
+}
+
+void Kunugida::replyFinished(QNetworkReply *reply)
+{
+    QString str;
+    str = "[Network]";
+    if(reply->error() == QNetworkReply::NoError){
+        str += tr("download success.");
+        file.write(reply->readAll());
+        file.close();
+    }else{
+        str = reply->errorString();
+        str += tr("      download failed.");
+        file.close();
+    }
+    qDebug() << str;
+    emit requestCSVcomplete();
 }
