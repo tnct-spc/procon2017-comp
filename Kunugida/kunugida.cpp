@@ -48,6 +48,9 @@ void Kunugida::run()
 
     procon::NeoField field;
 
+    //start QRcode decoder
+    QR.Decoder(1);
+
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
         logger->info("Selected ProbMaker DataSource");
