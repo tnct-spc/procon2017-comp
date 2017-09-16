@@ -529,7 +529,7 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                  most_frame = frame_instance;
              }
         }
-        for(auto const neopiece : field.getElementaryPieces()){
+        for(auto const neopiece : field.getPieces()){
             polygon_i piece = neopiece.procon::NeoExpandedPolygon::getPolygon();
             piece_instance = tool::polygondistance(piece);
             if(most_piece < piece_instance){
@@ -771,27 +771,6 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
         return true;
     };
-    //枝切り関数の時間計測部分
-/*
-    a1 = clock();
-    bool a = about_angle();
-    a2 = clock();
-    c1 = clock();
-    bool c = about_framesize();
-    c2 = clock();
-    d1 = clock();
-    bool d = about_distance();
-    d2 = clock();
-    e1 = clock();
-    bool e = about_frameangle();//ここまで進んだ後に何も出力されず終了　多分これ動いてないぞ
-    e2 = clock();
-    std::cout << "aの実行時間は " << a2 - a1 <<std::endl;
-    std::cout << "cの実行時間は " << c2 - c1 <<std::endl;
-    std::cout << "dの実行時間は " << d2 - d1 <<std::endl;
-    std::cout << "eの実行時間は " << e2 - e1 <<std::endl;
-    return a || c || d || e;
-    */
-    //枝切り関数の時間計測終わり使わないときはコメントアウトで
     bool a = about_distance();
     if(a)return a;
     bool b = about_angle();
