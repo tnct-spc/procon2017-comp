@@ -771,10 +771,10 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
         return true;
     };
-    bool a = about_distance();
-    if(a)return a;
-    bool b = about_angle();
-    if(b)return b;
+//    bool a = about_distance();
+//    if(a)return a;
+//    bool b = about_angle();
+//    if(b)return b;
 //    bool c = about_framesize();
 //    if(c)return c;
 //    bool d = about_frameangle();
