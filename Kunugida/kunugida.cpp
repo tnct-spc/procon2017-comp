@@ -40,6 +40,10 @@ Kunugida::~Kunugida()
 
 void Kunugida::run()
 {
+
+    QRLibrary lib;
+    lib.Decoder(true);
+
     logger->info("Run Button Clicked");
 
     procon::NeoField field;
@@ -100,10 +104,6 @@ void Kunugida::run()
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
     solver->run(field,algorithm_number);
-
-
-//    QRLibrary lib;
-//    lib.Decoder(true);
     
     this->finishedProcess();
 }

@@ -93,6 +93,8 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
                 decoded_polygons.second.outer().push_back(point);
             }
         }
+        
+        //QrTranslateToPolygon::
 
         imshow("Press esc key to exit", frame);
 
