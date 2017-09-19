@@ -1,4 +1,4 @@
-CONFIG += orderd
+CONFIG += ordered
 
 TEMPLATE = subdirs
 
@@ -6,8 +6,8 @@ SUBDIRS += \
     Utilities\
     Polygon \
     ImageRecognition \
-    QRcode \
     DisplayAnswer \
+    QRcode \
     Solver \
     NeoSolver \
     ProbMaker \
