@@ -32,10 +32,7 @@ Kunugida::Kunugida(QWidget *parent) :
     manager = new QNetworkAccessManager(this);
 
     board = std::make_shared<NeoAnswerBoard>();
-    tcp = std::make_shared<TcpMain>();
-
     board->show();
-    tcp->show();
     //    board->setSingleMode(true);
 //    board->setSingleMode(true);
 }
@@ -50,9 +47,6 @@ void Kunugida::run()
     logger->info("Run Button Clicked");
 
     procon::NeoField field;
-
-<<<<<<< HEAD
-
 
     auto polygoniToExpanded = [](std::vector<polygon_i> pieces_,std::vector<int> id_list){
 
@@ -77,10 +71,8 @@ void Kunugida::run()
         return expanded_pieces;
 
     };
-=======
     // Server
     QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
->>>>>>> feature/network
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
@@ -135,13 +127,9 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
-<<<<<<< HEAD
-=======
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
         emit requestCSV();
         NeoPolygonIO::importField("../../procon2017-comp/field.csv");
-        int i = 1;
->>>>>>> feature/network
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -197,9 +185,6 @@ void Kunugida::run()
     } else if (ui->beamsearch_button->isChecked()) {
         algorithm_number = 1;
     }
-
-//   Show piece list
-    list->makePieceList(field);
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);

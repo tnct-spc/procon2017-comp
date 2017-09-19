@@ -38,8 +38,6 @@ private:
     std::shared_ptr<spdlog::logger> logger;
     bool is_running = false;
     std::shared_ptr<NeoAnswerBoard> board;
-    NeoAnswerDock* list = new NeoAnswerDock;
-    std::shared_ptr<TcpMain> tcp;
     void finishedProcess();
     void startProcess();
     RequestMapper request_mapper;
