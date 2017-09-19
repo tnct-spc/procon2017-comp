@@ -27,7 +27,15 @@ SOURCES += \
     fit.cpp \
     neoexpandedpolygon.cpp \
     neosinglepolygondisplay.cpp \
-    neopolygonviewer.cpp
+    neopolygonviewer.cpp \
+    form.cpp \
+    neofield.cpp \
+    polygon.cpp \
+    complexangle.cpp \
+    neopolygonio.cpp \
+    Evaluation/evaluate.cpp \
+    Evaluation/evaluation.cpp \
+    Utils/polygonconnector.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -39,10 +47,18 @@ HEADERS += \
     fit.h \
     neoexpandedpolygon.h \
     neosinglepolygondisplay.h \
-    neopolygonviewer.h
+    neopolygonviewer.h \
+    form.h \
+    neofield.h \
+    polygon.h \
+    complexangle.h \
+    neopolygonio.h \
+    Evaluation/evaluate.h \
+    Evaluation/evaluation.h \
+    Utils/polygonconnector.h
 
 LIBS += -lboost_system -lboost_thread
-LIBS += -L/usr/local/lib `pkg-config --libs opencv`
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 INSTALLS += target
 
@@ -65,3 +81,6 @@ DEPENDPATH += $$PWD/../Utilities
 
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
+
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver

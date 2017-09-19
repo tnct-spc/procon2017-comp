@@ -56,6 +56,7 @@ void Hazama::acceptAnswer(QString file_path)
 
 void Hazama::emitAnswer(procon::Field field)
 {
+    std::cout << "emitted answer" << std::endl;
     if(!ui->isKeepBestAnswerMode->isChecked() || first_answer_flag){
         first_answer_flag = false;
         best_answer = field;
@@ -229,14 +230,14 @@ void Hazama::run()
         }
 
         // Image detect
-        PDATA = imrec.run(raw_frame, nocpieces);
+//        PDATA = imrec.run(raw_frame, nocpieces);
 
         // Set raw image data
         AnswerBoard::setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
         AnswerBoard::setRandomColors(imrec.getRawRandomColors());
 
     } else if (ui->useFileData->isChecked()) {
-        PDATA = procon::PolygonIO::importPolygon(path);
+//        PDATA = procon::PolygonIO::importPolygon(path);
 
     } else {
         return;
