@@ -1,3 +1,5 @@
+CONFIG += orderd
+
 TEMPLATE = subdirs
 
 SUBDIRS += \
