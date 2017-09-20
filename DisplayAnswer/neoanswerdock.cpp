@@ -7,7 +7,9 @@ NeoAnswerDock::NeoAnswerDock(QWidget *parent) :
 {
     ui->setupUi(this);
     // Background image
-    QImage image("../../procon2017-comp/background.png");
+    cv::Mat I = cv::imread("../../procon2017-comp/background.png");
+    cv::cvtColor(I, I, CV_RGB2BGRA);
+    QImage image(I.data, I.cols, I.rows, QImage::Format_RGBA8888);
     QGraphicsScene* scene = new QGraphicsScene();
     QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
     scene->addItem(pic);
