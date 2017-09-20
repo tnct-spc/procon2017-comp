@@ -43,7 +43,7 @@ std::string QRLibrary::Decoder(bool s)
     {
         Mat srcframe;
         std::string temp = {""};
-        std::string comp = {""};
+        std::string comp = {"0"};
 
         bool bSuccess = cap.read(srcframe); // read a new frame from video
 
@@ -103,17 +103,6 @@ std::string QRLibrary::Decoder(bool s)
         if(temp.length() > 2 && s && comp != temp){
             std::cout << "QRCode detected" << std::endl;
             comp = temp;
-            D.show();
-
-            while(check){
-              QEventLoop loop;
-              QTimer::singleShot(200, &loop, SLOT(quit()));
-              loop.exec();
-            }
-
-            if(c) break;
-            check = 1;
-            c = 0;
         }
         if(key == 27){
             std::cout << "Esc key was pressed" << std::endl;
@@ -126,14 +115,3 @@ std::string QRLibrary::Decoder(bool s)
     return code;
 //    return decoded_polygons;
 }
-
-void QRLibrary::pause()
-{
-    check = 0;
-}
-
-void QRLibrary::resume()
-{
-    c = 1;
-}
-

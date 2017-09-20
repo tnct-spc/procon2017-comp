@@ -33,17 +33,17 @@ SOURCES += \
         mainwindow.cpp \
         qrlibrary.cpp \
         qrtranslatetopolygon.cpp \
-    dialog.cpp
+
 
 HEADERS += \
         mainwindow.h \
         qrlibrary.h \
         qrtranslatetopolygon.h \
-    dialog.h
+
 
 FORMS += \
         mainwindow.ui \
-    dialog.ui
+
 
 LIBS += -L/usr/lib -lzbar
 LIBS += -L/usr/lib `pkg-config --libs opencv`
