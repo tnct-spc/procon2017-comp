@@ -35,7 +35,6 @@ private:
     IplImage* frame;
 private slots:
     void takePicture();
-public slots:
     void Quit(int);
 };
 

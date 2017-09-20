@@ -9,7 +9,8 @@ QRLibrary::QRLibrary()
     std::cout << "QR Libruary initialized" << std::endl;
 }
 
-std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
+//std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool  s)
+std::string QRLibrary::Decoder(bool s)
 {
     int resizedW;
     std::string code = {""};
@@ -41,6 +42,8 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
     while (1)
     {
         Mat srcframe;
+        std::string temp = {""};
+        std::string comp = {""};
 
         bool bSuccess = cap.read(srcframe); // read a new frame from video
 
@@ -66,7 +69,7 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             ++symbol) {
             std::vector<Point> vp;
             // do something useful with results
-            code = symbol->get_data();
+            temp = symbol->get_data();
             type = symbol->get_type_name();
             std::cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< std::endl;
             int n = symbol->get_location_size();
@@ -97,18 +100,40 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
         imshow("Press esc key to exit", frame);
 
         int key = waitKey(30);
-        if(code.length() > 2 && s){
+        if(temp.length() > 2 && s && comp != temp){
             std::cout << "QRCode detected" << std::endl;
-            break;
+            comp = temp;
+            D.show();
+
+            while(check){
+              QEventLoop loop;
+              QTimer::singleShot(200, &loop, SLOT(quit()));
+              loop.exec();
+            }
+
+            if(c) break;
+            check = 1;
+            c = 0;
         }
         if(key == 27){
             std::cout << "Esc key was pressed" << std::endl;
             break;
         }
+        code += temp;
     }
 
 //    code = "Type: " + type + "\n\n\"" + code + "\"";
-//    return code;
-    return decoded_polygons;
+    return code;
+//    return decoded_polygons;
+}
+
+void QRLibrary::pause()
+{
+    check = 0;
+}
+
+void QRLibrary::resume()
+{
+    c = 1;
 }
 
