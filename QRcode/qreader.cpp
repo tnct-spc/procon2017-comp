@@ -115,7 +115,7 @@ std::string QReader::Decoder()
           std::cout << "Esc key was pressed" << std::endl;
           break;
       }
-      code += temp;
+      code = "\n\n" + temp;
   }
   cap.release();
 //    code = "Type: " + type + "\n\n\"" + code + "\"";
