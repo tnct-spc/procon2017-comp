@@ -33,16 +33,19 @@ SOURCES += \
         mainwindow.cpp \
         qrlibrary.cpp \
         qrtranslatetopolygon.cpp \
+    qreader.cpp
 
 
 HEADERS += \
         mainwindow.h \
         qrlibrary.h \
         qrtranslatetopolygon.h \
+    qreader.h
 
 
 FORMS += \
         mainwindow.ui \
+    qreader.ui
 
 
 LIBS += -L/usr/lib -lzbar
