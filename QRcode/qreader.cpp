@@ -83,18 +83,18 @@ std::string QReader::Decoder()
               line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);
           }
           std::cout << "Angle: " << r.angle << std::endl;
-          QrTranslateToPolygon qrtrans(code);
-          for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
-              std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
-          }
-          std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
+//          QrTranslateToPolygon qrtrans(code);
+//          for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
+//              std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
+//          }
+//          std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
 
-          for(auto polygon : qrtrans.getPieceData()){
-              decoded_polygons.first.push_back(polygon);
-          }
-          for(auto point: qrtrans.getFrameData().outer()){
-              decoded_polygons.second.outer().push_back(point);
-          }
+//          for(auto polygon : qrtrans.getPieceData()){
+//              decoded_polygons.first.push_back(polygon);
+//          }
+//          for(auto point: qrtrans.getFrameData().outer()){
+//              decoded_polygons.second.outer().push_back(point);
+//          }
       }
 
       cvtColor(frame, frame, CV_RGB2BGRA);
@@ -119,8 +119,9 @@ std::string QReader::Decoder()
   }
   cap.release();
 //    code = "Type: " + type + "\n\n\"" + code + "\"";
-  return code;
+
 //    return decoded_polygons;
+  return code;
 }
 
 void QReader::stop()
