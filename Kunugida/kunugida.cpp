@@ -171,6 +171,23 @@ void Kunugida::run()
         //read sample
         field = NeoPolygonIO::importField("../../procon2017-comp/sample/comp-sample.csv");
 
+        //dummy
+        std::vector<procon::ExpandedPolygon> scanned_poly;
+        for(const auto& p : field.getElementaryPieces()){
+            polygon_t poly_buf;
+
+            for(const auto& p : p.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+
+            procon::ExpandedPolygon exp_buf(p.getId());
+            exp_buf.resetPolygonForce(poly_buf);
+            scanned_poly.push_back(exp_buf);
+        }
+
+        board->setScannedPieces(scanned_poly);
+
+
 //        for(auto& p : field.getElementaryPieces()){
 //            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
 //        }
@@ -187,6 +204,10 @@ void Kunugida::run()
     //    TODO: ここまでで各データソースから読み込むようにする
 
         for(auto p : field.getElementaryPieces()){
+            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
+        }
+
+        for(auto p: field.getElementaryFrame()){
             NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
         }
 
