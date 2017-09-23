@@ -148,6 +148,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 std::getline(line_stream, y, ',');
                 hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
             }
+            boost::geometry::correct(hoge);
             procon::NeoExpandedPolygon polygon;
             polygon.resetPolygonForce(hoge);
             elementary_frame_inner_pice.push_back(polygon);
@@ -224,6 +225,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
             }
             int _id = std::stoi(id);
+            boost::geometry::correct(hoge);
             procon::NeoExpandedPolygon polygon(_id);
             polygon.resetPolygonForce(hoge);
             elementary_piece.push_back(polygon);
@@ -233,6 +235,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 std::getline(line_stream, y, ',');
                 hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
             }
+            boost::geometry::correct(hoge);
             procon::NeoExpandedPolygon polygon;
             polygon.resetPolygonForce(hoge);
             if(mode == 0)
