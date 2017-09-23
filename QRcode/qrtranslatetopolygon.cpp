@@ -28,7 +28,6 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
         translateToPolygon(qrvector[tes],polygon[tes]);
     }
     if(useframedata)translateToPolygon(framevector,framepolygon);
-    translateToCSV(polygon);
 }
 
 void QrTranslateToPolygon::findColon()
@@ -97,14 +96,19 @@ void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i
     polygon.outer().push_back(point_i(intvec[1],intvec[2]));
 }
 
-void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> &polygon)
+void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> const& piece, polygon_i const& frame)
 {
     procon::NeoField field;
-    procon::NeoExpandedPolygon expandedpolygon;
-    for(auto p : polygon){
-        expandedpolygon.resetPolygonForce(p);
-        field.setPiece(expandedpolygon);
+    procon::NeoExpandedPolygon pieceexpandedpolygon;
+    for(auto p : piece){
+        pieceexpandedpolygon.resetPolygonForce(p);
+        field.setPiece(pieceexpandedpolygon);
     }
+    procon::NeoExpandedPolygon frameexpandedpolygon;
+    std::vector<procon::NeoExpandedPolygon> vectorexpandedpolygon;
+    frameexpandedpolygon.resetPolygonForce(frame);
+    vectorexpandedpolygon.push_back(frameexpandedpolygon);
+    field.setFrame(vectorexpandedpolygon);
     NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/fromQRcode.csv");
 }
 

@@ -92,9 +92,10 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             for(auto point: qrtrans.getFrameData().outer()){
                 decoded_polygons.second.outer().push_back(point);
             }
+            std::vector<polygon_i> pieceData = qrtrans.getPieceData();
+            polygon_i frameData = qrtrans.getFrameData();
+            QrTranslateToPolygon::translateToCSV(pieceData, frameData);
         }
-        
-        //QrTranslateToPolygon::
 
         imshow("Press esc key to exit", frame);
 

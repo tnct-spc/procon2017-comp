@@ -33,7 +33,7 @@ public:
     std::vector<polygon_i> getPieceData();
     polygon_i getFrameData();
     QrTranslateToPolygon(std::string qrinp);
-    void translateToCSV(std::vector<polygon_i> &polygon);
+    static void translateToCSV(std::vector<polygon_i> const& piece, const polygon_i &frame);
 
     int get();
 };
