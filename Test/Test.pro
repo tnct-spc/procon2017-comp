@@ -28,6 +28,7 @@ SOURCES += main.cpp\
     testalgorithmwrapper.cpp \
     testevaluation.cpp \
     testcheckoddfield.cpp
+    testcheckcanprume.cpp
 
 HEADERS += testdisplayanswer.h\
     testjoinpolygon.h \
@@ -38,10 +39,18 @@ HEADERS += testdisplayanswer.h\
     testalgorithmwrapper.h \
     testevaluation.h \
     testcheckoddfield.h
+    testcheckcanprume.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
 DEPENDPATH += $$PWD/../Polygon
+
+INCLUDEPATH += $$PWD/../ProbMaker
+DEPENDPATH += $$PWD/../ProbMaker
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../PeobMaker/release/ -lProbMaker
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/debug/ -lProbMaker
+else:unix: LIBS += -L$$OUT_PWD/../ProbMaker/ -lProbMaker
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/release/ -lDisplayAnswer
@@ -76,3 +85,9 @@ else:unix: LIBS += -L$$OUT_PWD/../NeoSolver/ -lNeoSolver
 
 INCLUDEPATH += $$PWD/../NeoSolver
 DEPENDPATH += $$PWD/../NeoSolver
+INCLUDEPATH += $$PWD/../ProbMaker
+DEPENDPATH += $$PWD/../ProbMaker
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../PeobMaker/release/ -lProbMaker
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/debug/ -lProbMaker
+else:unix: LIBS += -L$$OUT_PWD/../ProbMaker/ -lProbMaker

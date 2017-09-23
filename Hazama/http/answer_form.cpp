@@ -21,7 +21,7 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
     QUrlQuery url_query(lowdata);
     QString raw_user_id = url_query.queryItemValue("id");
     QString raw_answer_data = url_query.queryItemValue("answer");
-    //std::cout<<"raw answer data="<<raw_answer_data.toStdString()<<std::endl;
+    std::cout<<"raw answer data="<<raw_answer_data.toStdString()<<std::endl;
 
     // Decode
     raw_user_id.replace("+"," ");
