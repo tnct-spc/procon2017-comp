@@ -314,11 +314,15 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
             logger->info("evaluating");
 
-            procon::NeoField field_buf = fields[eval.fields_index];
-            ConnectedResult connect_result = PolygonConnector::connect(fields[eval.fields_index].getFrame()[eval.frame_index]
+            procon::NeoField field_buf;
+            {
+                std::lock_guard<decltype(mtx)> lock(mtx);
+                field_buf = fields[eval.fields_index];
+            }
+            ConnectedResult connect_result = PolygonConnector::connect(field_buf.getFrame()[eval.frame_index]
                     ,eval.is_inversed
-                        ? fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
-                        : fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
+                        ? field_buf.getElementaryInversePieces()[eval.piece_index]
+                        : field_buf.getElementaryPieces()[eval.piece_index]
                     ,eval.connection
             );
 
@@ -329,7 +333,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 field_buf.setPiece(std::get<1>(connect_result));
 
-                std::vector<procon::NeoExpandedPolygon> frames_buf = fields[eval.fields_index].getFrame();
+                std::vector<procon::NeoExpandedPolygon> frames_buf = field_buf.getFrame();
                 frames_buf.erase(frames_buf.begin() + eval.frame_index);
                 for (auto frame_polygon : std::get<0>(connect_result)){
                     frames_buf.push_back(frame_polygon);
@@ -339,18 +343,18 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 //deplicacte flag
                 bool flag = false;
-                const std::string now_hash = hashField(field_buf);
 
                 //check field is ok
                 {
+                    const std::string now_hash = hashField(field_buf);
                     std::lock_guard<decltype(mtx)> lock(mtx);
-                std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
-                    if(!flag){
-                        if(now_hash == hashField(f)){
-                            flag = true;
+                    std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
+                        if(!flag){
+                            if(now_hash == hashField(f)){
+                                flag = true;
+                            }
                         }
-                    }
-                });
+                    });
                 }
 
                 if(!flag){
