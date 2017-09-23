@@ -698,7 +698,7 @@ void ProbMaker::step()
 //    connect(this,&ProbMaker::nextLoop,&event,&QEventLoop::quit);
 //    event.exec();
 
-    
+
 
 }
 
