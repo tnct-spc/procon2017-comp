@@ -194,24 +194,9 @@ void Kunugida::run()
 
     }
 
-    for(auto const& p : field.getElementaryPieces()){
-        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
-    }
-
-    for(auto const& p : field.getElementaryFrame()){
-        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
-    }
     //    TODO: ここまでで各データソースから読み込むようにする
 
-        for(auto p : field.getElementaryPieces()){
-            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
-        }
-
-        for(auto p: field.getElementaryFrame()){
-            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
-        }
-
-        int algorithm_number = 0;
+    int algorithm_number = 0;
 
     if(ui->test_algorithm_button->isChecked()){
         algorithm_number = 0;
