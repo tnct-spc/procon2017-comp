@@ -21,13 +21,27 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     for(int tes=0;tes<shapecount;tes++){
         splitBasisOfSpace(splitedqrinput[tes],qrvector[tes]);
     }
-    framevector.resize(128,-1);
-    if(useframedata)splitBasisOfSpace(framestring,framevector);
+    framevector.resize(framedatacount);
+    framestring.resize(framedatacount);
+    for(auto frame : framevector){
+        frame.resize(128,-1);
+    }
+    if(useframedata){
+        for(int count=0;count<framedatacount;++count){
+            splitBasisOfSpace(framestring.at(count),framevector.at(count));
+        }
+    }
     polygon.resize(shapecount);
     for(int tes=0;tes<shapecount;tes++){
         translateToPolygon(qrvector[tes],polygon[tes]);
     }
-    if(useframedata)translateToPolygon(framevector,framepolygon);
+    if(useframedata){
+        for(int count=0;count<framedatacount;++count){
+            polygon_i frame_input_polygon;
+            translateToPolygon(framevector.at(count),frame_input_polygon);
+            framepolygon.push_back(frame_input_polygon);
+        }
+    }
 }
 
 void QrTranslateToPolygon::findColon()
@@ -39,12 +53,12 @@ void QrTranslateToPolygon::findColon()
         qrvector[tes].resize(128,-1);
     }
     colon.resize(shapecount);
-    for(unsigned int tes=0;tes<qrinput.size();tes++){
+    for(unsigned int tes=0;tes<qrinput.size();++tes){
         if(qrinput[tes]==':'){
-            if(cou==shapecount){
-                framestring=qrinput.substr(tes+1);
+            if(cou>=shapecount){
+                framestring.at(framedatacount)=qrinput.substr(tes+1);
                 useframedata=true;
-                break;
+                ++framedatacount;
             }
             colon[cou]=tes;
             cou++;
@@ -57,7 +71,7 @@ std::vector<polygon_i> QrTranslateToPolygon::getPieceData()
     return polygon;
 }
 
-polygon_i QrTranslateToPolygon::getFrameData()
+std::vector<polygon_i> QrTranslateToPolygon::getFrameData()
 {
     return framepolygon;
 }
@@ -96,7 +110,7 @@ void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i
     polygon.outer().push_back(point_i(intvec[1],intvec[2]));
 }
 
-void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> const& piece, polygon_i const& frame)
+void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> const& piece, std::vector<polygon_i> const& frame)
 {
     procon::NeoField field;
     procon::NeoExpandedPolygon pieceexpandedpolygon;
@@ -106,8 +120,10 @@ void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> const& piece, p
     }
     procon::NeoExpandedPolygon frameexpandedpolygon;
     std::vector<procon::NeoExpandedPolygon> vectorexpandedpolygon;
-    frameexpandedpolygon.resetPolygonForce(frame);
-    vectorexpandedpolygon.push_back(frameexpandedpolygon);
+  //  for(auto frame_ : frame){
+  //      frameexpandedpolygon.resetPolygonForce(frame_);
+  //      vectorexpandedpolygon.push_back(frameexpandedpolygon);
+  //  }
     field.setFrame(vectorexpandedpolygon);
     NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/fromQRcode.csv");
 }
@@ -119,6 +135,6 @@ int main()
     for(unsigned int tes=0;tes<qrtrans.polygon.size();tes++){
         std::cout << "polygon:" << bg::dsv(qrtrans.polygon[tes]) << std::endl;
     }
-    std::cout << "frame" << bg::dsv(qrtrans.framepolygon) << std::endl;
+    std::cout << "frame" << bg::dsv(qrtrans.gon) << std::endl;
     return 0;
 }*/

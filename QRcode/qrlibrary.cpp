@@ -84,16 +84,16 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
                 std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
             }
-            std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
+      //      std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
 
             for(auto polygon : qrtrans.getPieceData()){
                 decoded_polygons.first.push_back(polygon);
             }
-            for(auto point: qrtrans.getFrameData().outer()){
-                decoded_polygons.second.outer().push_back(point);
-            }
+     //       for(auto point: qrtrans.getFrameData().outer()){
+     //           decoded_polygons.second.outer().push_back(point);
+     //       }
             std::vector<polygon_i> pieceData = qrtrans.getPieceData();
-            polygon_i frameData = qrtrans.getFrameData();
+            std::vector<polygon_i> frameData = qrtrans.getFrameData();
             QrTranslateToPolygon::translateToCSV(pieceData, frameData);
         }
 
