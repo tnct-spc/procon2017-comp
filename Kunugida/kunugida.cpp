@@ -23,7 +23,7 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
 
-//    imageRecognitonTest();
+    //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
@@ -32,6 +32,7 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board->show();
     tcp->show();
+    //    board->setSingleMode(true);
 //    board->setSingleMode(true);
 }
 
@@ -125,16 +126,6 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
-        std::vector<int> id_list;
-        for(int i=0;i<pieces_.size();++i){
-            id_list.push_back(i);
-        }
-        std::vector<procon::ExpandedPolygon> expanded_pieces =  polygoniToExpanded(pieces_,id_list);
-        board->setScannedPieces(expanded_pieces);
-
-        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
-        int i = 1;
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -146,6 +137,10 @@ void Kunugida::run()
         cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame.png", 1);
         cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pices.png", 1);
 
+        ImageRecognition imrec;
+        field = imrec.run(frame, pieces);
+
+        //        imageRecognitonTest();
 //        ImageRecognition imrec;
 //        field = imrec.run(frame, pieces);
 //        board->setScannedPieces(imrec.getPolygonPosition());
@@ -173,7 +168,11 @@ void Kunugida::run()
     for(auto const& p : field.getPieces()){
         std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
     }
-//    TODO: ここまでで各データソースから読み込むようにする
+
+    for(auto const& p : field.getFrame()){
+        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
+    }
+    //    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
 
@@ -183,14 +182,17 @@ void Kunugida::run()
         algorithm_number = 1;
     }
 
+//   Show piece list
+    list->makePieceList(field);
+
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
     solver->run(field,algorithm_number);
 #endif
 
-//    QRLibrary lib;
-//    lib.Decoder(true);
-    
+    //    QRLibrary lib;
+    //    lib.Decoder(true);
+
     this->finishedProcess();
 }
 
@@ -228,8 +230,8 @@ void Kunugida::imageRecognitonTest()
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
     cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/piece3.png", 1);
+    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece5", 1);
 
     ImageRecognition imrec;
-    procon::Field PDATA = imrec.run(nocframe, nocpieces);
+    procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
 }

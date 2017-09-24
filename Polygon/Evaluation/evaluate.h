@@ -7,8 +7,6 @@
 class Evaluate
 {
 public:
-    Evaluate();
-
     double score = -1;
     Connect connection;
     int frame_index = -1;

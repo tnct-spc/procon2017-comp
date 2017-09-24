@@ -18,7 +18,7 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>1301</width>
+     <width>1520</width>
      <height>1061</height>
     </rect>
    </property>
@@ -30,11 +30,14 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1299</width>
-      <height>1059</height>
+      <width>1516</width>
+      <height>1057</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
+     <property name="verticalSpacing">
+      <number>10</number>
+     </property>
      <item row="0" column="0">
       <layout class="QGridLayout" name="board_container" rowstretch="0" columnstretch="0">
        <property name="topMargin">
@@ -44,7 +47,8 @@
         <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>3</number>
+
+        <number>10</number>
        </property>
        <property name="horizontalSpacing">
         <number>3</number>
@@ -60,16 +64,53 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>1370</x>
-     <y>30</y>
-     <width>511</width>
+     <x>1570</x>
+     <y>0</y>
+     <width>331</width>
      <height>211</height>
     </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>0</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>0</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>190</red>
+         <green>190</green>
+         <blue>190</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
    </property>
    <property name="font">
     <font>
      <family>Cantarell</family>
-     <pointsize>50</pointsize>
+     <pointsize>36</pointsize>
      <weight>50</weight>
      <italic>true</italic>
      <bold>false</bold>
@@ -81,30 +122,70 @@
    <property name="text">
     <string> AnswerDocker</string>
    </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
   </widget>
   <widget class="QGraphicsView" name="Picture">
    <property name="geometry">
     <rect>
-     <x>1310</x>
-     <y>0</y>
-     <width>611</width>
-     <height>1070</height>
+     <x>1530</x>
+     <y>19</y>
+     <width>391</width>
+     <height>1031</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>1720</x>
-     <y>160</y>
+     <x>1810</x>
+     <y>140</y>
      <width>261</width>
      <height>91</height>
     </rect>
    </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>221</green>
+         <blue>221</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>221</green>
+         <blue>221</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>190</red>
+         <green>190</green>
+         <blue>190</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
    <property name="font">
     <font>
      <family>Cantarell</family>
-     <pointsize>46</pointsize>
+     <pointsize>34</pointsize>
      <weight>50</weight>
      <italic>true</italic>
      <bold>false</bold>

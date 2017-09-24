@@ -1,6 +1,10 @@
 #include <string>
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
+// TODO:painteventが呼ばれるとピースが描画されなくなるバグを修正
+
+#include "neopolygonio.h"
+
 #include "neopolygonio.h"
 #include "neoanswerdock.h"
 #include "neopolygonviewer.h"
@@ -457,7 +461,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             return center1.x() < center2.x();
         });
         for(auto piece : pieces){
-            if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
+            polygon_list.push_back(piece.getPolygon());
         }
         this->update();
     }*/
@@ -491,7 +495,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
     for(auto poly : sorted_poly){
         point_i center_point;
         bg::centroid (poly.getPolygon(),center_point);
-        std::cout << bg::dsv(center_point) << std::endl;
+//        std::cout << bg::dsv(center_point) << std::endl;
     }
 
     blue_id = sorted_poly.size()-1;
@@ -531,7 +535,8 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                             : newField.getElementaryPieces().at(i.piece_index),
                         i.connection
             );
-            std::string text =  "fs:" + std::to_string(i.connection.frame_side_index) +
+            std::string text =  std::to_string(count) + "回目" +
+                                ",fs:" + std::to_string(i.connection.frame_side_index) +
                                 ",ps:" + std::to_string(i.connection.polygon_side_index) +
                                 ",fp:" + std::to_string(i.connection.frame_point_index) +
                                 ",pp:" + std::to_string(i.connection.polygon_point_index);

@@ -11,6 +11,7 @@
 #include "testevaluation.h"
 #include "testpolygonconnector.h"
 #include "testcheckoddfield.h"
+#include "testcheckcanprume.h"
 
 int Test()
 {
@@ -19,13 +20,15 @@ int Test()
     std::vector<TesterWraper*> TESTER;
 //    TESTER.push_back(new TestNeoExpandedPolygon);
 //    TESTER.push_back(new TesterWraper);
-    TESTER.push_back(new TestDisplayAnswer);
+//    TESTER.push_back(new TestDisplayAnswer);
 //    TESTER.push_back(new TestJoinPolygon);
 //    TESTER.push_back(new testSearchSameLength);
 //    TESTER.push_back(new TestAlgorithmWrapper);
 //    TESTER.push_back(new TestEvaluation);
 //    TESTER.push_back(new TestPolygonConnector);
+//    TESTER.push_back(new TestCheckCanPrume);
 //    TESTER.push_back(new testCheckOddField);
+//    TESTER.push_back(new TestCheckCanPrume);
 
     for(auto tester : TESTER){
         if(!tester->run()){
