@@ -34,15 +34,16 @@ LIBS += -lboost_system -lboost_thread
 SOURCES += neosolver.cpp \
     Algorithm/algorithmwrapper.cpp \
     Algorithm/testalgortithm.cpp \
-    Evaluation/evaluation.cpp \
-    Utils/polygonconnector.cpp
+    Algorithm/beamsearch.cpp
 
 HEADERS += neosolver.h\
     neosolver_global.h \
     Algorithm/algorithmwrapper.h \
     Algorithm/testalgortithm.h \
+    Algorithm/beamsearch.h \
     Evaluation/evaluation.h \
-    Utils/polygonconnector.h
+    Utils/polygonconnector.h \
+    Evaluation/evaluate.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
@@ -57,6 +58,9 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+INCLUDEPATH += $$PWD/../DisplayAnswer
+DEPENDPATH += $$PWD/../DisplayAnswer
 
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include

@@ -27,9 +27,18 @@ CONFIG += c++14
 
 
 SOURCES += main.cpp\
-        kunugida.cpp
+        kunugida.cpp\
+    http/answer_form.cpp \
+    http/help_page.cpp \
+    http/output_problem_page.cpp \
+    http/request_mapper.cpp
 
-HEADERS  += kunugida.h
+HEADERS  += kunugida.h\
+    http/answer_form.h \
+    http/help_page.h \
+    http/output_problem_page.h \
+    http/request_mapper.h
+
 
 FORMS    += kunugida.ui
 
@@ -86,6 +95,8 @@ DEPENDPATH += $$PWD/../ProbMaker
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/release/ -lNeoSolver
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../NeoSolver/debug/ -lNeoSolver
 else:unix: LIBS += -L$$OUT_PWD/../NeoSolver/ -lNeoSolver
+
+include(qhttpserver/qhttpserver.pri)
 
 INCLUDEPATH += $$PWD/../NeoSolver
 DEPENDPATH += $$PWD/../NeoSolver

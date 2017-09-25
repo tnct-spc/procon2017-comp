@@ -15,10 +15,10 @@
 #include <string>
 #include <QStringList>
 #include <QVector>
-#include <QList>
 #include "neofield.h"
+#include "expandedpolygon.h"
 #include "neoexpandedpolygon.h"
-#include <math.h>
+#include <QMessageBox>
 
 namespace Ui {
 class NeoAnswerBoard;
@@ -33,26 +33,51 @@ public:
     ~NeoAnswerBoard();
     void setField(procon::NeoField input_field);
     void setSingleMode(bool inp);
+    void setText(std::string text);
+    void setScannedPieces(std::vector<procon::ExpandedPolygon> vec);
+    void setUp();
+
 private:
+    int frame_margin;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
+    QPointF getPiecePosition(point_t point);
     void setField();
     QPointF getPosition(point_i point);
-    QVector<QString> list;
     void firstField();
     int left_right_margin;
     int grid_size;
     int top_bottom_margin;
     int down_up_y;
+    std::vector<procon::ExpandedPolygon> scanned_poly;
     procon::NeoField field;
 
     // Only field mode
     bool single_mode = false;
+    bool singleif = false;
+    int piece_size = 1;
+    bool allif = true;
 
+    //make id_list
+    std::vector<polygon_i> polygon_list;
+
+    //draw processingLine
+    std::vector<procon::NeoExpandedPolygon> sorted_poly; //画面の右側から順番にソートしたやつ
+    point_i center;
+    int point_id = 0;
+    int blue_id=-1;
+    int red_id = 0;
+    bool selecter;//true = left, false = right
+    bool pre = false;
+    bool paintif = false;
+
+    QString output_string;//ここのメンバ変数に入ってる文字列をAnswerBoardの画面下に表示するようにする
 
 protected:
     void beforePolygon();
     void paintEvent(QPaintEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // NEOANSWERBOARD_H
