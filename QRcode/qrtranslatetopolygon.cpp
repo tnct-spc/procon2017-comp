@@ -90,7 +90,7 @@ void QrTranslateToPolygon::translateToDoubleArray(){//二重配列に突っ込�
     //ここからpieceの二重配列とframeの二重配列に入れる作業をする
     for(unsigned int vector_count=0;vector_count<inputdatadoublearray.size();++vector_count){
         if(vector_count < piece_size)piece_data.push_back(inputdatadoublearray.at(vector_count));
-        else piece_data.push_back(inputdatadoublearray.at(vector_count));
+        else frame_data.push_back(inputdatadoublearray.at(vector_count));
     }
 }
 
@@ -120,6 +120,13 @@ void QrTranslateToPolygon::vectorToPolygon(){
     }
 }
 
+std::vector<polygon_i> QrTranslateToPolygon::getPieceData(){
+    return pieces;
+}
+
+std::vector<polygon_i> QrTranslateToPolygon::getFrameData(){
+    return frames;
+}
 /*
 void QrTranslateToPolygon::findColon()
 {
