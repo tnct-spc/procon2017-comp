@@ -53,13 +53,15 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     cv::imwrite("/home/spc/workspace/procon2017-image/topiece_image.png", line_image);
     */
 
-    /*
     for (unsigned int i=0; i<polygons.size(); i++) {
         procon::ExpandedPolygon ex;
         ex.resetPolygonForce(polygons[i]);
         PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
     }
-    */
+
+    double frame_x = polygons.at(0).outer().at(1).x() - polygons.at(0).outer().at(0).x();
+    double frame_y = polygons.at(0).outer().at(1).y() - polygons.at(0).outer().at(0).y();
+    frame_deg = std::atan2(frame_y, frame_x);
 
     // frameのinnersをouterに入れ替える
     field_num = polygons[0].inners().size();
@@ -116,7 +118,8 @@ void ImageRecognition::threshold(cv::Mat& image)
 {
     //resize
     //int cols = image.cols;
-    //int rows = image.rows;
+    //int rows = image.rows;= getError(pieces[i], i+1);
+    //printf
     //500,0,3300,2664
     image = cv::Mat(image,cv::Rect(0,0,3300,2664));
 
@@ -380,7 +383,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
         //LSD直線検出 引数の"scale"が重要！！！
         //cv::LSD_REFINE_STD,threshold::LSDthrehold
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.8);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.78);
         lsd->detect(image, pieces_lines[count]);
 
         /*

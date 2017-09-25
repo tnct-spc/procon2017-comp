@@ -70,6 +70,7 @@ private:
     std::vector<procon::ExpandedPolygon> position;
     int id = 0;
     int n = 1;
+    double frame_deg;
     std::map<point_i, double> tab;
 
     std::vector<std::pair<point_i,double>> length_table;
