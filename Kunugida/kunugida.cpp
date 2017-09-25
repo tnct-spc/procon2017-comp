@@ -44,15 +44,9 @@ Kunugida::~Kunugida()
 
 void Kunugida::run()
 {
-
-    QRLibrary lib;
-    lib.Decoder(true);
-
     logger->info("Run Button Clicked");
 
     procon::NeoField field;
-
-    QR.Decoder(1);
 
     auto polygoniToExpanded = [](std::vector<polygon_i> pieces_,std::vector<int> id_list){
 
@@ -214,7 +208,10 @@ void Kunugida::run()
 //        }
 
     }else if(ui->chinochan_button->isChecked()){
-        int i;
+        QRLibrary lib;
+        lib.Decoder(true);
+        QR.Decoder(1);
+        field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
     }
 
     //    TODO: ここまでで各データソースから読み込むようにする

@@ -209,17 +209,23 @@ void QrTranslateToPolygon::translateToCSV(std::pair<std::vector<polygon_i>, std:
 {
     procon::NeoField field;
     procon::NeoExpandedPolygon pieceexpandedpolygon;
+    std::vector<procon::NeoExpandedPolygon> elementarypieces;
     for(auto p : pieceframe.first){
         pieceexpandedpolygon.resetPolygonForce(p);
-        field.setPiece(pieceexpandedpolygon);
+        for(auto e : elementarypieces){
+            e.setPiece(pieceexpandedpolygon);
+        }
     }
+
     procon::NeoExpandedPolygon frameexpandedpolygon;
-    std::vector<procon::NeoExpandedPolygon> vectorexpandedpolygon;
-    for(auto frame_ : pieceframe.second){
+    std::vector<procon::NeoExpandedPolygon> elementaryframe;
+    for(auto f : pieceframe.second){
         frameexpandedpolygon.resetPolygonForce(frame_);
-        vectorexpandedpolygon.push_back(frameexpandedpolygon);
+        elementaryframe.push_back(frameexpandedpolygon);
     }
-    field.setFrame(vectorexpandedpolygon);
+
+    field.setElementaryPieces(elementarypieces);
+    field.setElementaryFrame(elementaryframe);
     NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/fromQRcode.csv");
 }
 

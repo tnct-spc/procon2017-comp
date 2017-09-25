@@ -18,7 +18,6 @@ public:
     std::pair<std::vector<polygon_i>, std::vector<polygon_i>> Decoder(bool s);
 
 private:
-    std::pair<std::vector<polygon_i>,std::vector<polygon_i>> decoded_polygons;
     bool is_multi = false;
     bool first = true;
 
