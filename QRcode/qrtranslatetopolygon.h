@@ -15,27 +15,51 @@
 class QrTranslateToPolygon
 {
 private:
+
+    std::string inputqr;
+    std::vector<std::string> qrinputvector;
+    std::vector<int> colonvector;
+    unsigned int piece_size;
+    unsigned int frame_size;
+    std::vector<std::vector<int>> piece_data;
+    std::vector<std::vector<int>> frame_data;
+
+    std::vector<polygon_i> pieces;
+    std::vector<polygon_i> frames;
+
+
+    void inpToVector();
+    void translateToDoubleArray();
+    void vectorToPolygon();
+    /*
     void findColon();
     void splitQrInput();
     void splitBasisOfSpace(std::string &str,std::vector<int> &qrvec);
     void translateToPolygon(std::vector<int> &intvec,polygon_i &polygon);
     std::vector<std::string> splitedqrinput;
-    std::string framestring;
+    std::vector<std::string> framestring;
     std::vector<int> colon;
     std::vector<std::vector<int>> qrvector;
-    std::vector<int> framevector;
+    std::vector<std::vector<int>> framevector;
     std::string qrinput;
     std::vector<polygon_i> polygon;
-    polygon_i framepolygon;
+    std::vector<polygon_i> framepolygon;
     int shapecount;
     bool useframedata = false;
+    int framedatacount = 0;
+    */
 public:
-    std::vector<polygon_i> getPieceData();
-    polygon_i getFrameData();
     QrTranslateToPolygon(std::string qrinp);
-    static void translateToCSV(std::vector<polygon_i> const& piece, const polygon_i &frame);
+    static void translateToCSV(std::vector<polygon_i> const& piece, const std::vector<polygon_i> &frame);
+    std::vector<polygon_i> getPieceData();
+    std::vector<polygon_i> getFrameData();
+
+    /*
+    std::vector<polygon_i> getPieceData();
+    std::vector<polygon_i> getFrameData();
 
     int get();
+    */
 };
 
 #endif // QRTRANSLATETOPOLYGON_H

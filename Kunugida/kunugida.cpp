@@ -2,6 +2,7 @@
 #include "ui_kunugida.h"
 #include "qrlibrary.h"
 #include "neofield.h"
+#include "neoqrlibrary.h"
 #include "probmaker.h"
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
@@ -45,7 +46,7 @@ Kunugida::~Kunugida()
 void Kunugida::run()
 {
 
-    QRLibrary lib;
+    NeoQRLibrary lib;
     lib.Decoder(true);
 
     logger->info("Run Button Clicked");

@@ -5,6 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "neoanswerboard.h"
 #include "neoanswerdock.h"
+#include "neoqrlibrary.h"
 #include "imagerecognition.h"
 #include "qrlibrary.h"
 #include "neofield.h"
@@ -41,7 +42,7 @@ private:
     std::shared_ptr<NeoAnswerBoard> board;
     void finishedProcess();
     void startProcess();
-    QRLibrary QR;
+    NeoQRLibrary QR;
     RequestMapper request_mapper;
     QNetworkAccessManager *manager;
     QFile file;
