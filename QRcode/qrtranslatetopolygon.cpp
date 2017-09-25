@@ -22,6 +22,7 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     piece_size = std::stod(qrinputvector.at(0));
     frame_size = colonvector.size() - piece_size;
     translateToDoubleArray();
+    vectorToPolygon();
 
     std::cout << "detected!!!!!!!!!!!!!!!!!!!!" << std::endl;
     for(auto output : qrinputvector){
@@ -33,12 +34,13 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     }
     std::cout << std::endl << "piece_size : " << piece_size << "  frame_size : " << frame_size << std::endl;
 
-    std::cout << "DoubleArray!!!!!!!!!!!1" << std::endl;
-    for(auto out : inputdatadoublearray){
-        for(auto put : out){
-            std::cout << put << " ";
-        }
-        std::cout << std::endl;
+    std::cout << "PieceData!!!!!!!!!!!" << std::endl;
+    for(auto output : pieces){
+        std::cout << bg::dsv(output) << std::endl;
+    }
+    std::cout << "FrameData!!!!!!!!!!!" << std::endl;
+    for(auto output : frames){
+        std::cout << bg::dsv(output) << std::endl;
     }
 }
 
@@ -72,6 +74,7 @@ void QrTranslateToPolygon::inpToVector(){
 }
 
 void QrTranslateToPolygon::translateToDoubleArray(){//二重配列に突っ込むやつ
+    std::vector<std::vector<int>> inputdatadoublearray;
     std::vector<int> vectorint;//一時的に格納しておくだけ
     for(unsigned int string_count=2;string_count<qrinputvector.size();++string_count){
         if(qrinputvector.at(string_count) == ":"){
@@ -83,6 +86,35 @@ void QrTranslateToPolygon::translateToDoubleArray(){//二重配列に突っ込�
         }else{
             vectorint.push_back(std::stod(qrinputvector.at(string_count)));
         }
+    }
+    //ここからpieceの二重配列とframeの二重配列に入れる作業をする
+    for(unsigned int vector_count=0;vector_count<inputdatadoublearray.size();++vector_count){
+        if(vector_count < piece_size)piece_data.push_back(inputdatadoublearray.at(vector_count));
+        else piece_data.push_back(inputdatadoublearray.at(vector_count));
+    }
+}
+
+void QrTranslateToPolygon::vectorToPolygon(){
+
+    auto toPolygon = [](std::vector<int> vec_poly){
+        polygon_i poly;
+        point_i point(0,0);
+        for(unsigned int vec_count=1;vec_count<vec_poly.size();++vec_count){
+            if(!vec_count%2)point.set<0>(vec_poly.at(vec_count));
+            else{
+                point.set<1>(vec_poly.at(vec_count));
+                poly.outer().push_back(point);
+            }
+        }
+        poly.outer().push_back(poly.outer().at(0));
+        return poly;
+    };
+
+    for(auto piece : piece_data){
+        pieces.push_back(toPolygon(piece));
+    }
+    for(auto frame : frame_data){
+        frames.push_back(toPolygon(frame));
     }
 }
 
@@ -152,7 +184,7 @@ void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i
     }
     polygon.outer().push_back(point_i(intvec[1],intvec[2]));
 }
-
+*/
 void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> const& piece, std::vector<polygon_i> const& frame)
 {
     procon::NeoField field;
@@ -171,7 +203,7 @@ void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> const& piece, s
     NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/fromQRcode.csv");
 }
 
-
+/*
 int main()
 {
     QrTransToPolygon qrtrans("8:5 7 1 6 5 4 5 0 2 6 0:3 0 0 4 4 0 5:5 2 5 0 5 5 0 5 8 2 8:3 6 2 0 7 0 0:5 6 5 0 0 0 13 9 2 9 5:4 0 0 4 0 4 5 0 3:8 5 1 5 0 7 0 7 3 0 3 0 0 2 0 2 1:4 0 0 3 0 3 3 0 3:9 11 0 11 2 13 2 13 0 16 0 16 10 0 10 0 3 4 0");
