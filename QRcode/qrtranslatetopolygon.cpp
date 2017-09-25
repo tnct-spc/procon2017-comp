@@ -100,13 +100,15 @@ void QrTranslateToPolygon::vectorToPolygon(){
         polygon_i poly;
         point_i point(0,0);
         for(unsigned int vec_count=1;vec_count<vec_poly.size();++vec_count){
-            if(!vec_count%2)point.set<0>(vec_poly.at(vec_count));
-            else{
+            if(vec_count%2==1){
+                point.set<0>(vec_poly.at(vec_count));
+            }else{
                 point.set<1>(vec_poly.at(vec_count));
                 poly.outer().push_back(point);
             }
         }
         poly.outer().push_back(poly.outer().at(0));
+        bg::correct(poly);
         return poly;
     };
 
