@@ -18,8 +18,8 @@ public:
     std::pair<std::vector<polygon_i>, std::vector<polygon_i>> Decoder(bool s);
 
 private:
-    bool is_pressed_enter = false;
     bool is_multi = false;
+    bool first = true;
 
 protected:
     void keyPressEvent(QKeyEvent *event);

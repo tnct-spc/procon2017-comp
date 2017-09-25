@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "neoqrlibrary.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,7 +20,7 @@ using namespace cv;
 
 void MainWindow::takePicture()
 {
-    NeoQRLibrary lib;
+    QRLibrary lib;
     auto decodedCode = lib.Decoder(isAuto());
     Quit(0);
 

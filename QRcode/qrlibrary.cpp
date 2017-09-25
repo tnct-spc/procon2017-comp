@@ -13,6 +13,7 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
 {
     int resizedW;
     std::string code = {""};
+    std::string bcode = {""};
     std::string type = {""};
     VideoCapture cap(1); // open the video camera no. 0
 
@@ -66,6 +67,7 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
             ++symbol) {
             std::vector<Point> vp;
             // do something useful with results
+            bcode = code;
             code = symbol->get_data();
             type = symbol->get_type_name();
             std::cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< std::endl;
@@ -79,7 +81,6 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
             for(int i=0;i<4;i++){
                 line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);
             }
-            if(is_pressed_enter){
             std::cout << "Angle: " << r.angle << std::endl;
             QrTranslateToPolygon qrtrans(code);
             is_multi = qrtrans.getIsMultiQr();
@@ -88,29 +89,21 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
             decoded_polygons.first = pieceData;
             decoded_polygons.second = frameData;
             QrTranslateToPolygon::translateToCSV(pieceData, frameData);
-            }
         }
 
-        imshow("Press esc key to exit", frame);
+        imshow("うんちっち", frame);
 
         int key = waitKey(1);
-        if(!is_multi && code.length() > 2 && s){
-            std::cout << "QRCode detected" << std::endl;
-            break;
+        if(code.length() > 2 && s){
+            if(!is_multi){
+                std::cout << "QRCode detected" << std::endl;
+                break;
+            }else if(!(code == bcode) && !first && !is_multi) break;
         }
+        first = false;
     }
 
 //    code = "Type: " + type + "\n\n\"" + code + "\"";
 //    return code;
     return decoded_polygons;
-}
-
-void QRLibrary::keyPressEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_Enter && event->type() == QEvent::KeyPress){
-        is_pressed_enter = true;
-    }
-    if(event->key() == Qt::Key_Enter && event->type() == QEvent::KeyRelease){
-        is_pressed_enter = false;
-    }
 }
