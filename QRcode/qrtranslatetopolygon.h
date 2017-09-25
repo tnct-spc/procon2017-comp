@@ -20,9 +20,10 @@ private:
     std::vector<std::string> qrinputvector;
     std::vector<int> colonvector;
     unsigned int piece_size;
-    unsigned int frame_size;
+    int frame_size;
     std::vector<std::vector<int>> piece_data;
     std::vector<std::vector<int>> frame_data;
+    bool ismultiqr;
 
     std::vector<polygon_i> pieces;
     std::vector<polygon_i> frames;
@@ -53,6 +54,7 @@ public:
     static void translateToCSV(std::vector<polygon_i> const& piece, const std::vector<polygon_i> &frame);
     std::vector<polygon_i> getPieceData();
     std::vector<polygon_i> getFrameData();
+    bool getIsMultiQr();
 
     /*
     std::vector<polygon_i> getPieceData();
