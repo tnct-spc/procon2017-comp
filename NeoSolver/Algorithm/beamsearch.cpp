@@ -902,7 +902,12 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
                     ev_buf.frame_index = frame_index;
                     ev_buf.piece_index = piece_index;
                     ev_buf.is_inversed = false;
-                    evaluations.push_back(ev_buf);
+
+                    {
+                        std::lock_guard<decltype(mtx)> lock(mtx);
+                        evaluations.push_back(ev_buf);
+                    }
+
                 }
             }
             for(const auto& e : evaluate_inversed){
@@ -913,7 +918,11 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
                     ev_buf.frame_index = frame_index;
                     ev_buf.piece_index = piece_index;
                     ev_buf.is_inversed = true;
-                    evaluations.push_back(ev_buf);
+
+                    {
+                        std::lock_guard<decltype(mtx)> lock(mtx);
+                        evaluations.push_back(ev_buf);
+                    }
                 }
             }
 
@@ -921,20 +930,49 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
         }
     };
 
-    auto evaluateNextState = [&](procon::NeoField const& field,int const& fields_index){
-        for (int piece_index = 0; piece_index < field.getElementaryPieces().size(); ++piece_index) {
-            //すでに置いてあったら評価しません
-            if(field.getIsPlaced().at(piece_index)) continue;
 
-            evaluateWrapper(field,piece_index,fields_index);
+    int global_field_index = 0;
+
+    auto evaluateNextState = [&](){
+        while(true){
+
+            procon::NeoField field_buf;
+            int now_field_index = 0;
+
+            {
+                std::lock_guard<decltype(mtx)> lock(mtx);
+
+                if(global_field_index == fields.size()){
+                    return;
+                }
+
+                logger->info("evaluating " + std::to_string(global_field_index));
+
+                field_buf = fields.at(global_field_index);
+                now_field_index = global_field_index;
+
+                ++global_field_index;
+            }
+
+            for (int piece_index = 0; piece_index < field_buf.getElementaryPieces().size(); ++piece_index) {
+                //すでに置いてあったら評価しません
+                if(field_buf.getIsPlaced().at(piece_index)) continue;
+
+                evaluateWrapper(field_buf,piece_index,now_field_index);
+            }
         }
     };
 
-    int field_index = 0;
-    for(auto const& f : fields){
-        evaluateNextState(f,field_index);
-        ++field_index;
+    std::vector<std::thread> threads(cpu_num);
+    for(auto& th : threads){
+        th = std::thread(evaluateNextState);
     }
+
+    for(auto& th : threads){
+        th.join();
+    }
+
+
 #endif
 }
 

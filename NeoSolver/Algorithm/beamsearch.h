@@ -48,7 +48,7 @@ private:
     std::shared_ptr<NeoAnswerDock> dock;
     std::shared_ptr<NeoAnswerDock> neo;
     unsigned int cpu_num = 0;
-    unsigned int beam_width = 400;
+    unsigned int beam_width = 200;
 
 };
 
