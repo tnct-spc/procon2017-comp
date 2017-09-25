@@ -127,6 +127,21 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
+        int scanned_dummy_piece_id = 0;
+        std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
+        for(auto polygon : pieces){
+            polygon_t poly_buf;
+            for(auto p : polygon.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+            procon::ExpandedPolygon ex_buf(scanned_dummy_piece_id);
+            ex_buf.resetPolygonForce(poly_buf);
+            scanned_dummy_piece.push_back(ex_buf);
+            ++scanned_dummy_piece_id;
+        }
+
+        board->setScannedPieces(scanned_dummy_piece);
+
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
         emit requestCSV();
         NeoPolygonIO::importField("../../procon2017-comp/field.csv");
@@ -234,6 +249,7 @@ void Kunugida::emitAnswer(procon::NeoField field)
    logger->info("emitted answer");
    std::cout << field.getPieces().size() << std::endl;
    this->board->setField(field);
+   this->board->update();
 }
 
 void Kunugida::finishedProcess()
