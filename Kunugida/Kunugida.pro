@@ -27,13 +27,18 @@ CONFIG += c++14
 
 
 SOURCES += main.cpp\
-        kunugida.cpp \
-    tcp_main.cpp \
-    request.cpp
+        kunugida.cpp\
+    http/answer_form.cpp \
+    http/help_page.cpp \
+    http/output_problem_page.cpp \
+    http/request_mapper.cpp
 
-HEADERS  += kunugida.h \
-    tcp_main.h \
-    request.h
+HEADERS  += kunugida.h\
+    http/answer_form.h \
+    http/help_page.h \
+    http/output_problem_page.h \
+    http/request_mapper.h
+
 
 FORMS    += kunugida.ui
 
