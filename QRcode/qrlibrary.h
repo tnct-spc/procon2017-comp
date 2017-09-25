@@ -19,6 +19,7 @@ public:
 
 private:
     bool is_pressed_enter = false;
+    bool is_multi = false;
 
 protected:
     void keyPressEvent(QKeyEvent *event);

@@ -14,7 +14,7 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
     int resizedW;
     std::string code = {""};
     std::string type = {""};
-    VideoCapture cap(0); // open the video camera no. 0
+    VideoCapture cap(1); // open the video camera no. 0
 
     if (!cap.isOpened())  // if not success, exit program
     {
@@ -82,6 +82,7 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
             if(is_pressed_enter){
             std::cout << "Angle: " << r.angle << std::endl;
             QrTranslateToPolygon qrtrans(code);
+            is_multi = qrtrans.getIsMultiQr();
             std::vector<polygon_i> pieceData = qrtrans.getPieceData();
             std::vector<polygon_i> frameData = qrtrans.getFrameData();
             decoded_polygons.first = pieceData;
@@ -92,13 +93,9 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
 
         imshow("Press esc key to exit", frame);
 
-        int key = waitKey(30);
-        if(code.length() > 2 && s){
+        int key = waitKey(1);
+        if(!is_multi && code.length() > 2 && s){
             std::cout << "QRCode detected" << std::endl;
-            break;
-        }
-        if(key == 27){
-            std::cout << "Esc key was pressed" << std::endl;
             break;
         }
     }
