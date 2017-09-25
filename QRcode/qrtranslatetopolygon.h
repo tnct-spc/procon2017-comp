@@ -15,6 +15,15 @@
 class QrTranslateToPolygon
 {
 private:
+
+    std::string inputqr;
+    std::vector<std::string> qrinputvector;
+    std::vector<int> colonvector;
+    int frame_size;
+
+    void inpToVector();
+    void translateToDoubleArray();
+    /*
     void findColon();
     void splitQrInput();
     void splitBasisOfSpace(std::string &str,std::vector<int> &qrvec);
@@ -30,13 +39,16 @@ private:
     int shapecount;
     bool useframedata = false;
     int framedatacount = 0;
+    */
 public:
+    QrTranslateToPolygon(std::string qrinp);
+    /*
     std::vector<polygon_i> getPieceData();
     std::vector<polygon_i> getFrameData();
-    QrTranslateToPolygon(std::string qrinp);
     static void translateToCSV(std::vector<polygon_i> const& piece, const std::vector<polygon_i> &frame);
 
     int get();
+    */
 };
 
 #endif // QRTRANSLATETOPOLYGON_H

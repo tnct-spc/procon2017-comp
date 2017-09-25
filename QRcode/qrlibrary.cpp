@@ -9,7 +9,7 @@ QRLibrary::QRLibrary()
     std::cout << "QR Libruary initialized" << std::endl;
 }
 
-std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
+std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool s)
 {
     int resizedW;
     std::string code = {""};
@@ -36,7 +36,7 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
         resizeWindow("Press Esc to exit", 600, 600);
     }
 
-    std::pair<std::vector<polygon_i>,polygon_i> decoded_polygons;
+    std::pair<std::vector<polygon_i>,std::vector<polygon_i>> decoded_polygons;
 
     while (1)
     {
@@ -81,7 +81,7 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             }
             std::cout << "Angle: " << r.angle << std::endl;
             QrTranslateToPolygon qrtrans(code);
-            for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
+/*            for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
                 std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
             }
       //      std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
@@ -89,12 +89,13 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             for(auto polygon : qrtrans.getPieceData()){
                 decoded_polygons.first.push_back(polygon);
             }
-     //       for(auto point: qrtrans.getFrameData().outer()){
-     //           decoded_polygons.second.outer().push_back(point);
-     //       }
+            for(auto polygon : qrtrans.getFrameData()){
+                decoded_polygons.second.push_back(polygon);
+            }
             std::vector<polygon_i> pieceData = qrtrans.getPieceData();
             std::vector<polygon_i> frameData = qrtrans.getFrameData();
             QrTranslateToPolygon::translateToCSV(pieceData, frameData);
+*/
         }
 
         imshow("Press esc key to exit", frame);

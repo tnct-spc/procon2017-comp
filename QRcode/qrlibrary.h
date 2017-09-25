@@ -14,7 +14,7 @@ class QRLibrary
 {
 public:
     QRLibrary();
-    std::pair<std::vector<polygon_i>,polygon_i> Decoder(bool s);
+    std::pair<std::vector<polygon_i>,std::vector<polygon_i>> Decoder(bool s);
 };
 
 #endif // QRLIBRUARY_H

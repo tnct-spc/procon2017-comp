@@ -15,35 +15,56 @@
 
 QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
 {
-    qrinput = qrinp;
-    findColon();
-    splitQrInput();
-    for(int tes=0;tes<shapecount;tes++){
-        splitBasisOfSpace(splitedqrinput[tes],qrvector[tes]);
+    inputqr = qrinp;//メンバ変数に代入
+    inpToVector();
+    frame_size = colonvector.size() - std::stod(qrinputvector.at(0));
+
+
+    std::cout << "detected!!!!!!!!!!!!!!!!!!!!" << std::endl;
+    for(auto output : qrinputvector){
+        std::cout << output << " ";
     }
-    framevector.resize(framedatacount);
-    framestring.resize(framedatacount);
-    for(auto frame : framevector){
-        frame.resize(128,-1);
+    std::cout << std::endl << "colon!!!!!!!!!!!!!!!!!!" << std::endl;
+    for(auto output : colonvector){
+        std::cout << output << " ";
     }
-    if(useframedata){
-        for(int count=0;count<framedatacount;++count){
-            splitBasisOfSpace(framestring.at(count),framevector.at(count));
+    std::cout << std::endl << "frame_size : " << frame_size << std::endl;
+}
+
+
+void QrTranslateToPolygon::inpToVector(){
+
+    std::string inp;//一時保管するためのstring
+    for(unsigned int string_count=0;string_count < inputqr.size();++string_count){
+        //実行時に引数として渡されたstringの中身を確認してく
+        if(string_count == inputqr.size() - 1){
+            inp.push_back(inputqr.at(string_count));
+            qrinputvector.push_back(inp);//空白なら代入して中身削除
+            inp.clear();
+            break;
+        }else if(inputqr.at(string_count) == ' '){
+            qrinputvector.push_back(inp);//空白なら代入して中身削除
+            inp.clear();
+        }else if(inputqr.at(string_count) == ':'){
+
+            qrinputvector.push_back(inp);//空白なら代入して中身削除
+            inp.clear();
+            qrinputvector.push_back(":");
+        }else{
+            inp.push_back(inputqr.at(string_count));
         }
+
     }
-    polygon.resize(shapecount);
-    for(int tes=0;tes<shapecount;tes++){
-        translateToPolygon(qrvector[tes],polygon[tes]);
-    }
-    if(useframedata){
-        for(int count=0;count<framedatacount;++count){
-            polygon_i frame_input_polygon;
-            translateToPolygon(framevector.at(count),frame_input_polygon);
-            framepolygon.push_back(frame_input_polygon);
-        }
+    for(unsigned int vector_count=0;vector_count<qrinputvector.size();++vector_count){
+        if(qrinputvector.at(vector_count) == ":")colonvector.push_back(vector_count);
     }
 }
 
+void QrTranslateToPolygon::translateToDoubleArray(){
+
+}
+
+/*
 void QrTranslateToPolygon::findColon()
 {
     int cou=0;
@@ -128,7 +149,7 @@ void QrTranslateToPolygon::translateToCSV(std::vector<polygon_i> const& piece, s
     NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/fromQRcode.csv");
 }
 
-/*
+
 int main()
 {
     QrTransToPolygon qrtrans("8:5 7 1 6 5 4 5 0 2 6 0:3 0 0 4 4 0 5:5 2 5 0 5 5 0 5 8 2 8:3 6 2 0 7 0 0:5 6 5 0 0 0 13 9 2 9 5:4 0 0 4 0 4 5 0 3:8 5 1 5 0 7 0 7 3 0 3 0 0 2 0 2 1:4 0 0 3 0 3 3 0 3:9 11 0 11 2 13 2 13 0 16 0 16 10 0 10 0 3 4 0");
