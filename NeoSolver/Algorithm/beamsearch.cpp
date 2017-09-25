@@ -456,14 +456,28 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
 
         return true;
     };
-    bool a = about_distance();
+
+    auto about_frameside = [&field](){//frameの辺の長さのアレ
+        for(auto neoframe : field.getFrame()){
+            polygon_i frame = neoframe.getPolygon();
+            for(unsigned int count=0;count<frame.outer().size() - 1;++count){
+                if(bg::distance(frame.outer().at(count) , frame.outer().at(count + 1)) < 4)return true;
+            }
+        }
+        //枝切りできないならfalse
+        return false;
+    };
+
+    /*bool a = about_distance();
     if(a)return a;
     bool b = about_angle();
     if(b)return b;
     bool c = about_framesize();
     if(c)return c;
     bool d = about_frameangle();
-    if(d)return d;
+    if(d)return d;*/
+    bool e = about_frameside();
+    if(e)return e;
     return false;
 }
 
