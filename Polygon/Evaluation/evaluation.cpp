@@ -172,13 +172,14 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
                 double precious_degree = calculation_precious(frame_point_index , polygon_point_index);
                 if(snuggle_up > evaluation) evaluation = std::pow(snuggle_up , 2);
                 vector.push_back((std::pair<double , Connect>(evaluation + precious_degree, connect1)));
-            }else if(angle_agreement == 0 && contain_zero){
+            }else if(angle_agreement == 0){
                 //角に隙間があるとき
-                if(!passed) vector.push_back(std::pair<double , Connect>(0 , connect1));
+                if(!passed && contain_zero) vector.push_back(std::pair<double , Connect>(0 , connect1));
 
                 double evaluation = 0;
                 if(snuggle_up > evaluation) evaluation = std::pow(snuggle_up , 2);
                 vector.push_back((std::pair<double , Connect>(evaluation , connect2)));
+                if(!contain_zero && (evaluation == 0)) vector.erase(vector.end());
             }
         }
     }
