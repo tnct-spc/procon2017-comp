@@ -57,7 +57,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         procon::ExpandedPolygon ex;
         ex.resetPolygonForce(polygons[i]);
-        PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
+        // PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
     }
 
     // degree of frame
@@ -94,7 +94,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        //NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -613,24 +613,51 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
         piece_lines = std::move(tmp);
 
         if (frame_flag == true){
-            {
-                //謎の長さtoセンチメートル→ミリメートル
-                //scaleを頑張って測る
-                //コードが最高にキモい
-                const cv::Vec4f start_line = piece_lines.at(0);
-                auto func = [&](cv::Vec4f line1,cv::Vec4f line2)->double {
-                    const double line1_distance = calcDistance(start_line[0],start_line[1],line1[2],line1[3]);
-                    const double line2_distance = calcDistance(start_line[0],start_line[1],line2[2],line2[3]);
-                    return line1_distance < line2_distance;
-                };
-                auto end_line = *(std::min_element(piece_lines.begin(),piece_lines.end(),func));
-                double sum = 0;
+
+            // pick up 3 long line
+            std::vector<cv::Vec4f> sorted;
+            double longgest = 10000;
+
+            for (int i=0; i<3; i++) {
+                cv::Vec4f box;
+                double shorter = 0;
                 for (auto line : piece_lines) {
-                    sum += calcDistance(line[0],line[1],line[2],line[3]);
-                    if (line == end_line) break;    //キモい
+                    double len = calcDistance(line[0],line[1],line[2],line[3]);
+                    if ((shorter < len) && (longgest > len)) {
+                        shorter = len;
+                        box = line;
+                    }
                 }
-                scale = (210.0 * 2 + 297.0 * 2) / sum; // まわりの実際の長さ/計算上の合計？　変更
+                sorted.push_back(box);
+                longgest = shorter;
             }
+
+            for (int i=0; i<3; i++) {
+                double len1 = calcDistance(sorted.at(i)[0],sorted.at(i)[1],sorted.at(i)[2],sorted.at(i)[3]);
+                double len2 = calcDistance(sorted.at((i+1)%3)[0],sorted.at((i+1)%3)[1],sorted.at((i+1)%3)[2],sorted.at((i+1)%3)[3]);
+                if (fabs(len1-len2) < 0.1) {
+                    scale = 297.0 * 2 / (len1 + len2);
+                    break;
+                }
+            }
+
+            //謎の長さtoセンチメートル→ミリメートル
+            //scaleを頑張って測る
+            //コードが最高にキモい
+//            const cv::Vec4f start_line = piece_lines.at(0);
+
+//            auto func = [&](cv::Vec4f line1,cv::Vec4f line2)->double {
+//                const double line1_distance = calcDistance(start_line[0],start_line[1],line1[2],line1[3]);
+//                const double line2_distance = calcDistance(start_line[0],start_line[1],line2[2],line2[3]);
+//                return line1_distance < line2_distance;
+//            };
+//            auto end_line = *(std::min_element(piece_lines.begin(),piece_lines.end(),func));
+//            double sum = 0;
+//            for (auto line : piece_lines) {
+//                sum += calcDistance(line[0],line[1],line[2],line[3]);
+//                if (line == end_line) break;    //キモい
+//            }
+//            scale = (210.0 * 2 + 297.0 * 2) / sum; // まわりの実際の長さ/計算上の合計？　変更
 
             std::vector<std::vector<cv::Vec4f>> rings;
             std::vector<cv::Vec4f> ring;
@@ -646,7 +673,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
                 }
 
                 //許容幅20mm(要検証)
-                constexpr double weight_threshold = 30;
+                constexpr double weight_threshold = 20;
 
                 if (distance > weight_threshold) {
                     rings.push_back(ring);
