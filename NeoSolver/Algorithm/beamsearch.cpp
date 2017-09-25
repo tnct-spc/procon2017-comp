@@ -827,6 +827,7 @@ int BeamSearch::checkOddField(const procon::NeoField &field, const Connect &conn
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
+#ifdef DEBUG_MODE
     //frameがstd::vector<NeoExPolygon>なのでそれぞれに対して、評価関数を回す
     auto evaluateWrapper = [&](procon::NeoField const& field,int const& piece_index,int const& fields_index){
         int frame_index = 0;
@@ -841,26 +842,24 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
             Evaluate ev_buf;
             for(const auto& e : evaluate){
                 if(e.first){
-                ev_buf.score = e.first;
-                ev_buf.connection = e.second;
-                ev_buf.fields_index = fields_index;
-                ev_buf.frame_index = frame_index;
-                ev_buf.piece_index = piece_index;
-                ev_buf.is_inversed = false;
-                evaluations.push_back(ev_buf);
-
+                    ev_buf.score = e.first;
+                    ev_buf.connection = e.second;
+                    ev_buf.fields_index = fields_index;
+                    ev_buf.frame_index = frame_index;
+                    ev_buf.piece_index = piece_index;
+                    ev_buf.is_inversed = false;
+                    evaluations.push_back(ev_buf);
                 }
             }
             for(const auto& e : evaluate_inversed){
                 if(e.first){
                     ev_buf.score = e.first;
-                ev_buf.connection = e.second;
-                ev_buf.fields_index = fields_index;
-                ev_buf.frame_index = frame_index;
-                ev_buf.piece_index = piece_index;
-                ev_buf.is_inversed = true;
-                evaluations.push_back(ev_buf);
-
+                    ev_buf.connection = e.second;
+                    ev_buf.fields_index = fields_index;
+                    ev_buf.frame_index = frame_index;
+                    ev_buf.piece_index = piece_index;
+                    ev_buf.is_inversed = true;
+                    evaluations.push_back(ev_buf);
                 }
             }
 
@@ -877,19 +876,65 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
         }
     };
 
-#ifdef DEBUG_MODE
     int field_index = 0;
     for(auto const& f : fields){
         evaluateNextState(f,field_index);
         ++field_index;
     }
 #else
+        //frameがstd::vector<NeoExPolygon>なのでそれぞれに対して、評価関数を回す
+    auto evaluateWrapper = [&](procon::NeoField const& field,int const& piece_index,int const& fields_index){
+        int frame_index = 0;
+        for(const auto& f : field.getFrame()){
+            //inverseしていない方のpiece評価
+            std::vector<std::pair<double,Connect>> evaluate = Evaluation::evaluation(f,field.getElementaryPieces()[piece_index],1.0,1.0,true);
+            //inverseしている方のpiece評価
+            std::vector<std::pair<double,Connect>> evaluate_inversed = Evaluation::evaluation(f,field.getElementaryInversePieces()[piece_index],1.0,1.0,true);
+
+            //一時保存用の変数
+//            TODO: いい感じにここをパフォーマンスよくする
+            Evaluate ev_buf;
+            for(const auto& e : evaluate){
+                if(e.first){
+                    ev_buf.score = e.first;
+                    ev_buf.connection = e.second;
+                    ev_buf.fields_index = fields_index;
+                    ev_buf.frame_index = frame_index;
+                    ev_buf.piece_index = piece_index;
+                    ev_buf.is_inversed = false;
+                    evaluations.push_back(ev_buf);
+                }
+            }
+            for(const auto& e : evaluate_inversed){
+                if(e.first){
+                    ev_buf.score = e.first;
+                    ev_buf.connection = e.second;
+                    ev_buf.fields_index = fields_index;
+                    ev_buf.frame_index = frame_index;
+                    ev_buf.piece_index = piece_index;
+                    ev_buf.is_inversed = true;
+                    evaluations.push_back(ev_buf);
+                }
+            }
+
+            ++frame_index;
+        }
+    };
+
+    auto evaluateNextState = [&](procon::NeoField const& field,int const& fields_index){
+        for (int piece_index = 0; piece_index < field.getElementaryPieces().size(); ++piece_index) {
+            //すでに置いてあったら評価しません
+            if(field.getIsPlaced().at(piece_index)) continue;
+
+            evaluateWrapper(field,piece_index,fields_index);
+        }
+    };
+
     int field_index = 0;
     for(auto const& f : fields){
         evaluateNextState(f,field_index);
         ++field_index;
     }
-
 #endif
 }
 
