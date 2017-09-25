@@ -51,7 +51,7 @@ private:
     */
 public:
     QrTranslateToPolygon(std::string qrinp);
-    static void translateToCSV(std::vector<polygon_i> const& piece, const std::vector<polygon_i> &frame);
+    static void translateToCSV(std::pair<std::vector<polygon_i>, std::vector<polygon_i>> pieceframe);
     std::vector<polygon_i> getPieceData();
     std::vector<polygon_i> getFrameData();
     bool getIsMultiQr();

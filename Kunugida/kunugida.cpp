@@ -53,6 +53,7 @@ void Kunugida::run()
     procon::NeoField field;
 
     QR.Decoder(1);
+
     auto polygoniToExpanded = [](std::vector<polygon_i> pieces_,std::vector<int> id_list){
 
 
@@ -212,6 +213,8 @@ void Kunugida::run()
 //            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
 //        }
 
+    }else if(ui->chinochan_button->isChecked()){
+        int i;
     }
 
     //    TODO: ここまでで各データソースから読み込むようにする
