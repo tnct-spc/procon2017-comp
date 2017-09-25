@@ -20,7 +20,7 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     inpToVector();
     std::cout << qrinputvector.size() << std::endl;
     piece_size = std::stod(qrinputvector.at(0));
-    if(colonvector.size() < piece_size){
+    if(colonvector.size() <= piece_size){
         ismultiqr = true;
         frame_size = -1;
     }else{
