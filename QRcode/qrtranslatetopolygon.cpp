@@ -20,7 +20,7 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     inpToVector();
     std::cout << qrinputvector.size() << std::endl;
     piece_size = std::stod(qrinputvector.at(0));
-    if(colonvector.size() - piece_size < 0){
+    if(colonvector.size() < piece_size){
         ismultiqr = true;
         frame_size = -1;
     }else{
@@ -44,6 +44,7 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     for(auto output : pieces){
         std::cout << bg::dsv(output) << std::endl;
     }
+    if(getIsMultiQr())std::cout << "MultiQR!!!!!!!!!!!!!!!!!!!" << std::endl;
     std::cout << "FrameData!!!!!!!!!!!" << std::endl;
     for(auto output : frames){
         std::cout << bg::dsv(output) << std::endl;

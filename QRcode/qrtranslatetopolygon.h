@@ -23,7 +23,7 @@ private:
     int frame_size;
     std::vector<std::vector<int>> piece_data;
     std::vector<std::vector<int>> frame_data;
-    bool ismultiqr;
+    bool ismultiqr = false;
 
     std::vector<polygon_i> pieces;
     std::vector<polygon_i> frames;
