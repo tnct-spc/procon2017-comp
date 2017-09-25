@@ -5,6 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "neoanswerboard.h"
 #include "neoanswerdock.h"
+#include "neoqrlibrary.h"
 #include "imagerecognition.h"
 #include "qrlibrary.h"
 #include "neofield.h"

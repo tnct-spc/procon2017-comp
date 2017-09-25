@@ -79,23 +79,15 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
             for(int i=0;i<4;i++){
                 line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);
             }
+            if(is_pressed_enter){
             std::cout << "Angle: " << r.angle << std::endl;
             QrTranslateToPolygon qrtrans(code);
-/*            for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
-                std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
-            }
-      //      std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
-
-            for(auto polygon : qrtrans.getPieceData()){
-                decoded_polygons.first.push_back(polygon);
-            }
-            for(auto polygon : qrtrans.getFrameData()){
-                decoded_polygons.second.push_back(polygon);
-            }
             std::vector<polygon_i> pieceData = qrtrans.getPieceData();
             std::vector<polygon_i> frameData = qrtrans.getFrameData();
+            decoded_polygons.first = pieceData;
+            decoded_polygons.second = frameData;
             QrTranslateToPolygon::translateToCSV(pieceData, frameData);
-*/
+            }
         }
 
         imshow("Press esc key to exit", frame);
@@ -116,3 +108,12 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
     return decoded_polygons;
 }
 
+void QRLibrary::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Enter && event->type() == QEvent::KeyPress){
+        is_pressed_enter = true;
+    }
+    if(event->key() == Qt::Key_Enter && event->type() == QEvent::KeyRelease){
+        is_pressed_enter = false;
+    }
+}
