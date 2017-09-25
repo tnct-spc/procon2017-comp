@@ -20,7 +20,13 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     inpToVector();
     std::cout << qrinputvector.size() << std::endl;
     piece_size = std::stod(qrinputvector.at(0));
-    frame_size = colonvector.size() - piece_size;
+    if(colonvector.size() - piece_size < 0){
+        ismultiqr = true;
+        frame_size = -1;
+    }else{
+        frame_size = colonvector.size() - piece_size;
+        ismultiqr = false;
+    }
     translateToDoubleArray();
     vectorToPolygon();
 
@@ -127,6 +133,10 @@ std::vector<polygon_i> QrTranslateToPolygon::getPieceData(){
 std::vector<polygon_i> QrTranslateToPolygon::getFrameData(){
     return frames;
 }
+bool QrTranslateToPolygon::getIsMultiQr(){
+    return ismultiqr;
+}
+
 /*
 void QrTranslateToPolygon::findColon()
 {
