@@ -58,7 +58,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
         for(double i : vector){
             if(i != before_angle){
                 count = 1;
-                map.push_back(std::pair<double , int>(i , count));
+                map.emplace_back(std::pair<double , int>(i , count));
             }else{
                 auto itr = map.end() - 1;
                 *itr = std::pair<double , int>(i , count);
@@ -116,7 +116,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
         for(int i = 1; i <= snuggle_up ; i ++){
             int calculated_frame_index = calculation_nep(frame , frame_point_index , i);
             int calculated_polygon_index = calculation_nep(polygon , polygon_point_index , i);
-            passed_checker.push_back(std::pair<int , int>(calculated_frame_index , calculated_polygon_index));
+            passed_checker.emplace_back(std::pair<int , int>(calculated_frame_index , calculated_polygon_index));
         }
         //通ってきた道がいかに貴重だったかを確認する
         double precious_degree = 0;
@@ -171,14 +171,14 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
                 //角の貴重度
                 double precious_degree = calculation_precious(frame_point_index , polygon_point_index);
                 if(snuggle_up > evaluation) evaluation = std::pow(snuggle_up , 2);
-                vector.push_back((std::pair<double , Connect>(evaluation + precious_degree, connect1)));
+                vector.emplace_back((std::pair<double , Connect>(evaluation + precious_degree, connect1)));
             }else if(angle_agreement == 0){
                 //角に隙間があるとき
-                if(!passed && contain_zero) vector.push_back(std::pair<double , Connect>(0 , connect1));
+                if(!passed && contain_zero) vector.emplace_back(std::pair<double , Connect>(0 , connect1));
 
                 double evaluation = 0;
                 if(snuggle_up > evaluation) evaluation = std::pow(snuggle_up , 2);
-                vector.push_back((std::pair<double , Connect>(evaluation , connect2)));
+                vector.emplace_back((std::pair<double , Connect>(evaluation , connect2)));
                 if(!contain_zero && (evaluation == 0)) vector.erase(vector.end());
             }
         }
