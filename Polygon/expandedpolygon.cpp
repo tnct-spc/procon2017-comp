@@ -213,6 +213,15 @@ std::vector<double> const& procon::ExpandedPolygon::getSideAngle() const
     return side_angle;
 }
 
+std::vector<double> const procon::ExpandedPolygon::getSideAngle_degree() const
+{
+    std::vector<double> side_angle_degree;
+    for(const double angle : this->side_angle) {
+        side_angle_degree.push_back((angle / M_PI) * 180);
+    }
+    return side_angle_degree;
+}
+
 std::vector<double> const& procon::ExpandedPolygon::getSideSlope() const
 {
     return side_slope;
