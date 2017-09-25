@@ -2,6 +2,7 @@
 #define EXPANDEDPOLYGON_H
 
 #include "fit.h"
+#include "precompile.h"
 
 namespace bg = boost::geometry;
 using point_t = bg::model::d2::point_xy<double>;
