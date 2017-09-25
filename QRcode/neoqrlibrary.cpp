@@ -31,9 +31,9 @@ std::pair<std::vector<polygon_i>, polygon_i> NeoQRLibrary::Decoder(bool s)
     double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH);
     double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
 
-    std::cout << "Frame size: " << dWidth << " x " << dHeight << std::endl;
+    std::cout << "Camera size: " << dWidth << " x " << dHeight << std::endl;
 
-    namedWindow("Press Esc key to exit", CV_WINDOW_AUTOSIZE);
+    namedWindow("Press Esc key to exit", CV_WINDOW_NORMAL);
 
     std::pair<std::vector<polygon_i>, polygon_i> decoded_polygons;
 
@@ -73,5 +73,7 @@ std::pair<std::vector<polygon_i>, polygon_i> NeoQRLibrary::Decoder(bool s)
             imshow("Press Esc key to exit", frame);
         }
     }
+
+    int key = waitKey(30);
     return decoded_polygons;
 }

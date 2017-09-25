@@ -46,7 +46,7 @@ Kunugida::~Kunugida()
 void Kunugida::run()
 {
 
-    NeoQRLibrary lib;
+    QRLibrary lib;
     lib.Decoder(true);
 
     logger->info("Run Button Clicked");

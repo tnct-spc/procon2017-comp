@@ -42,7 +42,7 @@ private:
     std::shared_ptr<NeoAnswerBoard> board;
     void finishedProcess();
     void startProcess();
-    NeoQRLibrary QR;
+    QRLibrary QR;
     RequestMapper request_mapper;
     QNetworkAccessManager *manager;
     QFile file;

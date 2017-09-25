@@ -15,14 +15,13 @@ class QRLibrary
 {
 public:
     QRLibrary();
+    std::pair<std::vector<polygon_i>, std::vector<polygon_i>> Decoder(bool s);
 
 private:
-    bool scanif = false;
+    bool is_pressed_enter = false;
 
 protected:
     void keyPressEvent(QKeyEvent *event);
-
-    std::pair<std::vector<polygon_i>,std::vector<polygon_i>> Decoder(bool s);
 };
 
 #endif // QRLIBRUARY_H
