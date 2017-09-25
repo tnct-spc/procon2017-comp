@@ -109,6 +109,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
     };
     //すでに通ったことのあるところのchecker
     std::vector<std::pair<int , int>> passed_checker;
+    passed_checker.reserve(20);
     //どれだけ辺に寄り添ってきたか(二重forに呼ばれる方)
     auto snuggle_processing = [&](int frame_point_index , int polygon_point_index){
         double snuggle_up = snuggle_up_counter(frame_point_index , polygon_point_index);
@@ -140,6 +141,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
 
     //返すときに使うvector
     std::vector<std::pair<double , Connect>> vector;
+    vector.reserve(3200);
     //二重ループ開始
     for(int frame_point_index = 0 ; frame_point_index < frame.getSize() ; frame_point_index++){
         for(int polygon_point_index = 0 ; polygon_point_index < polygon.getSize() ; polygon_point_index++){
