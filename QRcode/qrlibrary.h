@@ -1,3 +1,4 @@
+
 #ifndef QRLIBRUARY_H
 #define QRLIBRUARY_H
 
@@ -15,6 +16,13 @@ class QRLibrary
 public:
     QRLibrary();
     std::pair<std::vector<polygon_i>,polygon_i> Decoder(bool s);
+
+private:
+    bool scanif = false;
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
+
 };
 
 #endif // QRLIBRUARY_H

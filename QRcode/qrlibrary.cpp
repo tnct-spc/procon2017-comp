@@ -58,43 +58,45 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
         uchar *raw = (uchar *)grey.data;
         // wrap image data
         Image image(width, height, "Y800", raw, width * height);
-        // scan the image for barcodes
-        int n = scanner.scan(image);
-        // extract results
-        for(Image::SymbolIterator symbol = image.symbol_begin();
-            symbol != image.symbol_end();
-            ++symbol) {
-            std::vector<Point> vp;
-            // do something useful with results
-            code = symbol->get_data();
-            type = symbol->get_type_name();
-            std::cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< std::endl;
-            int n = symbol->get_location_size();
-            for(int i=0;i<n;i++){
-                vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i)));
-            }
-            RotatedRect r = minAreaRect(vp);
-            Point2f pts[4];
-            r.points(pts);
-            for(int i=0;i<4;i++){
-                line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);
-            }
-            std::cout << "Angle: " << r.angle << std::endl;
-            QrTranslateToPolygon qrtrans(code);
-            for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
-                std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
-            }
-            std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
+        if(scanif){
+            // scan the image for barcodes
+            int n = scanner.scan(image);
+            // extract results
+            for(Image::SymbolIterator symbol = image.symbol_begin();
+                symbol != image.symbol_end();
+                ++symbol) {
+                std::vector<Point> vp;
+                // do something useful with results
+                code = symbol->get_data();
+                type = symbol->get_type_name();
+                std::cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< std::endl;
+                int n = symbol->get_location_size();
+                for(int i=0;i<n;i++){
+                    vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i)));
+                }
+                RotatedRect r = minAreaRect(vp);
+                Point2f pts[4];
+                r.points(pts);
+                for(int i=0;i<4;i++){
+                    line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);
+                }
+                std::cout << "Angle: " << r.angle << std::endl;
+                QrTranslateToPolygon qrtrans(code);
+                for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
+                    std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
+                }
+                std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
 
-            for(auto polygon : qrtrans.getPieceData()){
-                decoded_polygons.first.push_back(polygon);
+                for(auto polygon : qrtrans.getPieceData()){
+                    decoded_polygons.first.push_back(polygon);
+                }
+                for(auto point: qrtrans.getFrameData().outer()){
+                    decoded_polygons.second.outer().push_back(point);
+                }
+                std::vector<polygon_i> pieceData = qrtrans.getPieceData();
+                polygon_i frameData = qrtrans.getFrameData();
+                QrTranslateToPolygon::translateToCSV(pieceData, frameData);
             }
-            for(auto point: qrtrans.getFrameData().outer()){
-                decoded_polygons.second.outer().push_back(point);
-            }
-            std::vector<polygon_i> pieceData = qrtrans.getPieceData();
-            polygon_i frameData = qrtrans.getFrameData();
-            QrTranslateToPolygon::translateToCSV(pieceData, frameData);
         }
 
         imshow("Press esc key to exit", frame);
@@ -115,3 +117,12 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
     return decoded_polygons;
 }
 
+void QRLibrary::keyPressEvent(QKeyEvent *event)
+{
+    if(event->type() == QEvent::KeyPress || event->key() == Qt::Key_Y){
+        scanif = true;
+    }
+    if(event->type() == QEvent::KeyRelease){
+        scanif = false;
+    }
+}
