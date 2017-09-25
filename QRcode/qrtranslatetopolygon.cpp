@@ -16,9 +16,12 @@
 QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
 {
     inputqr = qrinp;//メンバ変数に代入
+    std::cout << qrinp << std::endl;
     inpToVector();
-    frame_size = colonvector.size() - std::stod(qrinputvector.at(0));
-
+    std::cout << qrinputvector.size() << std::endl;
+    piece_size = std::stod(qrinputvector.at(0));
+    frame_size = colonvector.size() - piece_size;
+    translateToDoubleArray();
 
     std::cout << "detected!!!!!!!!!!!!!!!!!!!!" << std::endl;
     for(auto output : qrinputvector){
@@ -28,7 +31,15 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     for(auto output : colonvector){
         std::cout << output << " ";
     }
-    std::cout << std::endl << "frame_size : " << frame_size << std::endl;
+    std::cout << std::endl << "piece_size : " << piece_size << "  frame_size : " << frame_size << std::endl;
+
+    std::cout << "DoubleArray!!!!!!!!!!!1" << std::endl;
+    for(auto out : inputdatadoublearray){
+        for(auto put : out){
+            std::cout << put << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 
@@ -60,8 +71,19 @@ void QrTranslateToPolygon::inpToVector(){
     }
 }
 
-void QrTranslateToPolygon::translateToDoubleArray(){
-
+void QrTranslateToPolygon::translateToDoubleArray(){//二重配列に突っ込むやつ
+    std::vector<int> vectorint;//一時的に格納しておくだけ
+    for(unsigned int string_count=2;string_count<qrinputvector.size();++string_count){
+        if(qrinputvector.at(string_count) == ":"){
+            inputdatadoublearray.push_back(vectorint);
+            vectorint.clear();
+        }else if(string_count == qrinputvector.size() - 1){
+            vectorint.push_back(std::stod(qrinputvector.at(string_count)));
+            inputdatadoublearray.push_back(vectorint);
+        }else{
+            vectorint.push_back(std::stod(qrinputvector.at(string_count)));
+        }
+    }
 }
 
 /*

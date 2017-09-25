@@ -19,7 +19,9 @@ private:
     std::string inputqr;
     std::vector<std::string> qrinputvector;
     std::vector<int> colonvector;
+    int piece_size;
     int frame_size;
+    std::vector<std::vector<int>> inputdatadoublearray;
 
     void inpToVector();
     void translateToDoubleArray();
