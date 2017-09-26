@@ -6,6 +6,7 @@
 #include "neoanswerboard.h"
 #include "neoanswerdock.h"
 #include "imagerecognition.h"
+#include "qrlibrary.h"
 #include "neofield.h"
 #include "http/request_mapper.h"
 #include <QNetworkAccessManager>
@@ -40,6 +41,7 @@ private:
     std::shared_ptr<NeoAnswerBoard> board;
     void finishedProcess();
     void startProcess();
+    QRLibrary QR;
     RequestMapper request_mapper;
     QNetworkAccessManager *manager;
     QFile file;

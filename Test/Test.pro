@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     testpolygonconnector.cpp \
     testalgorithmwrapper.cpp \
     testevaluation.cpp \
-    testcheckoddfield.cpp
+    testcheckoddfield.cpp \
+    testqrtranslatetopolygon.cpp
     testcheckcanprume.cpp
 
 HEADERS += testdisplayanswer.h\
@@ -38,7 +39,8 @@ HEADERS += testdisplayanswer.h\
     testpolygonconnector.h \
     testalgorithmwrapper.h \
     testevaluation.h \
-    testcheckoddfield.h
+    testcheckoddfield.h \
+    testqrtranslatetopolygon.h
     testcheckcanprume.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
@@ -91,3 +93,10 @@ DEPENDPATH += $$PWD/../ProbMaker
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../PeobMaker/release/ -lProbMaker
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/debug/ -lProbMaker
 else:unix: LIBS += -L$$OUT_PWD/../ProbMaker/ -lProbMaker
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QRcode/release/ -lQRcode
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QRcode/debug/ -lQRcode
+else:unix: LIBS += -L$$OUT_PWD/../QRcode/ -lQRcode
+
+INCLUDEPATH += $$PWD/../QRcode
+DEPENDPATH += $$PWD/../QRcode

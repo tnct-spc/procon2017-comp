@@ -12,6 +12,7 @@
 #include "testpolygonconnector.h"
 #include "testcheckoddfield.h"
 #include "testcheckcanprume.h"
+#include "testqrtranslatetopolygon.h"
 
 int Test()
 {
@@ -30,6 +31,7 @@ int Test()
 //    TESTER.push_back(new testCheckOddField);
 //    TESTER.push_back(new TestCheckCanPrume);
 //    TESTER.push_back(new testCheckOddField);
+    TESTER.push_back(new TestQrTranslateToPolygon);
 
     for(auto tester : TESTER){
         if(!tester->run()){

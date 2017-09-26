@@ -127,6 +127,21 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
+        int scanned_dummy_piece_id = 0;
+        std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
+        for(auto polygon : pieces){
+            polygon_t poly_buf;
+            for(auto p : polygon.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+            procon::ExpandedPolygon ex_buf(scanned_dummy_piece_id);
+            ex_buf.resetPolygonForce(poly_buf);
+            scanned_dummy_piece.push_back(ex_buf);
+            ++scanned_dummy_piece_id;
+        }
+
+        board->setScannedPieces(scanned_dummy_piece);
+
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
         emit requestCSV();
         NeoPolygonIO::importField("../../procon2017-comp/field.csv");
@@ -194,6 +209,25 @@ void Kunugida::run()
 //            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
 //        }
 
+    }else if(ui->chinochan_button->isChecked()){
+        QRLibrary lib;
+        lib.Decoder(true);
+        field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
+        int scanned_dummy_piece_id = 0;
+
+        std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
+        for(auto polygon : field.getElementaryPieces()){
+            polygon_t poly_buf;
+            for(auto p : polygon.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+            procon::ExpandedPolygon ex_buf(scanned_dummy_piece_id);
+            ex_buf.resetPolygonForce(poly_buf);
+            scanned_dummy_piece.push_back(ex_buf);
+            ++scanned_dummy_piece_id;
+        }
+
+        board->setScannedPieces(scanned_dummy_piece);
     }
 
     //    TODO: ここまでで各データソースから読み込むようにする
@@ -211,11 +245,11 @@ void Kunugida::run()
     connect(solver, SIGNAL(requestCSV()), this, SLOT(getCSV()));
     connect(this, SIGNAL(requestCSVcomplete()), solver, SLOT(requestCSVcomplete()));
     solver->run(field,algorithm_number);
+
 #endif
 
     //    QRLibrary lib;
     //    lib.Decoder(true);
-
     this->finishedProcess();
 }
 
@@ -236,6 +270,7 @@ void Kunugida::emitAnswer(procon::NeoField field)
    logger->info("emitted answer");
    std::cout << field.getPieces().size() << std::endl;
    this->board->setField(field);
+   this->board->update();
 }
 
 void Kunugida::finishedProcess()
