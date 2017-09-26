@@ -212,15 +212,13 @@ void QrTranslateToPolygon::translateToCSV(std::pair<std::vector<polygon_i>, std:
     std::vector<procon::NeoExpandedPolygon> elementarypieces;
     for(auto p : pieceframe.first){
         pieceexpandedpolygon.resetPolygonForce(p);
-        for(auto e : elementarypieces){
-            e.setPiece(pieceexpandedpolygon);
-        }
+        elementarypieces.push_back(pieceexpandedpolygon);
     }
 
     procon::NeoExpandedPolygon frameexpandedpolygon;
     std::vector<procon::NeoExpandedPolygon> elementaryframe;
     for(auto f : pieceframe.second){
-        frameexpandedpolygon.resetPolygonForce(frame_);
+        frameexpandedpolygon.resetPolygonForce(f);
         elementaryframe.push_back(frameexpandedpolygon);
     }
 

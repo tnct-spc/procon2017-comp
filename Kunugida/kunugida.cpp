@@ -211,6 +211,7 @@ void Kunugida::run()
         QRLibrary lib;
         lib.Decoder(true);
         QR.Decoder(1);
+//        lib.debug("");
         field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
     }
 
