@@ -70,13 +70,15 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (int i=0; i<field_num; i++) {
         polygon_t inside;
         for (unsigned int j=0; j<polygons[0].inners()[i].size(); j++) {
-            inside.outer().push_back(polygons[0].inners()[i].at(polygons[0].inners()[i].size()-1-j));
+            inside.outer().push_back(polygons[0].inners()[i].at(j));
         }
         polygons.push_back(inside);
     }
 
     // 元のフレームは削除
     polygons.erase(polygons.begin());
+
+    bool check = boost::geometry::is_valid(polygons.at(polygons.size()-1));
 
     // change vector's scale to grid
     for (auto& piece : polygons) {
@@ -1266,7 +1268,6 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
         neo_frame.push_back(polygon);
     }
 
-    field.setFrame(neo_frame);
     field.setElementaryFrame(neo_frame);
 
     return field;
