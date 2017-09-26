@@ -87,7 +87,8 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
     };
 
     export2file(0,field.getElementaryFrame());
-    exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
+//    exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
+    export2file(1,field.getElementaryFrameInnerPices());
 //    export2file(2,field.getElementaryPieces());
     export2file_with_id(2,field.getElementaryPieces());
     export2file(3,field.getFrame());
@@ -218,17 +219,17 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
 //            ev.connection.polygon_point_index = std::stoi(polygon_point_index);
 //            ev.connection.polygon_side_index = std::stoi(polygon_side_index);
 //            import_field.evaluate_cache.push_back(ev);
-        }else if(mode == 2){
-            std::getline(line_stream, id, ',');
-            while(std::getline(line_stream, x, ',')){
-                std::getline(line_stream, y, ',');
-                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
-            }
-            int _id = std::stoi(id);
-            boost::geometry::correct(hoge);
-            procon::NeoExpandedPolygon polygon(_id);
-            polygon.resetPolygonForce(hoge);
-            elementary_piece.push_back(polygon);
+//        }else if(mode == 2){
+//            std::getline(line_stream, id, ',');
+//            while(std::getline(line_stream, x, ',')){
+//                std::getline(line_stream, y, ',');
+//                hoge.outer().push_back(point_i(std::stoi(x), std::stoi(y)));
+//            }
+//            int _id = std::stoi(id);
+//            boost::geometry::correct(hoge);
+//            procon::NeoExpandedPolygon polygon(_id);
+//            polygon.resetPolygonForce(hoge);
+//            elementary_piece.push_back(polygon);
 
         }else{
             while(std::getline(line_stream, x, ',')){
@@ -242,6 +243,8 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
                 elementary_frame.push_back(polygon);
             if(mode == 3)
                 frame.push_back(polygon);
+            if(mode == 1)
+                elementary_frame_inner_pices.push_back(polygon);
 
         }
     }
