@@ -86,6 +86,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
+    for (int i=0; i<polygons.size()-1; i++) {
+
+        // 確認用
+        procon::ExpandedPolygon pos(i);
+        pos.resetPolygonForce(polygons[i]);
+        position.push_back(pos);
+    }
+
     // change vector's scale to grid
     for (auto& piece : polygons) {
         for (auto& side : piece.outer()) {
@@ -102,7 +110,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        // NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -1078,11 +1086,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     } else {
 
-        // 確認用
-        procon::ExpandedPolygon pos(id);
-        pos.resetPolygonForce(vertex);
-        position.push_back(pos);
-
         for (unsigned int i=0; i<polygon.size()-1; i++) {
             double vec[4];
             vec[0] = polygon.at(i).x() - polygon.at(i+1).x();
@@ -1329,4 +1332,43 @@ void ImageRecognition::makeTable()
     std::sort(this->length_table.begin(), this->length_table.end(), waySort);
 
     return;
+}
+
+std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
+{
+    std::vector<cv::Mat> piece_images;
+
+    std::vector<procon::ExpandedPolygon> polygons = ImageRecognition::getPolygonPosition();
+
+    int i = 0;
+    int margin = 10;
+
+    for (auto polygon : polygons) {
+
+        bg::model::box<bg::model::d2::point_xy<double>> box;
+        bg::envelope(polygon.getPolygon(), box);
+
+        cv::Mat image(pieces_image, cv::Rect(box.min_corner().x()-margin, box.min_corner().y()-margin, box.max_corner().x()-box.min_corner().x()+margin*2, box.max_corner().y()-box.min_corner().y()+margin*2));
+        piece_images.push_back(image);
+
+        cv::namedWindow(std::to_string(i));
+        cv::imshow(std::to_string(i), image);
+        i++;
+    }
+
+    return piece_images;
+}
+
+std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
+{
+    std::vector<procon::ExpandedPolygon> polygons = ImageRecognition::getPolygonPosition();
+
+    for (auto polygon : polygons) {
+
+        bg::model::box<bg::model::d2::point_xy<double>> box;
+        bg::envelope(polygon.getPolygon(), box);
+
+        //bg::strategy::transform::translate_transformer<double, 2, 2> translate(polygon)
+    }
+
 }
