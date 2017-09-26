@@ -523,6 +523,9 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
 
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
+
+//#define DEBUG
+#ifdef DEBUG
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
     }else if(event->button() == Qt::MouseButton::LeftButton){
@@ -592,6 +595,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
             }
         }
     }
+#endif
     if(event->button() == Qt::MouseButton::LeftButton){
         clickedpiece_id = -1;
         QPointF clickedposition = event->pos();
