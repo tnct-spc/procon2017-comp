@@ -12,14 +12,24 @@ class TryNextSearch : public QWidget
 {
     Q_OBJECT
 
+signals:
+    void startBeamSearch(procon::NeoField next_field);
+
 public:
     explicit TryNextSearch(QWidget *parent = 0);
     ~TryNextSearch();
+
+    void setField(procon::NeoField field);
 
 private:
     Ui::TryNextSearch *ui;
     QPushButton *go_button;
     NeoAnswerBoard *board;
+
+    procon::NeoField field;
+
+private slots:
+    void clickedGoButton();
 };
 
 #endif // TRYNEXTSEARCH_H
