@@ -37,8 +37,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
         //角に隙間があるとき
         else if(frame_angle > polygon_angle) return 0;
         //ポリゴンの角がフレームの角より大きくてありえんとき
-        else if(frame_angle < polygon_angle) return -1;
-
+        return -1;
     };
     //辺の状態を返す
     auto length_status = [&frame , &polygon](int frame_side_index , int polygon_side_index){
@@ -55,7 +54,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
         sort(vector.begin() , vector.end(), [](double angle1 , double angle2){ return angle1 < angle2; });
 
         double before_angle = -1;
-        int count;
+        int count = 0;
         for(double i : vector){
             if(i != before_angle){
                 count = 1;
@@ -136,6 +135,7 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
         for(std::pair<int , int> i :vector){
             if((i.first == frame_point_index) && (i.second == polygon_point_index)) return true;
         }
+        return false;
     };
 
     //返すときに使うvector
@@ -172,13 +172,14 @@ std::vector<std::pair<double , Connect>> Evaluation::evaluation(
                 double precious_degree = calculation_precious(frame_point_index , polygon_point_index);
                 if(snuggle_up > evaluation) evaluation = std::pow(snuggle_up , 2);
                 vector.push_back((std::pair<double , Connect>(evaluation + precious_degree, connect1)));
-            }else if(angle_agreement == 0 && contain_zero){
+            }else if(angle_agreement == 0){
                 //角に隙間があるとき
-                if(!passed) vector.push_back(std::pair<double , Connect>(0 , connect1));
+                if(!passed && contain_zero) vector.push_back(std::pair<double , Connect>(0 , connect1));
 
                 double evaluation = 0;
                 if(snuggle_up > evaluation) evaluation = std::pow(snuggle_up , 2);
                 vector.push_back((std::pair<double , Connect>(evaluation , connect2)));
+                if(!contain_zero && (evaluation == 0)) vector.erase(vector.end());
             }
         }
     }

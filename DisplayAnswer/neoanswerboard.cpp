@@ -492,11 +492,11 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         if(!flag)sorted_poly.push_back(expanded_poly);
     }
 
-    for(auto poly : sorted_poly){
-        point_i center_point;
-        bg::centroid (poly.getPolygon(),center_point);
-        std::cout << bg::dsv(center_point) << std::endl;
-    }
+//    for(auto poly : sorted_poly){
+//        point_i center_point;
+//        bg::centroid (poly.getPolygon(),center_point);
+//        std::cout << bg::dsv(center_point) << std::endl;
+//    }
 
     blue_id = sorted_poly.size()-1;
 }
