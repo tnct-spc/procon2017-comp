@@ -37,6 +37,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
+    for(auto p : polygons){
+        std::cerr << boost::geometry::is_valid(p);
+    }
+    for(auto& p : polygons){
+        boost::geometry::correct(p);
+    }
+
     /*
     cv::Mat line_image;
     line_image = cv::imread("/home/spc/workspace/procon2017-image/and_image.png", 1);
