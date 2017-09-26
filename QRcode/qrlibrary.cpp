@@ -9,12 +9,14 @@ QRLibrary::QRLibrary()
     std::cout << "QR Libruary initialized" << std::endl;
 }
 
-std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
+std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool s)
 {
     int resizedW;
+    std::pair<std::vector<polygon_i>,std::vector<polygon_i>> decoded_polygons;
     std::string code = {""};
+    std::string bcode = {"."};
     std::string type = {""};
-    VideoCapture cap(0); // open the video camera no. 0
+    VideoCapture cap(1); // open the video camera no. 0
 
     if (!cap.isOpened())  // if not success, exit program
     {
@@ -35,8 +37,6 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
     if(dHeight < 600){
         resizeWindow("Press Esc to exit", 600, 600);
     }
-
-    std::pair<std::vector<polygon_i>,polygon_i> decoded_polygons;
 
     while (1)
     {
@@ -66,6 +66,7 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             ++symbol) {
             std::vector<Point> vp;
             // do something useful with results
+            bcode = code;
             code = symbol->get_data();
             type = symbol->get_type_name();
             std::cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< std::endl;
@@ -81,34 +82,63 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             }
             std::cout << "Angle: " << r.angle << std::endl;
             QrTranslateToPolygon qrtrans(code);
-            for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
-                std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
-            }
-            std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
+            is_multi = qrtrans.getIsMultiQr();
+            if(bcode != code){
+                std::vector<polygon_i> pieceData = qrtrans.getPieceData();
+                std::vector<polygon_i> frameData = qrtrans.getFrameData();
+                for(auto p : pieceData){
+                    decoded_polygons.first.push_back(p);
+                    std::cout << "piece: " << decoded_polygons.first.size() << std::endl;
+                }
 
-            for(auto polygon : qrtrans.getPieceData()){
-                decoded_polygons.first.push_back(polygon);
-            }
-            for(auto point: qrtrans.getFrameData().outer()){
-                decoded_polygons.second.outer().push_back(point);
+                for(auto f : frameData){
+                    decoded_polygons.second.push_back(f);
+                    std::cout << "frame: " << decoded_polygons.second.size() << std::endl;
+                }
             }
         }
 
-        imshow("Press esc key to exit", frame);
+        imshow("QR", frame);
 
-        int key = waitKey(30);
+        int key = waitKey(1);
         if(code.length() > 2 && s){
-            std::cout << "QRCode detected" << std::endl;
-            break;
-        }
-        if(key == 27){
-            std::cout << "Esc key was pressed" << std::endl;
-            break;
+            if(!is_multi){
+                std::cout << "QRCode detected" << std::endl;
+                if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons);
+                read = true;
+                std::cout << "a: " << decoded_polygons.first.size() << std::endl;
+                std::cout << "b: " << decoded_polygons.second.size() << std::endl;
+                break;
+            }
         }
     }
-
 //    code = "Type: " + type + "\n\n\"" + code + "\"";
 //    return code;
     return decoded_polygons;
 }
 
+//void QRLibrary::debug(std::string code)
+//{
+//    std::pair<std::vector<polygon_i>, std::vector<polygon_i>> translatedfield;
+//    while(1){
+//        QrTranslateToPolygon codetrans(code);
+//        std::vector<polygon_i> pieceData = codetrans.getPieceData();
+//        std::vector<polygon_i> frameData = codetrans.getFrameData();
+//        bool is_multi = codetrans.getIsMultiQr();
+//        for(auto p : pieceData){
+//            translatedfield.first.push_back(p);
+//        }
+//        for(auto f : frameData){
+//            translatedfield.second.push_back(f);
+//        }
+
+//        if(is_multi){
+//            std::cout << "2つめのcodeを入力してください" << std::endl;
+//            std::cin >> code;
+//        }else{
+//            break;
+//        }
+//    }
+
+//    QrTranslateToPolygon::translateToCSV(translatedfield);
+//}
