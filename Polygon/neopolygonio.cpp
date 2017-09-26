@@ -87,8 +87,8 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
     };
 
     export2file(0,field.getElementaryFrame());
-//    exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
-    export2file(1,field.getElementaryFrameInnerPices());
+//    exportDoubleVector2file(1,field.getElementaryFrameInnerPieces());
+    export2file(1,field.getElementaryFrameInnerPieces());
 //    export2file(2,field.getElementaryPieces());
     export2file_with_id(2,field.getElementaryPieces());
     export2file(3,field.getFrame());
@@ -120,7 +120,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
 
     //doublevector2
     std::vector<procon::NeoExpandedPolygon> elementary_frame_inner_pice;
-    std::vector<std::vector<procon::NeoExpandedPolygon>> elementary_frame_inner_pices;
+    std::vector<std::vector<procon::NeoExpandedPolygon>> elementary_frame_inner_pieces;
     Evaluate ev;
     std::string i;
 
@@ -244,7 +244,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             if(mode == 3)
                 frame.push_back(polygon);
             if(mode == 1)
-                elementary_frame_inner_pices.push_back(polygon);
+                elementary_frame_inner_pieces.push_back(polygon);
 
         }
     }
@@ -252,6 +252,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
     import_field.setElementaryPieces(elementary_piece);
     import_field.setFrame(frame);
     import_field.setIsPlaced(is_placed);
+    import_field.setElementaryFrameInnerPieces(elementary_frame_inner_pieces);
 
     return import_field;
 }
