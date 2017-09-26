@@ -1,7 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>TryNextSearch</class>
  <widget class="QWidget" name="TryNextSearch">
   <property name="geometry">
@@ -15,7 +13,8 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout"/>
  </widget>
- <pixmapfunction/>
+ <resources/>
  <connections/>
 </ui>
