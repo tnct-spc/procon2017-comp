@@ -71,7 +71,6 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // 元のフレームは削除
     polygons.erase(polygons.begin());
 
-
     for(auto p : polygons){
         std::cerr << boost::geometry::is_valid(p);
     }
@@ -85,21 +84,39 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         procon::ExpandedPolygon pos(i);
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
+
+//        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
+
+    double scale_len;
+    for (auto piece : polygons) {
+        if (piece.outer().size() == 5) {
+            bool check = true;
+            scale_len = 0;
+            for (int i=0; i<4; i++) {
+                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
+                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
+                double len = hypot(x,y) * scale / 2.5;
+                if (fabs(6.0 - len) > 1) {
+                    check = false;
+                } else {
+                    scale_len += hypot(x,y);
+                }
+            }
+
+            if (check) {
+                break;
+            }
+        }
+    }
+
+    scale = 15 * 4 / scale_len;
 
     // change vector's scale to grid
     for (auto& piece : polygons) {
         for (auto& side : piece.outer()) {
             side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
         }
-    }
-
-    // image of vectors
-    for (unsigned int i=0; i<polygons.size(); i++) {
-
-        procon::ExpandedPolygon ex;
-        ex.resetPolygonForce(polygons[i]);
-        PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
     }
 
     makeTable();
@@ -111,7 +128,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        // NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -1378,5 +1395,4 @@ std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
     }
 
     return trans_polygon;
-
 }

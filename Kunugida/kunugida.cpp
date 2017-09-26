@@ -162,7 +162,7 @@ void Kunugida::run()
         board->setScannedPieces(imrec.getPolygonPosition());
 
 //        std::vector<cv::Mat> images = imrec.getPiecesImages(pieces);
-        std::vector<procon::ExpandedPolygon> polygons = imrec.getPolygonForImage();
+//        std::vector<procon::ExpandedPolygon> polygons = imrec.getPolygonForImage();
 
     }else if(ui->csv_button->isChecked()){
         //CSV date
