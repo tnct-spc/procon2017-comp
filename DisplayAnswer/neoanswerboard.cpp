@@ -540,10 +540,13 @@ void NeoAnswerBoard::mouseDoubleClickEvent(QMouseEvent *event)
                     i.connection
         );
         std::string text =  std::to_string(count) + "回目" +
+                            "index(f,p):" + std::to_string(i.frame_index) + "," + std::to_string(i.piece_index) +
+                            "inverse:" +  std::to_string(i.is_inversed) +
                             ",fs:" + std::to_string(i.connection.frame_side_index) +
                             ",ps:" + std::to_string(i.connection.polygon_side_index) +
                             ",fp:" + std::to_string(i.connection.frame_point_index) +
-                            ",pp:" + std::to_string(i.connection.polygon_point_index);
+                            ",pp:" + std::to_string(i.connection.polygon_point_index) +
+                            ",score:" + std::to_string(i.score);
         std::cout<<text<<std::endl;
         std::vector<procon::NeoExpandedPolygon> field_frame = newField.getFrame();
         int j = 0;
