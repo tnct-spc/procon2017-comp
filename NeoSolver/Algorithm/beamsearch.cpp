@@ -10,6 +10,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -987,6 +988,11 @@ void BeamSearch::init()
 void BeamSearch::run(procon::NeoField field)
 {
     logger->info("beamsearch run");
+
+    //時間計測
+    std::chrono::system_clock::time_point start,end;
+    start = std::chrono::system_clock::now();
+
     dock->addAnswer(field);
 //    logger->info("beamsearch run");
 
@@ -1079,6 +1085,11 @@ void BeamSearch::run(procon::NeoField field)
 //            break;
 //        }
     }
+
+    end = std::chrono::system_clock::now();
+    double time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+
+    logger->warn("elapsed time: "+ std::to_string(time));
 
     //    neo = std::make_shared<NeoAnswerDock>();
     //    neo->show();
