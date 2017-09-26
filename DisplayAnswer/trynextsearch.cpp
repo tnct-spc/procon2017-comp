@@ -1,6 +1,8 @@
 #include "trynextsearch.h"
 #include "ui_trynextsearch.h"
 
+#include "neopolygonviewer.h"
+
 #include <QLayout>
 
 TryNextSearch::TryNextSearch(QWidget *parent) :
@@ -40,7 +42,10 @@ void TryNextSearch::clickedGoButton()
 
     std::vector<polygon_i> polygons;
     for(auto id : piece_id){
-        polygons.push_back(field.getPiece(id).getPolygon());
+        polygons.push_back(field.getElementaryPieces().at(id).getPolygon());
+    }
+    for(auto frame : field.getFrame()){
+        polygons.push_back(frame.getPolygon());
     }
 
     //完了したらwhile抜けるでしょ？
@@ -71,6 +76,8 @@ void TryNextSearch::clickedGoButton()
 
             boost::geometry::union_(now_prosessing_polygon,p,out);
 
+            std::cerr << out.size() << std::endl;
+
             if(out.size() == 1){
                 now_prosessing_polygon = out[0];
                 is_there_no_connect_piece = false;
@@ -89,6 +96,7 @@ void TryNextSearch::clickedGoButton()
 
         if(polygons.empty()){
             complete_flag = true;
+            processed_frame.push_back(now_prosessing_polygon);
         }
 
     }
@@ -98,8 +106,11 @@ void TryNextSearch::clickedGoButton()
     std::vector<procon::NeoExpandedPolygon> not_selected_pieces = field.getPieces();
 
     for(auto id : piece_id){
-        auto ichi = std::find(not_selected_pieces.begin(),not_selected_pieces.end(),field.getPiece(id));
+        auto ichi = std::find(not_selected_pieces.begin(),not_selected_pieces.end(),field.getElementaryPieces().at(id));
+
         not_selected_pieces.erase(ichi);
+
+        next_field.setIsPlaced(id,false);
     }
 
     next_field.setElementaryPieces(field.getElementaryPieces());
@@ -118,5 +129,12 @@ void TryNextSearch::clickedGoButton()
         next_field.setPiece(p);
     }
 
-    emit startBeamSearch(this->field);
+    NeoPolygonViewer::getInstance().displayPolygon(processed_expolygon.at(0).getPolygon(),"hgoe",false);
+
+    NeoAnswerBoard *neoansboard = new NeoAnswerBoard();
+    neoansboard->setSingleMode(true);
+    neoansboard->setField(next_field);
+    neoansboard->show();
+
+    emit startBeamSearch(next_field);
 }

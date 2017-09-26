@@ -138,6 +138,10 @@ BeamSearch::BeamSearch()
     dock = std::make_shared<NeoAnswerDock>();
     dock->show();
 
+    //test
+    neo = std::make_shared<NeoAnswerDock>();
+    neo->show();
+
     cpu_num = std::thread::hardware_concurrency();
 }
 
@@ -1151,7 +1155,7 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
 
         bool flag = false;
         for(auto const& _field : state){
-            dock->addAnswer(_field);
+            neo->addAnswer(_field);
             if(!flag){
                 submitAnswer(_field);
                 flag = true;
