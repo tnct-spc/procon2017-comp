@@ -501,6 +501,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
 }
 
 //#define OUT_FILE
+//#define DISPLAY_POLYGON
 
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
@@ -546,9 +547,12 @@ void NeoAnswerBoard::mouseDoubleClickEvent(QMouseEvent *event)
         std::cout<<text<<std::endl;
         std::vector<procon::NeoExpandedPolygon> field_frame = newField.getFrame();
         int j = 0;
+
+#ifdef DISPLAY_POLYGON
         for(procon::NeoExpandedPolygon frame : field_frame) {
             NeoPolygonViewer::getInstance().displayPolygon(frame.getPolygon(),"frame <" + std::to_string(j) + ">",false);
         }
+#endif
 
         if(std::get<2>(connected)){
             std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
@@ -558,8 +562,6 @@ void NeoAnswerBoard::mouseDoubleClickEvent(QMouseEvent *event)
             field_frame.erase(field_frame.begin() + i.frame_index);
             newField.setFrame(field_frame);
             newField.setPiece(std::get<1>(connected));
-            procon::NeoExpandedPolygon nep = std::get<1>(connected);
-            NeoPolygonViewer::getInstance().displayPolygon(nep.getPolygon(),"hello",false);
             newField.setIsPlaced(i.piece_index);
             nad->addAnswer(newField , text);
 #ifdef OUT_FILE
@@ -570,10 +572,12 @@ void NeoAnswerBoard::mouseDoubleClickEvent(QMouseEvent *event)
             std::cout << "結合失敗" << std::endl;
             nad->deleteLater();
             QMessageBox::warning(nad, tr("エラー"), tr("結合失敗！"));
+#ifdef DISPLAY_POLYGON
             NeoPolygonViewer::getInstance().displayPolygon(i.is_inversed
                                                            ? newField.getElementaryInversePieces().at(i.piece_index).getPolygon()
                                                            : newField.getElementaryPieces().at(i.piece_index).getPolygon(),
                                                            "hello", false);
+#endif
             break;
         }
     }
