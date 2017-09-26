@@ -55,9 +55,10 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // image of vectors
     for (unsigned int i=0; i<polygons.size(); i++) {
+
         procon::ExpandedPolygon ex;
         ex.resetPolygonForce(polygons[i]);
-        // PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
+        PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
     }
 
     // degree of frame
