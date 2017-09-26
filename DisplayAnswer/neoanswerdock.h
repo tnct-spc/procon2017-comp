@@ -8,8 +8,10 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsRectItem>
 #include "neofield.h"
+#include "neosinglepolygondisplay.h"
 #include "utilities.h"
 #include "neoanswerboard.h"
+#include "neopolygonviewer.h"
 
 
 namespace Ui {
@@ -24,11 +26,14 @@ public:
     explicit NeoAnswerDock(QWidget *parent = 0);
     ~NeoAnswerDock();
     void addAnswer(procon::NeoField const& field);
-    void addAnswer(procon::NeoField const& field , std::string const& text);
+    void makePieceList(procon::NeoField const& field);
+
+    void addAnswer(const procon::NeoField &field , const std::string &text);
 
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;
+    std::vector<procon::NeoField> pieces;
 };
 
 #endif // NEOANSWERDOCK_H

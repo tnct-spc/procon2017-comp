@@ -7,9 +7,10 @@
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
 #include "polygonio.h"
+#include "http/request_mapper.h"
+#include "Algorithm/beamsearch.h"
 
 #include <iostream>
-
 #include <QDebug>
 #include <QPushButton>
 #include <QCheckBox>
@@ -27,11 +28,13 @@ Kunugida::Kunugida(QWidget *parent) :
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
+    connect(this, SIGNAL(requestCSV()), this, SLOT(getCSV()));
+    manager = new QNetworkAccessManager(this);
+
     board = std::make_shared<NeoAnswerBoard>();
-    tcp = std::make_shared<TcpMain>();
     board->show();
-    tcp->show();
-   //     board->setSingleMode(true);
+    //    board->setSingleMode(true);
+//    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -44,8 +47,6 @@ void Kunugida::run()
     logger->info("Run Button Clicked");
 
     procon::NeoField field;
-
-
 
     auto polygoniToExpanded = [](std::vector<polygon_i> pieces_,std::vector<int> id_list){
 
@@ -70,6 +71,8 @@ void Kunugida::run()
         return expanded_pieces;
 
     };
+    // Server
+    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
@@ -83,6 +86,28 @@ void Kunugida::run()
         PbMaker->show();
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();
+
+//#define SHOW_ANGLE
+#ifdef SHOW_ANGLE
+        std::cout << "angles ->" << std::endl;
+        std::vector<double> angles;
+        for(polygon_i piece : pieces_) {
+            procon::NeoExpandedPolygon neoPiece;
+            neoPiece.resetPolygonForce(piece);
+            for(double angle : neoPiece.getSideAngle()) {
+                angle = (angle / M_PI) * 180;
+                angles.push_back(angle);
+            }
+        }
+
+        std::sort(angles.begin(), angles.end());
+
+        for(double angle : angles) {
+            std::cout << angle << ", ";
+        }
+        std::cout << std::endl << std::endl;
+    }
+#else
 
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
@@ -102,16 +127,24 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
-        std::vector<int> id_list;
-        for(int i=0;i<pieces_.size();++i){
-            id_list.push_back(i);
+        int scanned_dummy_piece_id = 0;
+        std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
+        for(auto polygon : pieces){
+            polygon_t poly_buf;
+            for(auto p : polygon.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+            procon::ExpandedPolygon ex_buf(scanned_dummy_piece_id);
+            ex_buf.resetPolygonForce(poly_buf);
+            scanned_dummy_piece.push_back(ex_buf);
+            ++scanned_dummy_piece_id;
         }
-        std::vector<procon::ExpandedPolygon> expanded_pieces =  polygoniToExpanded(pieces_,id_list);
-        board->setScannedPieces(expanded_pieces);
+
+        board->setScannedPieces(scanned_dummy_piece);
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        procon::NeoField unko = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
-        int i = 1;
+        emit requestCSV();
+        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -125,7 +158,11 @@ void Kunugida::run()
 
         ImageRecognition imrec;
         field = imrec.run(frame, pieces);
-        board->setScannedPieces(imrec.getPolygonPosition());
+
+        //        imageRecognitonTest();
+//        ImageRecognition imrec;
+//        field = imrec.run(frame, pieces);
+//        board->setScannedPieces(imrec.getPolygonPosition());
 
         //        imageRecognitonTest();
     }else if(ui->csv_button->isChecked()){
@@ -145,15 +182,52 @@ void Kunugida::run()
         std::vector<procon::ExpandedPolygon> ex_poly = polygoniToExpanded(poly_pieces , id_list);
         board->setScannedPieces(ex_poly);
 
+    }else if(ui->sample_data_use_button->isChecked()){
+        //read sample
+        field = NeoPolygonIO::importField("../../procon2017-comp/sample/comp-sample.csv");
+
+        //dummy
+        std::vector<procon::ExpandedPolygon> scanned_poly;
+        for(const auto& p : field.getElementaryPieces()){
+            polygon_t poly_buf;
+
+            for(const auto& p : p.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+
+            procon::ExpandedPolygon exp_buf(p.getId());
+            exp_buf.resetPolygonForce(poly_buf);
+            scanned_poly.push_back(exp_buf);
+        }
+
+        board->setScannedPieces(scanned_poly);
+
+
+//        for(auto& p : field.getElementaryPieces()){
+//            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
+//        }
+
+    }else if(ui->chinochan_button->isChecked()){
+        QRLibrary lib;
+        lib.Decoder(true);
+        field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
+        int scanned_dummy_piece_id = 0;
+
+        std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
+        for(auto polygon : field.getElementaryPieces()){
+            polygon_t poly_buf;
+            for(auto p : polygon.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+            procon::ExpandedPolygon ex_buf(scanned_dummy_piece_id);
+            ex_buf.resetPolygonForce(poly_buf);
+            scanned_dummy_piece.push_back(ex_buf);
+            ++scanned_dummy_piece_id;
+        }
+
+        board->setScannedPieces(scanned_dummy_piece);
     }
 
-    for(auto const& p : field.getPieces()){
-        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
-    }
-
-    for(auto const& p : field.getFrame()){
-        std::cout << boost::geometry::is_valid(p.getPolygon()) << std::endl;
-    }
     //    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
@@ -166,12 +240,14 @@ void Kunugida::run()
 
     NeoSolver *solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
+    connect(solver, SIGNAL(requestCSV()), this, SLOT(getCSV()));
+    connect(this, SIGNAL(requestCSVcomplete()), solver, SLOT(requestCSVcomplete()));
     solver->run(field,algorithm_number);
 
+#endif
 
     //    QRLibrary lib;
     //    lib.Decoder(true);
-
     this->finishedProcess();
 }
 
@@ -192,6 +268,7 @@ void Kunugida::emitAnswer(procon::NeoField field)
    logger->info("emitted answer");
    std::cout << field.getPieces().size() << std::endl;
    this->board->setField(field);
+   this->board->update();
 }
 
 void Kunugida::finishedProcess()
@@ -208,10 +285,37 @@ void Kunugida::imageRecognitonTest()
 {
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
-    cv::Mat nocframe = cv::imread("/home/spc/ダウンロード/real_frame3.png", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece3.png", 1);
+    cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
+    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece5", 1);
 
     ImageRecognition imrec;
     procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
-    board->setScannedPieces(imrec.getPolygonPosition());
+}
+
+void Kunugida::getCSV()
+{
+    connect(manager, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(replyFinished(QNetworkReply*)));
+
+    file.setFileName("../../procon2017-comp/receivedfield.csv");
+    if(!file.open(QIODevice::WriteOnly))
+        return;
+    manager->get(QNetworkRequest(QUrl("http://localhost:8016/get")));
+}
+
+void Kunugida::replyFinished(QNetworkReply *reply)
+{
+    QString str;
+    str = "[Network]";
+    if(reply->error() == QNetworkReply::NoError){
+        str += tr("download success.");
+        file.write(reply->readAll());
+        file.close();
+    }else{
+        str = reply->errorString();
+        str += tr("      download failed.");
+        file.close();
+    }
+    qDebug() << str;
+    emit requestCSVcomplete();
 }

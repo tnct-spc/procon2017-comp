@@ -1,6 +1,13 @@
+#include <string>
 #include "neoanswerboard.h"
 #include "ui_neoanswerboard.h"
+// TODO:painteventが呼ばれるとピースが描画されなくなるバグを修正
+
 #include "neopolygonio.h"
+
+#include "neopolygonio.h"
+#include "neoanswerdock.h"
+#include "neopolygonviewer.h"
 
 NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     QWidget(parent),
@@ -253,16 +260,16 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setBackground(QBrush(Qt::white));
 
-        int number=0;
-        for(auto expanded_polygon: field.getPieces()){
-            polygon_i poly = expanded_polygon.getPolygon();
-            painter.setPen(QPen(QBrush(QColor(list[expanded_polygon.getId()])), 0.1));
-            for(auto point : poly.outer()){
-                QPointF text_point = getPosition(point);
-                painter.drawText(text_point,QString::number(expanded_polygon.getId()));
-            }
-            ++number;
-        }
+//        int number=0;
+//        for(auto expanded_polygon: field.getPieces()){
+//            polygon_i poly = expanded_polygon.getPolygon();
+//            painter.setPen(QPen(QBrush(QColor(list[expanded_polygon.getId()])), 0.1));
+//            for(auto point : poly.outer()){
+//                QPointF text_point = getPosition(point);
+//                painter.drawText(text_point,QString::number(expanded_polygon.getId()));
+//            }
+//            ++number;
+//        }
         painter.setPen(QPen(QBrush(QColor(236,182,138, 200)),0.1));
         int count=0;
         for(auto frame : field.getFrame()){
@@ -293,7 +300,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
        painter.drawText(evalution_point, QString::number(field.getFrame().size()) + "  " + QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
 
         QPointF text_point = evalution_point;
-        text_point.setY(splitedheight);
+        painter.setFont(QFont("Deciratuve",10,QFont::AnyStyle));
+        text_point.setY(splitedheight - 60);
+        evalution_color = {0,0,0};
+        painter.setPen(QPen(QBrush(evalution_color),10));
         painter.drawText(text_point, output_string);
         //painter.drawText(evalution_point, QString::number(field.getTotalEvaluation())+" : "+QString::number(field.getFrame().getJointedPieces().size())+"/"+QString::number(field.getElementaryPieces().size()));
         //painter.drawText(display_pos, QString::number(field->getTotalEvaluation())+" : "+QString::number(field->getFrame().getJointedPieces().size())+"/"+QString::number(field->getElementaryPieces().size()));
@@ -469,7 +479,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
             return center1.x() < center2.x();
         });
         for(auto piece : pieces){
-            if(piece.getId() != -1) polygon_list.push_back(piece.getPolygon());
+            polygon_list.push_back(piece.getPolygon());
         }
         this->update();
     }*/
@@ -500,19 +510,87 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
         if(!flag)sorted_poly.push_back(expanded_poly);
     }
 
-    for(auto poly : sorted_poly){
-        point_i center_point;
-        bg::centroid (poly.getPolygon(),center_point);
-        std::cout << bg::dsv(center_point) << std::endl;
-    }
+//    for(auto poly : sorted_poly){
+//        point_i center_point;
+//        bg::centroid (poly.getPolygon(),center_point);
+//        std::cout << bg::dsv(center_point) << std::endl;
+//    }
 
     blue_id = sorted_poly.size()-1;
 }
 
+//#define OUT_FILE
+
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::MouseButton::RightButton){
-        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
+        NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
+    }else if(event->button() == Qt::MouseButton::LeftButton){
+        //二回目以上クリックされたら困る
+        if(this->field.evaluate_cache.empty()) return;
+
+        NeoAnswerDock *nad = new NeoAnswerDock();
+        nad->setWindowTitle("career");
+        nad->show();
+
+        //fieldのリセット
+        auto reset_neo_field = [](procon::NeoField input_field){
+            procon::NeoField output_field;
+            output_field.setFrame(input_field.getElementaryFrame());
+            output_field.setElementaryFrame(input_field.getElementaryFrame());
+            output_field.setElementaryPieces(input_field.getElementaryPieces());
+            return output_field;
+        };
+        procon::NeoField newField = reset_neo_field(this->field);
+
+        int count = 0;
+        for(Evaluate i : this->field.evaluate_cache){
+            count++;
+            std::tuple<std::vector<procon::NeoExpandedPolygon> , procon::NeoExpandedPolygon , bool> connected = PolygonConnector::connect(
+                        newField.getFrame().at(i.frame_index),
+                        i.is_inversed
+                            ? newField.getElementaryInversePieces().at(i.piece_index)
+                            : newField.getElementaryPieces().at(i.piece_index),
+                        i.connection
+            );
+            std::string text =  "fs:" + std::to_string(i.connection.frame_side_index) +
+                                ",ps:" + std::to_string(i.connection.polygon_side_index) +
+                                ",fp:" + std::to_string(i.connection.frame_point_index) +
+                                ",pp:" + std::to_string(i.connection.polygon_point_index);
+            std::cout<<text<<std::endl;
+            std::vector<procon::NeoExpandedPolygon> field_frame = newField.getFrame();
+            int j = 0;
+            for(procon::NeoExpandedPolygon frame : field_frame) {
+                NeoPolygonViewer::getInstance().displayPolygon(frame.getPolygon(),"frame <" + std::to_string(j) + ">",false);
+            }
+
+            if(std::get<2>(connected)){
+                std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
+                for(procon::NeoExpandedPolygon nep : newframe){
+                    field_frame.push_back(nep);
+                }
+                field_frame.erase(field_frame.begin() + i.frame_index);
+                newField.setFrame(field_frame);
+                newField.setPiece(std::get<1>(connected));
+                procon::NeoExpandedPolygon nep = std::get<1>(connected);
+                NeoPolygonViewer::getInstance().displayPolygon(nep.getPolygon(),"hello",false);
+                newField.setIsPlaced(i.piece_index);
+                nad->addAnswer(newField , text);
+#ifdef OUT_FILE
+                std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count) + ".csv";
+                NeoPolygonIO::exportPolygon(newField , path);
+#endif
+            } else {
+                std::cout << "結合失敗" << std::endl;
+                nad->deleteLater();
+                QMessageBox::warning(nad, tr("エラー"), tr("結合失敗！"));
+                NeoPolygonViewer::getInstance().displayPolygon(i.is_inversed
+                                                               ? newField.getElementaryInversePieces().at(i.piece_index).getPolygon()
+                                                               : newField.getElementaryPieces().at(i.piece_index).getPolygon(),
+                                                               "hello", false);
+                break;
+            }
+        }
     }
     if(event->button() == Qt::MouseButton::LeftButton){
         clickedpiece_id = -1;

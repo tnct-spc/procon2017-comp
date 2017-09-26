@@ -1,4 +1,6 @@
 #include "testdisplayanswer.h"
+#include "neoanswerboard.h"
+#include "neoanswerdock.h"
 
 TestDisplayAnswer::TestDisplayAnswer()
 {
@@ -6,21 +8,28 @@ TestDisplayAnswer::TestDisplayAnswer()
 
 bool TestDisplayAnswer::run()
 {
-    /*
-    std::cout << "Hello,display!" << std::endl;
-    polygon_t b,c,d;
-    bg::exterior_ring(b) = boost::assign::list_of<point_t>(0, 0)(30, 0)(30,30)(0, 30)(0, 2)(2, 2)(2,28)(28, 28)(28, 2)(0, 2)(0,0);
-    bg::exterior_ring(c) = boost::assign::list_of<point_t>(0, 0)(0,1)(1,0)(0,0);
-    Field f;
-    PolygonExpansion hoge,huga;
-    hoge.resetPolygonForce(b);
-    huga.resetPolygonForce(c);
-    f.setFrame(hoge);
-    f.pushPiece(huga);
-    f.setPiece(huga,1919);
-    f.printFrame();
-    f.printPiece();
-    disp->setField(f);
-    */
+    NeoAnswerDock *nad = new NeoAnswerDock();
+    polygon_i boost_polygon;
+    bg::exterior_ring ( boost_polygon ) = boost::assign::list_of < point_i >
+            (0,0) (0,30) (60,30) (60,0) (0,0);
+    procon::NeoExpandedPolygon nep;
+    nep.resetPolygonForce(boost_polygon);
+    procon::NeoField neofield;
+    neofield.setElementaryFrame({nep});
+
+    NeoAnswerBoard *nab = new NeoAnswerBoard();
+    nab->setField(neofield);
+    nab->setText("hello");
+    nab->show();
+
+    nad->addAnswer(neofield , "test");
+    nad->addAnswer(neofield , "aaaaa");
+    nad->addAnswer(neofield , "hello");
+    nad->addAnswer(neofield);
+    nad->addAnswer(neofield);
+    nad->addAnswer(neofield);
+    nad->addAnswer(neofield);
+    nad->addAnswer(neofield);
+    nad->show();
     return true;
 }

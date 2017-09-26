@@ -34,10 +34,7 @@ LIBS += -lboost_system -lboost_thread
 SOURCES += neosolver.cpp \
     Algorithm/algorithmwrapper.cpp \
     Algorithm/testalgortithm.cpp \
-    Algorithm/beamsearch.cpp \
-    Evaluation/evaluation.cpp \
-    Utils/polygonconnector.cpp \
-    Evaluation/evaluate.cpp
+    Algorithm/beamsearch.cpp
 
 HEADERS += neosolver.h\
     neosolver_global.h \
