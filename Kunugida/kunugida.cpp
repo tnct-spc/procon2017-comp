@@ -144,6 +144,8 @@ void Kunugida::run()
         ImageRecognition imrec;
         field = imrec.run(frame, pieces);
 
+        board->setScannedPieces(imrec.getPolygonPosition());
+
         //        imageRecognitonTest();
 //        ImageRecognition imrec;
 //        field = imrec.run(frame, pieces);

@@ -37,13 +37,6 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
-    for(auto p : polygons){
-        std::cerr << boost::geometry::is_valid(p);
-    }
-    for(auto& p : polygons){
-        boost::geometry::correct(p);
-    }
-
     /*
     cv::Mat line_image;
     line_image = cv::imread("/home/spc/workspace/procon2017-image/and_image.png", 1);
@@ -85,7 +78,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // 元のフレームは削除
     polygons.erase(polygons.begin());
 
-    bool check = boost::geometry::is_valid(polygons.at(polygons.size()-1));
+
+    for(auto p : polygons){
+        std::cerr << boost::geometry::is_valid(p);
+    }
+    for(auto& p : polygons){
+        boost::geometry::correct(p);
+    }
 
     // change vector's scale to grid
     for (auto& piece : polygons) {
@@ -1046,18 +1045,21 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 //    }
 //    polygon.push_back(polygon.at(0));
 
-    // 確認用
-    procon::ExpandedPolygon pos(id);
-    pos.resetPolygonForce(vertex);
-    position.push_back(pos);
-    id++;
-
     // ９０度の角を持つピースはそこを基準に計算
     bool right_angle = false;
+
+    // polygonのid
+    id++;
 
     if (id == pieces_num) {
         right_angle = true;
     } else {
+
+        // 確認用
+        procon::ExpandedPolygon pos(id);
+        pos.resetPolygonForce(vertex);
+        position.push_back(pos);
+
         for (unsigned int i=0; i<polygon.size()-1; i++) {
             double vec[4];
             vec[0] = polygon.at(i).x() - polygon.at(i+1).x();
@@ -1282,16 +1284,6 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
 std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
 {
-    if (position.size() > 0) {
-        position.pop_back();
-    }
-
-    /*
-    for (unsigned int i=0; i<position.size(); i++) {
-        PolygonViewer::getInstance().pushPolygon(position[i],std::to_string(i));
-    }
-    */
-
     return position;
 }
 
