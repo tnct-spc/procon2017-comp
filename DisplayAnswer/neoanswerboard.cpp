@@ -597,7 +597,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     }
 #endif
     if(event->button() == Qt::MouseButton::LeftButton){
-        clickedpiece_id = -1;
+//        clickedpiece_id = -1;
         QPointF clickedposition = event->pos();
         //QPointF→point_iへの変換
 
@@ -610,7 +610,16 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         for(auto piece : field.getPieces()){
             if(bg::intersects(piece.getPolygon() , clickedpos)){
                 std::cout << "piece id :" << piece.getId() << std::endl;
-                clickedpiece_id = piece.getId();
+
+                auto index = std::find(clicked_piece_id.begin(),clicked_piece_id.end(),piece.getId());
+                if(index == clicked_piece_id.end()){
+                    this->clicked_piece_id.push_back(piece.getId());
+                }else{
+                    this->clicked_piece_id.erase(index);
+                }
+
+
+
             }
         }
         this->update();
