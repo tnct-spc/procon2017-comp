@@ -506,7 +506,7 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::MouseButton::RightButton){
-        NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
+        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
     }
 }
 
@@ -565,7 +565,7 @@ void NeoAnswerBoard::mouseDoubleClickEvent(QMouseEvent *event)
             newField.setIsPlaced(i.piece_index);
             nad->addAnswer(newField , text);
 #ifdef OUT_FILE
-            std::string path = "/home/yui/Procon/fieldcdv/" + std::to_string(count) + ".csv";
+            std::string path = "../../procon2017-comp/debug-field.csv" + std::to_string(count) + ".csv";
             NeoPolygonIO::exportPolygon(newField , path);
 #endif
         } else {
