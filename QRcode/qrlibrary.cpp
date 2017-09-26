@@ -11,17 +11,20 @@ QRLibrary::QRLibrary()
 
 std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool s)
 {
+    VideoCapture cap(1);
+    if (!cap.isOpened())  // if not success, exit program
+    {
+        std::cout << "Cannot open the video cam" << std::endl;
+        while(!cap.isOpened()){
+
+        }
+    }
+
     int resizedW;
     std::pair<std::vector<polygon_i>,std::vector<polygon_i>> decoded_polygons;
     std::string code = {""};
     std::string bcode = {"."};
     std::string type = {""};
-    VideoCapture cap(1); // open the video camera no. 0
-
-    if (!cap.isOpened())  // if not success, exit program
-    {
-        std::cout << "Cannot open the video cam" << std::endl;
-    }
 
     ImageScanner scanner;
     scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
