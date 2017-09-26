@@ -208,11 +208,13 @@ void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i
 void QrTranslateToPolygon::translateToCSV(std::pair<std::vector<polygon_i>, std::vector<polygon_i>> pieceframe)
 {
     procon::NeoField field;
-    procon::NeoExpandedPolygon pieceexpandedpolygon;
+    int id = 0;
     std::vector<procon::NeoExpandedPolygon> elementarypieces;
     for(auto p : pieceframe.first){
+        procon::NeoExpandedPolygon pieceexpandedpolygon(id);
         pieceexpandedpolygon.resetPolygonForce(p);
         elementarypieces.push_back(pieceexpandedpolygon);
+        id++;
     }
 
     procon::NeoExpandedPolygon frameexpandedpolygon;

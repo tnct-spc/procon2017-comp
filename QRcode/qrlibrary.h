@@ -20,7 +20,7 @@ public:
 
 private:
     bool is_multi = false;
-    bool first = true;
+    bool read = false;
 
 protected:
     void keyPressEvent(QKeyEvent *event);

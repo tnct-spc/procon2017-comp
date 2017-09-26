@@ -95,7 +95,6 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
                     decoded_polygons.second.push_back(f);
                     std::cout << "frame: " << decoded_polygons.second.size() << std::endl;
                 }
-                first = false;
             }
         }
 
@@ -105,7 +104,8 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
         if(code.length() > 2 && s){
             if(!is_multi){
                 std::cout << "QRCode detected" << std::endl;
-                QrTranslateToPolygon::translateToCSV(decoded_polygons);
+                if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons);
+                read = true;
                 std::cout << "a: " << decoded_polygons.first.size() << std::endl;
                 std::cout << "b: " << decoded_polygons.second.size() << std::endl;
                 break;
