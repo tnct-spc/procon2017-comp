@@ -1051,8 +1051,31 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     // polygonのid
     id++;
 
-    if (id == pieces_num) {
+    if (id == pieces_num-1) {
+
+        unsigned int longgest;
+        double long_len = 0;
+        for (unsigned int i = 0; i < polygon.size()-1; i++) {
+            double x = polygon.at(i+1).x() - polygon.at(i).x();
+            double y = polygon.at(i+1).y() - polygon.at(i).y();
+            double it_len = hypot(x, y);
+            if (long_len < it_len) {
+                long_len = it_len;
+                longgest = i;
+            }
+        }
+
+        // 配列を循環
+        vertex.outer().pop_back();
+        polygon_t longer;
+        for (unsigned int i = 0; i < polygon.size(); i++) {
+            longer.outer().push_back(vertex.outer().at((i+longgest)%(polygon.size())));
+        }
+        longer.outer().push_back(longer.outer().at(0));
+        vertex = longer;
+
         right_angle = true;
+
     } else {
 
         // 確認用

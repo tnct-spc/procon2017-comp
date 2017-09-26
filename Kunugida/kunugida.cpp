@@ -161,12 +161,6 @@ void Kunugida::run()
 
         board->setScannedPieces(imrec.getPolygonPosition());
 
-        //        imageRecognitonTest();
-//        ImageRecognition imrec;
-//        field = imrec.run(frame, pieces);
-//        board->setScannedPieces(imrec.getPolygonPosition());
-
-        //        imageRecognitonTest();
     }else if(ui->csv_button->isChecked()){
         //CSV date
         std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
