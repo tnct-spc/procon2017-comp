@@ -11,6 +11,7 @@ TryNextSearch::TryNextSearch(QWidget *parent) :
 
     board = new NeoAnswerBoard();
     board->setSingleMode(true);
+    board->setSelectPieceMode(true);
 
     go_button = new QPushButton();
     go_button->setText("RUN BEAMSEARCH");

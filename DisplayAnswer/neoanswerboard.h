@@ -36,6 +36,7 @@ public:
     void setText(std::string text);
     void setScannedPieces(std::vector<procon::ExpandedPolygon> vec);
     void setUp();
+    void setSelectPieceMode(bool mode);
 
 private:
     int frame_margin;
@@ -60,6 +61,7 @@ private:
     bool singleif = false;
     int piece_size = 1;
     bool allif = true;
+    bool select_piece_mode = false;
 
     //make id_list
     std::vector<polygon_i> polygon_list;

@@ -25,6 +25,11 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
+void NeoAnswerBoard::setSelectPieceMode(bool mode)
+{
+    this->select_piece_mode = mode;
+}
+
 void NeoAnswerBoard::setUp()
 {
     QMessageBox msgBox;
@@ -596,7 +601,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         }
     }
 #endif
-    if(event->button() == Qt::MouseButton::LeftButton){
+    if(event->button() == Qt::MouseButton::LeftButton && this->select_piece_mode){
 //        clickedpiece_id = -1;
         QPointF clickedposition = event->pos();
         //QPointF→point_iへの変換
@@ -617,9 +622,6 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 }else{
                     this->clicked_piece_id.erase(index);
                 }
-
-
-
             }
         }
         this->update();
