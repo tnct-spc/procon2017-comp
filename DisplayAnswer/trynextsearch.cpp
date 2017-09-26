@@ -13,6 +13,7 @@ TryNextSearch::TryNextSearch(QWidget *parent) :
     board->setSingleMode(true);
 
     go_button = new QPushButton();
+    go_button->setText("RUN BEAMSEARCH");
 
     ui->verticalLayout->addWidget(board,0);
     ui->verticalLayout->addWidget(go_button,1);
