@@ -16,6 +16,8 @@ CONFIG   += precompile_header
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
+LIBS += -L/usr/lib `pkg-config --libs opencv`
+
 DEFINES += UTILITIES_LIBRARY
 
 SOURCES += utilities.cpp \
@@ -34,3 +36,7 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include

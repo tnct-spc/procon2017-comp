@@ -290,7 +290,7 @@
      <rect>
       <x>390</x>
       <y>40</y>
-      <width>167</width>
+      <width>174</width>
       <height>132</height>
      </rect>
     </property>
@@ -421,7 +421,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>./../../procon2016-comp/sample/sample_pieces_3.JPG</string>
+     <string>./../../procon2017-comp/sample/sample_pieces_3.JPG</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="franeURL">
@@ -434,7 +434,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>./../../procon2016-comp/sample/sample_frame_3.JPG</string>
+     <string>./../../procon2017-comp/sample/sample_frame_3.JPG</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -550,7 +550,7 @@
      <x>0</x>
      <y>0</y>
      <width>1230</width>
-     <height>27</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>

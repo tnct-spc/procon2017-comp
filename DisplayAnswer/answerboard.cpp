@@ -2,6 +2,7 @@
 #include "ui_answerboard.h"
 #include "utilities.h"
 
+
 //#define GOSA_CHECK_MODE
 //#define HYOKA_MODE
 
@@ -63,7 +64,7 @@ void AnswerBoard::setRawPicture(const cv::Mat& raw_pieces_pic, const std::vector
     pieces_pos = Utilities::make_unique<std::vector<cv::Point>>(pieces_pos_);
 }
 
-void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b> &random_colors_)
+void AnswerBoard::setRandomColors(const std::vector<cv::Vec3b>& random_colors_)
 {
     random_colors = Utilities::make_unique<std::vector<cv::Vec3b>>(random_colors_);
 }

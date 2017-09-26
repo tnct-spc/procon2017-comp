@@ -56,6 +56,7 @@ void Hazama::acceptAnswer(QString file_path)
 
 void Hazama::emitAnswer(procon::Field field)
 {
+    std::cout << "emitted answer" << std::endl;
     if(!ui->isKeepBestAnswerMode->isChecked() || first_answer_flag){
         first_answer_flag = false;
         best_answer = field;
@@ -127,7 +128,7 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
         std::cout << "now:" << i << std::endl;
 
         char filename[128];
-        sprintf(filename, "../../procon2016-comp/picture/cal/pic%d.JPG", i);
+        sprintf(filename, "../../procon2017-comp/picture/cal/pic%d.JPG", i);
         cv::Mat frame = cv::imread(filename);
         cv::Mat gray;
 
@@ -163,16 +164,20 @@ void Hazama::makeCalibrationData(std::string savefile_path,unsigned int numberOf
 void Hazama::run()
 {
     // When you want to calibrate webcamera,please comment out this line!!!
-    //makeCalibrationData("./../../procon2016-comp/picture/cal/calibration.yml",NUM);
+    //makeCalibrationData("./../../procon2017-comp/picture/cal/calibration.yml",NUM);
 
     std::cout << "Run" << std::endl;
+
+    // ピースの画像
+    cv::Mat nocpieces;
+    cv::Mat nocframe;
 
     // Disable threshold UI
     disableThresholdUI();
 
     std::string frame_path = ui->franeURL->text().toStdString();
     std::string pieces_path = ui->pieceURL->text().toStdString();
-    std::string path = "./../../procon2016-comp/sample/data.csv";
+    std::string path = "./../../procon2017-comp/sample/data.csv";
 
     // Get puzzle data
     if(ui->useWebCamera->isChecked() || ui->useImageData->isChecked() || ui->selectImageData->isChecked()){
@@ -211,8 +216,8 @@ void Hazama::run()
                 frame_path = QFileDialog::getOpenFileName(this,"input frame picture","/media/spc").toStdString();
                 pieces_path = QFileDialog::getOpenFileName(this,"input pieces picture","/media/spc").toStdString();
             }
-            cv::Mat nocframe = cv::imread(frame_path, 1);
-            cv::Mat nocpieces = cv::imread(pieces_path, 1);
+            nocframe = cv::imread(frame_path, 1);
+            nocpieces = cv::imread(pieces_path, 1);
 
             //calibration
             cv::Mat mtx,dist;
@@ -225,14 +230,14 @@ void Hazama::run()
         }
 
         // Image detect
-        PDATA = imrec.run(raw_frame, raw_pieces);
+//        PDATA = imrec.run(raw_frame, nocpieces);
 
         // Set raw image data
         AnswerBoard::setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
         AnswerBoard::setRandomColors(imrec.getRawRandomColors());
 
     } else if (ui->useFileData->isChecked()) {
-        PDATA = procon::PolygonIO::importPolygon(path);
+//        PDATA = procon::PolygonIO::importPolygon(path);
 
     } else {
         return;
@@ -358,7 +363,7 @@ void Hazama::makeInIFile()
     config.put("test.test",13);
 
     // Write
-    boost::property_tree::write_ini("./../../procon2016-comp/config/threshold.ini",config);
+    boost::property_tree::write_ini("./../../procon2017-comp/config/threshold.ini",config);
 
     /* threhsold.ini write example
      *
@@ -372,7 +377,7 @@ void Hazama::loadInIFile()
     boost::property_tree::ptree config;
 
     // Read
-    boost::property_tree::read_ini("./../../procon2016-comp/config/threshold.ini",config);
+    boost::property_tree::read_ini("./../../procon2017-comp/config/threshold.ini",config);
 
     if(boost::optional<int> value_test = config.get_optional<int>("test.test")){
 

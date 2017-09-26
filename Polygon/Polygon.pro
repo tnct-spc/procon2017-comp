@@ -24,7 +24,18 @@ SOURCES += \
     expandedpolygon.cpp \
     singlepolygondisplay.cpp \
     polygonviewer.cpp \
-    fit.cpp
+    fit.cpp \
+    neoexpandedpolygon.cpp \
+    neosinglepolygondisplay.cpp \
+    neopolygonviewer.cpp \
+    form.cpp \
+    neofield.cpp \
+    polygon.cpp \
+    complexangle.cpp \
+    neopolygonio.cpp \
+    Evaluation/evaluate.cpp \
+    Evaluation/evaluation.cpp \
+    Utils/polygonconnector.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -33,9 +44,21 @@ HEADERS += \
     expandedpolygon.h \
     singlepolygondisplay.h \
     polygonviewer.h \
-    fit.h
+    fit.h \
+    neoexpandedpolygon.h \
+    neosinglepolygondisplay.h \
+    neopolygonviewer.h \
+    form.h \
+    neofield.h \
+    polygon.h \
+    complexangle.h \
+    neopolygonio.h \
+    Evaluation/evaluate.h \
+    Evaluation/evaluation.h \
+    Utils/polygonconnector.h
 
 LIBS += -lboost_system -lboost_thread
+LIBS += -L/usr/lib `pkg-config --libs opencv`
 
 INSTALLS += target
 
@@ -46,7 +69,8 @@ unix {
 
 FORMS += \
     singlepolygondisplay.ui \
-    form.ui
+    form.ui \
+    neosinglepolygondisplay.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
@@ -54,3 +78,9 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include
+
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver

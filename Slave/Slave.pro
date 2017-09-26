@@ -26,6 +26,8 @@ HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
+LIBS += -L/usr/lib `pkg-config --libs opencv`
+
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
 else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
@@ -53,3 +55,7 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include
