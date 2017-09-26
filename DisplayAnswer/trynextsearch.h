@@ -2,6 +2,7 @@
 #define TRYNEXTSEARCH_H
 
 #include <QWidget>
+#include "neoanswerboard.h"
 
 namespace Ui {
 class TryNextSearch;
@@ -17,6 +18,8 @@ public:
 
 private:
     Ui::TryNextSearch *ui;
+    QPushButton *go_button;
+    NeoAnswerBoard *board;
 };
 
 #endif // TRYNEXTSEARCH_H
