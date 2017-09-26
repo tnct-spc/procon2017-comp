@@ -38,10 +38,12 @@ public:
     void setUp();
     void setSelectPieceMode(bool mode);
 
+    std::vector<int> getSelectedPieceId();
+
 private:
     int frame_margin;
 //    int clickedpiece_id=-1;
-    std::vector<unsigned int> clicked_piece_id;
+    std::vector<int> clicked_piece_id;
 
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
