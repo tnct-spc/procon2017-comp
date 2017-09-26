@@ -203,6 +203,20 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawText(piececenter, QString(QString::number(expanded_poly.getId())));
     };
 
+    auto drawInverseMark = [&](procon::NeoExpandedPolygon neopoly){//裏返されてるなら@マークをつける
+        polygon_i poly = neopoly.getPolygon();
+        painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackground(QBrush(QColor(list[neopoly.getId()])));
+        painter.setPen(QPen(QBrush(Qt::red), 0.3));
+        point_i cent;
+        bg::centroid(poly,cent);
+        QPointF cent_point = getPosition(cent);
+        cent_point.setX(cent_point.x() + grid_size);
+        cent_point.setY(cent_point.y() - grid_size);
+        painter.drawText(cent_point, QString(QString("@")));
+    };
+
     auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直した
         if(!single_mode){
 
@@ -289,7 +303,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     for(auto poly : field.getPieces()){//ここの描画はsingle_modeやキーの状況に問わずやるらしい
             drawAfterPiece(poly);
-            drawPieceId(poly);
+    }
+    for(auto poly : field.getPieces()){
+        drawPieceId(poly);
+        if(poly.is_inverse)drawInverseMark(poly);
     }
     if(!single_mode){
         for(auto poly : scanned_poly){
