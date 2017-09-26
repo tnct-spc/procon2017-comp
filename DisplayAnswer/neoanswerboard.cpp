@@ -169,7 +169,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //処理後ピースを描画
     auto drawAfterPiece = [&](procon::NeoExpandedPolygon expanded_poly){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            if(expanded_poly.getId() == clickedpiece_id)painter.setBrush(QBrush(Qt::red));
+            if(std::find(clicked_piece_id.begin(),clicked_piece_id.end(),expanded_poly.getId()) != clicked_piece_id.end())painter.setBrush(QBrush(Qt::white));
             else painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
 //          int pcount = field.getPiece(pnum).getSize();
 //          QPointF points[pcount];
