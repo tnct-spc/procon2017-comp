@@ -87,8 +87,15 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     QFont font;
     font.setPixelSize(20);
     painter.setFont(font);
+    QString str;
     for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
-        painter.drawText(polygon_points[point_index] ,QString::number(point_index));
+        str += QString::number(point_index);
+        str += "(";
+        str += QString::number(polygon_points[point_index].x());
+        str += ",";
+        str += QString::number(polygon_points[point_index].y());
+        str += ")";
+        painter.drawText(polygon_points[point_index] ,str);
     }
 
     painter.setPen(QPen(QColor("#000000")));
