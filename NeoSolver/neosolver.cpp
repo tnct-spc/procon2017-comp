@@ -6,6 +6,12 @@
 NeoSolver::NeoSolver()
 {
     logger = spdlog::get("Solver");
+    Algorithms.push_back(new TestAlgortithm());
+    Algorithms.push_back(new BeamSearch());
+    for(auto& al : Algorithms){
+        connect(al, &AlgorithmWrapper::requestCSV, this, &NeoSolver::_requestCSV);
+        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
+    }
 }
 
 NeoSolver::~NeoSolver()
@@ -15,8 +21,6 @@ NeoSolver::~NeoSolver()
 
 void NeoSolver::run(procon::NeoField field, int algorithm_number)
 {
-    Algorithms.push_back(new TestAlgortithm());
-    Algorithms.push_back(new BeamSearch());
 
     field.setFrame(field.getElementaryFrame());
     emitAnswer(field);
@@ -33,4 +37,14 @@ void NeoSolver::run(procon::NeoField field, int algorithm_number)
 void NeoSolver::emitAnswer(procon::NeoField field){
     std::cout << "neoalgrotithm warpper throwanswer called" << std::endl;
     emit throwAnswer(field);
+}
+
+void NeoSolver::_requestCSV()
+{
+    emit requestCSV();
+}
+
+void NeoSolver::_requestCSVcomplete()
+{
+    emit requestCSVcomplete();
 }
