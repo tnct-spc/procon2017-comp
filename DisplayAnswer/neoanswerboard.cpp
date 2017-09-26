@@ -496,4 +496,18 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
     }
+    if(event->button() == Qt::MouseButton::LeftButton){
+        QPointF clickedposition = event->pos();
+        //QPointF→point_iへの変換
+
+        int pointx = clickedposition.x() - left_right_margin;
+        int pointy = clickedposition.y() - top_bottom_margin;
+
+        point_i clickedpos( pointx / grid_size - 8, pointy / grid_size - 8);
+        std::cout << "clicked : " << bg::dsv(clickedpos) << std::endl;
+
+        for(auto piece : field.getPieces()){
+            if(bg::intersects(piece.getPolygon() , clickedpos))std::cout << "piece id :" << piece.getId() << std::endl;
+        }
+    }
 }
