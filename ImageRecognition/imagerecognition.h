@@ -74,6 +74,7 @@ private:
     int n = 1;
     double frame_deg;
     std::map<point_i, double> tab;
+    int margin = 10;
 
     std::vector<std::pair<point_i,double>> length_table;
 };

@@ -53,14 +53,6 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     cv::imwrite("/home/spc/workspace/procon2017-image/topiece_image.png", line_image);
     */
 
-    // image of vectors
-    for (unsigned int i=0; i<polygons.size(); i++) {
-
-        procon::ExpandedPolygon ex;
-        ex.resetPolygonForce(polygons[i]);
-        PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
-    }
-
     // degree of frame
     double frame_x = polygons.at(0).outer().at(1).x() - polygons.at(0).outer().at(0).x();
     double frame_y = polygons.at(0).outer().at(1).y() - polygons.at(0).outer().at(0).y();
@@ -100,6 +92,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         for (auto& side : piece.outer()) {
             side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
         }
+    }
+
+    // image of vectors
+    for (unsigned int i=0; i<polygons.size(); i++) {
+
+        procon::ExpandedPolygon ex;
+        ex.resetPolygonForce(polygons[i]);
+        PolygonViewer::getInstance().pushPolygon(ex,std::to_string(i));
     }
 
     makeTable();
@@ -1342,7 +1342,6 @@ std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
     std::vector<procon::ExpandedPolygon> polygons = ImageRecognition::getPolygonPosition();
 
     int i = 0;
-    int margin = 10;
 
     for (auto polygon : polygons) {
 
@@ -1363,13 +1362,21 @@ std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
 std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
 {
     std::vector<procon::ExpandedPolygon> polygons = ImageRecognition::getPolygonPosition();
+    std::vector<procon::ExpandedPolygon> trans_polygon;
 
     for (auto polygon : polygons) {
 
         bg::model::box<bg::model::d2::point_xy<double>> box;
         bg::envelope(polygon.getPolygon(), box);
 
-        //bg::strategy::transform::translate_transformer<double, 2, 2> translate(polygon)
+        bg::strategy::transform::translate_transformer<double, 2, 2> translate(-box.min_corner().x()+margin, -box.min_corner().y()+margin);
+        polygon_t result;
+        bg::transform(polygon.getPolygon(), result, translate);
+        procon::ExpandedPolygon set_pol;
+        set_pol.resetPolygonForce(result);
+        trans_polygon.push_back(set_pol);
     }
+
+    return trans_polygon;
 
 }
