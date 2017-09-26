@@ -39,6 +39,7 @@ public:
 
 private:
     int frame_margin;
+    int clickedpiece_id=-1;
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
     QPointF getPiecePosition(point_t point);

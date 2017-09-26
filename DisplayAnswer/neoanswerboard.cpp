@@ -162,7 +162,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //処理後ピースを描画
     auto drawAfterPiece = [&](procon::NeoExpandedPolygon expanded_poly){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
+            if(expanded_poly.getId() == clickedpiece_id)painter.setBrush(QBrush(Qt::red));
+            else painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
 //          int pcount = field.getPiece(pnum).getSize();
 //          QPointF points[pcount];
 //          for(int tes = 0;tes < pcount; tes++){
@@ -514,6 +515,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/debug-field.csv");
     }
     if(event->button() == Qt::MouseButton::LeftButton){
+        clickedpiece_id = -1;
         QPointF clickedposition = event->pos();
         //QPointF→point_iへの変換
 
@@ -524,7 +526,11 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         std::cout << "clicked : " << bg::dsv(clickedpos) << std::endl;
 
         for(auto piece : field.getPieces()){
-            if(bg::intersects(piece.getPolygon() , clickedpos))std::cout << "piece id :" << piece.getId() << std::endl;
+            if(bg::intersects(piece.getPolygon() , clickedpos)){
+                std::cout << "piece id :" << piece.getId() << std::endl;
+                clickedpiece_id = piece.getId();
+            }
         }
+        this->update();
     }
 }
