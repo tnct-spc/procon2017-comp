@@ -217,10 +217,8 @@ void Kunugida::run()
             is_multi = true;
             how_qr = ui->how_qr->value();
         }
-//        QRCode qrcode;
-//        qrcode.Decoder(true, is_hint, is_multi, how_qr);
-        QRLibrary lib;
-        lib.Decoder(true, false);
+        QRCode qrcode;
+        qrcode.Decoder(true, is_hint, is_multi, how_qr);
         field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
         int scanned_dummy_piece_id = 0;
 
