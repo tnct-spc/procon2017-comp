@@ -716,6 +716,7 @@ int ProbMaker::retRnd(int num){
     return rnd(mt);
 }
 void ProbMaker::makeHint(){
+    std::cout << "nngo"<<std::endl;
     double mostinstanceHintsNumber = print_polygons.size() * 0.9;
     double miminstanceHintsNumber = print_polygons.size() * 0.8;
     std::vector<polygon_i> piece = print_polygons;
@@ -725,11 +726,12 @@ void ProbMaker::makeHint(){
     int moke = (mostHintsNumber - mimHintsNumber)/2;
     int Hintnum = (mimHintsNumber + moke)/4;
     int count = 0;
+    std::string str;
+    std::cout<<"tango2"<<std::endl;
     do{
     for(int k = 0;k < Hintnum;k++){
         int hoge = retRnd(3) + 3;
         count = hoge + count;
-        std::string str;
         str.erase();
         str += std::to_string(hoge);
         for(int e = 0;e < hoge;e++){
@@ -750,11 +752,11 @@ void ProbMaker::makeHint(){
                 }
                 s++;
             }
-            disposition.push_back(str);
         }
+        disposition.push_back(str);
     }
     }while(mostHintsNumber < count || mimHintsNumber > count);
-    std::cout <<mostHintsNumber <<" "<<mimHintsNumber<<" "<< count<<std::endl;
+    std::cout<<"ink"<<std::endl;
     /*
     int HintsNumber1,HintsNumber2,HintsNumber3,HintsNumber4;
     do{
@@ -930,6 +932,10 @@ void ProbMaker::makeHint(){
         counter++;
     }
     std::cout <<shapeHints<<std::endl;
+    for(std::string st :disposition){
+        std::cout<< st <<std::endl;
+        st.erase();
+    }
 }
 
 void ProbMaker::paintEvent(QPaintEvent *)
