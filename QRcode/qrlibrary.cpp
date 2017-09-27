@@ -12,7 +12,7 @@ QRLibrary::QRLibrary()
 
 std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool s, bool is_hint)
 {
-    VideoCapture cap(1);
+    VideoCapture cap(0);
     if (!cap.isOpened())  // if not success, exit program
     {
         std::cout << "Cannot open the video cam" << std::endl;
@@ -108,7 +108,7 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
         if(code.length() > 2 && s){
             if(!is_multi){
                 std::cout << "QRCode detected" << std::endl;
-                if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons, is_hint);
+                if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons, false);
                 read = true;
                 std::cout << "a: " << decoded_polygons.first.size() << std::endl;
                 std::cout << "b: " << decoded_polygons.second.size() << std::endl;

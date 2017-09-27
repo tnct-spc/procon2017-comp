@@ -204,7 +204,7 @@ procon::NeoField NeoPolygonIO::importField(std::string file_path)
             if(mode == 0)
                 elementary_frame.push_back(polygon);
             if(mode == 3)
-                frame.push_back(polygon);
+                elementary_frame.push_back(polygon);
             if(mode == 1)
                 elementary_frame_inner_pieces.push_back(polygon);
 

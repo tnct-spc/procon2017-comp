@@ -48,7 +48,6 @@ private:
     procon::NeoField PDATA;
     bool first_answer_flag = true;
     procon::NeoField best_answer;
-    std::shared_ptr<QRCode> qrcode;
 
 public slots:
     void getCSV();
