@@ -719,8 +719,43 @@ void ProbMaker::makeHint(){
     double mostinstanceHintsNumber = print_polygons.size() * 0.9;
     double miminstanceHintsNumber = print_polygons.size() * 0.8;
     std::vector<polygon_i> piece = print_polygons;
+
     int mostHintsNumber = mostinstanceHintsNumber;
     int mimHintsNumber = miminstanceHintsNumber;
+    int moke = (mostHintsNumber - mimHintsNumber)/2;
+    int Hintnum = (mimHintsNumber + moke)/4;
+    int count = 0;
+    do{
+    for(int k = 0;k < Hintnum;k++){
+        int hoge = retRnd(3) + 3;
+        count = hoge + count;
+        std::string str;
+        str.erase();
+        str += std::to_string(hoge);
+        for(int e = 0;e < hoge;e++){
+            int rnd = retRnd(piece.size());
+            polygon_i poly2 = piece.at(rnd);
+            piece.erase(piece.begin() + rnd);
+            int s = 0;
+            for(point_i point : poly2.outer()){
+                if(s == 0){
+                    str += ":";
+                    str += std::to_string(poly2.outer().size() - 1);
+                 }
+                if(s != 0){
+                    str += " ";
+                    str += std::to_string(point.x());
+                    str += " ";
+                    str += std::to_string(point.y());
+                }
+                s++;
+            }
+            disposition.push_back(str);
+        }
+    }
+    }while(mostHintsNumber < count || mimHintsNumber > count);
+    std::cout <<mostHintsNumber <<" "<<mimHintsNumber<<" "<< count<<std::endl;
+    /*
     int HintsNumber1,HintsNumber2,HintsNumber3,HintsNumber4;
     do{
     HintsNumber1 = retRnd(100) + 1;
@@ -822,6 +857,8 @@ void ProbMaker::makeHint(){
     std::cout<<print_polygons.size()<<" "<<mimHintsNumber<<std::endl;
     std::cout<<HintsNumber1<<" "<<HintsNumber2<<" "<<HintsNumber3<<" "<<HintsNumber4<<" "<< HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4 <<std::endl;
     std::cout <<disposition4<<std::endl;
+    */
+
     //ここから形状情報
     std::vector<polygon_i> shapepiece;
     polygon_i neoframe;
