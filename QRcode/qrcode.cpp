@@ -17,7 +17,7 @@ QRCode::~QRCode()
     delete ui;
 }
 
-std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRCode::Decoder(bool s, bool is_hint, bool is_multi, int how_qr)
+std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRCode::Decoder(bool s, bool is_hint, bool hint_multi, int how_qr)
 {
     VideoCapture cap(0);
     if (!cap.isOpened())  // if not success, exit program
@@ -89,6 +89,7 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRCode::Decoder(bool s,
             }
             std::cout << "Angle: " << r.angle << std::endl;
             QrTranslateToPolygon qrtrans(code);
+            is_multi = qrtrans.getIsMultiQr();
             if(bcode != code){
                 std::vector<polygon_i> pieceData = qrtrans.getPieceData();
                 std::vector<polygon_i> frameData = qrtrans.getFrameData();
@@ -108,7 +109,18 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRCode::Decoder(bool s,
         imshow("QR", frame);
         int key = waitKey(1);
         if(code.length() > 2 && s){
-            if(!is_multi || how_qr == much){
+            if(is_hint){
+                if(hint_multi){
+                    if(much == how_qr){
+                        std::cout << "QRCode detected" << std::endl;
+                        if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons, is_hint);
+                        read = true;
+                        std::cout << "a: " << decoded_polygons.first.size() << std::endl;
+                        std::cout << "b: " << decoded_polygons.second.size() << std::endl;
+                        break;
+                    }
+                }
+            }else if(!is_multi){
                 std::cout << "QRCode detected" << std::endl;
                 if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons, is_hint);
                 read = true;
@@ -121,12 +133,4 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRCode::Decoder(bool s,
 //    code = "Type: " + type + "\n\n\"" + code + "\"";
 //    return code;
     return decoded_polygons;
-}
-
-QImage QRCode::setImg(cv::Mat &img)
-{
-    cv::Mat dst;
-    cv::cvtColor(img, dst, CV_RGBA2BGR);
-    QImage returnImage(dst.data, dst.cols, dst.rows, QImage::Format_RGBA8888);
-    return returnImage;
 }

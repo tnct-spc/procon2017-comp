@@ -23,12 +23,12 @@ class QRCode : public QWidget
 public:
     explicit QRCode(QWidget *parent = 0);
     ~QRCode();
-    std::pair<std::vector<polygon_i>,std::vector<polygon_i>> Decoder(bool s, bool is_hint, bool is_multi, int how_qr);
-    QImage setImg(cv::Mat &img);
+    std::pair<std::vector<polygon_i>,std::vector<polygon_i>> Decoder(bool s, bool is_hint, bool hint_multi, int how_qr);
 
 private:
     Ui::QRCode *ui;
     bool read = false;
+    bool is_multi = false;
 };
 
 #endif // QRCODE_H

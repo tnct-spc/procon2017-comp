@@ -209,9 +209,14 @@ void Kunugida::run()
 //        }
 
     }else if(ui->chinochan_button->isChecked()){
-        bool is_hint;
-        bool is_multi;
-        int how_qr;
+        bool is_hint = false;
+        bool is_multi = false;
+        int how_qr = 1;
+        if(ui->is_hint->isChecked()) is_hint = true;
+        if(ui->is_multi->isChecked()){
+            is_multi = true;
+            how_qr = ui->how_qr->value();
+        }
         qrcode = std::make_shared<QRCode>();
         qrcode->Decoder(true, is_hint, is_multi, how_qr);
         field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
