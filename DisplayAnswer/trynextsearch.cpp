@@ -84,6 +84,8 @@ void TryNextSearch::clickedGoButton()
 
                 //結合できたならpolygonsから除外していいよね
                 polygons.erase(polygons.begin() + index);
+
+                break;
             }
 
             ++index;
