@@ -203,26 +203,47 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
         bg::difference(frame_polygon, piece_rotate_polygon, frame_out_polygons);
         std::vector<procon::NeoExpandedPolygon> frames_out;
 
+        //180度角除去
+        std::function<void(procon::NeoExpandedPolygon&)> delete_180_degree = [&delete_180_degree](procon::NeoExpandedPolygon &expoly)
+        {
+            std::vector<double> angles = expoly.getSideAngle();
+            unsigned int i = 0;
+            for(double angle : angles) {
+                if(!(angle < M_PI || angle > M_PI)) {
+                    polygon_i poly = expoly.getPolygon();
+                    std::vector<point_i> &outer = poly.outer();
+                    outer.erase(outer.begin() + i);
+                    if(i == 0) outer.at(outer.size() - 1) = outer.at(0);
+                    expoly.resetPolygonForce(poly);
+                    delete_180_degree(expoly);
+                    break;
+                }
+                ++i;
+            }
+        };
+
         int id= 0;
         for(polygon_i frame_out_polygon : frame_out_polygons) {
             procon::NeoExpandedPolygon frame_out(id);
             frame_out.resetPolygonForce(frame_out_polygon);
+            delete_180_degree(frame_out);
             frames_out.push_back(frame_out);
             ++id;
         }
 
         std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> out = std::make_tuple(frames_out, piece_out, true);
         return out;
-    }
+    } else {
 #ifdef DEBUG
-    std::vector<procon::NeoExpandedPolygon> frames;
-    frames.push_back(frame);
-    const std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> out_debug3 = std::make_tuple(frames, piece_out, false);
-    return out_debug3;
+        std::vector<procon::NeoExpandedPolygon> frames;
+        frames.push_back(frame);
+        const std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> out_debug3 = std::make_tuple(frames, piece_out, false);
+        return out_debug3;
 #endif
 #ifndef DEBUG
         return out_empty;
 #endif
+    }
 }
 #endif
 
@@ -334,7 +355,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
         std::cout << "equals is true!" << std::endl;
 #endif
         bg::difference(frame_polygon, piece_rotate_polygon, frame_out_polygons);
-        std::vector<procon::NeoExpandedPolygon> frames_out; 
+        std::vector<procon::NeoExpandedPolygon> frames_out;
 
         //180度角除去
         std::function<void(procon::NeoExpandedPolygon&)> delete_180_degree = [&delete_180_degree](procon::NeoExpandedPolygon &expoly)
