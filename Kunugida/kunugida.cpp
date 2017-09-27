@@ -9,6 +9,7 @@
 #include "polygonio.h"
 #include "http/request_mapper.h"
 #include "Algorithm/beamsearch.h"
+#include "qrcode.h"
 
 #include <iostream>
 #include <QDebug>
@@ -208,8 +209,11 @@ void Kunugida::run()
 //        }
 
     }else if(ui->chinochan_button->isChecked()){
-        QRLibrary lib;
-        lib.Decoder(true);
+        bool is_hint;
+        bool is_multi;
+        int how_qr;
+        qrcode = std::make_shared<QRCode>();
+        qrcode->Decoder(true, is_hint, is_multi, how_qr);
         field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
         int scanned_dummy_piece_id = 0;
 
@@ -245,9 +249,6 @@ void Kunugida::run()
     solver->run(field,algorithm_number);
 
 #endif
-
-    //    QRLibrary lib;
-    //    lib.Decoder(true);
     this->finishedProcess();
 }
 
