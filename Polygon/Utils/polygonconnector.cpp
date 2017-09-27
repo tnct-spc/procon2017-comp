@@ -346,7 +346,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
 
         std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> out = std::make_tuple(frames_out, piece_out, true);
         return out;
-    }
+    } else {
 #ifdef DEBUG
     const std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> out_debug3 = std::make_tuple(frames, piece_out, false);
     return out_debug3;
@@ -354,6 +354,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
 #ifndef DEBUG
         return out_empty;
 #endif
+    }
 }
 
 std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, ComplexAngle after_angle, unsigned int before_index1, unsigned int before_index2)
