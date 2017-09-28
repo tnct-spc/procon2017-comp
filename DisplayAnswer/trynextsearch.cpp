@@ -42,65 +42,45 @@ void TryNextSearch::clickedGoButton()
 
     std::vector<polygon_i> polygons;
     for(auto id : piece_id){
-        polygons.push_back(field.getElementaryPieces().at(id).getPolygon());
+        for(auto p : field.getPieces()){
+            if(id == p.getId()){
+                polygons.push_back(p.getPolygon());
+            }
+        }
     }
     for(auto frame : field.getFrame()){
         polygons.push_back(frame.getPolygon());
     }
 
-    //完了したらwhile抜けるでしょ？
-    bool complete_flag = false;
+    std::vector<polygon_i> processed_pieces;
 
-    //今は各領域一番最初のstepかな
-    bool start_flag = true;
+    //connect wit frame
+    while(true){
+	    bool cannot_connect_piece = true;
 
-    polygon_i now_prosessing_polygon;
+        for(int index = 1; index < polygons.size(); ++index){
 
-    //output
-    std::vector<polygon_i> processed_frame;
-
-    while(!complete_flag){
-        //一つもピースがくっつけられなかったときに次の空間を作りに行くためのflag
-        bool is_there_no_connect_piece = true;
-
-        if(start_flag){
-            start_flag = false;
-            now_prosessing_polygon = polygons.at(0);
-            polygons.erase(polygons.begin());
-        }
-
-        int index = 0;
-
-        for(auto p : polygons){
             std::vector<polygon_i> out;
 
-            boost::geometry::union_(now_prosessing_polygon,p,out);
+            boost::geometry::union_(polygons[0],polygons[index],out);
 
-            std::cerr << out.size() << std::endl;
+		    if(out.size() == 1){
+			    now_prosessing_polygon = out[0];
+			    cannot_connect_piece = false;
 
-            if(out.size() == 1){
-                now_prosessing_polygon = out[0];
-                is_there_no_connect_piece = false;
-
-                //結合できたならpolygonsから除外していいよね
+			    //結合できたならpolygonsから除外していいよね
                 polygons.erase(polygons.begin() + index);
-
-                break;
+                polygons.erase(polygons.begin());
             }
-
-            ++index;
-        }
-
-        if(is_there_no_connect_piece){
-            start_flag = true;
-            processed_frame.push_back(now_prosessing_polygon);
         }
 
         if(polygons.empty()){
-            complete_flag = true;
-            processed_frame.push_back(now_prosessing_polygon);
+            break;
         }
 
+        if(cannot_connect_piece){
+            processed_pieces.push_back(polygons[0]);
+        }
     }
 
     procon::NeoField next_field;
