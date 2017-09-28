@@ -17,7 +17,7 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
 
     connect(edited_button,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
 
-    ui->verticalLayout->addWidget(edited_button);
+//    ui->verticalLayout->addWidget(edited_button);
 }
 
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
@@ -42,66 +42,48 @@ procon::ExpandedPolygon imagerecongnitionwithhumanpower::polygonAdapter(polygon_
 
 void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 {
+    scale = 10;
     int window_height = this->height();
     int window_width = this->width();
+
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 3));
 
+    std::vector<QPointF> points;
+    for(int i=0;i<polygon.getSize();i++) points.push_back(QPointF(polygon.getPolygon().outer()[i].x(),polygon.getPolygon().outer()[i].y()));
     double x_max,y_max,x_min,y_min;
     int x_max_i,y_max_i,x_min_i,y_min_i;
-    auto drawPolygon = [&](std::vector<QPointF> points){
-        static const double margin = 10;
-        const int size = points.size();
+    x_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() > b.x();}))->x();
+    y_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() > b.y();}))->y();
+    x_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
+    y_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
+    x_max_i = ceil(x_max);
+    y_max_i = ceil(y_max);
+    x_min_i = floor(x_min);
+    y_min_i = floor(y_min);
 
-        x_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() > b.x();}))->x();
-        y_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() > b.y();}))->y();
-        x_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
-        y_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
-        x_max_i = ceil(x_max);
-        y_max_i = ceil(y_max);
-        x_min_i = floor(x_min);
-        y_min_i = floor(y_min);
+    auto drawPolygon = [&](){
+        int grid_margin  = 10;
+        bool enlarged_polygon = false;
 
-        const double width  = x_max - x_min;
-        const double height = y_max - y_min;
-        const double max = scale != -1 ? scale : width < height ? height : width;
-        const double y = window_height - margin;
-        const double x = window_height - margin;
-        const double y_margin = margin/2;
-        const double x_margin = (window_width-window_height)/2 + margin/2;
-        const double x_offset = - (x_min + (x_max - x_min)/2);
-        const double y_offset = - (y_min + (y_max - y_min)/2);
-        QPointF* draw_point = new QPointF[points.size()];
-        for(int i=0;i<size;i++){
-            draw_point[i].setX(((points.at(i).x() + x_offset)*x/max)+x/2+x_margin);
-            draw_point[i].setY(((points.at(i).y() + y_offset)*y/max)+y/2+y_margin);
+        int grid_col = enlarged_polygon ? 101 : x_max - x_min;
+        int grid_row = enlarged_polygon ? 65 : y_max - y_min;
+
+        const int grid_size =
+                        window_width <= window_height
+                        ? window_width / (grid_col + grid_margin)
+                        : window_height / (grid_row + grid_margin);
+        const int top_buttom_margin = (window_height - grid_size * grid_row) / 2;
+        const int left_right_margin = (window_width - grid_size * grid_col) / 2;
+
+        std::vector<QPointF> polygon_points;
+        for(unsigned int a = 0;a < this->polygont.outer().size(); a++){
+            int x_buf = enlarged_polygon ? grid_size * polygont.outer()[a].x() + left_right_margin : grid_size * (polygont.outer()[a].x() - x_max + left_right_margin);
+            int y_buf = enlarged_polygon ? grid_size * polygont.outer()[a].y() + top_buttom_margin : grid_size * (polygont.outer()[a].y() - y_max + top_buttom_margin);
+            polygon_points.push_back(QPoint(x_buf,y_buf));
         }
-        //draw polygo
-        painter.drawPolygon(draw_point,size);
-        //draw number
-        painter.setPen(QPen(QColor("#00ff00")));
-        QFont font = painter.font();
-        font.setPointSize(std::abs(y/30));
-        painter.setFont(font);
-        for(int count=0; count<size;++count){
-            painter.drawText(draw_point[count], QString::number(count));
-        }
-
-        for(int cnt = 0; cnt < (size - 1); cnt++){
-            double dx = points[cnt].x() - points[cnt + 1].x();
-            double dy = points[cnt].y() - points[cnt + 1].y();
-            double distance = std::sqrt(dx * dx + dy * dy);
-
-            double draw_dx = draw_point[cnt + 1].x() - draw_point[cnt].x();
-            draw_dx = draw_dx / 2;
-            double draw_dy = draw_point[cnt + 1].y() - draw_point[cnt].y();
-            draw_dy = draw_dy / 2;
-
-            QPointF drawing_point(draw_point[cnt].x() + draw_dx ,draw_point[cnt].y() + draw_dy);
-
-            painter.drawText(drawing_point,QString::fromStdString(std::to_string( distance )));
-        }
-        delete[] draw_point;
+        painter.setPen(QPen(QColor("#99CC00")));
+        painter.drawPolygon(&polygon_points.front(),polygon_points.size());
     };
 
     auto drawGrid = [&](){
@@ -117,14 +99,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
             painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
         }
     };
-
-    //draw piece
-    int piece_size = polygon.getSize();
-    std::vector<QPointF> points;
-    for(int i=0;i<piece_size;i++){
-        points.push_back(QPointF(polygon.getPolygon().outer()[i].x(),polygon.getPolygon().outer()[i].y()));
-    }
     painter.setBrush(QBrush(QColor("#0f5ca0")));
-    drawPolygon(points);
+    drawPolygon();
     drawGrid();
 }

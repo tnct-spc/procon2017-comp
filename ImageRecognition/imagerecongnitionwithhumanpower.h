@@ -28,7 +28,7 @@ private:
     QPushButton *edited_button;
     polygon_t polygont;
     procon::ExpandedPolygon polygon;
-    int scale = 7;
+    int scale;
 
 private slots:
     void clickedEditedButton();
