@@ -1107,7 +1107,12 @@ void BeamSearch::run(procon::NeoField field)
     //    }
     //    test();
 
+#define DEBUG
+#ifdef DEBUG
     if(true){
+#elif
+    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+#endif
         TryNextSearch *next = new TryNextSearch();
         next->setField(last_fields.at(0));
         next->show();
@@ -1171,7 +1176,7 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
 //        }
     }
 
-    if(true){
+    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
         TryNextSearch *next = new TryNextSearch();
         next->setField(last_fields.at(0));
         next->show();

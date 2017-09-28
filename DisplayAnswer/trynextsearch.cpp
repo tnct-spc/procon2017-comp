@@ -129,12 +129,15 @@ void TryNextSearch::clickedGoButton()
         next_field.setPiece(p);
     }
 
-    NeoPolygonViewer::getInstance().displayPolygon(processed_expolygon.at(0).getPolygon(),"hgoe",false);
-
+//#define DEBUG
+#ifdef DEBUG
     NeoAnswerBoard *neoansboard = new NeoAnswerBoard();
     neoansboard->setSingleMode(true);
     neoansboard->setField(next_field);
     neoansboard->show();
+#endif
 
     emit startBeamSearch(next_field);
+
+    this->close();
 }
