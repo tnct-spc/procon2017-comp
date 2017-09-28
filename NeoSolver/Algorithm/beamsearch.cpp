@@ -1107,10 +1107,10 @@ void BeamSearch::run(procon::NeoField field)
     //    }
     //    test();
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
     if(true){
-#elif
+#else
     if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
 #endif
         TryNextSearch *next = new TryNextSearch();
