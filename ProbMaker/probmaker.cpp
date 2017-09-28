@@ -716,44 +716,54 @@ int ProbMaker::retRnd(int num){
     return rnd(mt);
 }
 void ProbMaker::makeHint(){
-    std::cout << "nngo"<<std::endl;
+    //std::cout << "nngo"<<std::endl;
     double mostinstanceHintsNumber = print_polygons.size() * 0.9;
     double miminstanceHintsNumber = print_polygons.size() * 0.8;
-    std::vector<polygon_i> piece = print_polygons;
 
     int mostHintsNumber = mostinstanceHintsNumber;
     int mimHintsNumber = miminstanceHintsNumber;
-    int moke = (mostHintsNumber - mimHintsNumber)/2;
+    int moke = retRnd(mostHintsNumber - mimHintsNumber);
     int Hintnum = (mimHintsNumber + moke)/4;
     int count = 0;
     std::string str;
-    std::cout<<"tango2"<<std::endl;
+    //std::cout<<"tango2"<<std::endl;
     do{
+        count = 0;
+        std::vector<polygon_i> piece = print_polygons;
     for(int k = 0;k < Hintnum;k++){
+        //std::cout<<"ループ突入"<<std::endl;
         int hoge = retRnd(3) + 3;
         count = hoge + count;
-        str.erase();
+        str.clear();
         str += std::to_string(hoge);
         for(int e = 0;e < hoge;e++){
+            //std::cout <<"pieceループ突入"<<std::endl;
             int rnd = retRnd(piece.size());
+            //std::cout <<"はじめ"<<std::endl;
             polygon_i poly2 = piece.at(rnd);
+            //std::cout <<"ゆん"<<std::endl;
             piece.erase(piece.begin() + rnd);
+            //std::cout <<"あおば"<<std::endl;
             int s = 0;
+            //std::cout <<"代入"<<std::endl;
+            str += ":";
+            str += std::to_string(poly2.outer().size()-1);
+            //std::cout <<"pointループ突入"<<std::endl;
             for(point_i point : poly2.outer()){
-                if(s == 0){
-                    str += ":";
-                    str += std::to_string(poly2.outer().size() - 1);
-                 }
+                //std::cout <<"えへへ"<<std::endl;
                 if(s != 0){
                     str += " ";
                     str += std::to_string(point.x());
                     str += " ";
                     str += std::to_string(point.y());
                 }
+                //std::cout <<"リゼ可愛い"<<std::endl;
                 s++;
             }
         }
+        //std::cout <<"push_back前"<<std::endl;
         disposition.push_back(str);
+        //std::cout <<"push_back後"<<std::endl;
     }
     }while(mostHintsNumber < count || mimHintsNumber > count);
     std::cout<<"ink"<<std::endl;
@@ -785,7 +795,7 @@ void ProbMaker::makeHint(){
                    disposition1 += std::to_string(point_y);
                }
            counter++;
-           }\
+           }
                 }
 
     //ヒント二段階目
@@ -880,7 +890,7 @@ void ProbMaker::makeHint(){
             polygon2.outer().push_back(point_i(point_x,point_y));
             }
         result = true;
-        std::cout<<"うふふ"<<std::endl;
+        //std::cout<<"うふふ"<<std::endl;
         for(polygon_i poly : shapepiece){
             result = bg::disjoint(poly,polygon2);
             if(!result)break;
@@ -888,7 +898,7 @@ void ProbMaker::makeHint(){
         }while(!result);
         shapepiece.push_back(polygon2);
     }
-    std::cout <<"あははははは一段階目クリアだよ"<<std::endl;
+    //std::cout <<"あははははは一段階目クリアだよ"<<std::endl;
     for(polygon_i polygonZ : shapepiece){
         shapeHints += ":";
         shapeHints += std::to_string(polygonZ.outer().size() - 1);
@@ -905,7 +915,7 @@ void ProbMaker::makeHint(){
             counter++;
         }
     }
-    std::cout<<"あはは二段階目クリアだよ"<<std::endl;
+    //std::cout<<"あはは二段階目クリアだよ"<<std::endl;
     bool result_moke = false;
     do{
         int random_x = retRnd(1000000);
@@ -931,11 +941,14 @@ void ProbMaker::makeHint(){
         }
         counter++;
     }
+    /*
     std::cout <<shapeHints<<std::endl;
     for(std::string st :disposition){
         std::cout<< st <<std::endl;
         st.erase();
     }
+    */
+    std::cout <<print_polygons.size()<<" "<<mostHintsNumber<<" "<<mimHintsNumber<<" "<<count<<std::endl;
 }
 
 void ProbMaker::paintEvent(QPaintEvent *)
