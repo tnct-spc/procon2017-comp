@@ -14,8 +14,6 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
 
     connect(edited_button,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
 
-    single_polygon_display = SinglePolygonDisplay::create(polygonAdapter(polygon),"",1).get();
-    ui->verticalLayout->addWidget(single_polygon_display);
     ui->verticalLayout->addWidget(edited_button);
 }
 
@@ -26,7 +24,6 @@ imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
 
 void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
     this->polygon = polygon;
-    single_polygon_display = SinglePolygonDisplay::create(polygonAdapter(polygon),"",1).get();
 }
 
 void imagerecongnitionwithhumanpower::clickedEditedButton(){

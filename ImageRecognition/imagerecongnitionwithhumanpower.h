@@ -25,7 +25,6 @@ private:
     polygon_t polygonAdapter(procon::ExpandedPolygon polygon);
     Ui::imagerecongnitionwithhumanpower *ui;
     QPushButton *edited_button;
-    SinglePolygonDisplay *single_polygon_display;
     polygon_t polygon;
 
 private slots:
