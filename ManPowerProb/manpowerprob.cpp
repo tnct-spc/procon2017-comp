@@ -27,6 +27,7 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
     QPainter painter(this);
     const QString back_ground_color = "#EEEEBB";
     const QString frame_color = "#DDDD99";
+    const QString piece_color = "#992222";
     const int window_width = this->width();
     const int window_height = this->height();
     // 101 x 65
@@ -46,7 +47,7 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
     painter.drawRect(QRect(0,0,window_width,window_height));
 
     auto drawGrid = [&]{
-        painter.setPen(QPen(QBrush(Qt::black),0.5));
+        painter.setPen(QPen(QBrush(Qt::black),0.3));
         for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
             int x = current_col * grid_size + left_right_margin;
             painter.drawLine(x,top_bottom_margin,x,splitedheight - top_bottom_margin);
@@ -65,7 +66,7 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
             painter.drawPoint(draw_point);
             draw_points.push_back(draw_point);
         }
-        painter.setPen(QPen(QBrush(Qt::red),2.0));
+        painter.setPen(QPen(QBrush(Qt::red),1.0));
         if(draw_points.size()>1){
             for(unsigned int count=0;count<draw_points.size() - 1;++count){
                 painter.drawLine(draw_points.at(count),draw_points.at(count + 1));
@@ -75,7 +76,7 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
     };
 
     auto drawFrames = [&]{
-        painter.setPen(QPen(QBrush(Qt::black),2.0));
+        painter.setPen(QPen(QBrush(Qt::black),1.0));
         QVector<QPointF> draw_points;
         painter.setBrush(QBrush(QColor(frame_color)));
         for(auto point : not_put_part.outer()){
@@ -97,6 +98,16 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
 
     auto drawPieces = [&]{
 
+        painter.setBrush(QBrush(QColor(piece_color)));
+        QVector<QPointF> draw_points;
+        for(auto piece : pieces){
+            for(auto point : piece.outer()){
+                QPointF draw_point = translateToQPoint(point);
+                draw_points.push_back(draw_point);
+            }
+            painter.drawPolygon(draw_points);
+            draw_points.clear();
+        }
     };
 
 
