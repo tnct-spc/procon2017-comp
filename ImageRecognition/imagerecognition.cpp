@@ -418,18 +418,18 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         //描画
 //        cv::Mat pic(and_image);
 //        if (count == 0) {
-            for (auto line : pieces_lines[count]) {
-                cv::line(image, cv::Point(line[0],line[1]), cv::Point(line[2],line[3]),cv::Scalar(50.0), 5,CV_AA);
+//            for (auto line : pieces_lines[count]) {
+//                cv::line(image, cv::Point(line[0],line[1]), cv::Point(line[2],line[3]),cv::Scalar(50.0), 5,CV_AA);
 
                 //cv::imwrite("/home/spc/workspace/procon2017-image/line_image.png", and_image);
-            }
+//            }
 //        }
 
 //        lsd->drawSegments(image, pieces_lines[count]);
 //      Debug
 //        if (count == 0) {
-            cv::namedWindow(std::to_string(count+1));
-            cv::imshow(std::to_string(count+1), image);
+//            cv::namedWindow(std::to_string(count+1));
+//            cv::imshow(std::to_string(count+1), image);
 //        }
         count++;
     }
@@ -1331,7 +1331,24 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
 std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
 {
-    return position;
+    std::vector<procon::ExpandedPolygon> polygons;
+
+    std::copy(position.begin(), position.end(), std::back_inserter(polygons));
+
+    trans::rotate_transformer<bg::degree,double,2,2> deg(90);
+
+    for (auto& polygon : polygons) {
+        polygon_t p = polygon.getPolygon();
+        for (auto& point : p.outer()) {
+            point = point_t(-point.x(), point.y());
+        }
+        bg::correct(p);
+        polygon_t r;
+        bg::transform(p, r, deg);
+        polygon.resetPolygonForce(r);
+    }
+
+    return polygons;
 }
 
 void ImageRecognition::makeTable()
@@ -1359,7 +1376,7 @@ std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
 {
     std::vector<cv::Mat> piece_images;
 
-    std::vector<procon::ExpandedPolygon> polygons = ImageRecognition::getPolygonPosition();
+    std::vector<procon::ExpandedPolygon> polygons = position;
 
     int i = 0;
 
@@ -1381,7 +1398,7 @@ std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
 
 std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
 {
-    std::vector<procon::ExpandedPolygon> polygons = ImageRecognition::getPolygonPosition();
+    std::vector<procon::ExpandedPolygon> polygons = position;
     std::vector<procon::ExpandedPolygon> trans_polygon;
 
     for (auto polygon : polygons) {
