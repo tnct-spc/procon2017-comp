@@ -52,7 +52,7 @@ void TryNextSearch::clickedGoButton()
         polygons.push_back(frame.getPolygon());
     }
 
-    std::vector<polygon_i> processed_pieces;
+    std::vector<polygon_i> processed_frame;
 
     //connect wit frame
     while(true){
@@ -65,12 +65,14 @@ void TryNextSearch::clickedGoButton()
             boost::geometry::union_(polygons[0],polygons[index],out);
 
 		    if(out.size() == 1){
-			    now_prosessing_polygon = out[0];
-			    cannot_connect_piece = false;
+                cannot_connect_piece = false;
 
 			    //結合できたならpolygonsから除外していいよね
                 polygons.erase(polygons.begin() + index);
                 polygons.erase(polygons.begin());
+
+                //最後に結合したやつをまた突っ込む
+                polygons.push_back(out[0]);
             }
         }
 
@@ -79,7 +81,8 @@ void TryNextSearch::clickedGoButton()
         }
 
         if(cannot_connect_piece){
-            processed_pieces.push_back(polygons[0]);
+            processed_frame.push_back(polygons[0]);
+            polygons.erase(polygons.begin());
         }
     }
 
@@ -87,11 +90,26 @@ void TryNextSearch::clickedGoButton()
 
     std::vector<procon::NeoExpandedPolygon> not_selected_pieces = field.getPieces();
 
+    std::vector<int> delete_piece_index;
+    for(int placed_piece_index = 0; placed_piece_index < not_selected_pieces.size(); ++placed_piece_index){
+        auto index = std::find(piece_id.begin(),piece_id.end(),not_selected_pieces[placed_piece_index].getId());
+
+        if(index != piece_id.end()){
+//            not_selected_pieces.erase(not_selected_pieces.begin() + placed_piece_index);
+            delete_piece_index.push_back(placed_piece_index);
+        }
+    }
+
+    std::sort(delete_piece_index.begin(),delete_piece_index.end(),std::greater<int>());
+
+    for(auto id : delete_piece_index){
+        not_selected_pieces.erase(not_selected_pieces.begin() + id);
+    }
+
+
+    next_field.setIsPlaced(field.getIsPlaced());
+
     for(auto id : piece_id){
-        auto ichi = std::find(not_selected_pieces.begin(),not_selected_pieces.end(),field.getElementaryPieces().at(id));
-
-        not_selected_pieces.erase(ichi);
-
         next_field.setIsPlaced(id,false);
     }
 
