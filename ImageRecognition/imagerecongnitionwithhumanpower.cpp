@@ -99,6 +99,31 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
         delete[] draw_point;
     };
 
+    auto drawGrid = [&](){
+        std::vector<QPoint> points;
+        for(unsigned int a = 0; a < polygont.outer().size(); a++){
+            points.push_back(QPoint(polygont.outer()[a].x(),polygont.outer()[a].y()));
+        }
+
+        auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() > b.x(); });
+        auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.y() > b.y(); });
+
+        int grid_col = minmaxX.first->x() - minmaxX.second->x();
+        int grid_row = minmaxY.first->y() - minmaxY.second->y();
+
+        int grid_size = 10 , top_buttom_margin = 10 , left_right_margin = 10;
+
+        painter.setPen(QPen(QColor("#000000")));
+        for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
+            int x = current_col * grid_size + left_right_margin;
+            painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
+        }
+        for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
+            int y = current_row * grid_size + top_buttom_margin;
+            painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
+        }
+    };
+
     //draw piece
     int piece_size = polygon.getSize();
     std::vector<QPointF> points;
@@ -107,15 +132,5 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     }
     painter.setBrush(QBrush(QColor("#0f5ca0")));
     drawPolygon(points, 1);
-    int inner_size = polygon.getInnerSize();
-    for(int i=0;i<inner_size;i++){
-        auto inner = polygon.getPolygon().inners().at(i);
-        int piece_size = inner.size()-1;
-        std::vector<QPointF> points;
-        for(int i=0;i<piece_size;i++){
-            points.push_back(QPointF(inner[i].x(),inner[i].y()));
-        }
-        painter.setBrush(QBrush(QColor("#f4c342")));
-        drawPolygon(points,0);
-    }
+    drawGrid();
 }
