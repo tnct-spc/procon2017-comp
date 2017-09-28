@@ -14,6 +14,7 @@ ManPowerProb::ManPowerProb(QWidget *parent) :
     not_put_part_.outer().push_back(point_i(101,65));
     not_put_part_.outer().push_back(point_i(0,65));
     not_put_part_.outer().push_back(point_i(0,0));
+    bg::correct(not_put_part_);
     not_put_part.push_back(not_put_part_);
     logger = spdlog::get("ManPowerProb");
 }
@@ -74,9 +75,18 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
         draw_points.clear();
     };
 
+    auto drawFrames = [&]{
+
+    };
+
+    auto drawPieces = [&]{
+
+    };
 
 
     drawGrid();
+    drawFrames();
+    drawPieces();
     drawLastPolygon();
 }
 void ManPowerProb::mousePressEvent(QMouseEvent *event){
@@ -140,9 +150,16 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
             else{
                 if(is_frame)frames.push_back(last_polygon);
                 else pieces.push_back(last_polygon);
+                logger->info("polygonを生成しました");
             }
             last_polygon.clear();
         }
+    }
+    if(event->key() == Qt::Key_M){
+        is_frame = !is_frame;
+        logger->info(is_frame
+                     ? "changed to frame_mode"
+                     : "chenged to piece_mode");
     }
 }
 
