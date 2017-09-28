@@ -20,11 +20,14 @@ CONFIG += c++14
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    neoslaver.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    neoslaver.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    neoslaver.ui
 
 LIBS += -L/usr/lib `pkg-config --libs opencv`
 
