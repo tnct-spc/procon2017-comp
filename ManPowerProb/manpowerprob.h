@@ -27,6 +27,8 @@ public:
     ~ManPowerProb();
 
 private:
+
+    std::shared_ptr<spdlog::logger> logger;
     Ui::ManPowerProb *ui;
     QPointF getPosition(point_i point);
     int top_bottom_margin;

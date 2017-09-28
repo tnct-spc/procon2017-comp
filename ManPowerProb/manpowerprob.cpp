@@ -7,7 +7,7 @@ ManPowerProb::ManPowerProb(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
+    logger = spdlog::get("ManPowerProb");
 }
 
 ManPowerProb::~ManPowerProb()
@@ -55,6 +55,14 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
 }
 void ManPowerProb::mousePressEvent(QMouseEvent *event){
     if(event->button() == Qt::MouseButton::LeftButton){
+
+    }
+}
+
+void ManPowerProb::keyPressEvent(QKeyEvent *event){
+
+    if(event->key() == Qt::Key_A){//EnterでexportCSV
+
         std::vector<procon::NeoExpandedPolygon> neopieces;
         std::vector<procon::NeoExpandedPolygon> neoframes;
 
@@ -70,14 +78,9 @@ void ManPowerProb::mousePressEvent(QMouseEvent *event){
         }
         field.setFrame(neoframes);
         field.setElementaryPieces(neopieces);
-    }
-}
-
-void ManPowerProb::keyPressEvent(QKeyEvent *event){
-
-    if(event->key() == Qt::Key_Enter){//EnterでexportCSV
-
-        NeoPolygonIO::exportPolygon(this->field,"../humanpowerfield.csv");
+        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
+        logger->info("exported CSV");
+        std::cout << "exported CSV" << std::endl;
     }
 }
 
