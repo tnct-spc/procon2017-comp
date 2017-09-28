@@ -42,64 +42,57 @@ procon::ExpandedPolygon imagerecongnitionwithhumanpower::polygonAdapter(polygon_
 
 void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 {
-    scale = 10;
-    int window_height = this->height();
-    int window_width = this->width();
-
+    bool enlarged_polygon = false;
     QPainter painter(this);
-    painter.setPen(QPen(Qt::black, 3));
 
-    std::vector<QPointF> points;
-    for(int i=0;i<polygon.getSize();i++) points.push_back(QPointF(polygon.getPolygon().outer()[i].x(),polygon.getPolygon().outer()[i].y()));
-    double x_max,y_max,x_min,y_min;
-    int x_max_i,y_max_i,x_min_i,y_min_i;
-    x_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() > b.x();}))->x();
-    y_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() > b.y();}))->y();
-    x_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
-    y_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
-    x_max_i = ceil(x_max);
-    y_max_i = ceil(y_max);
-    x_min_i = floor(x_min);
-    y_min_i = floor(y_min);
+    const int grid_margin = 4;
 
-    auto drawPolygon = [&](){
-        int grid_margin  = 10;
-        bool enlarged_polygon = false;
+    int window_width = this->width();
+    int window_height = this->height();
 
-        int grid_col = enlarged_polygon ? 101 : x_max - x_min;
-        int grid_row = enlarged_polygon ? 65 : y_max - y_min;
+    painter.setBrush(QBrush(QColor("#E5E6DB")));
+    painter.drawRect(0,0,this->width(),this->height());
 
-        const int grid_size =
-                        window_width <= window_height
-                        ? window_width / (grid_col + grid_margin)
-                        : window_height / (grid_row + grid_margin);
-        const int top_buttom_margin = (window_height - grid_size * grid_row) / 2;
-        const int left_right_margin = (window_width - grid_size * grid_col) / 2;
+    //push_back points to std::vector<QPoint>
+    std::vector<QPoint> points;
+    for(unsigned int a = 0; a < polygont.outer().size(); a++){
+        points.push_back(QPoint(polygont.outer()[a].x(),polygont.outer()[a].y()));
+    }
 
-        std::vector<QPointF> polygon_points;
-        for(unsigned int a = 0;a < this->polygont.outer().size(); a++){
-            int x_buf = enlarged_polygon ? grid_size * polygont.outer()[a].x() + left_right_margin : grid_size * (polygont.outer()[a].x() - x_max + left_right_margin);
-            int y_buf = enlarged_polygon ? grid_size * polygont.outer()[a].y() + top_buttom_margin : grid_size * (polygont.outer()[a].y() - y_max + top_buttom_margin);
-            polygon_points.push_back(QPoint(x_buf,y_buf));
-        }
-        painter.setPen(QPen(QColor("#99CC00")));
-        painter.drawPolygon(&polygon_points.front(),polygon_points.size());
-    };
+    auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() > b.x(); });
+    auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.y() > b.y(); });
 
-    auto drawGrid = [&](){
-        int grid_size = 10 , top_buttom_margin = 10 , left_right_margin = 10;
+    int grid_col = enlarged_polygon ? 101 : minmaxX.first->x() - minmaxX.second->x();
+    int grid_row = enlarged_polygon ? 65 : minmaxY.first->y() - minmaxY.second->y();
 
-        painter.setPen(QPen(QColor("#000000")));
-        for (int current_col = x_min_i; current_col < x_max_i + 1; ++current_col) {
-            int x = current_col * grid_size + left_right_margin;
-            painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
-        }
-        for (int current_row = y_min_i; current_row < x_max_i + 1; ++current_row) {
-            int y = current_row * grid_size + top_buttom_margin;
-            painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
-        }
-    };
-    painter.setBrush(QBrush(QColor("#0f5ca0")));
-    drawPolygon();
-    drawGrid();
+    const int grid_size =
+                    window_width <= window_height
+                    ? window_width / (grid_col + grid_margin)
+                    : window_height / (grid_row + grid_margin);
+    const int top_buttom_margin = (window_height - grid_size * grid_row) / 2;
+    const int left_right_margin = (window_width - grid_size * grid_col) / 2;
+
+
+
+    painter.setBrush(QBrush(QColor("#00FFFF")));
+
+    std::vector<QPoint> polygont_points;
+    for(unsigned int a = 0;a < this->polygont.outer().size(); a++){
+        int x_buf = enlarged_polygon ? grid_size * polygont.outer()[a].x() + left_right_margin : grid_size * (polygont.outer()[a].x() - minmaxX.second->x()) + left_right_margin;
+        int y_buf = enlarged_polygon ? grid_size * polygont.outer()[a].y() + top_buttom_margin : grid_size * (polygont.outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
+        polygont_points.push_back(QPoint(x_buf,y_buf));
+    }
+    painter.setPen(QPen(QColor("#99CC00")));
+    painter.drawPolygon(&polygont_points.front(),polygont_points.size());
+
+    painter.setPen(QPen(QColor("#000000")));
+    for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
+        int x = current_col * grid_size + left_right_margin;
+        painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
+    }
+    for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
+        int y = current_row * grid_size + top_buttom_margin;
+        painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
+    }
+
 }
