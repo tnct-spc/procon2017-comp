@@ -59,11 +59,19 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
 
     auto drawLastPolygon = [&]{
         painter.setPen(QPen(QBrush(Qt::red),5.0));
+        static std::vector<QPointF> draw_points;
         for(auto point : last_polygon.outer()){
             QPointF draw_point = translateToQPoint(point);
             painter.drawPoint(draw_point);
+            draw_points.push_back(draw_point);
         }
-
+        painter.setPen(QPen(QBrush(Qt::red),2.0));
+        if(draw_points.size()>1){
+            for(unsigned int count=0;count<draw_points.size() - 1;++count){
+                painter.drawLine(draw_points.at(count),draw_points.at(count + 1));
+            }
+        }
+        draw_points.clear();
     };
 
 
