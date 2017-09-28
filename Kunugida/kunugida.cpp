@@ -9,6 +9,7 @@
 #include "polygonio.h"
 #include "http/request_mapper.h"
 #include "Algorithm/beamsearch.h"
+#include "trynextsearch.h"
 
 #include <iostream>
 #include <QDebug>
