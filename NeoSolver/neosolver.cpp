@@ -11,6 +11,8 @@ NeoSolver::NeoSolver()
     for(auto& al : Algorithms){
         connect(al, &AlgorithmWrapper::requestCSV, this, &NeoSolver::_requestCSV);
         connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
+        connect(al, &AlgorithmWrapper::requestpostCSV, this, &NeoSolver::_requestCSV);
+        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
     }
 }
 
@@ -47,4 +49,14 @@ void NeoSolver::_requestCSV()
 void NeoSolver::_requestCSVcomplete()
 {
     emit requestCSVcomplete();
+}
+
+void NeoSolver::_requestpostCSV()
+{
+    emit requestpostCSV();
+}
+
+void NeoSolver::_requestpostCSVcomplete()
+{
+    emit requestpostCSVcomplete();
 }

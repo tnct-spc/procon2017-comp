@@ -29,6 +29,7 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     connect(this, SIGNAL(requestCSV()), this, SLOT(getCSV()));
+    connect(this, SIGNAL(requestpostCSV()), this, SLOT(postCSV()));
     manager = new QNetworkAccessManager(this);
 
     board = std::make_shared<NeoAnswerBoard>();
@@ -142,8 +143,8 @@ void Kunugida::run()
 
         board->setScannedPieces(scanned_dummy_piece);
 
-        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        emit requestCSV();
+        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/post.csv");
+        emit requestpostCSV();
         NeoPolygonIO::importField("../../procon2017-comp/field.csv");
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
@@ -246,8 +247,6 @@ void Kunugida::run()
 
 #endif
 
-    //    QRLibrary lib;
-    //    lib.Decoder(true);
     this->finishedProcess();
 }
 
@@ -301,6 +300,14 @@ void Kunugida::getCSV()
     if(!file.open(QIODevice::WriteOnly))
         return;
     manager->get(QNetworkRequest(QUrl("http://localhost:8016/get")));
+}
+
+void Kunugida::postCSV()
+{
+    file.setFileName("../../procon2017-comp/post.csv");
+    if(!file.open(QIODevice::ReadOnly))
+        return;
+    manager->post(QNetworkRequest(QUrl("http://localhost:8016/answer")), &file);
 }
 
 void Kunugida::replyFinished(QNetworkReply *reply)

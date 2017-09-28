@@ -33,6 +33,7 @@ public:
 signals:
     void requestCSV();
     void requestCSVcomplete();
+    void requestpostCSV();
 
 private:
     Ui::Kunugida *ui;
@@ -51,6 +52,7 @@ private:
 
 public slots:
     void getCSV();
+    void postCSV();
 
 private slots:
     void clickedRunButton();
