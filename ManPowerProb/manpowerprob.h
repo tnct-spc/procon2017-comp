@@ -41,6 +41,7 @@ private:
     std::vector<polygon_i> pieces;
     std::vector<polygon_i> frames;
     bool is_frame = true;
+    polygon_i not_put_part;
 
 
     polygon_i last_polygon;

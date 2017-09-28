@@ -9,6 +9,12 @@ ManPowerProb::ManPowerProb(QWidget *parent) :
     standard_pos.set<0>(50);
     standard_pos.set<1>(32);
     logger = spdlog::get("ManPowerProb");
+    not_put_part.outer().push_back(point_i(0,0));
+    not_put_part.outer().push_back(point_i(101,0));
+    not_put_part.outer().push_back(point_i(101,65));
+    not_put_part.outer().push_back(point_i(0,65));
+    not_put_part.outer().push_back(point_i(0,0));
+    bg::correct(not_put_part);
 }
 
 ManPowerProb::~ManPowerProb()
@@ -20,7 +26,7 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
 
     QPainter painter(this);
     const QString back_ground_color = "#EEEEBB";
-    const QString frame_color = "#EEEEEE";
+    const QString frame_color = "#DDDD99";
     const int window_width = this->width();
     const int window_height = this->height();
     // 101 x 65
@@ -70,8 +76,15 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
 
     auto drawFrames = [&]{
         painter.setPen(QPen(QBrush(Qt::black),2.0));
-        painter.setBrush(QBrush(QColor(frame_color)));
         QVector<QPointF> draw_points;
+        painter.setBrush(QBrush(QColor(frame_color)));
+        for(auto point : not_put_part.outer()){
+            QPointF draw_point = translateToQPoint(point);
+            draw_points.push_back(draw_point);
+        }
+        painter.drawPolygon(draw_points);
+        draw_points.clear();
+        painter.setBrush(QBrush(QColor(back_ground_color)));
         for(auto frame : frames){
             for(auto point : frame.outer()){
                 QPointF draw_point = translateToQPoint(point);
@@ -129,6 +142,10 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
             neopieces.push_back(neopiece);
         }
         procon::NeoExpandedPolygon neoframe;
+        if(frames.size()){
+
+            frames.push_back(not_put_part);
+        }
         for(auto frame : frames){
             neoframe.resetPolygonForce(frame);
             neoframes.push_back(neoframe);
@@ -164,14 +181,6 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
 
 bool ManPowerProb::checkCanPlace(polygon_i poly){
     if(frames.size()){//フレームが無い時
-
-        polygon_i not_put_part;
-        not_put_part.outer().push_back(point_i(0,0));
-        not_put_part.outer().push_back(point_i(101,0));
-        not_put_part.outer().push_back(point_i(101,65));
-        not_put_part.outer().push_back(point_i(0,65));
-        not_put_part.outer().push_back(point_i(0,0));
-        bg::correct(not_put_part);
         if(!bg::intersects(not_put_part,poly))return false;
     }else{
         bool frame_flag=false;
@@ -188,14 +197,6 @@ bool ManPowerProb::checkCanPlace(polygon_i poly){
 
 bool ManPowerProb::checkCanPlace(point_i point){
     if(frames.size()){//フレームが無い時
-
-        polygon_i not_put_part;
-        not_put_part.outer().push_back(point_i(0,0));
-        not_put_part.outer().push_back(point_i(101,0));
-        not_put_part.outer().push_back(point_i(101,65));
-        not_put_part.outer().push_back(point_i(0,65));
-        not_put_part.outer().push_back(point_i(0,0));
-        bg::correct(not_put_part);
         if(!bg::intersects(not_put_part,point))return false;
     }else{
         bool frame_flag=false;
