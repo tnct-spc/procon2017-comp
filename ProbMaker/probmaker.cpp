@@ -730,6 +730,7 @@ void ProbMaker::makeHint(){
     do{
         count = 0;
         std::vector<polygon_i> piece = print_polygons;
+        disposition.clear();
     for(int k = 0;k < Hintnum;k++){
         //std::cout<<"ループ突入"<<std::endl;
         int hoge = retRnd(3) + 3;
@@ -941,13 +942,11 @@ void ProbMaker::makeHint(){
         }
         counter++;
     }
-    /*
     std::cout <<shapeHints<<std::endl;
     for(std::string st :disposition){
         std::cout<< st <<std::endl;
         st.erase();
     }
-    */
     std::cout <<print_polygons.size()<<" "<<mostHintsNumber<<" "<<mimHintsNumber<<" "<<count<<std::endl;
 }
 
