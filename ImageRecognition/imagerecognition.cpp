@@ -91,6 +91,20 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
+    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
+    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
+
+    int count = 0;
+    for (auto polygon : pfi) {
+        polygon_t p = polygon.getPolygon();
+        for (unsigned int i=0; i<p.outer().size()-1; i++) {
+            cv::line(pimage.at(count), cv::Point(p.outer().at(i).x(),p.outer().at(i).y()), cv::Point(p.outer().at(i+1).x(), p.outer().at(i+1).y()),cv::Scalar(50.0), 5,CV_AA);
+        }
+        cv::namedWindow(std::to_string(count));
+        cv::imshow(std::to_string(count), pimage.at(count));
+        count++;
+    }
+
 //    double scale_len;
 //    for (auto piece : polygons) {
 //        if (piece.outer().size() == 5) {
@@ -651,32 +665,34 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
         if (frame_flag == true){
 
+            scale = 437.0 / 5150.0;
+
             // pick up 3 long line
-            std::vector<cv::Vec4f> sorted;
-            double longgest = 1000000;
+//            std::vector<cv::Vec4f> sorted;
+//            double longgest = 1000000;
 
-            for (int i=0; i<3; i++) {
-                cv::Vec4f box;
-                double shorter = 0;
-                for (auto line : piece_lines) {
-                    double len = calcDistance(line[0],line[1],line[2],line[3]);
-                    if ((shorter < len) && (longgest > len)) {
-                        shorter = len;
-                        box = line;
-                    }
-                }
-                sorted.push_back(box);
-                longgest = shorter;
-            }
+//            for (int i=0; i<3; i++) {
+//                cv::Vec4f box;
+//                double shorter = 0;
+//                for (auto line : piece_lines) {
+//                    double len = calcDistance(line[0],line[1],line[2],line[3]);
+//                    if ((shorter < len) && (longgest > len)) {
+//                        shorter = len;
+//                        box = line;
+//                    }
+//                }
+//                sorted.push_back(box);
+//                longgest = shorter;
+//            }
 
-            for (int i=0; i<3; i++) {
-                double len1 = calcDistance(sorted.at(i)[0],sorted.at(i)[1],sorted.at(i)[2],sorted.at(i)[3]);
-                double len2 = calcDistance(sorted.at((i+1)%3)[0],sorted.at((i+1)%3)[1],sorted.at((i+1)%3)[2],sorted.at((i+1)%3)[3]);
-                if (fabs(len1-len2) < 100) { // regulation
-                    scale = 297.0 * 2 / (len1 + len2);
-                    break;
-                }
-            }
+//            for (int i=0; i<3; i++) {
+//                double len1 = calcDistance(sorted.at(i)[0],sorted.at(i)[1],sorted.at(i)[2],sorted.at(i)[3]);
+//                double len2 = calcDistance(sorted.at((i+1)%3)[0],sorted.at((i+1)%3)[1],sorted.at((i+1)%3)[2],sorted.at((i+1)%3)[3]);
+//                if (fabs(len1-len2) < 100) { // regulation
+//                    scale = 297.0 * 2 / (len1 + len2);
+//                    break;
+//                }
+//            }
 
             //謎の長さtoセンチメートル→ミリメートル
             //scaleを頑張って測る
@@ -896,7 +912,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
             int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if ((h > 0 && h < 50) && s > 90 && v > 100) { // (h > 0 && h < 50) && s > 90 && v > 100
+            if ((h > 0 && h < 60) && s > 60 && v > 60) { // (h > 0 && h < 50) && s > 90 && v > 100
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -999,80 +1015,80 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     polygon_i grid_piece;
     grid_piece.outer().push_back(point_i(0,0));
 
-//    // 1cm以下の辺があったら削除
-//    polygon.pop_back();
-//    for (unsigned int i=0; i<polygon.size(); i++) {
+    // 1cm以下の辺があったら削除
+    polygon.pop_back();
+    for (unsigned int i=0; i<polygon.size(); i++) {
 
-//        double x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
-//        double y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
+        double x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
+        double y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
 
-//        double len = hypot(x, y);
+        double len = hypot(x, y);
 
-//        double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
-//        double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
+        double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
+        double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
 
-    //        printf("%f\n", acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI);
+            printf("%f\n", acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI);
 
-//        if (len < 1.0) {
+        if (len < 1.0) {
 
-//            // 異常に短いものは一つに結合
-//            polygon.at((i+1)%polygon.size()) = point_t(polygon.at((i+1)%polygon.size()).x() + x * 0.5, polygon.at((i+1)%polygon.size()).y() + y * 0.5);
-//            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
-//            i--;
+            // 異常に短いものは一つに結合
+            polygon.at((i+1)%polygon.size()) = point_t(polygon.at((i+1)%polygon.size()).x() + x * 0.5, polygon.at((i+1)%polygon.size()).y() + y * 0.5);
+            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+            i--;
 
-//        } else if (len < 3.5) {
+        } else if (len < 3.5) {
 
-//            // 外積を用いて交点を求める
-//            double a1x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+3)%polygon.size()).x();
-//            double a1y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+3)%polygon.size()).y();
-//            double b2x = polygon.at(i).x() - polygon.at((i+3)%polygon.size()).x();
-//            double b2y = polygon.at(i).y() - polygon.at((i+3)%polygon.size()).y();
-//            double S1 = (a1x * b2y - a1y * b2x) * 0.5;
+            // 外積を用いて交点を求める
+            double a1x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+3)%polygon.size()).x();
+            double a1y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+3)%polygon.size()).y();
+            double b2x = polygon.at(i).x() - polygon.at((i+3)%polygon.size()).x();
+            double b2y = polygon.at(i).y() - polygon.at((i+3)%polygon.size()).y();
+            double S1 = (a1x * b2y - a1y * b2x) * 0.5;
 
-//            double b1x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
-//            double b1y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
-//            double S2 = (a1x * b1y - a1y * b1x) * 0.5;
+            double b1x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
+            double b1y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
+            double S2 = (a1x * b1y - a1y * b1x) * 0.5;
 
-//            double a2x = polygon.at((i+1)%polygon.size()).x() - polygon.at(i).x();
-//            double a2y = polygon.at((i+1)%polygon.size()).y() - polygon.at(i).y();
+            double a2x = polygon.at((i+1)%polygon.size()).x() - polygon.at(i).x();
+            double a2y = polygon.at((i+1)%polygon.size()).y() - polygon.at(i).y();
 
-//            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 170 * M_PI / 180.0) {
+            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 170 * M_PI / 180.0) {
 
-//                polygon.erase(polygon.begin() + (i + 1) % polygon.size());
-//                polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+                polygon.erase(polygon.begin() + (i + 1) % polygon.size());
+                polygon.erase(polygon.begin() + (i + 2) % polygon.size());
 
-//                // 点が2つ減ったのでもう一度同じ点から見直す
-//                if ((i+1)%polygon.size() == 0) {
-//                    i = i - 3;
-//                } else if ((i+2)%polygon.size() == 0){
-//                    i = i - 2;
-//                } else {
-//                    i--;
-//                }
+                // 点が2つ減ったのでもう一度同じ点から見直す
+                if ((i+1)%polygon.size() == 0) {
+                    i = i - 3;
+                } else if ((i+2)%polygon.size() == 0){
+                    i = i - 2;
+                } else {
+                    i--;
+                }
 
-//            } else {
+            } else {
 
-//                double inter_x = polygon.at(i).x() + a2x * S1 / (S1 + S2);
-//                double inter_y = polygon.at(i).y() + a2y * S1 / (S1 + S2);
+                double inter_x = polygon.at(i).x() + a2x * S1 / (S1 + S2);
+                double inter_y = polygon.at(i).y() + a2y * S1 / (S1 + S2);
 
-//                // 短い辺をはさむ2点を交点に置き換える
-//                polygon.at((i+1)%polygon.size()) = point_t(inter_x, inter_y);
-//                polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+                // 短い辺をはさむ2点を交点に置き換える
+                polygon.at((i+1)%polygon.size()) = point_t(inter_x, inter_y);
+                polygon.erase(polygon.begin() + (i + 2) % polygon.size());
 
-//                // 点が1つ減ったのでもう一度同じ点から見直す
-//                if ((i+2)%polygon.size() < i) {
-//                    i = i - 2;
-//                } else {
-//                    i--;
-//                }
-//            }
-//        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 7) {
+                // 点が1つ減ったのでもう一度同じ点から見直す
+                if ((i+2)%polygon.size() < i) {
+                    i = i - 2;
+                } else {
+                    i--;
+                }
+            }
+        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 7) {
 
-//            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
-//            i--;
-//        }
-//    }
-//    polygon.push_back(polygon.at(0));
+            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+            i--;
+        }
+    }
+    polygon.push_back(polygon.at(0));
 
     // ９０度の角を持つピースはそこを基準に計算
     bool right_angle = false;
