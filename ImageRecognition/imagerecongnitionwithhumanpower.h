@@ -18,17 +18,22 @@ public:
     explicit imagerecongnitionwithhumanpower(QWidget *parent = 0);
     ~imagerecongnitionwithhumanpower();
 
-    void setPolygon(polygon_t polygon);
+    void setPolygon(polygon_t polygont);
 
 private:
-    procon::ExpandedPolygon polygonAdapter(polygon_t polygon);
-    polygon_t polygonAdapter(procon::ExpandedPolygon polygon);
     Ui::imagerecongnitionwithhumanpower *ui;
+
+    procon::ExpandedPolygon polygonAdapter(polygon_t polygont);
+    polygon_t polygonAdapter(procon::ExpandedPolygon polygont);
     QPushButton *edited_button;
-    polygon_t polygon;
+    polygon_t polygont;
+    procon::ExpandedPolygon polygon;
+    int scale = 7;
 
 private slots:
     void clickedEditedButton();
+protected:
+    void paintEvent(QPaintEvent *);
 };
 
 #endif // IMAGERECONGNITIONWITHHUMANPOWER_H
