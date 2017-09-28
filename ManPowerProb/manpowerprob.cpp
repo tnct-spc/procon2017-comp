@@ -8,14 +8,6 @@ ManPowerProb::ManPowerProb(QWidget *parent) :
     ui->setupUi(this);
     standard_pos.set<0>(50);
     standard_pos.set<1>(32);
-    polygon_i not_put_part_;
-    not_put_part_.outer().push_back(point_i(0,0));
-    not_put_part_.outer().push_back(point_i(101,0));
-    not_put_part_.outer().push_back(point_i(101,65));
-    not_put_part_.outer().push_back(point_i(0,65));
-    not_put_part_.outer().push_back(point_i(0,0));
-    bg::correct(not_put_part_);
-    not_put_part.push_back(not_put_part_);
     logger = spdlog::get("ManPowerProb");
 }
 
@@ -27,7 +19,8 @@ ManPowerProb::~ManPowerProb()
 void ManPowerProb::paintEvent(QPaintEvent *event){
 
     QPainter painter(this);
-    const QString back_ground_color = "#EEEEEE";
+    const QString back_ground_color = "#EEEEBB";
+    const QString frame_color = "#EEEEEE";
     const int window_width = this->width();
     const int window_height = this->height();
     // 101 x 65
@@ -60,7 +53,7 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
 
     auto drawLastPolygon = [&]{
         painter.setPen(QPen(QBrush(Qt::red),5.0));
-        static std::vector<QPointF> draw_points;
+        std::vector<QPointF> draw_points;
         for(auto point : last_polygon.outer()){
             QPointF draw_point = translateToQPoint(point);
             painter.drawPoint(draw_point);
@@ -76,7 +69,17 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
     };
 
     auto drawFrames = [&]{
-
+        painter.setPen(QPen(QBrush(Qt::black),2.0));
+        painter.setBrush(QBrush(QColor(frame_color)));
+        QVector<QPointF> draw_points;
+        for(auto frame : frames){
+            for(auto point : frame.outer()){
+                QPointF draw_point = translateToQPoint(point);
+                draw_points.push_back(draw_point);
+            }
+            painter.drawPolygon(draw_points);
+            draw_points.clear();
+        }
     };
 
     auto drawPieces = [&]{
@@ -84,10 +87,10 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
     };
 
 
-    drawGrid();
     drawFrames();
     drawPieces();
     drawLastPolygon();
+    drawGrid();
 }
 void ManPowerProb::mousePressEvent(QMouseEvent *event){
     if(event->button() == Qt::MouseButton::LeftButton){
@@ -95,12 +98,7 @@ void ManPowerProb::mousePressEvent(QMouseEvent *event){
         point_i clicked = translateToPointi(clickedposition);
 
 
-        //交点を出すやつ
-        bool intersect_flag=false;//falseのままなら範囲外にある
-        for(auto poly : not_put_part){
-            if(bg::intersects(poly , clicked))intersect_flag=true;
-        }
-        if(!intersect_flag)logger->error("範囲外を指定しています");
+        if(checkCanPlace(clicked))logger->error("範囲外を指定しています");
         else{
             last_polygon.outer().push_back(clicked);
         }
@@ -161,6 +159,55 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
                      ? "changed to frame_mode"
                      : "chenged to piece_mode");
     }
+    this->update();
+}
+
+bool ManPowerProb::checkCanPlace(polygon_i poly){
+    if(frames.size()){//フレームが無い時
+
+        polygon_i not_put_part;
+        not_put_part.outer().push_back(point_i(0,0));
+        not_put_part.outer().push_back(point_i(101,0));
+        not_put_part.outer().push_back(point_i(101,65));
+        not_put_part.outer().push_back(point_i(0,65));
+        not_put_part.outer().push_back(point_i(0,0));
+        bg::correct(not_put_part);
+        if(!bg::intersects(not_put_part,poly))return false;
+    }else{
+        bool frame_flag=false;
+        for(auto frame : frames){
+            if(bg::intersects(frame,poly))frame_flag=true;
+        }
+        if(!frame_flag)return false;
+    }
+    for(auto piece : pieces){
+        if(bg::intersects(piece,poly))return false;
+    }
+    return true;
+}
+
+bool ManPowerProb::checkCanPlace(point_i point){
+    if(frames.size()){//フレームが無い時
+
+        polygon_i not_put_part;
+        not_put_part.outer().push_back(point_i(0,0));
+        not_put_part.outer().push_back(point_i(101,0));
+        not_put_part.outer().push_back(point_i(101,65));
+        not_put_part.outer().push_back(point_i(0,65));
+        not_put_part.outer().push_back(point_i(0,0));
+        bg::correct(not_put_part);
+        if(!bg::intersects(not_put_part,point))return false;
+    }else{
+        bool frame_flag=false;
+        for(auto frame : frames){
+            if(bg::intersects(frame,point))frame_flag=true;
+        }
+        if(!frame_flag)return false;
+    }
+    for(auto piece : pieces){
+        if(bg::intersects(piece,point))return false;
+    }
+    return true;
 }
 
 QPointF ManPowerProb::translateToQPoint(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
