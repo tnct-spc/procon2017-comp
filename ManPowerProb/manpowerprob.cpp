@@ -6,7 +6,15 @@ ManPowerProb::ManPowerProb(QWidget *parent) :
     ui(new Ui::ManPowerProb)
 {
     ui->setupUi(this);
-
+    standard_pos.set<0>(50);
+    standard_pos.set<1>(32);
+    polygon_i not_put_part_;
+    not_put_part_.outer().push_back(point_i(0,0));
+    not_put_part_.outer().push_back(point_i(101,0));
+    not_put_part_.outer().push_back(point_i(101,65));
+    not_put_part_.outer().push_back(point_i(0,65));
+    not_put_part_.outer().push_back(point_i(0,0));
+    not_put_part.push_back(not_put_part_);
     logger = spdlog::get("ManPowerProb");
 }
 
@@ -49,22 +57,45 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
         }
     };
 
+    auto drawLastPolygon = [&]{
+        painter.setPen(QPen(QBrush(Qt::red),5.0));
+        for(auto point : last_polygon.outer()){
+            QPointF draw_point = translateToQPoint(point);
+            painter.drawPoint(draw_point);
+        }
+
+    };
+
 
 
     drawGrid();
+    drawLastPolygon();
 }
 void ManPowerProb::mousePressEvent(QMouseEvent *event){
     if(event->button() == Qt::MouseButton::LeftButton){
         QPointF clickedposition = event->pos();
         point_i clicked = translateToPointi(clickedposition);
+
+
+        //交点を出すやつ
+        bool intersect_flag=false;//falseのままなら範囲外にある
+        for(auto poly : not_put_part){
+            if(bg::intersects(poly , clicked))intersect_flag=true;
+        }
+        if(!intersect_flag)logger->error("範囲外を指定しています");
+        else{
+            last_polygon.outer().push_back(clicked);
+        }
+        /*
         last_polygon.outer().push_back(clicked);
+
         if(last_polygon.outer().size()>2){
             if(bg::equals( last_polygon.outer().at(0) , last_polygon.outer().at(last_polygon.outer().size()))){
 
-                bg::correct(last_poygon);
+                bg::correct(last_polygon);
             }
         }
-
+        */
         this->update();
     }
 }
@@ -90,6 +121,20 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         field.setElementaryPieces(neopieces);
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
         logger->info("exported CSV");
+    }
+
+    if(event->key() == Qt::Key_L){
+        if(last_polygon.outer().size() < 3)logger->error("始点と終点を結ぶことができません");
+        else{
+            last_polygon.outer().push_back(last_polygon.outer().at(0));
+            bg::correct(last_polygon);
+            if(!bg::is_valid(last_polygon))logger->error("ポリゴンが不自然な形になっています");
+            else{
+                if(is_frame)frames.push_back(last_polygon);
+                else pieces.push_back(last_polygon);
+            }
+            last_polygon.clear();
+        }
     }
 }
 

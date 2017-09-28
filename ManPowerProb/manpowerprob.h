@@ -38,8 +38,11 @@ private:
     procon::NeoField field;
     std::vector<polygon_i> pieces;
     std::vector<polygon_i> frames;
+    bool is_frame = false;
 
     polygon_i last_polygon;
+    point_i standard_pos;
+    std::vector<polygon_i> not_put_part;
 
 
 protected:
