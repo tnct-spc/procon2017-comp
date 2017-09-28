@@ -76,14 +76,30 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
-    std::vector<QPoint> polygont_points;
+    std::vector<QPoint> polygon_points;
     for(unsigned int a = 0;a < this->polygont.outer().size(); a++){
         int x_buf = enlarged_polygon ? grid_size * polygont.outer()[a].x() + left_right_margin : grid_size * (polygont.outer()[a].x() - minmaxX.second->x()) + left_right_margin;
         int y_buf = enlarged_polygon ? grid_size * polygont.outer()[a].y() + top_buttom_margin : grid_size * (polygont.outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
-        polygont_points.push_back(QPoint(x_buf,y_buf));
+        polygon_points.push_back(QPoint(x_buf,y_buf));
     }
     painter.setPen(QPen(QColor("#99CC00")));
-    painter.drawPolygon(&polygont_points.front(),polygont_points.size());
+    painter.drawPolygon(&polygon_points.front(),polygon_points.size());
+
+    painter.setPen(QPen(QColor("#F15A22")));
+    QFont font;
+    font.setPixelSize(20);
+    painter.setFont(font);
+    QString str;
+    for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
+        str += QString::number(point_index);
+        str += "(";
+        str += QString::number(polygon_points[point_index].x());
+        str += ",";
+        str += QString::number(polygon_points[point_index].y());
+        str += ")";
+        painter.drawText(polygon_points[point_index] ,str);
+    }
+
 
     painter.setPen(QPen(QColor("#000000")));
     for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
