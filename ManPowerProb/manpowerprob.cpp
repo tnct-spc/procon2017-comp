@@ -55,7 +55,17 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
 }
 void ManPowerProb::mousePressEvent(QMouseEvent *event){
     if(event->button() == Qt::MouseButton::LeftButton){
+        QPointF clickedposition = event->pos();
+        point_i clicked = translateToPointi(clickedposition);
+        last_polygon.outer().push_back(clicked);
+        if(last_polygon.outer().size()>2){
+            if(bg::equals( last_polygon.outer().at(0) , last_polygon.outer().at(last_polygon.outer().size()))){
 
+                bg::correct(last_poygon);
+            }
+        }
+
+        this->update();
     }
 }
 
@@ -80,12 +90,22 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         field.setElementaryPieces(neopieces);
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
         logger->info("exported CSV");
-        std::cout << "exported CSV" << std::endl;
     }
 }
 
-QPointF ManPowerProb::getPosition(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
+QPointF ManPowerProb::translateToQPoint(point_i point){//point_iを上画面のgridと対応させるようにQPointFに変換する
     int pointx = point.x();
     int pointy = point.y();
     return QPointF(left_right_margin + pointx * grid_size, top_bottom_margin + pointy * grid_size);
+}
+
+point_i ManPowerProb::translateToPointi(QPointF point){//point_iを上画面のgridと対応させるようにQPointFに変換する
+    //QPointF→point_iへの変換
+
+    int pointx = point.x() - left_right_margin;
+    int pointy = point.y() - top_bottom_margin;
+
+    point_i clickedpos( pointx / grid_size, pointy / grid_size);
+    std::cout << bg::dsv(clickedpos) << std::endl;
+    return clickedpos;
 }

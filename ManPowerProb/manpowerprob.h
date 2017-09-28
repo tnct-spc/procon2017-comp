@@ -30,13 +30,16 @@ private:
 
     std::shared_ptr<spdlog::logger> logger;
     Ui::ManPowerProb *ui;
-    QPointF getPosition(point_i point);
+    QPointF translateToQPoint(point_i point);
+    point_i translateToPointi(QPointF point);
     int top_bottom_margin;
     int left_right_margin;
     int grid_size;
     procon::NeoField field;
     std::vector<polygon_i> pieces;
     std::vector<polygon_i> frames;
+
+    polygon_i last_polygon;
 
 
 protected:
