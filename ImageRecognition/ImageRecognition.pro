@@ -18,10 +18,12 @@ PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
 DEFINES += IMAGERECOGNITION_LIBRARY
 
-SOURCES += imagerecognition.cpp
+SOURCES += imagerecognition.cpp \
+    imagerecongnitionwithhumanpower.cpp
 
 HEADERS += imagerecognition.h\
-        imagerecognition_global.h
+        imagerecognition_global.h \
+    imagerecongnitionwithhumanpower.h
 
 LIBS += -L/usr/lib `pkg-config --libs opencv`
 
@@ -43,3 +45,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Utilities/ -lUtilities
 
 INCLUDEPATH += $$PWD/../Utilities
 DEPENDPATH += $$PWD/../Utilities
+
+FORMS += \
+    imagerecongnitionwithhumanpower.ui
