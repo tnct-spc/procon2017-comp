@@ -5,6 +5,7 @@
 #include "Utils/polygonconnector.h"
 #include "Evaluation/evaluation.h"
 #include "parallel.h"
+#include "trynextsearch.h"
 
 #include <math.h>
 #include <thread>
@@ -136,6 +137,10 @@ BeamSearch::BeamSearch()
 //    logger = spdlog::get("beamsearch");
     dock = std::make_shared<NeoAnswerDock>();
     dock->show();
+
+    //test
+    neo = std::make_shared<NeoAnswerDock>();
+    neo->show();
 
     cpu_num = std::thread::hardware_concurrency();
 }
@@ -1061,7 +1066,7 @@ void BeamSearch::run(procon::NeoField field)
 
         logger->info("making field process has finished");
 
-        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() << std::endl;
+        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() - field.getPieces().size() << std::endl;
         std::cout << "evaluated state size:" << ev.size() << std::endl;
         std::cout << "field size:" << state.size() << std::endl;
 
@@ -1081,6 +1086,10 @@ void BeamSearch::run(procon::NeoField field)
             }
         }
 
+        if(flag){
+            last_fields.clear();
+            std::copy(state.begin(),state.end(),std::back_inserter(last_fields));
+        }
 //        if(piece_num == 4){
 //            break;
 //        }
@@ -1097,5 +1106,89 @@ void BeamSearch::run(procon::NeoField field)
     //        neo->addAnswer(f);
     //    }
     //    test();
+
+//#define DEBUG
+#ifdef DEBUG
+    if(true){
+#else
+    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+#endif
+        TryNextSearch *next = new TryNextSearch();
+        next->setField(last_fields.at(0));
+        next->show();
+
+        connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
+            this->tryNextBeamSearch(next_field);
+        });
+    }
+}
+
+void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
+{
+    std::cout << "called next beamsearch slot" << std::endl;
+
+    //時間計測
+    std::chrono::system_clock::time_point start,end;
+    start = std::chrono::system_clock::now();
+
+    std::vector<procon::NeoField> state;
+
+    dock->addAnswer(next_field);
+
+    state.push_back(next_field);
+
+//    ev.resize(2000000);
+    for (int piece_num = 0; piece_num < static_cast<int>(next_field.getElementaryPieces().size() - next_field.getPieces().size()); ++piece_num) {
+        std::vector<Evaluate> ev;
+
+        logger->info("next step start");
+
+        evaluateNextState(state,ev);
+
+        logger->info("evaluating field process has finished");
+
+        makeNextState(state,ev);
+
+        logger->info("making field process has finished");
+
+        std::cout << "now" << (piece_num + 1) << "/" << next_field.getElementaryPieces().size() << std::endl;
+        std::cout << "evaluated state size:" << ev.size() << std::endl;
+        std::cout << "field size:" << state.size() << std::endl;
+
+        //vectorのメモリ解放って頭悪くね？
+        std::vector<Evaluate>().swap(ev);
+
+        bool flag = false;
+        for(auto const& _field : state){
+            neo->addAnswer(_field);
+            if(!flag){
+                submitAnswer(_field);
+                flag = true;
+            }
+        }
+
+        if(flag){
+            last_fields.clear();
+            std::copy(state.begin(),state.end(),std::back_inserter(last_fields));
+        }
+//        if(piece_num == 4){
+//            break;
+//        }
+    }
+
+    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+        TryNextSearch *next = new TryNextSearch();
+        next->setField(last_fields.at(0));
+        next->show();
+
+        connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
+            this->tryNextBeamSearch(next_field);
+        });
+    }
+
+    end = std::chrono::system_clock::now();
+    double time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+
+    logger->warn("elapsed time: "+ std::to_string(time));
 }
 

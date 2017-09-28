@@ -36,11 +36,14 @@ public:
     void setText(std::string text);
     void setScannedPieces(std::vector<procon::ExpandedPolygon> vec);
     void setUp();
+    void setSelectPieceMode(bool mode);
+
+    std::vector<int> getSelectedPieceId();
 
 private:
     int frame_margin;
 //    int clickedpiece_id=-1;
-    std::vector<unsigned int> clicked_piece_id;
+    std::vector<int> clicked_piece_id;
 
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
@@ -60,6 +63,7 @@ private:
     bool singleif = false;
     int piece_size = 1;
     bool allif = true;
+    bool select_piece_mode = false;
 
     //make id_list
     std::vector<polygon_i> polygon_list;
