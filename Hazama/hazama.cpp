@@ -230,14 +230,14 @@ void Hazama::run()
         }
 
         // Image detect
-        PDATA = imrec.run(raw_frame, nocpieces);
+//        PDATA = imrec.run(raw_frame, nocpieces);
 
         // Set raw image data
         AnswerBoard::setRawPicture(imrec.getRawPiecesPic(), imrec.getRawPiecesPos());
         AnswerBoard::setRandomColors(imrec.getRawRandomColors());
 
     } else if (ui->useFileData->isChecked()) {
-        PDATA = procon::PolygonIO::importPolygon(path);
+//        PDATA = procon::PolygonIO::importPolygon(path);
 
     } else {
         return;

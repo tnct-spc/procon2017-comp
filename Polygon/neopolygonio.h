@@ -2,6 +2,7 @@
 #define NEOPOLYGONIO_H
 
 #include "neofield.h"
+#include "Evaluation/evaluate.h"
 
 class NeoPolygonIO
 {

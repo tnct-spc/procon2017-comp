@@ -6,6 +6,7 @@
 #include "neosolver.h"
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
+#include "polygonio.h"
 #include "http/request_mapper.h"
 #include "Algorithm/beamsearch.h"
 
@@ -23,7 +24,7 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
 
-//    imageRecognitonTest();
+    //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
@@ -32,6 +33,8 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     board->show();
+    //    board->setSingleMode(true);
+//    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -45,6 +48,29 @@ void Kunugida::run()
 
     procon::NeoField field;
 
+    auto polygoniToExpanded = [](std::vector<polygon_i> pieces_,std::vector<int> id_list){
+
+
+        std::vector<procon::ExpandedPolygon> expanded_pieces;
+        int id = 0;
+        for(auto &piece_i : pieces_){
+            polygon_t piece_t;
+            for(auto &point : piece_i.outer()){
+                int double_point_x = point.x();
+                int double_point_y = point.y();
+                piece_t.outer().push_back(point_t(double_point_x,double_point_y));
+            }
+            bg::correct(piece_t);
+
+            procon::ExpandedPolygon ex_poly(id_list.at(id));
+            ex_poly.resetPolygonForce(piece_t);
+            expanded_pieces.push_back(ex_poly);
+            id++;
+        }
+
+        return expanded_pieces;
+
+    };
     // Server
     QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
 
@@ -61,10 +87,32 @@ void Kunugida::run()
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();
 
+//#define SHOW_ANGLE
+#ifdef SHOW_ANGLE
+        std::cout << "angles ->" << std::endl;
+        std::vector<double> angles;
+        for(polygon_i piece : pieces_) {
+            procon::NeoExpandedPolygon neoPiece;
+            neoPiece.resetPolygonForce(piece);
+            for(double angle : neoPiece.getSideAngle()) {
+                angle = (angle / M_PI) * 180;
+                angles.push_back(angle);
+            }
+        }
+
+        std::sort(angles.begin(), angles.end());
+
+        for(double angle : angles) {
+            std::cout << angle << ", ";
+        }
+        std::cout << std::endl << std::endl;
+    }
+#else
+
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
 
-        int id = 1;
+        int id = 0;
         for(auto& piece : pieces_){
             procon::NeoExpandedPolygon buf(id);
             buf.resetPolygonForce(piece);
@@ -79,10 +127,24 @@ void Kunugida::run()
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
 
+        int scanned_dummy_piece_id = 0;
+        std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
+        for(auto polygon : pieces){
+            polygon_t poly_buf;
+            for(auto p : polygon.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+            procon::ExpandedPolygon ex_buf(scanned_dummy_piece_id);
+            ex_buf.resetPolygonForce(poly_buf);
+            scanned_dummy_piece.push_back(ex_buf);
+            ++scanned_dummy_piece_id;
+        }
+
+        board->setScannedPieces(scanned_dummy_piece);
+
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
         emit requestCSV();
         NeoPolygonIO::importField("../../procon2017-comp/field.csv");
-        int i = 1;
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -91,8 +153,82 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
+        cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame.png", 1);
+        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pices.png", 1);
+
+        ImageRecognition imrec;
+        field = imrec.run(frame, pieces);
+
+        //        imageRecognitonTest();
+//        ImageRecognition imrec;
+//        field = imrec.run(frame, pieces);
+//        board->setScannedPieces(imrec.getPolygonPosition());
+
+        //        imageRecognitonTest();
+    }else if(ui->csv_button->isChecked()){
+        //CSV date
+        std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
+        field = NeoPolygonIO::importField(path);
+
+
+
+        std::vector<polygon_i> poly_pieces;
+        std::vector<int> id_list;
+        for(const auto poly : field.getElementaryPieces()){
+            id_list.push_back(poly.getId());
+            polygon_i i_poly = poly.getPolygon();
+            poly_pieces.push_back(i_poly);
+        }
+        std::vector<procon::ExpandedPolygon> ex_poly = polygoniToExpanded(poly_pieces , id_list);
+        board->setScannedPieces(ex_poly);
+
+    }else if(ui->sample_data_use_button->isChecked()){
+        //read sample
+        field = NeoPolygonIO::importField("../../procon2017-comp/sample/comp-sample.csv");
+
+        //dummy
+        std::vector<procon::ExpandedPolygon> scanned_poly;
+        for(const auto& p : field.getElementaryPieces()){
+            polygon_t poly_buf;
+
+            for(const auto& p : p.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+
+            procon::ExpandedPolygon exp_buf(p.getId());
+            exp_buf.resetPolygonForce(poly_buf);
+            scanned_poly.push_back(exp_buf);
+        }
+
+        board->setScannedPieces(scanned_poly);
+
+
+//        for(auto& p : field.getElementaryPieces()){
+//            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
+//        }
+
+    }else if(ui->chinochan_button->isChecked()){
+        QRLibrary lib;
+        lib.Decoder(true);
+        field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
+        int scanned_dummy_piece_id = 0;
+
+        std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
+        for(auto polygon : field.getElementaryPieces()){
+            polygon_t poly_buf;
+            for(auto p : polygon.getPolygon().outer()){
+                poly_buf.outer().push_back(point_t(p.x(),p.y()));
+            }
+            procon::ExpandedPolygon ex_buf(scanned_dummy_piece_id);
+            ex_buf.resetPolygonForce(poly_buf);
+            scanned_dummy_piece.push_back(ex_buf);
+            ++scanned_dummy_piece_id;
+        }
+
+        board->setScannedPieces(scanned_dummy_piece);
     }
-//    TODO: ここまでで各データソースから読み込むようにする
+
+    //    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
 
@@ -108,10 +244,10 @@ void Kunugida::run()
     connect(this, SIGNAL(requestCSVcomplete()), solver, SLOT(requestCSVcomplete()));
     solver->run(field,algorithm_number);
 
+#endif
 
-//    QRLibrary lib;
-//    lib.Decoder(true);
-    
+    //    QRLibrary lib;
+    //    lib.Decoder(true);
     this->finishedProcess();
 }
 
@@ -130,7 +266,9 @@ void Kunugida::clickedRunButton()
 void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
-   this->board->setField(NeoPolygonIO::importField("../../procon2017-comp/field.csv"));
+   std::cout << field.getPieces().size() << std::endl;
+   this->board->setField(field);
+   this->board->update();
 }
 
 void Kunugida::finishedProcess()
@@ -148,10 +286,10 @@ void Kunugida::imageRecognitonTest()
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
     cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/piece3.png", 1);
+    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece5", 1);
 
     ImageRecognition imrec;
-    procon::Field PDATA = imrec.run(nocframe, nocpieces);
+    procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
 }
 
 void Kunugida::getCSV()

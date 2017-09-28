@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>831</width>
+    <width>854</width>
     <height>410</height>
    </rect>
   </property>
@@ -68,6 +68,27 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QRadioButton" name="csv_button">
+           <property name="text">
+            <string>CS&amp;V</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="sample_data_use_button">
+           <property name="text">
+            <string>sample_data</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="chinochan_button">
+           <property name="text">
+            <string>チノちゃん</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -114,8 +135,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>831</width>
-     <height>30</height>
+     <width>854</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>
