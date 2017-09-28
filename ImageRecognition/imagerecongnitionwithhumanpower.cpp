@@ -47,16 +47,21 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 3));
 
-    auto drawPolygon = [&](std::vector<QPointF> points, bool set_base){
+    double x_max,y_max,x_min,y_min;
+    int x_max_i,y_max_i,x_min_i,y_min_i;
+    auto drawPolygon = [&](std::vector<QPointF> points){
         static const double margin = 10;
         const int size = points.size();
-        static double x_max,y_max,x_min,y_min;
-        if(set_base){
-            x_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
-            y_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
-            x_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
-            y_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
-        }
+
+        x_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() > b.x();}))->x();
+        y_max = (std::max_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() > b.y();}))->y();
+        x_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.x() < b.x();}))->x();
+        y_min = (std::min_element(points.begin(), points.end(), [](QPointF a, QPointF b){return a.y() < b.y();}))->y();
+        x_max_i = ceil(x_max);
+        y_max_i = ceil(y_max);
+        x_min_i = floor(x_min);
+        y_min_i = floor(y_min);
+
         const double width  = x_max - x_min;
         const double height = y_max - y_min;
         const double max = scale != -1 ? scale : width < height ? height : width;
@@ -100,25 +105,14 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     };
 
     auto drawGrid = [&](){
-        std::vector<QPoint> points;
-        for(unsigned int a = 0; a < polygont.outer().size(); a++){
-            points.push_back(QPoint(polygont.outer()[a].x(),polygont.outer()[a].y()));
-        }
-
-        auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() > b.x(); });
-        auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.y() > b.y(); });
-
-        int grid_col = minmaxX.first->x() - minmaxX.second->x();
-        int grid_row = minmaxY.first->y() - minmaxY.second->y();
-
         int grid_size = 10 , top_buttom_margin = 10 , left_right_margin = 10;
 
         painter.setPen(QPen(QColor("#000000")));
-        for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
+        for (int current_col = x_min_i; current_col < x_max_i + 1; ++current_col) {
             int x = current_col * grid_size + left_right_margin;
             painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
         }
-        for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
+        for (int current_row = y_min_i; current_row < x_max_i + 1; ++current_row) {
             int y = current_row * grid_size + top_buttom_margin;
             painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
         }
@@ -131,6 +125,6 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
         points.push_back(QPointF(polygon.getPolygon().outer()[i].x(),polygon.getPolygon().outer()[i].y()));
     }
     painter.setBrush(QBrush(QColor("#0f5ca0")));
-    drawPolygon(points, 1);
+    drawPolygon(points);
     drawGrid();
 }
