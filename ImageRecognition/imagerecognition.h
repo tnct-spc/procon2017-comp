@@ -67,12 +67,11 @@ private:
     static constexpr double cutting_allowance = 0.0;
 
     std::vector<int> area;
-    int field_num;
+    int frame_num;
     int pieces_num;
     std::vector<procon::ExpandedPolygon> position;
     int id = -1;
     int n = 1;
-    double frame_deg;
     std::map<point_i, double> tab;
     int margin = 10;
 

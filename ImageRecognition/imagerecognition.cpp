@@ -53,14 +53,9 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     cv::imwrite("/home/spc/workspace/procon2017-image/topiece_image.png", line_image);
     */
 
-    // degree of frame
-    double frame_x = polygons.at(0).outer().at(1).x() - polygons.at(0).outer().at(0).x();
-    double frame_y = polygons.at(0).outer().at(1).y() - polygons.at(0).outer().at(0).y();
-    frame_deg = std::atan2(frame_y, frame_x);
-
     // frameのinnersをouterに入れ替える
-    field_num = polygons[0].inners().size();
-    for (int i=0; i<field_num; i++) {
+    frame_num = polygons[0].inners().size();
+    for (int i=0; i<frame_num; i++) {
         polygon_t inside;
         for (unsigned int j=0; j<polygons[0].inners()[i].size(); j++) {
             inside.outer().push_back(polygons[0].inners()[i].at(j));
@@ -70,6 +65,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // 元のフレームは削除
     polygons.erase(polygons.begin());
+
+    // delete min piece
+    for (unsigned int i=0; i<polygons.size(); i++) {
+        double area = bg::area(polygons.at(i));
+        if (fabs(area) * scale * scale < 90) {
+            polygons.erase(polygons.begin() + i);
+        }
+    }
 
     for(auto p : polygons){
         std::cerr << boost::geometry::is_valid(p);
@@ -88,29 +91,29 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
-    double scale_len;
-    for (auto piece : polygons) {
-        if (piece.outer().size() == 5) {
-            bool check = true;
-            scale_len = 0;
-            for (int i=0; i<4; i++) {
-                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
-                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
-                double len = hypot(x,y) * scale / 2.5;
-                if (fabs(6.0 - len) > 1) {
-                    check = false;
-                } else {
-                    scale_len += hypot(x,y);
-                }
-            }
+//    double scale_len;
+//    for (auto piece : polygons) {
+//        if (piece.outer().size() == 5) {
+//            bool check = true;
+//            scale_len = 0;
+//            for (int i=0; i<4; i++) {
+//                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
+//                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
+//                double len = hypot(x,y) * scale / 2.5;
+//                if (fabs(6.0 - len) > 1) {
+//                    check = false;
+//                } else {
+//                    scale_len += hypot(x,y);
+//                }
+//            }
 
-            if (check) {
-                break;
-            }
-        }
-    }
+//            if (check) {
+//                break;
+//            }
+//        }
+//    }
 
-    scale = 15 * 4 / scale_len;
+//    scale = 15 * 4 / scale_len;
 
     // change vector's scale to grid
     for (auto& piece : polygons) {
@@ -128,7 +131,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+//        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -411,23 +414,23 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.6);
         lsd->detect(image, pieces_lines[count]);
 
-        /*
+
         //描画
-        cv::Mat pic(and_image);
-        if (count == 0) {
+//        cv::Mat pic(and_image);
+//        if (count == 0) {
             for (auto line : pieces_lines[count]) {
-                cv::line(and_image, cv::Point(line[0],line[1]), cv::Point(line[2],line[3]),cv::Scalar(1.0), 3,CV_AA);
+                cv::line(image, cv::Point(line[0],line[1]), cv::Point(line[2],line[3]),cv::Scalar(50.0), 5,CV_AA);
 
-//                cv::imwrite("/home/spc/workspace/procon2017-image/line_image.png", and_image);
+                //cv::imwrite("/home/spc/workspace/procon2017-image/line_image.png", and_image);
             }
-        }
+//        }
 
-//        lsd->drawSegments(and_image, pieces_lines[count]);
-        // Debug
-//        if (count < 10) {
-//            cv::namedWindow(std::to_string(count+1));
-//            cv::imshow(std::to_string(count+1), pic);
-//        }*/
+//        lsd->drawSegments(image, pieces_lines[count]);
+//      Debug
+//        if (count == 0) {
+            cv::namedWindow(std::to_string(count+1));
+            cv::imshow(std::to_string(count+1), image);
+//        }
         count++;
     }
 
@@ -650,7 +653,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
             // pick up 3 long line
             std::vector<cv::Vec4f> sorted;
-            double longgest = 10000;
+            double longgest = 1000000;
 
             for (int i=0; i<3; i++) {
                 cv::Vec4f box;
@@ -669,7 +672,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
             for (int i=0; i<3; i++) {
                 double len1 = calcDistance(sorted.at(i)[0],sorted.at(i)[1],sorted.at(i)[2],sorted.at(i)[3]);
                 double len2 = calcDistance(sorted.at((i+1)%3)[0],sorted.at((i+1)%3)[1],sorted.at((i+1)%3)[2],sorted.at((i+1)%3)[3]);
-                if (fabs(len1-len2) < 0.1) {
+                if (fabs(len1-len2) < 100) { // regulation
                     scale = 297.0 * 2 / (len1 + len2);
                     break;
                 }
@@ -905,8 +908,8 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     //cv::Mat resize_image;
     //cv::resize(piece_image, resize_image, cv::Size(), n, n);
 
-    //cv::namedWindow("resize", CV_WINDOW_NORMAL);
-    //cv::imshow("resize", resize_image);
+//    cv::namedWindow("bainary", CV_WINDOW_NORMAL);
+//    cv::imshow("bainary", piece_image);
 
     return piece_image;
 }
@@ -948,7 +951,7 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 
         // 面積の小さいものは省く
         int piece_area = param[cv::ConnectedComponentsTypes::CC_STAT_AREA];
-        if (piece_area > 1600) { // 調節
+        if (piece_area > 10000) { // 調節 1600
 
             // 各ピースごとに移し替える
             cv::Mat piece_image(cv::Size(width, height), CV_8UC1);
@@ -996,7 +999,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     polygon_i grid_piece;
     grid_piece.outer().push_back(point_i(0,0));
 
-    // 1cm以下の辺があったら削除
+//    // 1cm以下の辺があったら削除
 //    polygon.pop_back();
 //    for (unsigned int i=0; i<polygon.size(); i++) {
 
@@ -1008,7 +1011,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 //        double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
 //        double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
 
-//    //        printf("%f\n", acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI);
+    //        printf("%f\n", acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI);
 
 //        if (len < 1.0) {
 
@@ -1077,7 +1080,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     // polygonのid
     id++;
 
-    if (id == pieces_num-1) {
+    if (id >= pieces_num-frame_num) {
 
         unsigned int longgest;
         double long_len = 0;
@@ -1289,7 +1292,7 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
     std::vector<procon::NeoExpandedPolygon> neo_pieces;
 
-    for (unsigned int i=0; i<pieces.size() - (unsigned int)field_num; i++) {
+    for (unsigned int i=0; i<pieces.size() - (unsigned int)frame_num; i++) {
         procon::NeoExpandedPolygon polygon(i);
         polygon.resetPolygonForce(pieces[i]);
         neo_pieces.push_back(polygon);
@@ -1301,7 +1304,7 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
 
     std::vector<procon::NeoExpandedPolygon> neo_frame;
 
-    for (int i=0; i<field_num; i++) {
+    for (int i=0; i<frame_num; i++) {
 
         int smallest_x = 0;
         int smallest_y = 0;
