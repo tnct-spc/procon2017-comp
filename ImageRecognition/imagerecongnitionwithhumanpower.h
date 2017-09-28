@@ -2,6 +2,8 @@
 #define IMAGERECONGNITIONWITHHUMANPOWER_H
 
 #include <QWidget>
+#include "precompile.h"
+#include "polygonviewer.h"
 
 namespace Ui {
 class imagerecongnitionwithhumanpower;
@@ -15,8 +17,16 @@ public:
     explicit imagerecongnitionwithhumanpower(QWidget *parent = 0);
     ~imagerecongnitionwithhumanpower();
 
+    void setPolygon(polygon_t polygon);
+
 private:
     Ui::imagerecongnitionwithhumanpower *ui;
+    QPushButton *edited_button;
+
+    polygon_t polygon;
+
+private slots:
+    void clickedEditedButton();
 };
 
 #endif // IMAGERECONGNITIONWITHHUMANPOWER_H
