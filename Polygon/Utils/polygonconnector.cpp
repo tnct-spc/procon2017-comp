@@ -11,7 +11,8 @@ PolygonConnector::PolygonConnector()
 
 }
 
-std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> PolygonConnector::connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter)
+std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> PolygonConnector::connect(
+        procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter)
 #ifdef USE_BOOST_TRANSFORM
 {
     //Connectクラスからindexを抽出
@@ -201,7 +202,6 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
         std::cout << "equals is true!" << std::endl;
 #endif
         bg::difference(frame_polygon, piece_rotate_polygon, frame_out_polygons);
-        std::vector<procon::NeoExpandedPolygon> frames_out;
 
         //180度角除去
         std::function<void(procon::NeoExpandedPolygon&)> delete_180_degree = [&delete_180_degree](procon::NeoExpandedPolygon &expoly)
@@ -222,6 +222,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
             }
         };
 
+        std::vector<procon::NeoExpandedPolygon> frames_out;
         int id= 0;
         for(polygon_i frame_out_polygon : frame_out_polygons) {
             procon::NeoExpandedPolygon frame_out(id);
@@ -355,7 +356,6 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
         std::cout << "equals is true!" << std::endl;
 #endif
         bg::difference(frame_polygon, piece_rotate_polygon, frame_out_polygons);
-        std::vector<procon::NeoExpandedPolygon> frames_out;
 
         //180度角除去
         std::function<void(procon::NeoExpandedPolygon&)> delete_180_degree = [&delete_180_degree](procon::NeoExpandedPolygon &expoly)
@@ -376,6 +376,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
             }
         };
 
+        std::vector<procon::NeoExpandedPolygon> frames_out;
         int id= 0;
         for(polygon_i frame_out_polygon : frame_out_polygons) {
             procon::NeoExpandedPolygon frame_out(id);
@@ -553,3 +554,54 @@ std::pair<polygon_i, bool> PolygonConnector::rotate(polygon_i polygon_in, Comple
     return out;
 }
 #endif
+
+bool PolygonConnector::check_hint(procon::NeoField &field, const Evaluate &evaluate)
+{
+    std::vector<procon::NeoExpandedPolygon> hint_pieces =
+            field.getElementaryFrameInnerPices().at(static_cast<unsigned int>(evaluate.fields_index));
+
+    std::vector<procon::NeoExpandedPolygon> frames;
+    frames.reserve(100);
+    frames.emplace_back(field.getFrame().at(static_cast<unsigned int>(evaluate.frame_index)));
+
+    bool check_all_float; //ヒントが全部浮いてるか
+    do {
+        check_all_float = true;
+        unsigned int hint_index = 0;
+        for(const procon::NeoExpandedPolygon &hint_piece : hint_pieces) {
+            std::vector<procon::NeoExpandedPolygon> frames_next;
+            frames_next.reserve(100);
+            bool check_float = false; //ヒントが浮いてるか
+            for(const procon::NeoExpandedPolygon &frame : frames) {
+                std::vector<polygon_i> union_polygons;
+                bg::union_(frame.getPolygon(), hint_piece.getPolygon(), union_polygons);
+                if(union_polygons.size() == 1) { //ヒントがこのフレームにある！
+                    if(!bg::equals(frame.getPolygon(), union_polygons.at(0))) return false; //ヒントがコンフリクトしてる
+                    std::vector<polygon_i> frames_new;
+                    bg::difference(frame.getPolygon(), hint_piece.getPolygon(), frames_new);
+                    for(const polygon_i &frame_new : frames_new) {
+                        if(frame_new.inners().empty()) { //ちゃんとヒントがはまった
+                            procon::NeoExpandedPolygon frame_next;
+                            frames_next.emplace_back(frame_next);
+                            check_all_float = false;
+                        } else { //ヒントが浮いてる
+                            check_float = true;
+                            break;
+                        }
+                    }
+                } else frames_next.emplace_back(frame); //ヒントがこのフレームになかったらスルー
+                if(check_float) break;
+            }
+            if(!check_float) {
+                frames = frames_next;
+                field.setIsPlaced(hint_piece.getId());
+                field.removePiece(hint_piece.getId());
+                hint_pieces.erase(hint_pieces.begin() + hint_index);
+            }
+            ++hint_index;
+        }
+    } while(!check_all_float); //ヒントがはまらなくなるまで
+
+    field.setFrame(frames);
+    return true;
+}
