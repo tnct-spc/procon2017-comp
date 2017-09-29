@@ -87,7 +87,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
 
-//        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
     // sum polygon_t and piece's image
@@ -426,7 +426,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
         //LSD直線検出 引数の"scale"が重要！！！
         //cv::LSD_REFINE_STD,threshold::LSDthrehold
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.6);
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.75); // 0.75
         lsd->detect(image, pieces_lines[count]);
 
 
@@ -910,10 +910,10 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     cv::Mat piece_image = cv::Mat(cv::Size(width, height), CV_8UC1);
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            int h = channels[0].at<uchar>(y, x);
+//            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if ((h > 0 && h < 60) && s > 60 && v > 60) { // (h > 0 && h < 50) && s > 90 && v > 100
+            if (s > 60) { // (h > 0 && h < 50) && s > 90 && v > 100
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
