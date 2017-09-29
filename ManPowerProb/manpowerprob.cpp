@@ -126,14 +126,7 @@ void ManPowerProb::mousePressEvent(QMouseEvent *event){
         QPointF clickedposition = event->pos();
         point_i clicked = translateToPointi(clickedposition);
 
-        if(is_frame){
-            if(checkCanPlaceFrame(clicked))last_polygon.outer().push_back(clicked);
-            else logger->error("範囲外を指定しています");
-        }
-        else{
-            if(checkCanPlacePiece(clicked))last_polygon.outer().push_back(clicked);
-            else logger->error("範囲外を指定しています");
-        }
+        addPoint(clicked);
         /*
         last_polygon.outer().push_back(clicked);
 
@@ -148,81 +141,29 @@ void ManPowerProb::mousePressEvent(QMouseEvent *event){
     }
 }
 
+void ManPowerProb::addPoint(point_i point){
+
+    if(is_frame){
+        if(checkCanPlaceFrame(point))last_polygon.outer().push_back(point);
+        else logger->error("範囲外を指定しています");
+    }else{
+        if(checkCanPlacePiece(point))last_polygon.outer().push_back(point);
+        else logger->error("範囲外を指定しています");
+    }
+}
+
 void ManPowerProb::keyPressEvent(QKeyEvent *event){
 
-    auto checkWithIn = [&]{
-        for(auto piece : pieces){
-            std::vector<polygon_i>intersection;
-            bg::intersection(piece,last_polygon,intersection);
-            for(auto poly : intersection){
-                if(bg::area(poly)!=0)return true;
-            }
-        }
-        return false;//重なってるならtrueを返す
-    };
 
     if(event->key() == Qt::Key_A){//AでexportCSV
-
-        double frame_area=0;
-        double piece_area=0;
-
-        std::vector<procon::NeoExpandedPolygon> neopieces;
-        std::vector<procon::NeoExpandedPolygon> neoframes;
-        int id=0;
-        for(auto piece : pieces){
-            piece_area += bg::area(piece);
-            procon::NeoExpandedPolygon neopiece(id);
-            neopiece.resetPolygonForce(piece);
-            neopieces.push_back(neopiece);
-            ++id;
-        }
-        id=0;
-        if(frames.size()==0){
-            frame_area += bg::area(not_put_part);
-            procon::NeoExpandedPolygon neoframe(id);
-            neoframe.resetPolygonForce(not_put_part);
-            neoframes.push_back(neoframe);
-        }else{
-            for(auto frame : frames){
-                frame_area += bg::area(frame);
-                procon::NeoExpandedPolygon neoframe(id);
-                neoframe.resetPolygonForce(frame);
-                neoframes.push_back(neoframe);
-                ++id;
-            }
-        }
-
-        field.setElementaryFrame(neoframes);
-        field.setElementaryPieces(neopieces);
-        NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
-
-        logger->info("exported CSV");
-        std::cout << "empty area : " << frame_area - piece_area << std::endl;
+        exportToCsv();
     }
 
     if(event->key() == Qt::Key_L){//Lでポリゴンの生成
-        if(last_polygon.outer().size() < 3)logger->error("始点と終点を結ぶことができません");
-        else{
-            last_polygon.outer().push_back(last_polygon.outer().at(0));
-            bg::correct(last_polygon);
-            if(!bg::is_valid(last_polygon) || checkWithIn())logger->error("ポリゴンが不自然な形になっています");
-            else{
-                if(is_frame)frames.push_back(last_polygon);
-                else pieces.push_back(last_polygon);
-                logger->info("polygonを生成しました");
-            }
-            last_polygon.clear();
-        }
+        createPolygon();
     }
     if(event->key() == Qt::Key_M){//Mでモード変更
-        if(last_polygon.outer().size()!=0){
-            logger->error("polygonの生成中のためモードを変更できません");
-        }else{
-            is_frame = !is_frame;
-            logger->info(is_frame
-                     ? "changed to frame_mode"
-                     : "chenged to piece_mode");
-        }
+        changeMode();
     }
 
     if(event->key() == Qt::Key_B){//Bで最も新しい頂点の削除
@@ -247,6 +188,83 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
     }
 
     this->update();
+}
+
+void ManPowerProb::exportToCsv(){
+
+    double frame_area=0;
+    double piece_area=0;
+
+    std::vector<procon::NeoExpandedPolygon> neopieces;
+    std::vector<procon::NeoExpandedPolygon> neoframes;
+    int id=0;
+    for(auto piece : pieces){
+        piece_area += bg::area(piece);
+        procon::NeoExpandedPolygon neopiece(id);
+        neopiece.resetPolygonForce(piece);
+        neopieces.push_back(neopiece);
+        ++id;
+    }
+    id=0;
+    if(frames.size()==0){
+        frame_area += bg::area(not_put_part);
+        procon::NeoExpandedPolygon neoframe(id);
+        neoframe.resetPolygonForce(not_put_part);
+        neoframes.push_back(neoframe);
+    }else{
+        for(auto frame : frames){
+            frame_area += bg::area(frame);
+            procon::NeoExpandedPolygon neoframe(id);
+            neoframe.resetPolygonForce(frame);
+            neoframes.push_back(neoframe);
+            ++id;
+        }
+    }
+
+    field.setElementaryFrame(neoframes);
+    field.setElementaryPieces(neopieces);
+    NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
+
+    logger->info("exported CSV");
+    std::cout << "empty area : " << frame_area - piece_area << std::endl;
+}
+
+void ManPowerProb::createPolygon(){
+
+    auto checkWithIn = [&]{
+        for(auto piece : pieces){
+            std::vector<polygon_i>intersection;
+            bg::intersection(piece,last_polygon,intersection);
+            for(auto poly : intersection){
+                if(bg::area(poly)!=0)return true;
+            }
+        }
+        return false;//重なってるならtrueを返す
+    };
+
+    if(last_polygon.outer().size() < 3)logger->error("始点と終点を結ぶことができません");
+    else{
+        last_polygon.outer().push_back(last_polygon.outer().at(0));
+        bg::correct(last_polygon);
+        if(!bg::is_valid(last_polygon) || checkWithIn())logger->error("ポリゴンが不自然な形になっています");
+        else{
+            if(is_frame)frames.push_back(last_polygon);
+            else pieces.push_back(last_polygon);
+            logger->info("polygonを生成しました");
+        }
+        last_polygon.clear();
+    }
+}
+
+void ManPowerProb::changeMode(){
+    if(last_polygon.outer().size()!=0){
+        logger->error("polygonの生成中のためモードを変更できません");
+    }else{
+        is_frame = !is_frame;
+        logger->info(is_frame
+                     ? "changed to frame_mode"
+                     : "chenged to piece_mode");
+    }
 }
 
 bool ManPowerProb::checkCanPlacePiece(point_i point){//pieceが置けるならtrueを返す

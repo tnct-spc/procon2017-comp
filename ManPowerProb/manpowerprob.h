@@ -34,6 +34,11 @@ private:
     point_i translateToPointi(QPointF point);
     bool checkCanPlacePiece(point_i point);
     bool checkCanPlaceFrame(point_i point);
+    void addPoint(point_i point);
+    void exportToCsv();
+    void createPolygon();
+    void changeMode();
+
     int top_bottom_margin;
     int left_right_margin;
     int grid_size;
