@@ -38,6 +38,9 @@ private:
     void exportToCsv();
     void createPolygon();
     void changeMode();
+    void deletePoint();
+    void deletePiece();
+    void deleteFrame();
 
     int top_bottom_margin;
     int left_right_margin;

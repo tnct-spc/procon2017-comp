@@ -167,27 +167,40 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
     }
 
     if(event->key() == Qt::Key_B){//Bで最も新しい頂点の削除
-        if(last_polygon.outer().size()!=0){
-            last_polygon.outer().pop_back();
-            logger->info("頂点を削除しました");
-        }else logger->error("頂点を削除できませんでした");
+        deletePoint();
     }
 
     if(event->key() == Qt::Key_P){//Pで最も新しいピースの削除
-        if(pieces.size()!=0){
-            pieces.pop_back();
-            logger->info("ピースを削除しました");
-        }else logger->error("ピースを削除できませんでした");
+        deletePiece();
     }
 
     if(event->key() == Qt::Key_F){//Fで最も新しいフレームの削除
-        if(frames.size()!=0){
-            frames.pop_back();
-            logger->info("フレームを削除しました");
-        }else logger->error("フレームを削除できませんでした");
+        deleteFrame();
     }
 
     this->update();
+}
+
+void ManPowerProb::deleteFrame(){
+    if(frames.size()!=0){
+        frames.pop_back();
+        logger->info("フレームを削除しました");
+    }else logger->error("フレームを削除できませんでした");
+
+}
+void ManPowerProb::deletePiece(){
+    if(pieces.size()!=0){
+        pieces.pop_back();
+        logger->info("ピースを削除しました");
+    }else logger->error("ピースを削除できませんでした");
+
+}
+void ManPowerProb::deletePoint(){
+    if(last_polygon.outer().size()!=0){
+        last_polygon.outer().pop_back();
+        logger->info("頂点を削除しました");
+    }else logger->error("頂点を削除できませんでした");
+
 }
 
 void ManPowerProb::exportToCsv(){
