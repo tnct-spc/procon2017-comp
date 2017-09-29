@@ -28,6 +28,8 @@ private:
     QPushButton *edited_button;
     polygon_t polygont;
     procon::ExpandedPolygon polygon;
+    std::vector<int> grid_x;
+    std::vector<int> grid_y;
 
 private slots:
     void clickedEditedButton();
