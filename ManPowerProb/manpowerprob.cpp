@@ -221,11 +221,10 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
             ++id;
         }
         id=0;
-        if(frames.size()){
+        if(frames.size()==0){
             procon::NeoExpandedPolygon neoframe(id);
             neoframe.resetPolygonForce(not_put_part);
             neoframes.push_back(neoframe);
-            field.setFrame(neoframes);
         }else{
             for(auto frame : frames){
                 procon::NeoExpandedPolygon neoframe(id);
@@ -233,8 +232,9 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
                 neoframes.push_back(neoframe);
                 ++id;
             }
-            field.setFrame(neoframes);
         }
+
+        field.setElementaryFrame(neoframes);
         field.setElementaryPieces(neopieces);
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
         logger->info("exported CSV");
