@@ -26,6 +26,7 @@ private:
     QPushButton *edited_button;
     polygon_t polygon;
     int grid_size,left_right_margin,top_buttom_margin;
+    std::vector<QPointF> points;
 
 private slots:
     void clickedEditedButton();
