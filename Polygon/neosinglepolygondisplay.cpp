@@ -2,7 +2,6 @@
 #include "ui_neosinglepolygondisplay.h"
 #include "neoexpandedpolygon.h"
 
-#include <QPoint>
 #include <vector>
 #include <QPainter>
 
@@ -70,7 +69,11 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     const int top_buttom_margin = (window_height - grid_size * grid_row) / 2;
     const int left_right_margin = (window_width - grid_size * grid_col) / 2;
 
-
+    auto getRadian = [&](){
+       procon::NeoExpandedPolygon expandedpolygon;
+       expandedpolygon.resetPolygonForce(polygon);
+       std::vector<double> angles = expandedpolygon.getSideAngle_degree();
+    };
 
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
@@ -95,6 +98,7 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
         str += ",";
         str += QString::number(polygon_points[point_index].y());
         str += ")";
+        //str +=
         painter.drawText(polygon_points[point_index] ,str);
     }
 
@@ -107,5 +111,6 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
         int y = current_row * grid_size + top_buttom_margin;
         painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
     }
-}
 
+    getRadian();
+}

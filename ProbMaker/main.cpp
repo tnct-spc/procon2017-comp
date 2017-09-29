@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     NeoPolygonViewer::getInstance();
 
-//    auto aa = NeoSinglePolygonDisplay::createInstance(polygonn,"hogehoge");
+//    auto aa = NeoSinglePolygonDisplay::createInstance(polygon,"hogehoge",false);
 //    aa->show();
 
     return a.exec();

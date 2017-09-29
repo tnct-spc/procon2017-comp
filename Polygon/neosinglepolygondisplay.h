@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <memory>
 #include <string>
+#include <QPoint>
 
 namespace Ui {
 class NeoSinglePolygonDisplay;
