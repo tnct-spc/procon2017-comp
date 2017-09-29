@@ -25,6 +25,11 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
+void NeoAnswerBoard::setSelectPieceMode(bool mode)
+{
+    this->select_piece_mode = mode;
+}
+
 void NeoAnswerBoard::setUp()
 {
     QMessageBox msgBox;
@@ -169,7 +174,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //処理後ピースを描画
     auto drawAfterPiece = [&](procon::NeoExpandedPolygon expanded_poly){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
-            painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
+            if(std::find(clicked_piece_id.begin(),clicked_piece_id.end(),expanded_poly.getId()) != clicked_piece_id.end())painter.setBrush(QBrush(Qt::white));
+            else painter.setBrush(QBrush(QColor(list[expanded_poly.getId()])));
 //          int pcount = field.getPiece(pnum).getSize();
 //          QPointF points[pcount];
 //          for(int tes = 0;tes < pcount; tes++){
@@ -208,6 +214,20 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         piececenter.setX(piececenter.x() - grid_size);
         piececenter.setY(piececenter.y() + grid_size);
         painter.drawText(piececenter, QString(QString::number(expanded_poly.getId())));
+    };
+
+    auto drawInverseMark = [&](procon::NeoExpandedPolygon neopoly){//裏返されてるなら@マークをつける
+        polygon_i poly = neopoly.getPolygon();
+        painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackground(QBrush(QColor(list[neopoly.getId()])));
+        painter.setPen(QPen(QBrush(Qt::red), 0.3));
+        point_i cent;
+        bg::centroid(poly,cent);
+        QPointF cent_point = getPosition(cent);
+        cent_point.setX(cent_point.x() + grid_size);
+        cent_point.setY(cent_point.y() - grid_size);
+        painter.drawText(cent_point, QString(QString("@")));
     };
 
     auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直した
@@ -299,7 +319,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     for(auto poly : field.getPieces()){//ここの描画はsingle_modeやキーの状況に問わずやるらしい
             drawAfterPiece(poly);
-            drawPieceId(poly);
+    }
+    for(auto poly : field.getPieces()){
+        drawPieceId(poly);
+        if(poly.is_inverse)drawInverseMark(poly);
     }
     if(!single_mode){
         for(auto poly : scanned_poly){
@@ -505,6 +528,9 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
 
 void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 {
+
+//#define DEBUG
+#ifdef DEBUG
     if(event->button() == Qt::MouseButton::RightButton){
         NeoPolygonIO::exportPolygon(this->field,"/home/yui/Procon/fieldcdv/debug-field.csv");
     }else if(event->button() == Qt::MouseButton::LeftButton){
@@ -550,7 +576,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
                 for(procon::NeoExpandedPolygon nep : newframe){
                     field_frame.push_back(nep);
-                }
+                }initialized
                 field_frame.erase(field_frame.begin() + i.frame_index);
                 newField.setFrame(field_frame);
                 newField.setPiece(std::get<1>(connected));
@@ -574,4 +600,35 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
             }
         }
     }
+#endif
+    if(event->button() == Qt::MouseButton::LeftButton && this->select_piece_mode){
+//        clickedpiece_id = -1;
+        QPointF clickedposition = event->pos();
+        //QPointF→point_iへの変換
+
+        int pointx = clickedposition.x() - left_right_margin;
+        int pointy = clickedposition.y() - top_bottom_margin;
+
+        point_i clickedpos( pointx / grid_size - 8, pointy / grid_size - 8);
+        std::cout << "clicked : " << bg::dsv(clickedpos) << std::endl;
+
+        for(auto piece : field.getPieces()){
+            if(bg::intersects(piece.getPolygon() , clickedpos)){
+                std::cout << "piece id :" << piece.getId() << std::endl;
+
+                auto index = std::find(clicked_piece_id.begin(),clicked_piece_id.end(),piece.getId());
+                if(index == clicked_piece_id.end()){
+                    this->clicked_piece_id.push_back(piece.getId());
+                }else{
+                    this->clicked_piece_id.erase(index);
+                }
+            }
+        }
+        this->update();
+    }
+}
+
+std::vector<int> NeoAnswerBoard::getSelectedPieceId()
+{
+    return clicked_piece_id;
 }
