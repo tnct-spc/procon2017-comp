@@ -88,6 +88,26 @@ void Kunugida::run()
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();
 
+        procon::NeoExpandedPolygon exframe = *new procon::NeoExpandedPolygon();
+        procon::NeoExpandedPolygon expiece = *new procon::NeoExpandedPolygon();
+
+        exframe.resetPolygonForce(frame_);
+
+        std::vector<procon::NeoExpandedPolygon> exframes;
+        exframes.push_back(exframe);
+
+        procon::NeoField exfield;
+
+        for(polygon_i polygon_z :pieces_){
+            expiece.resetPolygonForce(polygon_z);
+            exfield.setPiece(expiece);
+        }
+
+
+        exfield.setFrame(exframes);
+
+        NeoPolygonIO::exportPolygon(exfield,"../../procon2017-comp/Rabbithouse.csv");
+
 //#define SHOW_ANGLE
 #ifdef SHOW_ANGLE
         std::cout << "angles ->" << std::endl;
