@@ -18,16 +18,14 @@ public:
     explicit imagerecongnitionwithhumanpower(QWidget *parent = 0);
     ~imagerecongnitionwithhumanpower();
 
-    void setPolygon(polygon_t polygont);
+    void setPolygon(polygon_t polygon);
 
 private:
     Ui::imagerecongnitionwithhumanpower *ui;
 
-    procon::ExpandedPolygon polygonAdapter(polygon_t polygont);
-    polygon_t polygonAdapter(procon::ExpandedPolygon polygont);
+    procon::ExpandedPolygon polygonAdapter(polygon_t polygon);
     QPushButton *edited_button;
-    polygon_t polygont;
-    procon::ExpandedPolygon polygon;
+    polygon_t polygon;
     std::vector<int> grid_x;
     std::vector<int> grid_y;
 
@@ -36,7 +34,6 @@ private slots:
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 };
 
