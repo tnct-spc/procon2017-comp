@@ -93,13 +93,13 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     QFont font;
     font.setPixelSize(20);
     painter.setFont(font);
-    QString str;
     for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
+        QString str;
         str += QString::number(point_index);
         str += "(";
-        str += QString::number(polygon_points[point_index].x());
+        str += QString::number(polygont.outer()[point_index].x());
         str += ",";
-        str += QString::number(polygon_points[point_index].y());
+        str += QString::number(polygont.outer()[point_index].y());
         str += ")";
         painter.drawText(polygon_points[point_index] ,str);
     }
