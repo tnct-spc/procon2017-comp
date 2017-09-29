@@ -2,21 +2,42 @@
 #define NEOSLAVER_H
 
 #include <QWidget>
+#include "neoanswerboard.h"
+#include "neofield.h"
+#include "neopolygonio.h"
+#include "neosolver.h"
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 namespace Ui {
-class neoslaver;
+class NeoSlaver;
 }
 
-class neoslaver : public QWidget
+class NeoSlaver : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit neoslaver(QWidget *parent = 0);
-    ~neoslaver();
+    explicit NeoSlaver(QWidget *parent = 0);
+    ~NeoSlaver();
 
 private:
-    Ui::neoslaver *ui;
+    std::shared_ptr<NeoAnswerBoard> board;
+    Ui::NeoSlaver *ui;
+    bool get();
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    bool network_error_flag = false;
+
+    std::string SAVE_PROBLEM_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
+    std::string SAVE_ANSWER_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/answer.csv";
+    QString SERVER_URL = "http://192.168.1.130:8016/get";
+    QString SERVER_POST_URL = "http://192.168.1.130:8016/answer";
+
+private slots:
+    void pushGetButton();
+    void networkerror(QNetworkReply::NetworkError);
+    bool emitAnswer(procon::NeoField);
 };
 
 #endif // NEOSLAVER_H

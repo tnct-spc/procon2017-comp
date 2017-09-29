@@ -33,7 +33,7 @@ Kunugida::Kunugida(QWidget *parent) :
     manager = new QNetworkAccessManager(this);
 
     board = std::make_shared<NeoAnswerBoard>();
-    board->show();
+    board->showMaximized();
     //    board->setSingleMode(true);
 //    board->setSingleMode(true);
 }
@@ -143,9 +143,8 @@ void Kunugida::run()
 
         board->setScannedPieces(scanned_dummy_piece);
 
-        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/post.csv");
-        emit requestpostCSV();
-        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/post.csv");
+//        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
