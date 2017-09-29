@@ -12,10 +12,10 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
     polygon.resetPolygonForce(polygont);
 
     ui->setupUi(this);
-    edited_button = new QPushButton();
-    edited_button->setText("edited");
+//    edited_button = new QPushButton();
+//    edited_button->setText("edited");
 
-    connect(edited_button,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
+//    connect(edited_button,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
 
 //    ui->verticalLayout->addWidget(edited_button);
 }
@@ -70,7 +70,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
     //push_back points to std::vector<QPoint>
     std::vector<QPoint> points;
-    for(unsigned int a = 0; a < polygont.outer().size(); a++){
+    for(int a = 0; a < polygont.outer().size(); a++){
         points.push_back(QPoint(polygont.outer()[a].x(),polygont.outer()[a].y()));
     }
 
@@ -92,7 +92,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
     std::vector<QPoint> polygon_points;
-    for(unsigned int a = 0;a < this->polygont.outer().size(); a++){
+    for(int a = 0;a < this->polygont.outer().size(); a++){
         int x_buf = enlarged_polygon
                 ? grid_size * polygont.outer()[a].x() + left_right_margin
                 : grid_size * (polygont.outer()[a].x() - minmaxX.first->x()) + left_right_margin;
@@ -108,7 +108,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     QFont font;
     font.setPixelSize(20);
     painter.setFont(font);
-    for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
+    for(int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
         QString str;
         str += QString::number(point_index);
         str += "(";
@@ -121,17 +121,19 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
 
     painter.setPen(QPen(QColor("#000000")));
-    this->grid_x.clear();
-    this->grid_y.clear();
+//    grid_x->resize(100);
+//    grid_y->resize(100);
+//    grid_x->clear();
+//    grid_y->clear();
     for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
         int x = current_col * grid_size + left_right_margin;
         painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
-        this->grid_x.push_back(x);
+        grid_x.push_back(x);
     }
     for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
         int y = current_row * grid_size + top_buttom_margin;
         painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
-        this->grid_y.push_back(y);
+        grid_y.push_back(y);
     }
 
 }
