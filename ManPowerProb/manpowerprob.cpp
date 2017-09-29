@@ -178,7 +178,6 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         deleteFrame();
     }
 
-    this->update();
 }
 
 void ManPowerProb::deleteFrame(){
@@ -186,6 +185,7 @@ void ManPowerProb::deleteFrame(){
         frames.pop_back();
         logger->info("フレームを削除しました");
     }else logger->error("フレームを削除できませんでした");
+    this->update();
 
 }
 void ManPowerProb::deletePiece(){
@@ -200,6 +200,7 @@ void ManPowerProb::deletePoint(){
         last_polygon.outer().pop_back();
         logger->info("頂点を削除しました");
     }else logger->error("頂点を削除できませんでした");
+    this->update();
 
 }
 
@@ -267,6 +268,7 @@ void ManPowerProb::createPolygon(){
         }
         last_polygon.clear();
     }
+    this->update();
 }
 
 void ManPowerProb::changeMode(){

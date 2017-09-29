@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <manpowerprob.h>
+#include <qspinbox.h>
 
 
 
