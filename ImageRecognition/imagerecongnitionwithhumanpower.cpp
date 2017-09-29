@@ -59,11 +59,11 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
         points.push_back(QPoint(polygont.outer()[a].x(),polygont.outer()[a].y()));
     }
 
-    auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() > b.x(); });
-    auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.y() > b.y(); });
+    auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() < b.x(); });
+    auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.y() < b.y(); });
 
-    int grid_col = enlarged_polygon ? 101 : minmaxX.first->x() - minmaxX.second->x();
-    int grid_row = enlarged_polygon ? 65 : minmaxY.first->y() - minmaxY.second->y();
+    int grid_col = enlarged_polygon ? 101 : minmaxX.second->x() - minmaxX.first->x();
+    int grid_row = enlarged_polygon ? 65 : minmaxY.second->y() - minmaxY.first->y();
 
     const int grid_size =
                     window_width <= window_height
@@ -78,8 +78,12 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
     std::vector<QPoint> polygon_points;
     for(unsigned int a = 0;a < this->polygont.outer().size(); a++){
-        int x_buf = enlarged_polygon ? grid_size * polygont.outer()[a].x() + left_right_margin : grid_size * (polygont.outer()[a].x() - minmaxX.second->x()) + left_right_margin;
-        int y_buf = enlarged_polygon ? grid_size * polygont.outer()[a].y() + top_buttom_margin : grid_size * (polygont.outer()[a].y() - minmaxY.second->y()) + top_buttom_margin;
+        int x_buf = enlarged_polygon
+                ? grid_size * polygont.outer()[a].x() + left_right_margin
+                : grid_size * (polygont.outer()[a].x() - minmaxX.first->x()) + left_right_margin;
+        int y_buf = enlarged_polygon
+                ? grid_size * polygont.outer()[a].y() + top_buttom_margin
+                : grid_size * (polygont.outer()[a].y() - minmaxY.first->y()) + top_buttom_margin;
         polygon_points.push_back(QPoint(x_buf,y_buf));
     }
     painter.setPen(QPen(QColor("#99CC00")));
