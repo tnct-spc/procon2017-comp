@@ -32,8 +32,8 @@ private:
     Ui::ManPowerProb *ui;
     QPointF translateToQPoint(point_i point);
     point_i translateToPointi(QPointF point);
-    bool checkCanPlace(polygon_i poly);
-    bool checkCanPlace(point_i point);
+    bool checkCanPlacePiece(point_i point);
+    bool checkCanPlaceFrame(point_i point);
     int top_bottom_margin;
     int left_right_margin;
     int grid_size;

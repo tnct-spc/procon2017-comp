@@ -121,10 +121,13 @@ void ManPowerProb::mousePressEvent(QMouseEvent *event){
         QPointF clickedposition = event->pos();
         point_i clicked = translateToPointi(clickedposition);
 
-
-        if(checkCanPlace(clicked))logger->error("範囲外を指定しています");
+        if(is_frame){
+            if(checkCanPlaceFrame(clicked))last_polygon.outer().push_back(clicked);
+            else logger->error("範囲外を指定しています");
+        }
         else{
-            last_polygon.outer().push_back(clicked);
+            if(checkCanPlacePiece(clicked))last_polygon.outer().push_back(clicked);
+            else logger->error("範囲外を指定しています");
         }
         /*
         last_polygon.outer().push_back(clicked);
@@ -182,42 +185,41 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         }
     }
     if(event->key() == Qt::Key_M){
-        is_frame = !is_frame;
-        logger->info(is_frame
+        if(last_polygon.outer().size()!=0){
+            logger->error("polygonの生成中のためモードを変更できません");
+        }else{
+            is_frame = !is_frame;
+            logger->info(is_frame
                      ? "changed to frame_mode"
                      : "chenged to piece_mode");
+        }
     }
     this->update();
 }
 
-bool ManPowerProb::checkCanPlace(polygon_i poly){
-    if(frames.size()){//フレームが無い時
-        if(!bg::intersects(not_put_part,poly))return false;
-    }else{
-        bool frame_flag=false;
-        for(auto frame : frames){
-            if(bg::intersects(frame,poly))frame_flag=true;
-        }
-        if(!frame_flag)return false;
-    }
-    for(auto piece : pieces){
-        if(bg::intersects(piece,poly))return false;
-    }
-    return true;
-}
-
-bool ManPowerProb::checkCanPlace(point_i point){
-    if(frames.size()){//フレームが無い時
-        if(!bg::intersects(not_put_part,point))return false;
+bool ManPowerProb::checkCanPlacePiece(point_i point){//pieceが置けるならtrueを返す
+    if(frames.size()==0){//フレームが無い時
+        if(!bg::intersects(not_put_part,point))return false;//枠外ならfalse
     }else{
         bool frame_flag=false;
         for(auto frame : frames){
             if(bg::intersects(frame,point))frame_flag=true;
         }
-        if(!frame_flag)return false;
+        if(!frame_flag)return false;//全ての枠の外ならfalse
     }
     for(auto piece : pieces){
-        if(bg::intersects(piece,point))return false;
+        if(bg::intersects(piece,point))return false;//pieceと重なっているならfalse
+    }
+    return true;
+}
+
+bool ManPowerProb::checkCanPlaceFrame(point_i point){
+    if(!bg::intersects(not_put_part,point))return false;
+    for(auto frame : frames){
+        if(bg::intersects(frame,point))return false;//frameと重なっているならfalse
+    }
+    for(auto piece : pieces){
+        if(bg::intersects(piece,point))return false;//pieceと重なっているならfalse
     }
     return true;
 }
