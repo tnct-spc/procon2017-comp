@@ -22,20 +22,28 @@ imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
 
 void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
     this->polygon = polygon;
+    this->update();
 }
 
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
 
 }
+QPointF imagerecongnitionwithhumanpower::toCoordinate(double window_x, double window_y){
+    const int N = 10;//小数点第Nまでの四捨五入
+    QPointF buf((window_x - left_right_margin)/grid_size,
+                  (window_y - top_buttom_margin)/grid_size);
+    QPointF point(std::round(buf.x()*N) / N , std::round(buf.y()*N) / N);
+    return point;
+}
 
 void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
-    std::cout<<"mousepressevent"<<std::endl;
-    std::cout<<event->x()<<","<<event->y()<<std::endl;
+    QPointF point = toCoordinate(event->x(),event->y());
+    std::cout<<point.x()<<","<<point.y()<<std::endl;
 }
 
 void imagerecongnitionwithhumanpower::mouseReleaseEvent(QMouseEvent *event){
-    std::cout<<"mousereleaseevent"<<std::endl;
-    std::cout<<event->x()<<","<<event->y()<<std::endl;
+    QPointF point = toCoordinate(event->x(),event->y());
+
 }
 
 void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)

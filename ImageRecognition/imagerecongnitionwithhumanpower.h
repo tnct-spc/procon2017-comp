@@ -21,6 +21,7 @@ public:
     void setPolygon(polygon_t polygon);
 
 private:
+    QPointF toCoordinate(double window_x,double window_y);
     Ui::imagerecongnitionwithhumanpower *ui;
     QPushButton *edited_button;
     polygon_t polygon;
