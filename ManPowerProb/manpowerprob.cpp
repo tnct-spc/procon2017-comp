@@ -200,12 +200,16 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
 
     auto checkWithIn = [&]{
         for(auto piece : pieces){
-            if(bg::intersects(last_polygon,piece))return true;
+            std::vector<polygon_i>intersection;
+            bg::intersection(piece,last_polygon,intersection);
+            for(auto poly : intersection){
+                if(bg::area(poly)!=0)return true;
+            }
         }
         return false;//重なってるならtrueを返す
     };
 
-    if(event->key() == Qt::Key_A){//EnterでexportCSV
+    if(event->key() == Qt::Key_A){//AでexportCSV
 
         std::vector<procon::NeoExpandedPolygon> neopieces;
         std::vector<procon::NeoExpandedPolygon> neoframes;
@@ -230,7 +234,7 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         logger->info("exported CSV");
     }
 
-    if(event->key() == Qt::Key_L){
+    if(event->key() == Qt::Key_L){//Lでポリゴンの生成
         if(last_polygon.outer().size() < 3)logger->error("始点と終点を結ぶことができません");
         else{
             last_polygon.outer().push_back(last_polygon.outer().at(0));
@@ -244,7 +248,7 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
             last_polygon.clear();
         }
     }
-    if(event->key() == Qt::Key_M){
+    if(event->key() == Qt::Key_M){//Mでモード変更
         if(last_polygon.outer().size()!=0){
             logger->error("polygonの生成中のためモードを変更できません");
         }else{
@@ -254,6 +258,12 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
                      : "chenged to piece_mode");
         }
     }
+
+    if(event->key() == Qt::Key_B){//Bで最も新しい頂点の削除
+        last_polygon.outer().pop_back();
+        logger->info("頂点を削除しました");
+    }
+
     this->update();
 }
 
