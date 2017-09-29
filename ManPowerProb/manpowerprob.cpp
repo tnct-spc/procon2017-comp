@@ -287,9 +287,13 @@ void ManPowerProb::changeMode(){
 bool ManPowerProb::checkCanPlacePiece(point_i point){//pieceが置けるならtrueを返す
     if(frames.size()==0){//フレームが無い時
         if(!bg::intersects(not_put_part,point))return false;//枠外ならfalse
+
     }else{
         bool frame_flag=false;
-        for(auto frame : frames){
+
+    std::cout << frames.size()<<std::endl;//はいここで問題が起きてる
+
+        for(auto frame : frames){//ここ
             if(bg::intersects(frame,point)){
                 frame_flag=true;
                 for(auto poly_point : last_polygon.outer()){
