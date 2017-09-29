@@ -24,6 +24,59 @@ ManPowerProb::~ManPowerProb()
 
 void ManPowerProb::paintEvent(QPaintEvent *event){
 
+    //色リスト
+    QStringList colorlist;
+        colorlist << "#f39700"
+                  << "#e60012"
+                  << "#9caeb7"
+                  << "#00a7db"
+                  << "#00a7db"
+                  << "#d7c447"
+                  << "#9b7cb6"
+                  << "#00ada9"
+                  << "#bb641d"
+                  << "#e85298"
+                  << "#0079c2"
+                  << "#6cbb5a"
+                  << "#b6007a"
+                  << "#e5171f"
+                  << "#522886"
+                  << "#0078ba"
+                  << "#019a66"
+                  << "#e44d93"
+                  << "#814721"
+                  << "#a9cc51"
+                  << "#ee7b1a"
+                  << "#00a0de"
+                  << "#dd3333"
+                  << "#bb3322"
+                  << "#bb3377"
+                  << "#773333"
+                  << "#ee7733"
+                  << "#ffdd00"
+                  << "#ffdd99"
+                  << "#bbbb99"
+                  << "#88bb88"
+                  << "#669966"
+                  << "#66aa88"
+                  << "#99dd66"
+                  << "#339966"
+                  << "#119988"
+                  << "#114433"
+                  << "#225588"
+                  << "#44aacc"
+                  << "#333388"
+                  << "#ff89ff"
+                  << "#ff8989"
+                  << "#99ffcc"
+                  << "#9eff9e"
+                  << "#add6ff"
+                  << "#ffcc99"
+                  << "#00ff00"
+                  << "#8b0000"
+                  << "#8b008b"
+                  << "#00ffff";
+
     QPainter painter(this);
     const QString back_ground_color = "#EEEEBB";
     const QString frame_color = "#DDDD99";
@@ -145,6 +198,13 @@ void ManPowerProb::mousePressEvent(QMouseEvent *event){
 
 void ManPowerProb::keyPressEvent(QKeyEvent *event){
 
+    auto checkWithIn = [&]{
+        for(auto piece : pieces){
+            if(bg::intersects(last_polygon,piece))return true;
+        }
+        return false;//重なってるならtrueを返す
+    };
+
     if(event->key() == Qt::Key_A){//EnterでexportCSV
 
         std::vector<procon::NeoExpandedPolygon> neopieces;
@@ -175,7 +235,7 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         else{
             last_polygon.outer().push_back(last_polygon.outer().at(0));
             bg::correct(last_polygon);
-            if(!bg::is_valid(last_polygon))logger->error("ポリゴンが不自然な形になっています");
+            if(!bg::is_valid(last_polygon) || checkWithIn())logger->error("ポリゴンが不自然な形になっています");
             else{
                 if(is_frame)frames.push_back(last_polygon);
                 else pieces.push_back(last_polygon);
@@ -213,7 +273,7 @@ bool ManPowerProb::checkCanPlacePiece(point_i point){//pieceが置けるならtr
         if(!frame_flag)return false;//全ての枠の外ならfalse
     }
     for(auto piece : pieces){
-        if(bg::intersects(piece,point))return false;//pieceと重なっているならfalse
+        if(bg::within(point,piece))return false;//pieceと重なっているならfalse
     }
     return true;
 }
