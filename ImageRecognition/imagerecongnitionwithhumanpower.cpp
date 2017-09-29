@@ -61,12 +61,12 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
     int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
 
-    const int grid_size =
+    grid_size =
                     window_width <= window_height
                     ? window_width / (grid_col + grid_margin)
                     : window_height / (grid_row + grid_margin);
-    const double top_buttom_margin = (window_height - grid_size * grid_row) / 2;
-    const double left_right_margin = (window_width - grid_size * grid_col) / 2;
+    top_buttom_margin = (window_height - grid_size * grid_row) / 2;
+    left_right_margin = (window_width - grid_size * grid_col) / 2;
 
     painter.setBrush(QBrush(QColor("#00FFFF")));
 

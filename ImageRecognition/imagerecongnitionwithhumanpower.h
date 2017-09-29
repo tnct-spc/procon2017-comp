@@ -24,6 +24,7 @@ private:
     Ui::imagerecongnitionwithhumanpower *ui;
     QPushButton *edited_button;
     polygon_t polygon;
+    int grid_size,left_right_margin,top_buttom_margin;
 
 private slots:
     void clickedEditedButton();
