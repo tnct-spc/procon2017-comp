@@ -221,14 +221,16 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         }
         procon::NeoExpandedPolygon neoframe;
         if(frames.size()){
-
-            frames.push_back(not_put_part);
-        }
-        for(auto frame : frames){
-            neoframe.resetPolygonForce(frame);
+            neoframe.resetPolygonForce(not_put_part);
             neoframes.push_back(neoframe);
+            field.setFrame(neoframes);
+        }else{
+            for(auto frame : frames){
+                neoframe.resetPolygonForce(frame);
+                neoframes.push_back(neoframe);
+            }
+            field.setFrame(neoframes);
         }
-        field.setFrame(neoframes);
         field.setElementaryPieces(neopieces);
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
         logger->info("exported CSV");
@@ -260,8 +262,24 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
     }
 
     if(event->key() == Qt::Key_B){//Bで最も新しい頂点の削除
-        last_polygon.outer().pop_back();
-        logger->info("頂点を削除しました");
+        if(last_polygon.outer().size()!=0){
+            last_polygon.outer().pop_back();
+            logger->info("頂点を削除しました");
+        }else logger->error("頂点を削除できませんでした");
+    }
+
+    if(event->key() == Qt::Key_P){//Pで最も新しいピースの削除
+        if(pieces.size()!=0){
+            pieces.pop_back();
+            logger->info("ピースを削除しました");
+        }else logger->error("ピースを削除できませんでした");
+    }
+
+    if(event->key() == Qt::Key_F){//Fで最も新しいフレームの削除
+        if(frames.size()!=0){
+            frames.pop_back();
+            logger->info("フレームを削除しました");
+        }else logger->error("フレームを削除できませんでした");
     }
 
     this->update();
