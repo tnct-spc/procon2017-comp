@@ -203,7 +203,12 @@ bool ManPowerProb::checkCanPlacePiece(point_i point){//pieceが置けるならtr
     }else{
         bool frame_flag=false;
         for(auto frame : frames){
-            if(bg::intersects(frame,point))frame_flag=true;
+            if(bg::intersects(frame,point)){
+                frame_flag=true;
+                for(auto poly_point : last_polygon.outer()){
+                    if(!bg::intersects(frame,poly_point))return false;
+                }
+            }
         }
         if(!frame_flag)return false;//全ての枠の外ならfalse
     }
