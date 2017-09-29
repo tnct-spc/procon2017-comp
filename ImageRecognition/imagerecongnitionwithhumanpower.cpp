@@ -65,15 +65,15 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
                     window_width <= window_height
                     ? window_width / (grid_col + grid_margin)
                     : window_height / (grid_row + grid_margin);
-    const int top_buttom_margin = (window_height - grid_size * grid_row) / 2;
-    const int left_right_margin = (window_width - grid_size * grid_col) / 2;
+    const double top_buttom_margin = (window_height - grid_size * grid_row) / 2;
+    const double left_right_margin = (window_width - grid_size * grid_col) / 2;
 
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
     std::vector<QPointF> polygon_points;
     for(unsigned int a = 0;a < this->polygon.outer().size(); a++){
-        int x_buf = grid_size * (polygon.outer()[a].x() - minmaxX.first->x()) + left_right_margin;
-        int y_buf = grid_size * (polygon.outer()[a].y() - minmaxY.first->y()) + top_buttom_margin;
+        int x_buf = grid_size * (polygon.outer()[a].x() - std::floor(minmaxX.first->x())) + left_right_margin;
+        int y_buf = grid_size * (polygon.outer()[a].y() - std::floor(minmaxY.first->y())) + top_buttom_margin;
         polygon_points.push_back(QPointF(x_buf,y_buf));
     }
     painter.setPen(QPen(QColor("#99CC00")));
