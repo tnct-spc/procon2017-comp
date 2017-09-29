@@ -31,6 +31,8 @@ void NeoSolver::run(procon::NeoField field, int algorithm_number)
 
     std::cout << "neosolver " << std::endl;
 
+    system("aplay /home/taki/procon2017-comp/p.wav");
+
     return;
 }
 
