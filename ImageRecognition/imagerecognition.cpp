@@ -87,7 +87,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
 
-        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+//        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
     // sum polygon_t and piece's image
@@ -146,7 +146,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-//        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -426,7 +426,7 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 
         //LSD直線検出 引数の"scale"が重要！！！
         //cv::LSD_REFINE_STD,threshold::LSDthrehold
-        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.75); // 0.75
+        cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.75); // 300->0.75
         lsd->detect(image, pieces_lines[count]);
 
 
@@ -913,7 +913,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if (s > 60) { // (h > 0 && h < 50) && s > 90 && v > 100
+            if (s > 60 && v > 50) { // 300->60,50
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -921,9 +921,6 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
             }
         }
     }
-
-    //cv::Mat resize_image;
-    //cv::resize(piece_image, resize_image, cv::Size(), n, n);
 
 //    cv::namedWindow("bainary", CV_WINDOW_NORMAL);
 //    cv::imshow("bainary", piece_image);
@@ -1028,8 +1025,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
         double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
 
-            printf("%f\n", acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI);
-
         if (len < 1.0) {
 
             // 異常に短いものは一つに結合
@@ -1124,6 +1119,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     } else {
 
+        //search right angle
         for (unsigned int i=0; i<polygon.size()-1; i++) {
             double vec[4];
             vec[0] = polygon.at(i).x() - polygon.at(i+1).x();
@@ -1194,13 +1190,12 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 //        }
 //    }
 
-    // 最初の辺の長さをグリッド基準で計算
+    // 最初の辺の長さを計算
     double first_x = polygon.at(1).x() - polygon.at(0).x();
     double first_y = polygon.at(1).y() - polygon.at(0).y();
     double len = hypot(first_x, first_y);
     double to_ver_rad = std::atan2(first_y, first_x);
     point_i smallest;
-    
 
     if (right_angle) {
         smallest = point_i((int)round(len), 0);
@@ -1208,6 +1203,9 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
         // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
         std::vector<point_i> first_point;
+
+//        if (len < 5) len += 2.0;
+//        else if (len < 10) len += 0.8;
 
         // binary search table
         int match = binarySearch(this->length_table, 0, this->length_table.size()-1, len);
@@ -1218,13 +1216,13 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         bool l_check = true;
         while (s_check || l_check) {
 
-            if (fabs(this->length_table.at(shorter).second - len) < 0.25) {
+            if (fabs(this->length_table.at(shorter).second - len) < 2.0) {
                 first_point.push_back(this->length_table.at(shorter).first);
             } else {
                 s_check = false;
             }
 
-            if (fabs(this->length_table.at(longer).second - len) < 0.25) {
+            if (fabs(this->length_table.at(longer).second - len) < 2.0) {
                 first_point.push_back(this->length_table.at(longer).first);
             } else {
                 l_check = false;
