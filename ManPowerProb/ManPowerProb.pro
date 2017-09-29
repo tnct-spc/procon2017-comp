@@ -24,11 +24,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        manpowerprob.cpp
+        manpowerprob.cpp \
+    manpowergui.cpp
 
-HEADERS  += manpowerprob.h
+HEADERS  += manpowerprob.h \
+    manpowergui.h
 
-FORMS    += manpowerprob.ui
+FORMS    += manpowerprob.ui \
+    manpowergui.ui
 
 LIBS += -L/usr/lib `pkg-config --libs opencv`
 unix {

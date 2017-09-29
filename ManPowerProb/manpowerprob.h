@@ -26,6 +26,15 @@ public:
     explicit ManPowerProb(QWidget *parent = 0);
     ~ManPowerProb();
 
+
+    void addPoint(point_i point);
+    void exportToCsv();
+    void createPolygon();
+    void changeMode();
+    void deletePoint();
+    void deletePiece();
+    void deleteFrame();
+
 private:
 
     std::shared_ptr<spdlog::logger> logger;
@@ -34,13 +43,6 @@ private:
     point_i translateToPointi(QPointF point);
     bool checkCanPlacePiece(point_i point);
     bool checkCanPlaceFrame(point_i point);
-    void addPoint(point_i point);
-    void exportToCsv();
-    void createPolygon();
-    void changeMode();
-    void deletePoint();
-    void deletePiece();
-    void deleteFrame();
 
     int top_bottom_margin;
     int left_right_margin;
@@ -60,6 +62,7 @@ protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
 };
 
 #endif // MANPOWERPROB_H
