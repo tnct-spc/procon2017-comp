@@ -24,59 +24,6 @@ ManPowerProb::~ManPowerProb()
 
 void ManPowerProb::paintEvent(QPaintEvent *event){
 
-    //色リスト
-    QStringList colorlist;
-        colorlist << "#f39700"
-                  << "#e60012"
-                  << "#9caeb7"
-                  << "#00a7db"
-                  << "#00a7db"
-                  << "#d7c447"
-                  << "#9b7cb6"
-                  << "#00ada9"
-                  << "#bb641d"
-                  << "#e85298"
-                  << "#0079c2"
-                  << "#6cbb5a"
-                  << "#b6007a"
-                  << "#e5171f"
-                  << "#522886"
-                  << "#0078ba"
-                  << "#019a66"
-                  << "#e44d93"
-                  << "#814721"
-                  << "#a9cc51"
-                  << "#ee7b1a"
-                  << "#00a0de"
-                  << "#dd3333"
-                  << "#bb3322"
-                  << "#bb3377"
-                  << "#773333"
-                  << "#ee7733"
-                  << "#ffdd00"
-                  << "#ffdd99"
-                  << "#bbbb99"
-                  << "#88bb88"
-                  << "#669966"
-                  << "#66aa88"
-                  << "#99dd66"
-                  << "#339966"
-                  << "#119988"
-                  << "#114433"
-                  << "#225588"
-                  << "#44aacc"
-                  << "#333388"
-                  << "#ff89ff"
-                  << "#ff8989"
-                  << "#99ffcc"
-                  << "#9eff9e"
-                  << "#add6ff"
-                  << "#ffcc99"
-                  << "#00ff00"
-                  << "#8b0000"
-                  << "#8b008b"
-                  << "#00ffff";
-
     QPainter painter(this);
     const QString back_ground_color = "#EEEEBB";
     const QString frame_color = "#DDDD99";
@@ -100,12 +47,17 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
     painter.drawRect(QRect(0,0,window_width,window_height));
 
     auto drawGrid = [&]{
-        painter.setPen(QPen(QBrush(Qt::black),0.3));
         for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
+            if(current_col%10)painter.setPen(QPen(QBrush(Qt::black),0.3));
+            else painter.setPen(QPen(QBrush(Qt::black),0.5));
+
             int x = current_col * grid_size + left_right_margin;
             painter.drawLine(x,top_bottom_margin,x,splitedheight - top_bottom_margin);
         }
         for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
+            if(current_row%10)painter.setPen(QPen(QBrush(Qt::black),0.3));
+            else painter.setPen(QPen(QBrush(Qt::black),0.5));
+
             int y = current_row * grid_size + top_bottom_margin;
             painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
         }
@@ -211,10 +163,14 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
 
     if(event->key() == Qt::Key_A){//AでexportCSV
 
+        double frame_area=0;
+        double piece_area=0;
+
         std::vector<procon::NeoExpandedPolygon> neopieces;
         std::vector<procon::NeoExpandedPolygon> neoframes;
         int id=0;
         for(auto piece : pieces){
+            piece_area += bg::area(piece);
             procon::NeoExpandedPolygon neopiece(id);
             neopiece.resetPolygonForce(piece);
             neopieces.push_back(neopiece);
@@ -222,11 +178,13 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         }
         id=0;
         if(frames.size()==0){
+            frame_area += bg::area(not_put_part);
             procon::NeoExpandedPolygon neoframe(id);
             neoframe.resetPolygonForce(not_put_part);
             neoframes.push_back(neoframe);
         }else{
             for(auto frame : frames){
+                frame_area += bg::area(frame);
                 procon::NeoExpandedPolygon neoframe(id);
                 neoframe.resetPolygonForce(frame);
                 neoframes.push_back(neoframe);
@@ -237,7 +195,9 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         field.setElementaryFrame(neoframes);
         field.setElementaryPieces(neopieces);
         NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
+
         logger->info("exported CSV");
+        std::cout << "empty area : " << frame_area - piece_area << std::endl;
     }
 
     if(event->key() == Qt::Key_L){//Lでポリゴンの生成
