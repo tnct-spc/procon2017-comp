@@ -72,8 +72,6 @@ void Kunugida::run()
         return expanded_pieces;
 
     };
-    // Server
-    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
@@ -144,7 +142,7 @@ void Kunugida::run()
         board->setScannedPieces(scanned_dummy_piece);
 
 //        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/post.csv");
-//        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+        //        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -226,6 +224,9 @@ void Kunugida::run()
         }
 
         board->setScannedPieces(scanned_dummy_piece);
+    }else if(ui->ServerModeCheckbox->isChecked()){
+        //Server
+        QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
     }
 
     //    TODO: ここまでで各データソースから読み込むようにする

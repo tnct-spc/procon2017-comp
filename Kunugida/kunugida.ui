@@ -103,6 +103,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="ServerModeCheckbox">
+        <property name="text">
+         <string>Server Mode</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="0" column="2">
