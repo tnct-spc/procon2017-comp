@@ -228,6 +228,7 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
             field.setFrame(neoframes);
         }else{
             for(auto frame : frames){
+                procon::NeoExpandedPolygon neoframe(id);
                 neoframe.resetPolygonForce(frame);
                 neoframes.push_back(neoframe);
                 ++id;
