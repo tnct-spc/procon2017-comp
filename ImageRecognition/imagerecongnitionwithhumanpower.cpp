@@ -51,7 +51,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     int window_height = this->height();
 
     painter.setBrush(QBrush(QColor("#E5E6DB")));
-    painter.drawRect(0,0,this->width(),this->height());
+    painter.drawRect(0,0,window_width,window_height);
 
     //push_back points to std::vector<QPoint>
     std::vector<QPoint> points;
