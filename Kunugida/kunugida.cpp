@@ -85,6 +85,7 @@ void Kunugida::run()
         //std::string test_text = "test";
         //board->setText(test_text);
         PbMaker->show();
+        board->update();
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();
 
