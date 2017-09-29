@@ -25,8 +25,10 @@ private:
     Ui::imagerecongnitionwithhumanpower *ui;
     QPushButton *edited_button;
     polygon_t polygon;
-    int grid_size,left_right_margin,top_buttom_margin;
     std::vector<QPointF> points;
+    int grid_size,left_right_margin,top_buttom_margin;
+    bool selecting;
+    QPointF selected_point;
 
 private slots:
     void clickedEditedButton();

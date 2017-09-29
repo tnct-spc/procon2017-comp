@@ -43,14 +43,17 @@ QPointF imagerecongnitionwithhumanpower::toCoordinate(double window_x, double wi
 void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
     QPointF selected_point = toCoordinate(event->x(),event->y());
     auto itr = std::find(points.begin(),points.end(),selected_point);
-    if(itr == points.end()) return;
 
-    std::cout<<"hello"<<std::endl;
+    selecting = itr != points.end();
+    if(selecting){
+        this->selected_point = selected_point;
+    }
 }
 
 void imagerecongnitionwithhumanpower::mouseReleaseEvent(QMouseEvent *event){
+    if(!selecting) return;
     QPointF point = toCoordinate(event->x(),event->y());
-
+    std::cout<<"changed to "<<point.x()<<","<<point.y()<<std::endl;
 }
 
 void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
