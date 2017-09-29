@@ -28,7 +28,7 @@ private:
     std::vector<QPointF> points;
     int grid_size,left_right_margin,top_buttom_margin;
     bool selecting;
-    QPointF selected_point;
+    int move_index;
 
 private slots:
     void clickedEditedButton();
