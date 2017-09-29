@@ -34,8 +34,11 @@ Kunugida::Kunugida(QWidget *parent) :
 
     board = std::make_shared<NeoAnswerBoard>();
     board->showMaximized();
+
+    //Server
+    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
     //    board->setSingleMode(true);
-//    board->setSingleMode(true);
+    //    board->setSingleMode(true);
 }
 
 Kunugida::~Kunugida()
@@ -224,11 +227,14 @@ void Kunugida::run()
         }
 
         board->setScannedPieces(scanned_dummy_piece);
-    }else if(ui->ServerModeCheckbox->isChecked()){
-        //Server
-        QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
     }
 
+    if(ui->ServerModeCheckbox->isChecked()){
+        std::string PROBLEM_SAVE_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
+        std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
+        NeoPolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
+
+    }else{
     //    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
@@ -248,6 +254,7 @@ void Kunugida::run()
 #endif
 
     this->finishedProcess();
+    }
 }
 
 void Kunugida::clickedRunButton()

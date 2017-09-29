@@ -10,11 +10,13 @@ NeoSlaver::NeoSlaver(QWidget *parent) :
     ui->setupUi(this);
     board = std::make_shared<NeoAnswerBoard>();
     board->showMaximized();
+    connect(ui->run, &QPushButton::clicked, this, &NeoSlaver::pushGetButton);
 }
 
 NeoSlaver::~NeoSlaver()
 {
     delete ui;
+    delete manager;
 }
 
 bool NeoSlaver::get()
