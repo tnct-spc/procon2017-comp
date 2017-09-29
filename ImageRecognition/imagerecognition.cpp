@@ -11,8 +11,6 @@
 
 procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
-    makeTable();
-
     raw_pieces_pic = raw_pieces_image;
 
     // ピースに分割
@@ -74,6 +72,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         }
     }
 
+    // correct vector
     for(auto p : polygons){
         std::cerr << boost::geometry::is_valid(p);
     }
@@ -81,9 +80,9 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
+    // make ExpandedPolygon for GUI
     for (int i=0; i<polygons.size()-1; i++) {
 
-        // 確認用
         procon::ExpandedPolygon pos(i);
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
@@ -91,20 +90,22 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
-    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
-    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
+    // sum polygon_t and piece's image
+//    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
+//    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
 
-    int count = 0;
-    for (auto polygon : pfi) {
-        polygon_t p = polygon.getPolygon();
-        for (unsigned int i=0; i<p.outer().size()-1; i++) {
-            cv::line(pimage.at(count), cv::Point(p.outer().at(i).x(),p.outer().at(i).y()), cv::Point(p.outer().at(i+1).x(), p.outer().at(i+1).y()),cv::Scalar(50.0), 5,CV_AA);
-        }
-        cv::namedWindow(std::to_string(count));
-        cv::imshow(std::to_string(count), pimage.at(count));
-        count++;
-    }
+//    int count = 0;
+//    for (auto polygon : pfi) {
+//        polygon_t p = polygon.getPolygon();
+//        for (unsigned int i=0; i<p.outer().size()-1; i++) {
+//            cv::line(pimage.at(count), cv::Point(p.outer().at(i).x(),p.outer().at(i).y()), cv::Point(p.outer().at(i+1).x(), p.outer().at(i+1).y()),cv::Scalar(50.0), 5,CV_AA);
+//        }
+//        cv::namedWindow(std::to_string(count));
+//        cv::imshow(std::to_string(count), pimage.at(count));
+//        count++;
+//    }
 
+    // scale is led from 6*6 piece
 //    double scale_len;
 //    for (auto piece : polygons) {
 //        if (piece.outer().size() == 5) {
