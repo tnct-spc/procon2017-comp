@@ -98,14 +98,14 @@ void Kunugida::run()
         exframes.push_back(exframe);
 
         procon::NeoField exfield;
+        std::vector<procon::NeoExpandedPolygon> expieces;
 
         for(polygon_i polygon_z :pieces_){
             expiece.resetPolygonForce(polygon_z);
-            exfield.setPiece(expiece);
+            expieces.push_back(expiece);
         }
-
-
-        exfield.setFrame(exframes);
+        exfield.setElementaryPieces(expieces);
+        exfield.setElementaryFrame(exframes);
 
         NeoPolygonIO::exportPolygon(exfield,"../../procon2017-comp/Rabbithouse.csv");
 
