@@ -50,14 +50,13 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor("#E5E6DB")));
     painter.drawRect(0,0,window_width,window_height);
 
-    //push_back points to std::vector<QPoint>
-    std::vector<QPoint> points;
+    std::vector<QPointF> points;
     for(unsigned int a = 0; a < polygon.outer().size(); a++){
-        points.push_back(QPoint(polygon.outer()[a].x(),polygon.outer()[a].y()));
+        points.push_back(QPointF(polygon.outer()[a].x(),polygon.outer()[a].y()));
     }
 
-    auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.x() < b.x(); });
-    auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPoint a,QPoint b){ return a.y() < b.y(); });
+    auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.x() < b.x(); });
+    auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.y() < b.y(); });
 
     int grid_col = minmaxX.second->x() - minmaxX.first->x();
     int grid_row = minmaxY.second->y() - minmaxY.first->y();
@@ -71,11 +70,11 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
-    std::vector<QPoint> polygon_points;
+    std::vector<QPointF> polygon_points;
     for(unsigned int a = 0;a < this->polygon.outer().size(); a++){
         int x_buf = grid_size * (polygon.outer()[a].x() - minmaxX.first->x()) + left_right_margin;
         int y_buf = grid_size * (polygon.outer()[a].y() - minmaxY.first->y()) + top_buttom_margin;
-        polygon_points.push_back(QPoint(x_buf,y_buf));
+        polygon_points.push_back(QPointF(x_buf,y_buf));
     }
     painter.setPen(QPen(QColor("#99CC00")));
     painter.drawPolygon(&polygon_points.front(),polygon_points.size());
