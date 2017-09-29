@@ -213,14 +213,16 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
 
         std::vector<procon::NeoExpandedPolygon> neopieces;
         std::vector<procon::NeoExpandedPolygon> neoframes;
-
-        procon::NeoExpandedPolygon neopiece;
+        int id=0;
         for(auto piece : pieces){
+            procon::NeoExpandedPolygon neopiece(id);
             neopiece.resetPolygonForce(piece);
             neopieces.push_back(neopiece);
+            ++id;
         }
-        procon::NeoExpandedPolygon neoframe;
+        id=0;
         if(frames.size()){
+            procon::NeoExpandedPolygon neoframe(id);
             neoframe.resetPolygonForce(not_put_part);
             neoframes.push_back(neoframe);
             field.setFrame(neoframes);
@@ -228,6 +230,7 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
             for(auto frame : frames){
                 neoframe.resetPolygonForce(frame);
                 neoframes.push_back(neoframe);
+                ++id;
             }
             field.setFrame(neoframes);
         }
