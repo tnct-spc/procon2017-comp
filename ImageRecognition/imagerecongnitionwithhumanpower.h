@@ -22,12 +22,8 @@ public:
 
 private:
     Ui::imagerecongnitionwithhumanpower *ui;
-
-    procon::ExpandedPolygon polygonAdapter(polygon_t polygon);
     QPushButton *edited_button;
     polygon_t polygon;
-    std::vector<int> grid_x;
-    std::vector<int> grid_y;
 
 private slots:
     void clickedEditedButton();
