@@ -144,9 +144,11 @@ void ManPowerProb::mousePressEvent(QMouseEvent *event){
 void ManPowerProb::addPoint(point_i point){
 
     if(is_frame){
+        std::cout << checkCanPlaceFrame(point) << std::endl;//ここで落ちてる
         if(checkCanPlaceFrame(point))last_polygon.outer().push_back(point);
         else logger->error("範囲外を指定しています");
     }else{
+        std::cout << checkCanPlacePiece(point) << std::endl;//ここで落ちてる
         if(checkCanPlacePiece(point))last_polygon.outer().push_back(point);
         else logger->error("範囲外を指定しています");
     }

@@ -21,9 +21,8 @@ public:
 
 private:
     Ui::ManPowerGui *ui;
-
-private slots:
-    void deletePiece();
+    unsigned int spin_x=0;
+    unsigned int spin_y=0;
 };
 
 #endif // MANPOWERGUI_H

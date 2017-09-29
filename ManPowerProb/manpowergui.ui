@@ -16,27 +16,39 @@
   <widget class="QSpinBox" name="set_point_x">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>40</x>
      <y>20</y>
-     <width>46</width>
-     <height>22</height>
+     <width>71</width>
+     <height>51</height>
     </rect>
+   </property>
+   <property name="maximum">
+    <number>101</number>
+   </property>
+   <property name="displayIntegerBase">
+    <number>10</number>
    </property>
   </widget>
   <widget class="QSpinBox" name="set_point_y">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>120</x>
      <y>20</y>
-     <width>46</width>
-     <height>22</height>
+     <width>71</width>
+     <height>51</height>
     </rect>
+   </property>
+   <property name="maximum">
+    <number>65</number>
+   </property>
+   <property name="displayIntegerBase">
+    <number>10</number>
    </property>
   </widget>
   <widget class="QPushButton" name="add_point">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>240</x>
      <y>20</y>
      <width>80</width>
      <height>20</height>
