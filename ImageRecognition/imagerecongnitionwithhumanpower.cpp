@@ -58,8 +58,8 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.x() < b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.y() < b.y(); });
 
-    int grid_col = minmaxX.second->x() - minmaxX.first->x();
-    int grid_row = minmaxY.second->y() - minmaxY.first->y();
+    int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
+    int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
 
     const int grid_size =
                     window_width <= window_height
@@ -83,7 +83,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     QFont font;
     font.setPixelSize(20);
     painter.setFont(font);
-    for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
+    for(unsigned int point_index = 0; point_index < polygon_points.size() ; ++point_index){
         QString str;
         str += QString::number(point_index);
         str += "(";
