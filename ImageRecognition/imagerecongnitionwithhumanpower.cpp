@@ -34,6 +34,21 @@ void imagerecongnitionwithhumanpower::clickedEditedButton(){
 
 }
 
+void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
+    std::cout<<"mousepressevent"<<std::endl;
+    std::cout<<event->x()<<","<<event->y()<<std::endl;
+}
+
+void imagerecongnitionwithhumanpower::mouseMoveEvent(QMouseEvent *event){
+    std::cout<<"mousemoveevent"<<std::endl;
+    std::cout<<event->x()<<","<<event->y()<<std::endl;
+}
+
+void imagerecongnitionwithhumanpower::mouseReleaseEvent(QMouseEvent *event){
+    std::cout<<"mousereleaseevent"<<std::endl;
+    std::cout<<event->x()<<","<<event->y()<<std::endl;
+}
+
 procon::ExpandedPolygon imagerecongnitionwithhumanpower::polygonAdapter(polygon_t polygon){
     procon::ExpandedPolygon expandedpolygon;
     expandedpolygon.resetPolygonForce(polygon);

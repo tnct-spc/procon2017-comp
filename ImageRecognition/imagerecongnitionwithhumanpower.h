@@ -33,6 +33,9 @@ private slots:
     void clickedEditedButton();
 protected:
     void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif // IMAGERECONGNITIONWITHHUMANPOWER_H
