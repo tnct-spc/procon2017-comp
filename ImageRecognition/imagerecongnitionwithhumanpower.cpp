@@ -36,9 +36,9 @@ void imagerecongnitionwithhumanpower::clickedEditedButton(){
 }
 QPointF imagerecongnitionwithhumanpower::toPolygonPoint(double window_x, double window_y){
     const int N = 10;//小数点第Nまでの四捨五入
-    QPointF buf((window_x - left_right_margin)/grid_size,
-                  (window_y - top_buttom_margin)/grid_size);
-    QPointF point(std::round(buf.x()*N) / N - std::floor(minXY.first) , std::round(buf.y()*N) / N - std::floor(minXY.second));
+    QPointF buf((window_x - left_right_margin - std::floor(minXY.first))/grid_size,
+                  (window_y - top_buttom_margin - std::floor(minXY.second))/grid_size);
+    QPointF point(std::round(buf.x()*N) / N , std::round(buf.y()*N) / N);
     return point;
 }
 
@@ -61,12 +61,12 @@ void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
 
 void imagerecongnitionwithhumanpower::mouseReleaseEvent(QMouseEvent *event){
     if(!selecting) return;
-    QPointF point = toPolygonPoint(event->x(),event->y());
-    point_t buf_point(point.x() , point.y());
+    QPointF sed_point = toPolygonPoint(event->x(),event->y());
+    point_t buf_point(sed_point.x() , sed_point.y());
     polygon_t changed_polygon = polygon;
     changed_polygon.outer()[move_index] = buf_point;
     setPolygon(changed_polygon);
-    std::cout<<"changed to "<<point.x()<<","<<point.y()<<"index = "<<move_index<<std::endl;
+    std::cout<<"changed to "<<sed_point.x()<<","<<sed_point.y()<<"index = "<<move_index<<std::endl;
 
     this->update();
 }
