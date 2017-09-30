@@ -12,8 +12,10 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
     ManProb = new ManPowerProb();
     ManProb->show();
 
+    int centerx=0;
+    int centery=0;
 
-    QGraphicsView *view = new QGraphicsView();
+    view = new QGraphicsView();
     QGraphicsScene *scene = new QGraphicsScene();
     view->resize(600,400);
     std::cout << "w :" << view->width() << " h :" << view->height() << std::endl;
@@ -32,10 +34,10 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
     connect(ui->set_point_x,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){spin_x=val;});
     connect(ui->set_point_y,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){spin_y=val;});
 
-    connect(ui->center_x,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){ManProb->centerx=val;});
-    connect(ui->center_y,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){ManProb->centery=val;});
+    connect(ui->center_x,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){centerx=val;});
+    connect(ui->center_y,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){centery=val;});
 
-    connect(ui->zoom,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[&](double val){ManProb->zoom=val;});
+    connect(ui->zoom,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[&](double val){zoomIn(centerx,centery,val);});
 
     connect(ui->add_point,&QPushButton::clicked,ManProb,[&]{
         ManProb->addPoint(point_i(spin_x,spin_y));
@@ -48,3 +50,9 @@ ManPowerGui::~ManPowerGui()
     delete ui;
 }
 
+void ManPowerGui::zoomIn(int x, int y, double value){
+    double zoom_ = value / zoom;
+    zoom = value;
+    view->scale(zoom_,zoom_);
+    view->update();
+}

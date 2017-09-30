@@ -21,9 +21,12 @@ public:
 
 private:
     Ui::ManPowerGui *ui;
+    QGraphicsView *view;
     ManPowerProb *ManProb;
     unsigned int spin_x=0;
     unsigned int spin_y=0;
+    double zoom=1;
+    void zoomIn(int x,int y,double value);
 };
 
 #endif // MANPOWERGUI_H
