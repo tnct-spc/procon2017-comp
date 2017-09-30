@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <manpowerprob.h>
-#include <QKeyEvent>
 
 
 
@@ -19,6 +18,11 @@ public:
     explicit ManPowerGui(QWidget *parent = 0);
     ~ManPowerGui();
 
+signals:
+    void zoom_In();
+    void zoom_Out();
+
+
 private:
     Ui::ManPowerGui *ui;
     QGraphicsView *view;
@@ -31,8 +35,9 @@ private:
     double zoom=1;
     void zoomIn(double value);
 
-protected:
-    void keyPressEvent(QKeyEvent *event);
+private slots:
+    void _zoom_In();
+    void _zoom_Out();
 };
 
 #endif // MANPOWERGUI_H

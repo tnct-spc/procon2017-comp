@@ -40,8 +40,8 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
         ManProb->update();
     });
 
-    connect(ManProb,SIGNAL(zoom_In()),this,SLOT(zoomIn(zoom+0.5)));
-    connect(ManProb,SIGNAL(zoom_Out()),this,SLOT(zoomIn(zoom-0.5)));
+    connect(ManProb,SIGNAL(zoom_In()),this,SLOT(_zoom_In()));
+    connect(ManProb,SIGNAL(zoom_Out()),this,SLOT(_zoom_Out()));
 }
 
 ManPowerGui::~ManPowerGui()
@@ -57,6 +57,9 @@ void ManPowerGui::zoomIn(double value){
         view->update();
     }
 }
+
+void ManPowerGui::_zoom_In(){zoomIn(zoom+0.5);}
+void ManPowerGui::_zoom_Out(){zoomIn(zoom-0.5);}
 
 void ManPowerGui::keyPressEvent(QKeyEvent *event){
     if(event->key() == Qt::Key_Z){
