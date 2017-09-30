@@ -105,10 +105,8 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
     std::vector<QPointF> polygon_points;
-    for(unsigned int a = 0;a < polygon.outer().size(); a++){
-        int x_buf = grid_size * (polygon.outer()[a].x() - std::floor(minmaxX.first->x())) + left_right_margin;
-        int y_buf = grid_size * (polygon.outer()[a].y() - std::floor(minmaxY.first->y())) + top_buttom_margin;
-        polygon_points.push_back(QPointF(x_buf,y_buf));
+    for(point_t i : polygon.outer()){
+        polygon_points.push_back(toWindowPoint(i));
     }
     painter.setPen(QPen(QColor("#99CC00")));
     painter.drawPolygon(&polygon_points.front(),polygon_points.size());
