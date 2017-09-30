@@ -113,8 +113,8 @@
   <widget class="QPushButton" name="change_mode">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>240</y>
+     <x>20</x>
+     <y>190</y>
      <width>80</width>
      <height>20</height>
     </rect>
@@ -126,8 +126,8 @@
   <widget class="QDoubleSpinBox" name="zoom">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>250</y>
+     <x>30</x>
+     <y>150</y>
      <width>64</width>
      <height>22</height>
     </rect>
@@ -142,75 +142,17 @@
     <double>1.000000000000000</double>
    </property>
   </widget>
-  <widget class="QSpinBox" name="center_x">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>220</y>
-     <width>46</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>101</number>
-   </property>
-   <property name="displayIntegerBase">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="center_y">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>250</y>
-     <width>46</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>65</number>
-   </property>
-   <property name="displayIntegerBase">
-    <number>10</number>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>230</y>
+     <y>130</y>
      <width>54</width>
      <height>12</height>
     </rect>
    </property>
    <property name="text">
     <string>Zoom</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>220</y>
-     <width>54</width>
-     <height>12</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>centerx:</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>250</y>
-     <width>54</width>
-     <height>12</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>centery:</string>
    </property>
   </widget>
  </widget>

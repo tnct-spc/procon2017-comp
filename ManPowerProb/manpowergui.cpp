@@ -4,6 +4,7 @@
 #include <qboxlayout.h>
 
 
+
 ManPowerGui::ManPowerGui(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ManPowerGui)
@@ -12,13 +13,11 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
     ManProb = new ManPowerProb();
     ManProb->show();
 
-    int centerx=0;
-    int centery=0;
 
     view = new QGraphicsView();
-    QGraphicsScene *scene = new QGraphicsScene();
+    scene = new QGraphicsScene();
+
     view->resize(600,400);
-    std::cout << "w :" << view->width() << " h :" << view->height() << std::endl;
     ManProb->resize(view->width()-10,view->height()-10);
     scene->addWidget(ManProb);
     view->setScene(scene);
@@ -34,10 +33,7 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
     connect(ui->set_point_x,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){spin_x=val;});
     connect(ui->set_point_y,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){spin_y=val;});
 
-    connect(ui->center_x,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){centerx=val;});
-    connect(ui->center_y,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){centery=val;});
-
-    connect(ui->zoom,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[&](double val){zoomIn(centerx,centery,val);});
+    connect(ui->zoom,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[&](double val){zoomIn(val);});
 
     connect(ui->add_point,&QPushButton::clicked,ManProb,[&]{
         ManProb->addPoint(point_i(spin_x,spin_y));
@@ -50,9 +46,20 @@ ManPowerGui::~ManPowerGui()
     delete ui;
 }
 
-void ManPowerGui::zoomIn(int x, int y, double value){
-    double zoom_ = value / zoom;
-    zoom = value;
-    view->scale(zoom_,zoom_);
-    view->update();
+void ManPowerGui::zoomIn(double value){
+    if(!(value>99 || value<0.5)){
+        double zoom_ = value / zoom;
+        zoom = value;
+        view->scale(zoom_,zoom_);
+        view->update();
+    }
+}
+
+void ManPowerGui::keyPressEvent(QKeyEvent *event){
+    if(event->key() == Qt::Key_Z){
+        zoomIn(zoom+0.5);
+    }
+    if(event->key() == Qt::Key_X){
+        zoomIn(zoom-0.5);
+    }
 }

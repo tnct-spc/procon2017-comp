@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <manpowerprob.h>
-#include <qspinbox.h>
+#include <QKeyEvent>
 
 
 
@@ -22,11 +22,17 @@ public:
 private:
     Ui::ManPowerGui *ui;
     QGraphicsView *view;
+    QGraphicsScene *scene;
     ManPowerProb *ManProb;
     unsigned int spin_x=0;
     unsigned int spin_y=0;
+    unsigned int center_x=0;
+    unsigned int center_y=0;
     double zoom=1;
-    void zoomIn(int x,int y,double value);
+    void zoomIn(double value);
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // MANPOWERGUI_H
