@@ -17,7 +17,7 @@ bool TestImageRecognitionWithHumanPower::run()
     imagerecongnitionwithhumanpower *iwh = new imagerecongnitionwithhumanpower();
     iwh->setPolygon(polygon);
     iwh->show();
-//    iwh->update();
+//    iwh->setPolygon(polygon);
     std::cout<<"hello"<<std::endl;
     return 1;
 }

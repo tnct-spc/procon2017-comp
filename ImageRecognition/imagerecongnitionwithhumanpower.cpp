@@ -21,7 +21,7 @@ imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
 }
 
 void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
-//    bg::correct(polygon);
+    bg::correct(polygon);
     this->polygon = polygon;
     points.clear();
     for(int i = 0 ; i<polygon.outer().size()-1;i++){
@@ -61,13 +61,12 @@ void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
 
 void imagerecongnitionwithhumanpower::mouseReleaseEvent(QMouseEvent *event){
     if(!selecting) return;
-    QPointF sed_point = toPolygonPoint(event->x(),event->y());
-    point_t buf_point(sed_point.x() , sed_point.y());
-    polygon_t changed_polygon = polygon;
-    changed_polygon.outer()[move_index] = buf_point;
+    points[move_index] = toPolygonPoint(event->x(),event->y());
+    polygon_t changed_polygon;
+    for(QPointF i : points){
+        changed_polygon.outer().push_back(point_t(i.x(),i.y()));
+    }
     setPolygon(changed_polygon);
-    std::cout<<"changed to "<<sed_point.x()<<","<<sed_point.y()<<"index = "<<move_index<<std::endl;
-
     this->update();
 }
 
