@@ -187,6 +187,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 points.push_back(getPosition(point));
             }
             painter.drawPolygon(&points.front(),points.size());
+            polygon_i test = expanded_poly.getPolygon();
     };
 
 

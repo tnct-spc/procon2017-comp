@@ -27,6 +27,7 @@ private:
     Ui::NeoSinglePolygonDisplay *ui;
     polygon_i polygon;
     bool enlarged_polygon;
+    std::vector<double> angles;
 
 protected:
     void paintEvent(QPaintEvent *);

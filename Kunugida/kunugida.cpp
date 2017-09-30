@@ -144,8 +144,15 @@ void Kunugida::run()
         board->setScannedPieces(scanned_dummy_piece);
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
-        emit requestCSV();
+//        emit requestCSV();
         NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+        display = new NeoSinglePolygonDisplay;
+        procon::NeoExpandedPolygon expandedpolygon;
+        expandedpolygon = field.getElementaryPieces().at(0);
+        polygon_i polygon;
+        polygon = expandedpolygon.getPolygon();
+        NeoPolygonViewer::getInstance().displayPolygon(polygon, "window", false);
+
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -186,7 +193,6 @@ void Kunugida::run()
     }else if(ui->sample_data_use_button->isChecked()){
         //read sample
         field = NeoPolygonIO::importField("../../procon2017-comp/sample/comp-sample.csv");
-
         //dummy
         std::vector<procon::ExpandedPolygon> scanned_poly;
         for(const auto& p : field.getElementaryPieces()){
