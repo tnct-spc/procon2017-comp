@@ -92,15 +92,14 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
     int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
 
-    grid_size =
-                    window_width <= window_height
+    grid_size =window_width <= window_height
                     ? window_width / (grid_col + grid_margin)
                     : window_height / (grid_row + grid_margin);
     top_buttom_margin = (window_height - grid_size * grid_row) / 2;
     left_right_margin = (window_width - grid_size * grid_col) / 2;
 
+    //polygon表示
     painter.setBrush(QBrush(QColor("#00FFFF")));
-
     std::vector<QPointF> window_points;
     for(QPointF i : points){
         window_points.push_back(toWindowPoint(i));
@@ -108,6 +107,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     painter.setPen(QPen(QColor("#99CC00")));
     painter.drawPolygon(&window_points.front(),window_points.size());
 
+    //index表示
     painter.setPen(QPen(QColor("#F15A22")));
     QFont font;
     font.setPixelSize(20);
@@ -123,7 +123,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
         painter.drawText(window_points[point_index] ,str);
     }
 
-
+    //grid表示
     painter.setPen(QPen(QColor("#000000")));
     for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
         int x = current_col * grid_size + left_right_margin;
