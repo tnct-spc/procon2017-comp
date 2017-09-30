@@ -60,12 +60,3 @@ void ManPowerGui::zoomIn(double value){
 
 void ManPowerGui::_zoom_In(){zoomIn(zoom+0.5);}
 void ManPowerGui::_zoom_Out(){zoomIn(zoom-0.5);}
-
-void ManPowerGui::keyPressEvent(QKeyEvent *event){
-    if(event->key() == Qt::Key_Z){
-        zoomIn(zoom+0.5);
-    }
-    if(event->key() == Qt::Key_X){
-        zoomIn(zoom-0.5);
-    }
-}
