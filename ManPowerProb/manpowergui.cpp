@@ -39,6 +39,9 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
         ManProb->addPoint(point_i(spin_x,spin_y));
         ManProb->update();
     });
+
+    connect(ManProb,SIGNAL(zoom_In()),this,SLOT(zoomIn(zoom+0.5)));
+    connect(ManProb,SIGNAL(zoom_Out()),this,SLOT(zoomIn(zoom-0.5)));
 }
 
 ManPowerGui::~ManPowerGui()

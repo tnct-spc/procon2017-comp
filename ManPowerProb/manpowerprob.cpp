@@ -185,6 +185,13 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
         deleteFrame();
     }
 
+    if(event->key() == Qt::Key_Z){//Zで拡大
+        emit zoom_In();
+    }
+
+    if(event->key() == Qt::Key_X){//Xで縮小
+        emit zoom_Out();
+    }
 }
 
 
