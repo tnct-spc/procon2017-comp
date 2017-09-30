@@ -989,7 +989,8 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 }
 
 polygon_i ImageRecognition::placeGrid(polygon_t vertex)
-{    
+{
+    // 辺の長さでの２分探索
     struct {
         int operator() (const std::vector<std::pair<point_i, double>> &tab, const int &start, const int &end, const double &target)
         {
@@ -1007,13 +1008,14 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     } binarySearch;
 
+    // outer
     auto& polygon = vertex.outer();
 
     // グリッドの点番号で保存
     polygon_i grid_piece;
     grid_piece.outer().push_back(point_i(0,0));
 
-    // 1cm以下の辺があったら削除
+    // 1cm以下の辺があったら加工
     polygon.pop_back();
     for (unsigned int i=0; i<polygon.size(); i++) {
 
@@ -1078,8 +1080,10 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                     i--;
                 }
             }
+
         } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 7) {
 
+            // ほぼ平らな２辺は１本に
             polygon.erase(polygon.begin() + (i + 2) % polygon.size());
             i--;
         }
@@ -1094,6 +1098,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     if (id >= pieces_num-frame_num) {
 
+        // フレームは長い辺を横に
         unsigned int longgest;
         double long_len = 0;
         for (unsigned int i = 0; i < polygon.size()-1; i++) {
@@ -1119,8 +1124,9 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     } else {
 
-        //search right angle
+        // ９０度角を探す
         for (unsigned int i=0; i<polygon.size()-1; i++) {
+
             double vec[4];
             vec[0] = polygon.at(i).x() - polygon.at(i+1).x();
             vec[1] = polygon.at(i).y() - polygon.at(i+1).y();
@@ -1131,12 +1137,16 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             // 配列を循環
             if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
                 double hori = hypot(vec[2], vec[3]);
+
+                // ９０度角でも傾いている場合を考慮
                 if (fabs(hori - round(hori)) < 0.1) {
+
                     polygon.pop_back();
                     polygon_t spin;
                     for (unsigned int j = 0; j < polygon.size(); j++) {
                         spin.outer().push_back(vertex.outer().at((j+i+1)%polygon.size()));
                     }
+
                     spin.outer().push_back(spin.outer().at(0));
                     vertex = spin;
 
@@ -1204,9 +1214,10 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
         std::vector<point_i> first_point;
 
+        // 面積が小さいものは拡大してから探索
         double area = bg::area(vertex);
 
-        if (fabs(area) < 50) {
+        if (fabs(area) < 100) {
             trans::scale_transformer<double,2,2> reduction(1.05);
             polygon_t reduce;
             bg::transform(vertex, reduce, reduction);
@@ -1216,9 +1227,10 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 //        if (len < 5) len += 2.0;
 //        else if (len < 10) len += 0.8;
 
-        // binary search table
+        // ２分探索
         int match = binarySearch(this->length_table, 0, this->length_table.size()-1, len);
 
+        // ２分探索から出た座標から距離のにているものをピックアップ
         int shorter = match;
         int longer = match + 1;
         bool s_check = true;
@@ -1241,7 +1253,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             longer++;
         }
 
-        // 可能性のあるものから相好の誤差が最も小さいものを確認
+        // 可能性のあるものから全角の誤差が最も小さいものを確認
         std::vector<double> difs;
         int smallest_dif = 100;
 
@@ -1267,6 +1279,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     }
 
+    // 最終的な回転角度を算出
     double theta = std::atan2(smallest.y(), smallest.x()) - to_ver_rad;
 
     // 全ての点を回転後のいちに移動
