@@ -25,7 +25,7 @@ void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
     points.clear();
     for(point_t i : polygon.outer()){
         QPointF point(i.x(),i.y());
-        this->points.push_back(point);
+        points.push_back(point);
     }
     this->update();
 }
@@ -33,7 +33,7 @@ void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
 
 }
-QPointF imagerecongnitionwithhumanpower::toCoordinate(double window_x, double window_y){
+QPointF imagerecongnitionwithhumanpower::toPolygonPoint(double window_x, double window_y){
     const int N = 10;//小数点第Nまでの四捨五入
     QPointF buf((window_x - left_right_margin)/grid_size,
                   (window_y - top_buttom_margin)/grid_size);
@@ -41,19 +41,25 @@ QPointF imagerecongnitionwithhumanpower::toCoordinate(double window_x, double wi
     return point;
 }
 
+QPointF imagerecongnitionwithhumanpower::toWindowPoint(point_t polygon_point){
+    int x_buf = grid_size * polygon_point.x() - std::floor(minXY.first) + left_right_margin;
+    int y_buf = grid_size * polygon_point.y() - std::floor(minXY.second) + top_buttom_margin;
+    return QPointF(x_buf,y_buf);
+}
+
 void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
-    QPointF selected_point = toCoordinate(event->x(),event->y());
+    QPointF selected_point = toPolygonPoint(event->x(),event->y());
     auto itr = std::find(points.begin(),points.end(),selected_point);
 
     selecting = itr != points.end();
     if(selecting){
-        this->move_index = std::distance(points.begin(),itr);
+        move_index = std::distance(points.begin(),itr);
     }
 }
 
 void imagerecongnitionwithhumanpower::mouseReleaseEvent(QMouseEvent *event){
     if(!selecting) return;
-    QPointF point = toCoordinate(event->x(),event->y());
+    QPointF point = toPolygonPoint(event->x(),event->y());
     point_t buf_point(point.x() , point.y());
     polygon_t changed_polygon = polygon;
     changed_polygon.outer()[move_index] = buf_point;
@@ -83,6 +89,9 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.x() < b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.y() < b.y(); });
 
+    minXY.first = minmaxX.second->x();
+    minXY.second = minmaxY.second->y();
+
     int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
     int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
 
@@ -96,7 +105,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
     std::vector<QPointF> polygon_points;
-    for(unsigned int a = 0;a < this->polygon.outer().size(); a++){
+    for(unsigned int a = 0;a < polygon.outer().size(); a++){
         int x_buf = grid_size * (polygon.outer()[a].x() - std::floor(minmaxX.first->x())) + left_right_margin;
         int y_buf = grid_size * (polygon.outer()[a].y() - std::floor(minmaxY.first->y())) + top_buttom_margin;
         polygon_points.push_back(QPointF(x_buf,y_buf));

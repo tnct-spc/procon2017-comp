@@ -21,12 +21,14 @@ public:
     void setPolygon(polygon_t polygon);
 
 private:
-    QPointF toCoordinate(double window_x,double window_y);
+    QPointF toPolygonPoint(double window_x,double window_y);
+    QPointF toWindowPoint(point_t polygon_point);
     Ui::imagerecongnitionwithhumanpower *ui;
     QPushButton *edited_button;
     polygon_t polygon;
     std::vector<QPointF> points;
     int grid_size,left_right_margin,top_buttom_margin;
+    std::pair<double,double> minXY;
     bool selecting;
     int move_index;
 
