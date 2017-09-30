@@ -263,6 +263,25 @@ bool procon::NeoField::check_hint()
 #endif
         std::vector<procon::NeoExpandedPolygon> hint_pieces_next = hint_pieces;
 
+        //180度角除去
+        std::function<void(polygon_i&)> delete_180_degree = [&delete_180_degree](polygon_i &poly)
+        {
+            procon::NeoExpandedPolygon expoly;
+            expoly.resetPolygonForce(poly);
+            std::vector<double> angles = expoly.getSideAngle();
+            unsigned int i = 0;
+            for(double angle : angles) {
+                if(!(angle < M_PI || angle > M_PI)) {
+                    std::vector<point_i> &outer = poly.outer();
+                    outer.erase(outer.begin() + i);
+                    if(i == 0) outer.at(outer.size() - 1) = outer.at(0);
+                    delete_180_degree(poly);
+                    break;
+                }
+                ++i;
+            }
+        };
+
         bool check_all_float = true; //ヒントが全部浮いてるか
             unsigned int hint_index = 0;
             for(procon::NeoExpandedPolygon hint_piece : hint_pieces) {
@@ -308,6 +327,9 @@ bool procon::NeoField::check_hint()
                         }
                         std::vector<polygon_i> frames_new;
                         bg::difference(frame.getPolygon(), hint_piece.getPolygon(), frames_new);
+                        for(polygon_i &frame_new : frames_new) {
+                            delete_180_degree(frame_new);
+                        }
                         for(const polygon_i &frame_new : frames_new) {
                             if(frame_new.inners().empty()) { //ちゃんとヒントがはまった
 #ifdef test
