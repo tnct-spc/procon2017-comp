@@ -21,10 +21,11 @@ imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
 }
 
 void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
+//    bg::correct(polygon);
     this->polygon = polygon;
     points.clear();
-    for(point_t i : polygon.outer()){
-        QPointF point(i.x(),i.y());
+    for(int i = 0 ; i<polygon.outer().size()-1;i++){
+        QPointF point(polygon.outer()[i].x(),polygon.outer()[i].y());
         points.push_back(point);
     }
     this->update();
@@ -37,18 +38,19 @@ QPointF imagerecongnitionwithhumanpower::toPolygonPoint(double window_x, double 
     const int N = 10;//小数点第Nまでの四捨五入
     QPointF buf((window_x - left_right_margin)/grid_size,
                   (window_y - top_buttom_margin)/grid_size);
-    QPointF point(std::round(buf.x()*N) / N , std::round(buf.y()*N) / N);
+    QPointF point(std::round(buf.x()*N) / N - std::floor(minXY.first) , std::round(buf.y()*N) / N - std::floor(minXY.second));
     return point;
 }
 
-QPointF imagerecongnitionwithhumanpower::toWindowPoint(point_t polygon_point){
-    int x_buf = grid_size * polygon_point.x() - std::floor(minXY.first) + left_right_margin;
-    int y_buf = grid_size * polygon_point.y() - std::floor(minXY.second) + top_buttom_margin;
+QPointF imagerecongnitionwithhumanpower::toWindowPoint(QPointF point){
+    int x_buf = grid_size * point.x() - std::floor(minXY.first) + left_right_margin;
+    int y_buf = grid_size * point.y() - std::floor(minXY.second) + top_buttom_margin;
     return QPointF(x_buf,y_buf);
 }
 
 void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
     QPointF selected_point = toPolygonPoint(event->x(),event->y());
+    std::cout<<selected_point.x()<<","<<selected_point.y()<<std::endl;
     auto itr = std::find(points.begin(),points.end(),selected_point);
 
     selecting = itr != points.end();
@@ -81,16 +83,11 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
     painter.setBrush(QBrush(QColor("#E5E6DB")));
     painter.drawRect(0,0,window_width,window_height);
 
-    std::vector<QPointF> points;
-    for(unsigned int a = 0; a < polygon.outer().size(); a++){
-        points.push_back(QPointF(polygon.outer()[a].x(),polygon.outer()[a].y()));
-    }
-
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.x() < b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.y() < b.y(); });
 
-    minXY.first = minmaxX.second->x();
-    minXY.second = minmaxY.second->y();
+    minXY.first = minmaxX.first->x();
+    minXY.second = minmaxY.first->y();
 
     int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
     int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
@@ -104,26 +101,26 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
-    std::vector<QPointF> polygon_points;
-    for(point_t i : polygon.outer()){
-        polygon_points.push_back(toWindowPoint(i));
+    std::vector<QPointF> window_points;
+    for(QPointF i : points){
+        window_points.push_back(toWindowPoint(i));
     }
     painter.setPen(QPen(QColor("#99CC00")));
-    painter.drawPolygon(&polygon_points.front(),polygon_points.size());
+    painter.drawPolygon(&window_points.front(),window_points.size());
 
     painter.setPen(QPen(QColor("#F15A22")));
     QFont font;
     font.setPixelSize(20);
     painter.setFont(font);
-    for(unsigned int point_index = 0; point_index < polygon_points.size() ; ++point_index){
+    for(unsigned int point_index = 0; point_index < window_points.size() ; ++point_index){
         QString str;
         str += QString::number(point_index);
         str += "(";
-        str += QString::number(polygon.outer()[point_index].x());
+        str += QString::number(points[point_index].x());
         str += ",";
-        str += QString::number(polygon.outer()[point_index].y());
+        str += QString::number(points[point_index].y());
         str += ")";
-        painter.drawText(polygon_points[point_index] ,str);
+        painter.drawText(window_points[point_index] ,str);
     }
 
 
