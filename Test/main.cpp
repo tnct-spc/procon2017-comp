@@ -26,12 +26,12 @@ int Test()
 //    TESTER.push_back(new TestJoinPolygon);
 //    TESTER.push_back(new testSearchSameLength);
 //    TESTER.push_back(new TestAlgorithmWrapper);
-    TESTER.push_back(new TestEvaluation);
-//    TESTER.push_back(new TestPolygonConnector);
+//    TESTER.push_back(new TestEvaluation);
+    TESTER.push_back(new TestPolygonConnector);
 //    TESTER.push_back(new testCheckOddField);
 //    TESTER.push_back(new TestCheckCanPrume);
 //    TESTER.push_back(new testCheckOddField);
-    TESTER.push_back(new TestQrTranslateToPolygon);
+//    TESTER.push_back(new TestQrTranslateToPolygon);
 
     for(auto tester : TESTER){
         if(!tester->run()){
