@@ -21,6 +21,7 @@ public:
 
 private:
     Ui::ManPowerGui *ui;
+    ManPowerProb *ManProb;
     unsigned int spin_x=0;
     unsigned int spin_y=0;
 };

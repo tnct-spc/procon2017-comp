@@ -1,6 +1,7 @@
 #include "manpowergui.h"
 #include "manpowerprob.h"
 #include "ui_manpowergui.h"
+#include <qboxlayout.h>
 
 
 ManPowerGui::ManPowerGui(QWidget *parent) :
@@ -8,9 +9,8 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
     ui(new Ui::ManPowerGui)
 {
     ui->setupUi(this);
-    ManPowerProb *ManProb = new ManPowerProb();
+    ManProb = new ManPowerProb();
     ManProb->show();
-
 
     connect(ui->change_mode,&QPushButton::clicked,ManProb,&ManPowerProb::changeMode);
     connect(ui->delete_piece,&QPushButton::clicked,ManProb,&ManPowerProb::deletePiece);
@@ -19,12 +19,17 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
 
     connect(ui->create_polygon,&QPushButton::clicked,ManProb,&ManPowerProb::createPolygon);
 
-    connect(ui->set_point_x,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){spin_x=val; std::cout << spin_x << std::endl;});//ここの二行が死んでる
+    connect(ui->set_point_x,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){spin_x=val; std::cout << spin_x << std::endl;});
     connect(ui->set_point_y,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){spin_y=val; std::cout << spin_y << std::endl;});
 
+    connect(ui->center_x,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){ManProb->centerx=val; std::cout << ManProb->centerx << std::endl;});
+    connect(ui->center_y,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[&](int val){ManProb->centery=val; std::cout << ManProb->centery << std::endl;});
+
+    connect(ui->zoom,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),[&](double val){std::cout << ManProb->zoom;});
+
     connect(ui->add_point,&QPushButton::clicked,ManProb,[&]{
-        std::cout << spin_x << " " << spin_y << std::endl;
         ManProb->addPoint(point_i(spin_x,spin_y));
+        ManProb->update();
     });
 }
 

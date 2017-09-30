@@ -148,6 +148,7 @@ void ManPowerProb::addPoint(point_i point){
         if(checkCanPlaceFrame(point))last_polygon.outer().push_back(point);
         else logger->error("範囲外を指定しています");
     }else{
+        std::cout << pieces.size() << "は:w"<<std::endl;
         std::cout << checkCanPlacePiece(point) << std::endl;//ここで落ちてる
         if(checkCanPlacePiece(point))last_polygon.outer().push_back(point);
         else logger->error("範囲外を指定しています");
@@ -181,6 +182,7 @@ void ManPowerProb::keyPressEvent(QKeyEvent *event){
     }
 
 }
+
 
 void ManPowerProb::deleteFrame(){
     if(frames.size()!=0){
@@ -285,13 +287,13 @@ void ManPowerProb::changeMode(){
 }
 
 bool ManPowerProb::checkCanPlacePiece(point_i point){//pieceが置けるならtrueを返す
-    if(frames.size()==0){//フレームが無い時
+    if(frames.empty()){//フレームが無い時
         if(!bg::intersects(not_put_part,point))return false;//枠外ならfalse
 
     }else{
         bool frame_flag=false;
 
-    std::cout << frames.size()<<std::endl;//はいここで問題が起きてる
+    std::cout << frames.size()<<std::endl;
 
         for(auto frame : frames){//ここ
             if(bg::intersects(frame,point)){

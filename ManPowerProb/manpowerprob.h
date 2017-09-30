@@ -34,11 +34,15 @@ public:
     void deletePoint();
     void deletePiece();
     void deleteFrame();
+    double zoom=0;
+    int centerx=0;
+    int centery=0;
 
 private:
 
     std::shared_ptr<spdlog::logger> logger;
     Ui::ManPowerProb *ui;
+
     QPointF translateToQPoint(point_i point);
     point_i translateToPointi(QPointF point);
     bool checkCanPlacePiece(point_i point);
@@ -52,6 +56,7 @@ private:
     std::vector<polygon_i> frames;
     bool is_frame = true;
     polygon_i not_put_part;
+
 
 
     polygon_i last_polygon;
