@@ -1204,6 +1204,15 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
         std::vector<point_i> first_point;
 
+        double area = bg::area(vertex);
+
+        if (fabs(area) < 50) {
+            trans::scale_transformer<double,2,2> reduction(1.05);
+            polygon_t reduce;
+            bg::transform(vertex, reduce, reduction);
+            vertex = reduce;
+        }
+
 //        if (len < 5) len += 2.0;
 //        else if (len < 10) len += 0.8;
 
