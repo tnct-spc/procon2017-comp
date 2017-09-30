@@ -5,6 +5,10 @@ ManPowerProb::ManPowerProb(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ManPowerProb)
 {
+
+
+
+
     ui->setupUi(this);
     standard_pos.set<0>(50);
     standard_pos.set<1>(32);
@@ -15,6 +19,7 @@ ManPowerProb::ManPowerProb(QWidget *parent) :
     not_put_part.outer().push_back(point_i(0,65));
     not_put_part.outer().push_back(point_i(0,0));
     bg::correct(not_put_part);
+
 }
 
 ManPowerProb::~ManPowerProb()
@@ -148,7 +153,6 @@ void ManPowerProb::addPoint(point_i point){
         if(checkCanPlaceFrame(point))last_polygon.outer().push_back(point);
         else logger->error("範囲外を指定しています");
     }else{
-        std::cout << pieces.size() << "は:w"<<std::endl;
         std::cout << checkCanPlacePiece(point) << std::endl;//ここで落ちてる
         if(checkCanPlacePiece(point))last_polygon.outer().push_back(point);
         else logger->error("範囲外を指定しています");

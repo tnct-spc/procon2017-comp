@@ -11,6 +11,7 @@
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
 #include "spdlog/spdlog.h"
+#include <QGraphicsView>
 
 
 

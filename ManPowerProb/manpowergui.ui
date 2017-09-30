@@ -132,6 +132,12 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="minimum">
+    <double>0.500000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.500000000000000</double>
+   </property>
    <property name="value">
     <double>1.000000000000000</double>
    </property>
@@ -149,7 +155,7 @@
     <number>101</number>
    </property>
    <property name="displayIntegerBase">
-    <number>101</number>
+    <number>10</number>
    </property>
   </widget>
   <widget class="QSpinBox" name="center_y">
@@ -165,7 +171,7 @@
     <number>65</number>
    </property>
    <property name="displayIntegerBase">
-    <number>65</number>
+    <number>10</number>
    </property>
   </widget>
   <widget class="QLabel" name="label">
