@@ -41,7 +41,13 @@ void imagerecongnitionwithhumanpower::setImage(QString path){
 }
 
 void imagerecongnitionwithhumanpower::setImage(cv::Mat mat){
-
+    QImage image(mat.data, mat.cols, mat.rows, QImage::Format_RGB888);
+    image = image.rgbSwapped(); //QImageの命令でRGBの順番を入れ替える
+    QGraphicsScene* scene = new QGraphicsScene();
+    QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+    scene->addItem(pic);
+    ui->graphicsView->setScene(scene);
+    this->update();
 }
 
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
