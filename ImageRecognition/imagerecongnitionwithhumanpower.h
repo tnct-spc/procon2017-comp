@@ -25,6 +25,7 @@ public:
 
     void setPolygon(polygon_t polygon);
     void setImage(QString path);
+    void setImage(cv::Mat mat);
 
 private:
     QPointF toPolygonPoint(double window_x,double window_y);

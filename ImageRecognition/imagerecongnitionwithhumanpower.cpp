@@ -40,6 +40,10 @@ void imagerecongnitionwithhumanpower::setImage(QString path){
     this->update();
 }
 
+void imagerecongnitionwithhumanpower::setImage(cv::Mat mat){
+
+}
+
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
 
     emit returnPolygon(this->polygon);
