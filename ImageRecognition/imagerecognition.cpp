@@ -13,6 +13,9 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 {
     raw_pieces_pic = raw_pieces_image;
 
+    // スケールを計算
+    scale = 437.0 / 5150.0;
+
     // ピースに分割
     std::vector<cv::Mat> frame_image = dividePiece(raw_frame_image);
     std::vector<cv::Mat> pieces_images = dividePiece(raw_pieces_image);
@@ -87,48 +90,54 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
 
+//        printf("%d : ", i);
+//        for (auto line : pos.getSideLength()) {
+//            std::cout << line * scale << " ";
+//        }
+//        std::cout << endl;
+
 //        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
     // sum polygon_t and piece's image
-//    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
-//    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
+    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
+    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
 
-//    int count = 0;
-//    for (auto polygon : pfi) {
-//        polygon_t p = polygon.getPolygon();
-//        for (unsigned int i=0; i<p.outer().size()-1; i++) {
-//            cv::line(pimage.at(count), cv::Point(p.outer().at(i).x(),p.outer().at(i).y()), cv::Point(p.outer().at(i+1).x(), p.outer().at(i+1).y()),cv::Scalar(50.0), 5,CV_AA);
-//        }
-//        cv::namedWindow(std::to_string(count));
-//        cv::imshow(std::to_string(count), pimage.at(count));
-//        count++;
-//    }
+    int count = 0;
+    for (auto polygon : pfi) {
+        polygon_t p = polygon.getPolygon();
+        for (unsigned int i=0; i<p.outer().size()-1; i++) {
+            cv::line(pimage.at(count), cv::Point(p.outer().at(i).x(),p.outer().at(i).y()), cv::Point(p.outer().at(i+1).x(), p.outer().at(i+1).y()),cv::Scalar(50.0), 1,CV_AA);
+        }
+        cv::namedWindow(std::to_string(count));
+        cv::imshow(std::to_string(count), pimage.at(count));
+        count++;
+    }
 
-    // scale is led from 6*6 piece
-//    double scale_len;
-//    for (auto piece : polygons) {
-//        if (piece.outer().size() == 5) {
-//            bool check = true;
-//            scale_len = 0;
-//            for (int i=0; i<4; i++) {
-//                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
-//                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
-//                double len = hypot(x,y) * scale / 2.5;
-//                if (fabs(6.0 - len) > 1) {
-//                    check = false;
-//                } else {
-//                    scale_len += hypot(x,y);
-//                }
-//            }
+//     scale is led from 6*6 piece
+    double scale_len;
+    for (auto piece : polygons) {
+        if (piece.outer().size() == 5) {
+            bool check = true;
+            scale_len = 0;
+            for (int i=0; i<4; i++) {
+                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
+                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
+                double len = hypot(x,y) * scale / 2.5;
+                if (fabs(6.0 - len) > 1) {
+                    check = false;
+                } else {
+                    scale_len += hypot(x,y);
+                }
+            }
 
-//            if (check) {
-//                break;
-//            }
-//        }
-//    }
+            if (check) {
+                break;
+            }
+        }
+    }
 
-//    scale = 15 * 4 / scale_len;
+    scale = 15 * 4 / scale_len;
 
     // change vector's scale to grid
     for (auto& piece : polygons) {
@@ -146,7 +155,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+//        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -666,8 +675,6 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
         if (frame_flag == true){
 
-            scale = 437.0 / 5150.0;
-
             // pick up 3 long line
 //            std::vector<cv::Vec4f> sorted;
 //            double longgest = 1000000;
@@ -1096,7 +1103,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     // polygonのid
     id++;
 
-    if (id >= pieces_num-frame_num) {
+    if (id >= pieces_num - frame_num) {
 
         // フレームは長い辺を横に
         unsigned int longgest;
@@ -1134,9 +1141,10 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             vec[3] = polygon.at((i+2) % (polygon.size()-1)).y() - polygon.at(i+1).y();
             double degree = acos((vec[0] * vec[2] + vec[1] * vec[3]) / (hypot(vec[0], vec[1]) * hypot(vec[2], vec[3])));
 
+            double hori = hypot(vec[2], vec[3]);
+
             // 配列を循環
             if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
-                double hori = hypot(vec[2], vec[3]);
 
                 // ９０度角でも傾いている場合を考慮
                 if (fabs(hori - round(hori)) < 0.1) {
@@ -1155,6 +1163,20 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                     break;
                 }
             }
+//            } else if (fabs(hori - round(hori)) < 0.05) {
+//                polygon.pop_back();
+//                polygon_t spin;
+//                for (unsigned int j = 0; j < polygon.size(); j++) {
+//                    spin.outer().push_back(vertex.outer().at((j+i+1)%polygon.size()));
+//                }
+
+//                spin.outer().push_back(spin.outer().at(0));
+//                vertex = spin;
+
+//                right_angle = true;
+
+//                break;
+//            }
         }
     }
 
@@ -1217,15 +1239,12 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         // 面積が小さいものは拡大してから探索
         double area = bg::area(vertex);
 
-        if (fabs(area) < 100) {
-            trans::scale_transformer<double,2,2> reduction(1.05);
+        if (fabs(area) < 150) {
+            trans::scale_transformer<double,2,2> reduction(1);
             polygon_t reduce;
             bg::transform(vertex, reduce, reduction);
             vertex = reduce;
         }
-
-//        if (len < 5) len += 2.0;
-//        else if (len < 10) len += 0.8;
 
         // ２分探索
         int match = binarySearch(this->length_table, 0, this->length_table.size()-1, len);
@@ -1254,7 +1273,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
 
         // 可能性のあるものから全角の誤差が最も小さいものを確認
-        std::vector<double> difs;
         int smallest_dif = 100;
 
         for (auto pi : first_point) {
@@ -1266,11 +1284,9 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             for (unsigned int i=1; i<rotate.outer().size(); i++) {
                 double x = rotate.outer().at(i).x() - rotate.outer().at(0).x();
                 double y = rotate.outer().at(i).y() - rotate.outer().at(0).y();
-                double dif_len = hypot(x-round(x), y-round(y)) * scale / 2.5;
+                double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
                 dif += dif_len;
             }
-
-            difs.push_back(dif / (rotate.outer().size() - 1));
 
             if (smallest_dif > dif) {
                 smallest_dif = dif;
