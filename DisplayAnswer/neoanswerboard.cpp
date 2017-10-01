@@ -24,11 +24,11 @@ NeoAnswerBoard::~NeoAnswerBoard()
 void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
-
+/*
 void NeoAnswerBoard::setShowUnplacedPieces(bool input){
     showunplacedpieces = input;
 }
-
+*/
 void NeoAnswerBoard::setSelectPieceMode(bool mode)
 {
     this->select_piece_mode = mode;
@@ -57,9 +57,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const QString up_back_ground_color = "#7BAB4F";
     const QString down_back_ground_color = "#118822";
     const QString unplaced_back_ground_color = "#EEEEEE";
-    const int width_size = (showunplacedpieces
-                ? this->width() * 0.6
-                : this->width());
+    const int width_size = (this->width());
     const int window_height = this->height();
     const int window_width = this->width();
 
@@ -133,9 +131,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             : splitedheight / (grid_row + grid_margin);
     //grid_size -= grid_size*8;
     top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
-    left_right_margin = (showunplacedpieces
-            ? (width_size - grid_size * grid_col) / 2
-            : (width_size - grid_size * grid_col) / 2);
+    left_right_margin = (width_size - grid_size * grid_col) / 2;
     down_up_y = splitedheight + top_bottom_margin;
 
     //余白(枠の部分)を設定
@@ -350,7 +346,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     }
 
-    auto drawunplacedpieces = [&]{//人力beamsearch用
+/*    auto drawunplacedpieces = [&]{//人力beamsearch用
 
         int unplacedpiececount = field.getElementaryPieces().size() - field.getPieces().size();
 
@@ -397,12 +393,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 ++value;
             }
         }
-    };
+    };*/
 
     drawPolygonPointNum();
     drawEvalution();
     drawGrid();
-    if(showunplacedpieces)drawunplacedpieces();
+   // if(showunplacedpieces)drawunplacedpieces();
 
 }
 
