@@ -359,10 +359,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             QPointF q_point = getPosition(point);
             if(value * 2 < unplacedpiececount){
                 q_point.setX(q_point.x() + width_size);
-                q_point.setY(point.y()*grid_size + window_height*0.5 + (unplacedpiececount/4 - value) * window_height/unplacedpiececount*1.2);
+                q_point.setY(point.y()*grid_size + window_height*0.5 + (unplacedpiececount/4 - value) * window_height/unplacedpiececount*1.4);
             }else{
                 q_point.setX(q_point.x() + width_size + (window_width - width_size) / 2);
-                q_point.setY(point.y()*grid_size + window_height*0.5 + (unplacedpiececount/4 - (value - unplacedpiececount/2)) * window_height/unplacedpiececount*1.2);
+                q_point.setY(point.y()*grid_size + window_height*0.5 + (unplacedpiececount/4 - (value - unplacedpiececount/2)) * window_height/unplacedpiececount*1.4);
             }
 
             return q_point;
@@ -388,7 +388,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         };
 
 
-        int value=0;
+        int value=1;
         for(unsigned int count=0;count<field.getElementaryPieces().size();++count){
             if(!field.getIsPlaced().at(count)){//置かれてないなら
                 polygon_i poly = field.getElementaryPieces().at(count).getPolygon();
