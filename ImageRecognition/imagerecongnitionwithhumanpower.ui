@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="polygonLayout">
      <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
@@ -42,7 +42,29 @@
     </layout>
    </item>
    <item>
-    <widget class="QGraphicsView" name="graphicsView"/>
+    <layout class="QVBoxLayout" name="imageLayout">
+     <item>
+      <widget class="QGraphicsView" name="graphicsView"/>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="scalingLayout">
+       <item>
+        <widget class="QPushButton" name="reductionButton">
+         <property name="text">
+          <string>+</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="enlargementButton">
+         <property name="text">
+          <string>-</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

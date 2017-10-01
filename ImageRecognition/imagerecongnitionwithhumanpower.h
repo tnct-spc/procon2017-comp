@@ -40,6 +40,8 @@ private:
 
 private slots:
     void clickedEditedButton();
+    void clickedEnlargement();
+    void clickedReduction();
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);

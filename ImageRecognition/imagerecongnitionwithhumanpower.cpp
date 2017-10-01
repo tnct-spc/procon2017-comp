@@ -10,6 +10,8 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
     ui->setupUi(this);
 
     connect(ui->editedButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
+    connect(ui->enlargementButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEnlargement);
+    connect(ui->reductionButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedReduction);
 }
 
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
@@ -48,10 +50,18 @@ void imagerecongnitionwithhumanpower::setImage(cv::Mat mat){
 }
 
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
-
     emit returnPolygon(this->polygon);
     this->close();
 }
+
+void imagerecongnitionwithhumanpower::clickedEnlargement(){
+
+}
+
+void imagerecongnitionwithhumanpower::clickedReduction(){
+
+}
+
 QPointF imagerecongnitionwithhumanpower::toPolygonPoint(double window_x, double window_y){
     const int N = 10;//小数点第Nまでの四捨五入
     QPointF buf((window_x - left_right_margin - std::floor(minXY.first))/grid_size,
