@@ -148,11 +148,9 @@ void ManPowerProb::mousePressEvent(QMouseEvent *event){
 void ManPowerProb::addPoint(point_i point){
 
     if(is_frame){
-        std::cout << checkCanPlaceFrame(point) << std::endl;//ここで落ちてる
         if(checkCanPlaceFrame(point))last_polygon.outer().push_back(point);
         else logger->error("範囲外を指定しています");
     }else{
-        std::cout << checkCanPlacePiece(point) << std::endl;//ここで落ちてる
         if(checkCanPlacePiece(point))last_polygon.outer().push_back(point);
         else logger->error("範囲外を指定しています");
     }
@@ -252,7 +250,6 @@ void ManPowerProb::exportToCsv(){
     NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
 
     logger->info("exported CSV");
-    std::cout << "empty area : " << empty_area() << std::endl;
 }
 
 void ManPowerProb::createPolygon(){
@@ -315,7 +312,6 @@ bool ManPowerProb::checkCanPlacePiece(point_i point){//pieceが置けるならtr
     }else{
         bool frame_flag=false;
 
-    std::cout << frames.size()<<std::endl;
 
         for(auto frame : frames){//ここ
             if(bg::intersects(frame,point)){
@@ -357,6 +353,5 @@ point_i ManPowerProb::translateToPointi(QPointF point){//point_iを上画面のg
     int pointy = point.y() - top_bottom_margin;
 
     point_i clickedpos( pointx / grid_size, pointy / grid_size);
-    std::cout << bg::dsv(clickedpos) << std::endl;
     return clickedpos;
 }
