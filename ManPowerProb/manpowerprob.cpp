@@ -208,6 +208,7 @@ void ManPowerProb::deletePiece(){
         pieces.pop_back();
         logger->info("ピースを削除しました");
     }else logger->error("ピースを削除できませんでした");
+    this->update();
 
 }
 void ManPowerProb::deletePoint(){
