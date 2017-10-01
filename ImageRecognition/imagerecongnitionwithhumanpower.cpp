@@ -106,8 +106,8 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
     const int grid_margin = 4;
 
-    int window_width = this->width() / 2;
-    int window_height = this->height();
+    int window_width = ui->verticalSpacer->width;
+    int window_height = ui->verticalSpacer->height;
 
     painter.setBrush(QBrush(QColor("#E5E6DB")));
     painter.drawRect(0,0,window_width,window_height);
