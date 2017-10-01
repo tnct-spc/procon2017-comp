@@ -178,7 +178,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>piece_size : </string>
+    <string>pieces_size : </string>
    </property>
   </widget>
  </widget>
