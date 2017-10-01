@@ -39,7 +39,6 @@ private:
     std::shared_ptr<spdlog::logger> logger;
     bool is_running = false;
     std::shared_ptr<NeoAnswerBoard> board;
-    NeoSinglePolygonDisplay *display;
     void finishedProcess();
     void startProcess();
     QRLibrary QR;
