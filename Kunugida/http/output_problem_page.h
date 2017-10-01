@@ -14,9 +14,7 @@ public:
 
 private:
     //pass
-    //QString ProblemFolderName=QCoreApplication::applicationDirPath()+"/docroot/files/";
-//    QString ProblemFileName = QCoreApplication::applicationDirPath()+"/docroot/problem.csv";
-    QString ProblemFileName = "../../procon2017-comp/CSV/Rabbithouse.csv";
+    QString ProblemFileName = "../../procon2017-comp/CSV/problem.csv";
 };
 
 #endif // OUTPUTPROBLEMPAGE_H
