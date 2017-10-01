@@ -33,12 +33,6 @@ public:
         return raw_random_colors;
     }
 
-    typedef struct {
-        int x;
-        int y;
-        double error;
-    } error_t;
-
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
     std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
@@ -68,6 +62,7 @@ private:
 
     std::vector<int> area;
     int frame_num;
+    double frame_rad;
     int pieces_num;
     std::vector<procon::ExpandedPolygon> position;
     int id = -1;
