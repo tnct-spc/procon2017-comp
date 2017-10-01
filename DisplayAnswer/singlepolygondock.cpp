@@ -16,9 +16,10 @@ SinglePolygonDock::~SinglePolygonDock()
 
 void SinglePolygonDock::addPolygon(const polygon_i poly){
     polygons.push_back(poly);
-    NeoPolygonViewer* viewer = new NeoPolygonViewer;
-    viewer->setFixedSize(500, 500);
+    NeoSinglePolygonDisplay* viewer = new NeoSinglePolygonDisplay;
+    viewer->setFixedSize(300, 300);
 
-    viewer->getInstance().displayPolygon(poly,"Piece",true);
-    this->ui->container->addWidget(viewer,(polygons.size()-1)/5,(polygons.size()-1)%5);
+   viewer->setPolygon(poly);
+
+    this->ui->container->addWidget(viewer,(polygons.size()-1)/3,(polygons.size()-1)%3);
 }
