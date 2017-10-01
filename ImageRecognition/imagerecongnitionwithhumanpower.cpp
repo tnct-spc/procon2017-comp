@@ -132,5 +132,4 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
         int y = current_row * grid_size + top_buttom_margin;
         painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
     }
-
 }
