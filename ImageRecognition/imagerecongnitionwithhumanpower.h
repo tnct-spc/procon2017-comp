@@ -31,7 +31,6 @@ private:
     QPointF toPolygonPoint(double window_x,double window_y);
     QPointF toWindowPoint(QPointF point);
     Ui::imagerecongnitionwithhumanpower *ui;
-    QPushButton *edited_button;
     polygon_t polygon;
     std::vector<QPointF> points;
     int grid_size,left_right_margin,top_buttom_margin;

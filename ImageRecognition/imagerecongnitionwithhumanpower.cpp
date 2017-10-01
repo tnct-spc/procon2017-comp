@@ -9,10 +9,7 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
 {
     ui->setupUi(this);
 
-    edited_button = new QPushButton();
-    edited_button->setText("edited");
-    connect(edited_button,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
-    ui->verticalLayout->addWidget(edited_button);
+    connect(ui->editedButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
 }
 
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()

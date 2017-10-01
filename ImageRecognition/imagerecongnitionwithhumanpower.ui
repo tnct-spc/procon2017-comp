@@ -29,6 +29,16 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="editedButton">
+       <property name="whatsThis">
+        <string/>
+       </property>
+       <property name="text">
+        <string>EDITED</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
