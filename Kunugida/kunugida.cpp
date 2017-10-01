@@ -163,7 +163,7 @@ void Kunugida::run()
         //        imageRecognitonTest();
 //        ImageRecognition imrec;
 //        field = imrec.run(frame, pieces);
-//        board->setScannedPieces(imrec.getPolygonPosition());
+        board->setScannedPieces(imrec.getPolygonPosition());
 
         //        imageRecognitonTest();
     }else if(ui->csv_button->isChecked()){

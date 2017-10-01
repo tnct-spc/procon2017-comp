@@ -42,6 +42,9 @@ public:
     int id = 0;
     int n = 1.8;
 
+    std::vector<procon::ExpandedPolygon> getPolygonPosition();
+    polygon_t expandPolygon(polygon_t polygon,double dxy);
+
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
     std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
@@ -60,7 +63,7 @@ private:
     polygon_i placeGrid(polygon_t vertex);
     double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
-    std::vector<procon::ExpandedPolygon> getPolygonPosition();
+//    std::vector<procon::ExpandedPolygon> getPolygonPosition();
     void makeTable();
 
     cv::Mat raw_pieces_pic;
