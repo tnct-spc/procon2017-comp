@@ -26,6 +26,7 @@ bool TestImageRecognitionWithHumanPower::run()
     });
 
     iwh->setPolygon(polygon);
+    iwh->setImage("../../procon2017-comp/background.png");
     iwh->show();
 //    iwh->setPolygon(polygon);
     std::cout<<"hello"<<std::endl;

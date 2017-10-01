@@ -2,8 +2,6 @@
 #include "ui_imagerecongnitionwithhumanpower.h"
 #include "precompile.h"
 #include "polygonviewer.h"
-#include <QLayout>
-#include <QSpacerItem>
 
 imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent) :
     QWidget(parent),
@@ -15,12 +13,6 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
     edited_button->setText("edited");
     connect(edited_button,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
     ui->verticalLayout->addWidget(edited_button);
-
-    graphics_view = new QGraphicsView();
-    ui->horizontalLayout->addWidget(graphics_view);
-//    QGraphicsScene* scene = new QGraphicsScene();
-//    QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-
 }
 
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
@@ -36,6 +28,15 @@ void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
         QPointF point(polygon.outer()[i].x(),polygon.outer()[i].y());
         points.push_back(point);
     }
+    this->update();
+}
+
+void imagerecongnitionwithhumanpower::setImage(QString path){
+    QImage image(path);
+    QGraphicsScene* scene = new QGraphicsScene();
+    QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+    scene->addItem(pic);
+    ui->graphicsView->setScene(scene);
     this->update();
 }
 

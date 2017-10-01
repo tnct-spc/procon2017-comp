@@ -3,6 +3,10 @@
 
 #include <QWidget>
 #include <QGraphicsView>
+#include <QGraphicsPixmapItem>
+#include <QLayout>
+#include <QSpacerItem>
+#include <QString>
 #include "precompile.h"
 #include "polygonviewer.h"
 #include "singlepolygondisplay.h"
@@ -20,13 +24,13 @@ public:
     ~imagerecongnitionwithhumanpower();
 
     void setPolygon(polygon_t polygon);
+    void setImage(QString path);
 
 private:
     QPointF toPolygonPoint(double window_x,double window_y);
     QPointF toWindowPoint(QPointF point);
     Ui::imagerecongnitionwithhumanpower *ui;
     QPushButton *edited_button;
-    QGraphicsView *graphics_view;
     polygon_t polygon;
     std::vector<QPointF> points;
     int grid_size,left_right_margin,top_buttom_margin;
