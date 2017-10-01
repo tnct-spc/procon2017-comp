@@ -120,7 +120,6 @@ void ManPowerProb::paintEvent(QPaintEvent *event){
         }
     };
 
-
     drawFrames();
     drawPieces();
     drawLastPolygon();
