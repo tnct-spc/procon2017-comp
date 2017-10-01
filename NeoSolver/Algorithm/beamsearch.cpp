@@ -5,11 +5,13 @@
 #include "Utils/polygonconnector.h"
 #include "Evaluation/evaluation.h"
 #include "parallel.h"
+#include "trynextsearch.h"
 
 #include <math.h>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -135,6 +137,10 @@ BeamSearch::BeamSearch()
 //    logger = spdlog::get("beamsearch");
     dock = std::make_shared<NeoAnswerDock>();
     dock->show();
+
+    //test
+    neo = std::make_shared<NeoAnswerDock>();
+    neo->show();
 
     cpu_num = std::thread::hardware_concurrency();
 }
@@ -314,11 +320,15 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
             logger->info("evaluating");
 
-            procon::NeoField field_buf = fields[eval.fields_index];
-            ConnectedResult connect_result = PolygonConnector::connect(fields[eval.fields_index].getFrame()[eval.frame_index]
+            procon::NeoField field_buf;
+            {
+                std::lock_guard<decltype(mtx)> lock(mtx);
+                field_buf = fields[eval.fields_index];
+            }
+            ConnectedResult connect_result = PolygonConnector::connect(field_buf.getFrame()[eval.frame_index]
                     ,eval.is_inversed
-                        ? fields[eval.fields_index].getElementaryInversePieces()[eval.piece_index]
-                        : fields[eval.fields_index].getElementaryPieces()[eval.piece_index]
+                        ? field_buf.getElementaryInversePieces()[eval.piece_index]
+                        : field_buf.getElementaryPieces()[eval.piece_index]
                     ,eval.connection
             );
 
@@ -329,7 +339,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 field_buf.setPiece(std::get<1>(connect_result));
 
-                std::vector<procon::NeoExpandedPolygon> frames_buf = fields[eval.fields_index].getFrame();
+                std::vector<procon::NeoExpandedPolygon> frames_buf = field_buf.getFrame();
                 frames_buf.erase(frames_buf.begin() + eval.frame_index);
                 for (auto frame_polygon : std::get<0>(connect_result)){
                     frames_buf.push_back(frame_polygon);
@@ -339,18 +349,18 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 //deplicacte flag
                 bool flag = false;
-                const std::string now_hash = hashField(field_buf);
 
                 //check field is ok
                 {
+                    const std::string now_hash = hashField(field_buf);
                     std::lock_guard<decltype(mtx)> lock(mtx);
-                std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
-                    if(!flag){
-                        if(now_hash == hashField(f)){
-                            flag = true;
+                    std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
+                        if(!flag){
+                            if(now_hash == hashField(f)){
+                                flag = true;
+                            }
                         }
-                    }
-                });
+                    });
                 }
 
                 if(!flag){
@@ -823,6 +833,7 @@ int BeamSearch::checkOddField(const procon::NeoField &field, const Connect &conn
 
 void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
+#ifdef DEBUG_MODE
     //frameがstd::vector<NeoExPolygon>なのでそれぞれに対して、評価関数を回す
     auto evaluateWrapper = [&](procon::NeoField const& field,int const& piece_index,int const& fields_index){
         int frame_index = 0;
@@ -837,26 +848,24 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
             Evaluate ev_buf;
             for(const auto& e : evaluate){
                 if(e.first){
-                ev_buf.score = e.first;
-                ev_buf.connection = e.second;
-                ev_buf.fields_index = fields_index;
-                ev_buf.frame_index = frame_index;
-                ev_buf.piece_index = piece_index;
-                ev_buf.is_inversed = false;
-                evaluations.push_back(ev_buf);
-
+                    ev_buf.score = e.first;
+                    ev_buf.connection = e.second;
+                    ev_buf.fields_index = fields_index;
+                    ev_buf.frame_index = frame_index;
+                    ev_buf.piece_index = piece_index;
+                    ev_buf.is_inversed = false;
+                    evaluations.push_back(ev_buf);
                 }
             }
             for(const auto& e : evaluate_inversed){
                 if(e.first){
                     ev_buf.score = e.first;
-                ev_buf.connection = e.second;
-                ev_buf.fields_index = fields_index;
-                ev_buf.frame_index = frame_index;
-                ev_buf.piece_index = piece_index;
-                ev_buf.is_inversed = true;
-                evaluations.push_back(ev_buf);
-
+                    ev_buf.connection = e.second;
+                    ev_buf.fields_index = fields_index;
+                    ev_buf.frame_index = frame_index;
+                    ev_buf.piece_index = piece_index;
+                    ev_buf.is_inversed = true;
+                    evaluations.push_back(ev_buf);
                 }
             }
 
@@ -873,18 +882,102 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
         }
     };
 
-#ifdef DEBUG_MODE
     int field_index = 0;
     for(auto const& f : fields){
         evaluateNextState(f,field_index);
         ++field_index;
     }
 #else
-    int field_index = 0;
-    for(auto const& f : fields){
-        evaluateNextState(f,field_index);
-        ++field_index;
+        //frameがstd::vector<NeoExPolygon>なのでそれぞれに対して、評価関数を回す
+    auto evaluateWrapper = [&](procon::NeoField const& field,int const& piece_index,int const& fields_index){
+        int frame_index = 0;
+        for(const auto& f : field.getFrame()){
+            //inverseしていない方のpiece評価
+            std::vector<std::pair<double,Connect>> evaluate = Evaluation::evaluation(f,field.getElementaryPieces()[piece_index],1.0,1.0,true);
+            //inverseしている方のpiece評価
+            std::vector<std::pair<double,Connect>> evaluate_inversed = Evaluation::evaluation(f,field.getElementaryInversePieces()[piece_index],1.0,1.0,true);
+
+            //一時保存用の変数
+//            TODO: いい感じにここをパフォーマンスよくする
+            Evaluate ev_buf;
+            for(const auto& e : evaluate){
+                if(e.first){
+                    ev_buf.score = e.first;
+                    ev_buf.connection = e.second;
+                    ev_buf.fields_index = fields_index;
+                    ev_buf.frame_index = frame_index;
+                    ev_buf.piece_index = piece_index;
+                    ev_buf.is_inversed = false;
+
+                    {
+                        std::lock_guard<decltype(mtx)> lock(mtx);
+                        evaluations.push_back(ev_buf);
+                    }
+
+                }
+            }
+            for(const auto& e : evaluate_inversed){
+                if(e.first){
+                    ev_buf.score = e.first;
+                    ev_buf.connection = e.second;
+                    ev_buf.fields_index = fields_index;
+                    ev_buf.frame_index = frame_index;
+                    ev_buf.piece_index = piece_index;
+                    ev_buf.is_inversed = true;
+
+                    {
+                        std::lock_guard<decltype(mtx)> lock(mtx);
+                        evaluations.push_back(ev_buf);
+                    }
+                }
+            }
+
+            ++frame_index;
+        }
+    };
+
+
+    int global_field_index = 0;
+
+    auto evaluateNextState = [&](){
+        while(true){
+
+            procon::NeoField field_buf;
+            int now_field_index = 0;
+
+            {
+                std::lock_guard<decltype(mtx)> lock(mtx);
+
+                if(global_field_index == fields.size()){
+                    return;
+                }
+
+                logger->info("evaluating " + std::to_string(global_field_index));
+
+                field_buf = fields.at(global_field_index);
+                now_field_index = global_field_index;
+
+                ++global_field_index;
+            }
+
+            for (int piece_index = 0; piece_index < field_buf.getElementaryPieces().size(); ++piece_index) {
+                //すでに置いてあったら評価しません
+                if(field_buf.getIsPlaced().at(piece_index)) continue;
+
+                evaluateWrapper(field_buf,piece_index,now_field_index);
+            }
+        }
+    };
+
+    std::vector<std::thread> threads(cpu_num);
+    for(auto& th : threads){
+        th = std::thread(evaluateNextState);
     }
+
+    for(auto& th : threads){
+        th.join();
+    }
+
 
 #endif
 }
@@ -900,53 +993,58 @@ void BeamSearch::init()
 void BeamSearch::run(procon::NeoField field)
 {
     logger->info("beamsearch run");
+
+    //時間計測
+    std::chrono::system_clock::time_point start,end;
+    start = std::chrono::system_clock::now();
+
     dock->addAnswer(field);
 //    logger->info("beamsearch run");
 
     std::vector<procon::NeoField> state;
 
     //フレームの同じ傾きの頂点を除去
-    auto delete_deplicate_point = [](procon::NeoField & field){
-        int frame_index = 0;
-        for(auto & frame : field.getFrame()){
-            std::vector<int> parallel_dot;
-            int count = 0;
-            for(auto const& angle : frame.getSideAngle()){
-                if(angle == M_PI){
-                    parallel_dot.insert(parallel_dot.begin(),count);
-                }
-                ++count;
-            }
-            if(parallel_dot.size()){
-                std::vector<point_i> points;
-                std::vector<procon::NeoExpandedPolygon> frames;
+//    auto delete_deplicate_point = [](procon::NeoField & field){
+//        int frame_index = 0;
+//        for(auto & frame : field.getFrame()){
+//            std::vector<int> parallel_dot;
+//            int count = 0;
+//            for(auto const& angle : frame.getSideAngle()){
+//                if(angle == M_PI){
+//                    parallel_dot.insert(parallel_dot.begin(),count);
+//                }
+//                ++count;
+//            }
+//            if(parallel_dot.size()){
+//                std::vector<point_i> points;
+//                std::vector<procon::NeoExpandedPolygon> frames;
 
-                std::copy(field.getFrame().begin(),field.getFrame().end(),std::back_inserter(frames));
+//                std::copy(field.getFrame().begin(),field.getFrame().end(),std::back_inserter(frames));
 
-                frames.erase(frames.begin() + frame_index);
+//                frames.erase(frames.begin() + frame_index);
 
-                std::copy(frame.getPolygon().outer().begin(),
-                          frame.getPolygon().outer().end(),
-                          std::back_inserter(points)
-                );
+//                std::copy(frame.getPolygon().outer().begin(),
+//                          frame.getPolygon().outer().end(),
+//                          std::back_inserter(points)
+//                );
 
-                for(auto const& c : parallel_dot){
-                    points.erase(points.begin() + c);
-                }
+//                for(auto const& c : parallel_dot){
+//                    points.erase(points.begin() + c);
+//                }
 
-                procon::NeoExpandedPolygon f;
-                polygon_i p;
-                for(auto const& point : points){
-                    p.outer().push_back(point);
-                }
-                f.resetPolygonForce(p);
+//                procon::NeoExpandedPolygon f;
+//                polygon_i p;
+//                for(auto const& point : points){
+//                    p.outer().push_back(point);
+//                }
+//                f.resetPolygonForce(p);
 
-                frames.insert(frames.begin() + frame_index,f);
-                field.setFrame(frames);
-            }
-            ++frame_index;
-        }
-    };
+//                frames.insert(frames.begin() + frame_index,f);
+//                field.setFrame(frames);
+//            }
+//            ++frame_index;
+//        }
+//    };
 
 
 #ifdef DEBUG_MODE
@@ -968,16 +1066,16 @@ void BeamSearch::run(procon::NeoField field)
 
         logger->info("making field process has finished");
 
-        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() << std::endl;
+        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() - field.getPieces().size() << std::endl;
         std::cout << "evaluated state size:" << ev.size() << std::endl;
         std::cout << "field size:" << state.size() << std::endl;
 
         //vectorのメモリ解放って頭悪くね？
         std::vector<Evaluate>().swap(ev);
 
-        for(auto& f : state){
-            delete_deplicate_point(f);
-        }
+//        for(auto& f : state){
+//            delete_deplicate_point(f);
+//        }
 
         bool flag = false;
         for(auto const& _field : state){
@@ -988,10 +1086,19 @@ void BeamSearch::run(procon::NeoField field)
             }
         }
 
+        if(flag){
+            last_fields.clear();
+            std::copy(state.begin(),state.end(),std::back_inserter(last_fields));
+        }
 //        if(piece_num == 4){
 //            break;
 //        }
     }
+
+    end = std::chrono::system_clock::now();
+    double time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+
+    logger->warn("elapsed time: "+ std::to_string(time));
 
     //    neo = std::make_shared<NeoAnswerDock>();
     //    neo->show();
@@ -999,5 +1106,89 @@ void BeamSearch::run(procon::NeoField field)
     //        neo->addAnswer(f);
     //    }
     //    test();
+
+//#define DEBUG
+#ifdef DEBUG
+    if(true){
+#else
+    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+#endif
+        TryNextSearch *next = new TryNextSearch();
+        next->setField(last_fields.at(0));
+        next->show();
+
+        connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
+            this->tryNextBeamSearch(next_field);
+        });
+    }
+}
+
+void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
+{
+    std::cout << "called next beamsearch slot" << std::endl;
+
+    //時間計測
+    std::chrono::system_clock::time_point start,end;
+    start = std::chrono::system_clock::now();
+
+    std::vector<procon::NeoField> state;
+
+    dock->addAnswer(next_field);
+
+    state.push_back(next_field);
+
+//    ev.resize(2000000);
+    for (int piece_num = 0; piece_num < static_cast<int>(next_field.getElementaryPieces().size() - next_field.getPieces().size()); ++piece_num) {
+        std::vector<Evaluate> ev;
+
+        logger->info("next step start");
+
+        evaluateNextState(state,ev);
+
+        logger->info("evaluating field process has finished");
+
+        makeNextState(state,ev);
+
+        logger->info("making field process has finished");
+
+        std::cout << "now" << (piece_num + 1) << "/" << next_field.getElementaryPieces().size() << std::endl;
+        std::cout << "evaluated state size:" << ev.size() << std::endl;
+        std::cout << "field size:" << state.size() << std::endl;
+
+        //vectorのメモリ解放って頭悪くね？
+        std::vector<Evaluate>().swap(ev);
+
+        bool flag = false;
+        for(auto const& _field : state){
+            neo->addAnswer(_field);
+            if(!flag){
+                submitAnswer(_field);
+                flag = true;
+            }
+        }
+
+        if(flag){
+            last_fields.clear();
+            std::copy(state.begin(),state.end(),std::back_inserter(last_fields));
+        }
+//        if(piece_num == 4){
+//            break;
+//        }
+    }
+
+    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+        TryNextSearch *next = new TryNextSearch();
+        next->setField(last_fields.at(0));
+        next->show();
+
+        connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
+            this->tryNextBeamSearch(next_field);
+        });
+    }
+
+    end = std::chrono::system_clock::now();
+    double time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+
+    logger->warn("elapsed time: "+ std::to_string(time));
 }
 

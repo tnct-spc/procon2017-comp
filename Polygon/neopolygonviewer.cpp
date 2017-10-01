@@ -14,5 +14,5 @@ NeoPolygonViewer& NeoPolygonViewer::getInstance()
 void NeoPolygonViewer::displayPolygon(const polygon_i &polygon, std::string wname, bool enlarged_polygon)
 {
     viewers.push_back(NeoSinglePolygonDisplay::createInstance(polygon,wname,enlarged_polygon));
-//    viewers.at(viewers.size() - 1)->show();
+    viewers.at(viewers.size() - 1)->show();
 }

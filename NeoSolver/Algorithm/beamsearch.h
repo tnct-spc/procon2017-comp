@@ -47,8 +47,14 @@ private:
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;
     std::shared_ptr<NeoAnswerDock> neo;
+
+    std::vector<procon::NeoField> last_fields;
+
     unsigned int cpu_num = 0;
     unsigned int beam_width = 200;
+
+private slots:
+    void tryNextBeamSearch(procon::NeoField next_field);
 };
 
 #endif // BEAMSEARCH_H
