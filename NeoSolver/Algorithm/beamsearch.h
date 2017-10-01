@@ -51,7 +51,7 @@ private:
     std::vector<procon::NeoField> last_fields;
 
     unsigned int cpu_num = 0;
-    unsigned int beam_width = 50;
+    unsigned int beam_width = 1;
 
 private slots:
     void tryNextBeamSearch(procon::NeoField next_field);

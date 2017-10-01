@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "neoanswerboard.h"
+#include "singlepolygondock.h"
 
 namespace Ui {
 class TryNextSearch;
@@ -23,6 +24,7 @@ public:
 
 private:
     Ui::TryNextSearch *ui;
+    SinglePolygonDock *dock;
     QPushButton *go_button;
     NeoAnswerBoard *board;
 
