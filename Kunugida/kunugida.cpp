@@ -145,8 +145,6 @@ void Kunugida::run()
 
         board->setScannedPieces(scanned_dummy_piece);
 
-//        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/post.csv");
-        //        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -220,7 +218,7 @@ void Kunugida::run()
         }
         QRCode qrcode;
         qrcode.Decoder(true, is_hint, is_multi, how_qr);
-        field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
+        field = NeoPolygonIO::importField("../../procon2017-comp/CSV/fromQRcode.csv");
         int scanned_dummy_piece_id = 0;
 
         std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
@@ -239,7 +237,7 @@ void Kunugida::run()
     }
 
     if(ui->ServerModeCheckbox->isChecked()){
-        std::string PROBLEM_SAVE_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
+        std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/CSV/problem.csv";
         std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
         NeoPolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
 
@@ -311,7 +309,7 @@ void Kunugida::getCSV()
     connect(manager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(replyFinished(QNetworkReply*)));
 
-    file.setFileName("../../procon2017-comp/receivedfield.csv");
+    file.setFileName("../../procon2017-comp/CSV/receivedfield.csv");
     if(!file.open(QIODevice::WriteOnly))
         return;
     manager->get(QNetworkRequest(QUrl("http://localhost:8016/get")));
@@ -319,7 +317,7 @@ void Kunugida::getCSV()
 
 void Kunugida::postCSV()
 {
-    file.setFileName("../../procon2017-comp/post.csv");
+    file.setFileName("../../procon2017-comp/CSV/post.csv");
     if(!file.open(QIODevice::ReadOnly))
         return;
     manager->post(QNetworkRequest(QUrl("http://localhost:8016/answer")), &file);

@@ -37,7 +37,7 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
     response->write("<html><head><title>ANSWER FORM</title></head><body>");
 
     // Save answer and emit
-    QString filename_answer="../../procon2017-comp/posted.csv";
+    QString filename_answer="../../procon2017-comp/CSV/posted.csv";
     QFile answer(filename_answer);
     answer.open(QIODevice::WriteOnly);
     answer.write(lowdata);
