@@ -63,10 +63,11 @@ void imagerecongnitionwithhumanpower::clickedReduction(){
 }
 
 QPointF imagerecongnitionwithhumanpower::toPolygonPoint(double window_x, double window_y){
-    const int N = 10;//小数点第Nまでの四捨五入
+    const int N = ui->spinBox->value();//小数点第Nまでを取る
+    double N_10 = std::pow(10,N);
     QPointF buf((window_x - left_right_margin - std::floor(minXY.first))/grid_size,
                   (window_y - top_buttom_margin - std::floor(minXY.second))/grid_size);
-    QPointF point(std::round(buf.x()*N) / N , std::round(buf.y()*N) / N);
+    QPointF point(std::round(buf.x()*N_10) / N_10 , std::round(buf.y()*N_10) / N_10);
     return point;
 }
 
@@ -106,8 +107,8 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
     const int grid_margin = 4;
 
-    int window_width = ui->verticalSpacer->width;
-    int window_height = ui->verticalSpacer->height;
+    int window_width = this->width()/2;
+    int window_height = this->height();
 
     painter.setBrush(QBrush(QColor("#E5E6DB")));
     painter.drawRect(0,0,window_width,window_height);
