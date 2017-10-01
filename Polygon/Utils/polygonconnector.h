@@ -1,7 +1,6 @@
 #ifndef POLYGONCONNECTOR_H
 #define POLYGONCONNECTOR_H
 
-#include "precompile.h"
 #include "neoexpandedpolygon.h"
 #include "complexangle.h"
 
@@ -27,8 +26,10 @@ class PolygonConnector
 {
 public:
     PolygonConnector();
-    static std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter);
-    static std::pair<polygon_i, bool> rotate(polygon_i polygon_in, ComplexAngle after_angle, unsigned int first_index, unsigned int second_index);
+    static std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> connect(
+            procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter);
+    static std::pair<polygon_i, bool> rotate(
+            polygon_i polygon_in, ComplexAngle after_angle, unsigned int first_index, unsigned int second_index);
 };
 
 #endif // POLYGONCONNECTOR_H

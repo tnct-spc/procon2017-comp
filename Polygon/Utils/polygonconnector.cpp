@@ -2,8 +2,8 @@
 #include <boost/geometry/algorithms/union.hpp>
 
 
-//#define DEBUG
-//#define TEST
+#define DEBUG
+#define TEST
 //#define USE_BOOST_TRANSFORM
 
 PolygonConnector::PolygonConnector()
@@ -11,7 +11,8 @@ PolygonConnector::PolygonConnector()
 
 }
 
-std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> PolygonConnector::connect(procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter)
+std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, bool> PolygonConnector::connect(
+        procon::NeoExpandedPolygon frame, procon::NeoExpandedPolygon piece, Connect connecter)
 #ifdef USE_BOOST_TRANSFORM
 {
     //Connectクラスからindexを抽出
@@ -201,7 +202,6 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
         std::cout << "equals is true!" << std::endl;
 #endif
         bg::difference(frame_polygon, piece_rotate_polygon, frame_out_polygons);
-        std::vector<procon::NeoExpandedPolygon> frames_out;
 
         //180度角除去
         std::function<void(procon::NeoExpandedPolygon&)> delete_180_degree = [&delete_180_degree](procon::NeoExpandedPolygon &expoly)
@@ -222,6 +222,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
             }
         };
 
+        std::vector<procon::NeoExpandedPolygon> frames_out;
         int id= 0;
         for(polygon_i frame_out_polygon : frame_out_polygons) {
             procon::NeoExpandedPolygon frame_out(id);
@@ -355,7 +356,6 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
         std::cout << "equals is true!" << std::endl;
 #endif
         bg::difference(frame_polygon, piece_rotate_polygon, frame_out_polygons);
-        std::vector<procon::NeoExpandedPolygon> frames_out;
 
         //180度角除去
         std::function<void(procon::NeoExpandedPolygon&)> delete_180_degree = [&delete_180_degree](procon::NeoExpandedPolygon &expoly)
@@ -376,6 +376,7 @@ std::tuple<std::vector<procon::NeoExpandedPolygon>, procon::NeoExpandedPolygon, 
             }
         };
 
+        std::vector<procon::NeoExpandedPolygon> frames_out;
         int id= 0;
         for(polygon_i frame_out_polygon : frame_out_polygons) {
             procon::NeoExpandedPolygon frame_out(id);

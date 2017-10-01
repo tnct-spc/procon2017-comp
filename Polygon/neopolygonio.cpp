@@ -87,7 +87,7 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
     };
 
     export2file(0,field.getElementaryFrame());
-    exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
+//    exportDoubleVector2file(1,field.getElementaryFrameInnerPices());
 //    export2file(2,field.getElementaryPieces());
     export2file_with_id(2,field.getElementaryPieces());
     export2file(3,field.getFrame());

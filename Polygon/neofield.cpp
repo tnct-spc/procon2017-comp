@@ -1,5 +1,6 @@
 #include "neofield.h"
 #include "utilities.h"
+#include "neopolygonviewer.h"
 
 
 /*--------------------constructor---------------------*/
@@ -49,6 +50,11 @@ void procon::NeoField::setElementaryPieces(std::vector<procon::NeoExpandedPolygo
     }
 }
 
+void procon::NeoField::setElementaryFrameInnerPieces(std::vector<procon::NeoExpandedPolygon> const& frame_inner_pices)
+{
+    elementary_frame_inner_pices = frame_inner_pices;
+}
+
 void procon::NeoField::setIsPlaced(const std::array<bool,50> &IsPlaced)
 {
     isPlaced = IsPlaced;
@@ -91,7 +97,7 @@ std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryFr
     return elementary_frame;
 }
 
-std::vector<std::vector<procon::NeoExpandedPolygon>> const& procon::NeoField::getElementaryFrameInnerPices() const
+std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryFrameInnerPices() const
 {
     return elementary_frame_inner_pices;
 }
@@ -223,3 +229,153 @@ void procon::NeoField::calcFieldID()
 //         piece_id.set(piece.getId());
 //    }
 }
+
+#define test
+
+bool procon::NeoField::check_hint()
+{
+#ifdef test
+    std::cout << "start check_hint!!" << std::endl;
+#endif
+
+    std::vector<procon::NeoExpandedPolygon> hint_pieces = elementary_frame_inner_pices;
+
+    unsigned int hint_index = 0;
+    for(const procon::NeoExpandedPolygon &hint_piece : hint_pieces) {
+        if(isPlaced.at(static_cast<unsigned int>(hint_piece.getId()))) hint_pieces.erase(hint_pieces.begin() + hint_piece.getId());
+        ++hint_index;
+    }
+
+    field_frame.reserve(100);
+    field_pieces.reserve(100);
+
+
+    std::function<bool(std::vector<procon::NeoExpandedPolygon>)> check_hint_and_connect = [&check_hint_and_connect, this](std::vector<procon::NeoExpandedPolygon> hint_pieces)
+    {
+#ifdef test
+        auto out = [](polygon_i poly, std::string name)
+        {
+            std::cout << name << " -> ";
+
+            for(point_i point : poly.outer()) {
+                std::cout << "(" << point.x() << ", " << point.y() << "), ";
+            }
+
+            std::cout << std::endl;
+        };
+
+        int doing = 0;
+#endif
+        std::vector<procon::NeoExpandedPolygon> hint_pieces_next = hint_pieces;
+
+        //180度角除去
+        std::function<void(polygon_i&)> delete_180_degree = [&delete_180_degree](polygon_i &poly)
+        {
+            procon::NeoExpandedPolygon expoly;
+            expoly.resetPolygonForce(poly);
+            std::vector<double> angles = expoly.getSideAngle();
+            unsigned int i = 0;
+            for(double angle : angles) {
+                if(!(angle < M_PI || angle > M_PI)) {
+                    std::vector<point_i> &outer = poly.outer();
+                    outer.erase(outer.begin() + i);
+                    if(i == 0) outer.at(outer.size() - 1) = outer.at(0);
+                    delete_180_degree(poly);
+                    break;
+                }
+                ++i;
+            }
+        };
+
+        bool check_all_float = true; //ヒントが全部浮いてるか
+            unsigned int hint_index = 0;
+            for(procon::NeoExpandedPolygon hint_piece : hint_pieces) {
+                std::vector<procon::NeoExpandedPolygon> frames_next;
+                frames_next.reserve(100);
+#ifdef test
+                std::cout << std::endl << "now hint is " << hint_index << " --------------" << std::endl;
+
+                out(hint_piece.getPolygon(), "hint");
+//                NeoPolygonViewer::getInstance().displayPolygon(hint_piece.getPolygon(), "do " + std::to_string(doing) + "hint " + std::to_string(hint_index) + " hint_piece", false);
+
+                int ii = 0;
+                for(const procon::NeoExpandedPolygon &frame : field_frame) {
+                    if(!frame.getPolygon().outer().empty()) {
+                        out(frame.getPolygon(), "frame " + std::to_string(ii));
+//                        NeoPolygonViewer::getInstance().displayPolygon(frame.getPolygon(), "do " + std::to_string(doing) + "hint " + std::to_string(hint_index) + " frame " + std::to_string(ii), false);
+                    } else std::cout << "frame " << ii << " is empty" << std::endl;
+                    ++ii;
+                }
+                int i = 0;
+#endif
+                bool check_float = false; //ヒントが浮いてるか
+                for(const procon::NeoExpandedPolygon &frame : field_frame) {
+                    std::vector<polygon_i> union_polygons;
+                    bg::union_(frame.getPolygon(), hint_piece.getPolygon(), union_polygons);
+                    if(union_polygons.size() == 1) { //ヒントがこのフレームにある！
+#ifdef test
+                        std::cout << "hint in frame " << i << " !" << std::endl;
+                        int iii = 0;
+                        for(const polygon_i &union_polygon : union_polygons) {
+                            if(!union_polygon.outer().empty()) {
+                                out(union_polygon, "union " + std::to_string(iii));
+//                                NeoPolygonViewer::getInstance().displayPolygon(union_polygon, "do " + std::to_string(doing) + "hint " + std::to_string(hint_index) + " union " + std::to_string(iii), false);
+                            } else std::cout << "union " << ii << " is empty" << std::endl;
+                            ++iii;
+                        }
+#endif
+                        if(!bg::equals(frame.getPolygon(), union_polygons.at(0))) { //ヒントがコンフリクトしてる
+#ifdef test
+                            std::cout << "hint conflicting" << std::endl;
+#endif
+                            return false;
+                        }
+                        std::vector<polygon_i> frames_new;
+                        bg::difference(frame.getPolygon(), hint_piece.getPolygon(), frames_new);
+                        for(polygon_i &frame_new : frames_new) {
+                            delete_180_degree(frame_new);
+                        }
+                        for(const polygon_i &frame_new : frames_new) {
+                            if(frame_new.inners().empty()) { //ちゃんとヒントがはまった
+#ifdef test
+                            std::cout << "set hint!" << std::endl;
+#endif
+                                procon::NeoExpandedPolygon frame_next;
+                                frame_next.resetPolygonForce(frame_new);
+                                frames_next.emplace_back(frame_next);
+                                check_all_float = false;
+                            } else { //ヒントが浮いてる
+#ifdef test
+                            std::cout << "not set hint. hint froating." << std::endl;
+#endif
+                                check_float = true;
+                                break;
+                            }
+                        }
+                    } else frames_next.emplace_back(frame); //ヒントがこのフレームになかったらスルー
+                    if(check_float) break;
+#ifdef test
+                    ++i;
+#endif
+                }
+                if(!check_float) {
+                    field_frame = frames_next;
+                    field_pieces.emplace_back(hint_piece);
+                    isPlaced.at(static_cast<unsigned int>(hint_piece.getId())) = true;
+                    hint_pieces_next.erase(hint_pieces_next.begin() + hint_index);
+                }
+                ++hint_index;
+            }
+#ifdef test
+            ++doing;
+#endif
+        if(!check_all_float) { //ヒントがはまらなくなるまで再帰
+            bool check = check_hint_and_connect(hint_pieces_next);
+            return (check) ? true : false;
+        } else return true;
+    };
+
+    bool check = check_hint_and_connect(hint_pieces);
+    return (check) ? true : false;
+}
+
