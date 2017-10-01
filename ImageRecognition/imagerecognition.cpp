@@ -38,6 +38,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
+    // フレームの回転角を計算
     for (unsigned int i=0; i<polygons.at(0).outer().size()-1; i++) {
         double x = polygons.at(0).outer().at(i+1).x() - polygons.at(0).outer().at(i).x();
         double y = polygons.at(0).outer().at(i+1).y() - polygons.at(0).outer().at(i).y();
@@ -103,9 +104,9 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
-    // sum polygon_t and piece's image
-    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
-    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
+//    // sum polygon_t and piece's image
+//    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
+//    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
 
 //    int count = 0;
 //    for (auto polygon : pfi) {
@@ -1022,10 +1023,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     // outer
     auto& polygon = vertex.outer();
 
-    // グリッドの点番号で保存
-    polygon_i grid_piece;
-    grid_piece.outer().push_back(point_i(0,0));
-
     // 1cm以下の辺があったら加工
     polygon.pop_back();
     for (unsigned int i=0; i<polygon.size(); i++) {
@@ -1109,28 +1106,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     bool frame = false;
     if (id >= pieces_num - frame_num) {
-
-//        // フレームは長い辺を横に
-//        unsigned int longgest;
-//        double long_len = 0;
-//        for (unsigned int i = 0; i < polygon.size()-1; i++) {
-//            double x = polygon.at(i+1).x() - polygon.at(i).x();
-//            double y = polygon.at(i+1).y() - polygon.at(i).y();
-//            double it_len = hypot(x, y);
-//            if (long_len < it_len) {
-//                long_len = it_len;
-//                longgest = i;
-//            }
-//        }
-
-//        // 配列を循環
-//        vertex.outer().pop_back();
-//        polygon_t longer;
-//        for (unsigned int i = 0; i < polygon.size(); i++) {
-//            longer.outer().push_back(vertex.outer().at((i+longgest)%(polygon.size())));
-//        }
-//        longer.outer().push_back(longer.outer().at(0));
-//        vertex = longer;
 
         right_angle = true;
 
@@ -1244,14 +1219,14 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         std::vector<point_i> first_point;
 
         // 面積が小さいものは拡大してから探索
-        double area = bg::area(vertex);
+//        double area = bg::area(vertex);
 
-        if (fabs(area) < 150) {
-            trans::scale_transformer<double,2,2> reduction(1);
-            polygon_t reduce;
-            bg::transform(vertex, reduce, reduction);
-            vertex = reduce;
-        }
+//        if (fabs(area) < 150) {
+//            trans::scale_transformer<double,2,2> reduction(1);
+//            polygon_t reduce;
+//            bg::transform(vertex, reduce, reduction);
+//            vertex = reduce;
+//        }
 
         // ２分探索
         int match = binarySearch(this->length_table, 0, this->length_table.size()-1, len);
@@ -1263,13 +1238,13 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         bool l_check = true;
         while (s_check || l_check) {
 
-            if (fabs(this->length_table.at(shorter).second - len) < 2.0) {
+            if (fabs(this->length_table.at(shorter).second - len) < 1.5) {
                 first_point.push_back(this->length_table.at(shorter).first);
             } else {
                 s_check = false;
             }
 
-            if (fabs(this->length_table.at(longer).second - len) < 2.0) {
+            if (fabs(this->length_table.at(longer).second - len) < 1.5) {
                 first_point.push_back(this->length_table.at(longer).first);
             } else {
                 l_check = false;
@@ -1283,17 +1258,32 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         double smallest_dif = 100;
 
         for (auto pi : first_point) {
+
+            // 原点に平行移動
+            trans::translate_transformer<double,2,2> translate(-vertex.outer().at(0).x(), -vertex.outer().at(0).y());
+            polygon_t shift;
+            bg::transform(vertex, shift, translate);
+
+            // 回転
             double to_po_rad = std::atan2(pi.y() , pi.x());
-            trans::rotate_transformer<boost::geometry::radian,double,2,2> rad(to_po_rad - to_ver_rad);
+            trans::rotate_transformer<bg::radian,double,2,2> rad(-(to_po_rad - to_ver_rad));
             polygon_t rotate;
-            bg::transform(vertex, rotate, rad);
+            bg::transform(shift, rotate, rad);
+
             double dif = 0;
             for (unsigned int i=1; i<rotate.outer().size(); i++) {
-                double x = rotate.outer().at(i).x() - rotate.outer().at(0).x();
-                double y = rotate.outer().at(i).y() - rotate.outer().at(0).y();
+                double x = rotate.outer().at(i).x();
+                double y = rotate.outer().at(i).y();
                 double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
                 dif += dif_len;
             }
+
+//            for (unsigned int i=1; i<rotate.outer().size()-1; i++) {
+//                double x = rotate.outer().at(i+1).x() - rotate.outer().at(i).x();
+//                double y = rotate.outer().at(i+1).y() - rotate.outer().at(i).y();
+//                double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
+//                dif += dif_len;
+//            }
 
             if (smallest_dif > dif) {
                 smallest_dif = dif;
@@ -1310,14 +1300,28 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         theta = std::atan2(smallest.y(), smallest.x()) - to_ver_rad;
     }
 
+    // グリッドの点番号で保存
+    polygon_i grid_piece;
+
     // 全ての点を回転後のいちに移動
-    for (unsigned int i=1; i<polygon.size(); i++) {
-        double x = polygon.at(i).x() - polygon.at(0).x();
-        double y = polygon.at(i).y() - polygon.at(0).y();
-        double move_x = x * cos(theta) - y * sin(theta);
-        double move_y = x * sin(theta) + y * cos(theta);
-        grid_piece.outer().push_back(point_i(round(move_x), round(move_y)));
+    polygon_t shift;
+    polygon_t to_grid;
+    trans::translate_transformer<double,2,2> translate(-vertex.outer().at(0).x(), -vertex.outer().at(0).y());
+    bg::transform(vertex, shift, translate);
+    trans::rotate_transformer<bg::radian,double,2,2> rad(-theta);
+    bg::transform(shift, to_grid, rad);
+
+    for (auto po : to_grid.outer()) {
+        grid_piece.outer().push_back(point_i(round(po.x()), round(po.y())));
     }
+
+//    for (unsigned int i=0; i<polygon.size(); i++) {
+//        double x = polygon.at(i).x() - polygon.at(0).x();
+//        double y = polygon.at(i).y() - polygon.at(0).y();
+//        double move_x = x * cos(theta) - y * sin(theta);
+//        double move_y = x * sin(theta) + y * cos(theta);
+//        grid_piece.outer().push_back(point_i(round(move_x), round(move_y)));
+//    }
 
     return grid_piece;
 }

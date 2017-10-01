@@ -10,7 +10,6 @@
 #include "singlepolygondisplay.h"
 
 namespace trans = bg::strategy::transform;
-using degree_t = trans::rotate_transformer<boost::geometry::radian,double,2,2>;
 
 class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
