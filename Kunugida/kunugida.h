@@ -9,6 +9,7 @@
 #include "qrlibrary.h"
 #include "neofield.h"
 #include "http/request_mapper.h"
+#include "qrcode.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -42,7 +43,6 @@ private:
     std::shared_ptr<NeoAnswerBoard> board;
     void finishedProcess();
     void startProcess();
-    QRLibrary QR;
     RequestMapper request_mapper;
     QNetworkAccessManager *manager;
     QFile file;

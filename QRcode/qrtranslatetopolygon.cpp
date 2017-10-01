@@ -205,27 +205,37 @@ void QrTranslateToPolygon::translateToPolygon(std::vector<int> &intvec,polygon_i
     polygon.outer().push_back(point_i(intvec[1],intvec[2]));
 }
 */
-void QrTranslateToPolygon::translateToCSV(std::pair<std::vector<polygon_i>, std::vector<polygon_i>> pieceframe)
+void QrTranslateToPolygon::translateToCSV(std::pair<std::vector<polygon_i>, std::vector<polygon_i>> pieceframe, bool is_hint)
 {
     procon::NeoField field;
-    int id = 0;
-    std::vector<procon::NeoExpandedPolygon> elementarypieces;
-    for(auto p : pieceframe.first){
-        procon::NeoExpandedPolygon pieceexpandedpolygon(id);
-        pieceexpandedpolygon.resetPolygonForce(p);
-        elementarypieces.push_back(pieceexpandedpolygon);
-        id++;
-    }
+    if(is_hint){
+        std::vector<procon::NeoExpandedPolygon> elementaryFrameInnerPieces;
+        for(auto ep : pieceframe.first){
+            procon::NeoExpandedPolygon elementaryFrameInnerPiece;
+            elementaryFrameInnerPiece.resetPolygonForce(ep);
+            elementaryFrameInnerPieces.push_back(elementaryFrameInnerPiece);
+        }
+        field.setElementaryFrameInnerPieces(elementaryFrameInnerPieces);
+    }else{
+        int id = 0;
+        std::vector<procon::NeoExpandedPolygon> elementarypieces;
+        for(auto p : pieceframe.first){
+            procon::NeoExpandedPolygon pieceexpandedpolygon(id);
+            pieceexpandedpolygon.resetPolygonForce(p);
+            elementarypieces.push_back(pieceexpandedpolygon);
+            id++;
+        }
 
-    procon::NeoExpandedPolygon frameexpandedpolygon;
-    std::vector<procon::NeoExpandedPolygon> elementaryframe;
-    for(auto f : pieceframe.second){
-        frameexpandedpolygon.resetPolygonForce(f);
-        elementaryframe.push_back(frameexpandedpolygon);
-    }
+        procon::NeoExpandedPolygon frameexpandedpolygon;
+        std::vector<procon::NeoExpandedPolygon> elementaryframe;
+        for(auto f : pieceframe.second){
+            frameexpandedpolygon.resetPolygonForce(f);
+            elementaryframe.push_back(frameexpandedpolygon);
+        }
 
-    field.setElementaryPieces(elementarypieces);
-    field.setElementaryFrame(elementaryframe);
+        field.setElementaryPieces(elementarypieces);
+        field.setElementaryFrame(elementaryframe);
+    }
     NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/fromQRcode.csv");
 }
 

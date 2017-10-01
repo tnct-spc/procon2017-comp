@@ -32,15 +32,18 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         qrlibrary.cpp \
-        qrtranslatetopolygon.cpp
+        qrtranslatetopolygon.cpp \
+    qrcode.cpp
 
 HEADERS += \
         mainwindow.h \
         qrlibrary.h \
-        qrtranslatetopolygon.h
+        qrtranslatetopolygon.h \
+    qrcode.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    qrcode.ui
 
 LIBS += -L/usr/lib -lzbar
 LIBS += -L/usr/lib `pkg-config --libs opencv`
