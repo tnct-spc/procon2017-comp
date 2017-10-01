@@ -25,6 +25,7 @@ public:
 private:
     std::shared_ptr<NeoAnswerBoard> board;
     Ui::NeoSlaver *ui;
+    NeoSolver *solver;
     bool get();
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     bool network_error_flag = false;

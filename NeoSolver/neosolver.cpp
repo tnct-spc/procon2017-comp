@@ -9,10 +9,10 @@ NeoSolver::NeoSolver()
     Algorithms.push_back(new TestAlgortithm());
     Algorithms.push_back(new BeamSearch());
     for(auto& al : Algorithms){
-        connect(al, &AlgorithmWrapper::requestCSV, this, &NeoSolver::_requestCSV);
-        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
-        connect(al, &AlgorithmWrapper::requestpostCSV, this, &NeoSolver::_requestCSV);
-        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
+//        connect(al, &AlgorithmWrapper::requestCSV, this, &NeoSolver::_requestCSV);
+//        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
+//        connect(al, &AlgorithmWrapper::requestpostCSV, this, &NeoSolver::_requestCSV);
+//        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
     }
 }
 
