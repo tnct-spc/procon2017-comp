@@ -58,7 +58,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     const QString down_back_ground_color = "#118822";
     const QString unplaced_back_ground_color = "#EEEEEE";
     const int width_size = (showunplacedpieces
-                ? this->width() * 0.75
+                ? this->width() * 0.6
                 : this->width());
     const int window_height = this->height();
     const int window_width = this->width();
@@ -350,24 +350,50 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
     }
 
-    auto drawunplacedpieces = [&]{
+    auto drawunplacedpieces = [&]{//人力beamsearch用
 
-        auto drawPiece = [&](polygon_i poly,int id){
+        int unplacedpiececount = field.getElementaryPieces().size() - field.getPieces().size();
+
+        auto getUnplacedPosition = [&](point_i point,int value){
+            QPointF q_point = getPosition(point);
+            if(value * 2 < unplacedpiececount){
+                q_point.setX(q_point.x() + width_size);
+                q_point.setY(point.y()*grid_size + window_height * 2 * value /unplacedpiececount);
+            }else{
+                q_point.setX(q_point.x() + width_size + (window_width - width_size) / 2);
+                q_point.setY(point.y()*grid_size + window_height * 2 * value /unplacedpiececount - window_height);
+            }
+
+            return q_point;
+        };
+
+        auto drawPiece = [&](polygon_i poly,int id,int count){
             painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
             painter.setBrush(QBrush(QColor(list[id])));
             std::vector<QPointF> points;
-            for(auto point : poly.outer()){
-                points.push_back(getPosition(point));
+
+            //中央に揃える処理
+            point_i center_point;
+            polygon_i center_poly;
+            bg::centroid(poly , center_point);
+            bg::strategy::transform::translate_transformer<int,2,2>translate(-center_point.x(),-center_point.y());
+            bg::transform(poly,center_poly,translate);
+
+            for(auto point : center_poly.outer()){
+                points.push_back(getUnplacedPosition(point,count));
             }
             painter.drawPolygon(&points.front(),points.size());
 
         };
 
+
+        int value=0;
         for(unsigned int count=0;count<field.getElementaryPieces().size();++count){
             if(!field.getIsPlaced().at(count)){//置かれてないなら
                 polygon_i poly = field.getElementaryPieces().at(count).getPolygon();
                 int poly_id = field.getElementaryPieces().at(count).getId();
-                drawPiece(poly,poly_id);
+                drawPiece(poly,poly_id,value);
+                ++value;
             }
         }
     };
