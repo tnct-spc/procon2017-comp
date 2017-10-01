@@ -2,6 +2,7 @@
 #define IMAGERECONGNITIONWITHHUMANPOWER_H
 
 #include <QWidget>
+#include <QGraphicsView>
 #include "precompile.h"
 #include "polygonviewer.h"
 #include "singlepolygondisplay.h"
@@ -25,6 +26,7 @@ private:
     QPointF toWindowPoint(QPointF point);
     Ui::imagerecongnitionwithhumanpower *ui;
     QPushButton *edited_button;
+    QGraphicsView *graphics_view;
     polygon_t polygon;
     std::vector<QPointF> points;
     int grid_size,left_right_margin,top_buttom_margin;

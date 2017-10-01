@@ -3,16 +3,24 @@
 #include "precompile.h"
 #include "polygonviewer.h"
 #include <QLayout>
+#include <QSpacerItem>
 
 imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::imagerecongnitionwithhumanpower)
 {
     ui->setupUi(this);
+
     edited_button = new QPushButton();
     edited_button->setText("edited");
     connect(edited_button,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
-    ui->verticalLayout->addWidget(edited_button,1);
+    ui->verticalLayout->addWidget(edited_button);
+
+    graphics_view = new QGraphicsView();
+    ui->horizontalLayout->addWidget(graphics_view);
+//    QGraphicsScene* scene = new QGraphicsScene();
+//    QGraphicsPixmapItem* pic = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+
 }
 
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
@@ -78,7 +86,7 @@ void imagerecongnitionwithhumanpower::paintEvent(QPaintEvent *)
 
     const int grid_margin = 4;
 
-    int window_width = this->width();
+    int window_width = this->width() / 2;
     int window_height = this->height();
 
     painter.setBrush(QBrush(QColor("#E5E6DB")));
