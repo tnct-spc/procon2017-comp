@@ -13,6 +13,7 @@ TryNextSearch::TryNextSearch(QWidget *parent) :
 
     board = new NeoAnswerBoard();
     board->setSingleMode(true);
+    board->setShowUnplacedPieces(true);
     board->setSelectPieceMode(true);
 
     go_button = new QPushButton();

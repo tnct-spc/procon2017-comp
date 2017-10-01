@@ -355,13 +355,14 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         int unplacedpiececount = field.getElementaryPieces().size() - field.getPieces().size();
 
         auto getUnplacedPosition = [&](point_i point,int value){
+
             QPointF q_point = getPosition(point);
             if(value * 2 < unplacedpiececount){
                 q_point.setX(q_point.x() + width_size);
-                q_point.setY(point.y()*grid_size + window_height * 2 * value /unplacedpiececount);
+                q_point.setY(point.y()*grid_size + window_height*0.5 + (unplacedpiececount/4 - value) * window_height/unplacedpiececount*1.2);
             }else{
                 q_point.setX(q_point.x() + width_size + (window_width - width_size) / 2);
-                q_point.setY(point.y()*grid_size + window_height * 2 * value /unplacedpiececount - window_height);
+                q_point.setY(point.y()*grid_size + window_height*0.5 + (unplacedpiececount/4 - (value - unplacedpiececount/2)) * window_height/unplacedpiececount*1.2);
             }
 
             return q_point;
