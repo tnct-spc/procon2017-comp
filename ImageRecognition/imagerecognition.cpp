@@ -114,30 +114,29 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         count++;
     }
 
-//     scale is led from 6*6 piece
-    double scale_len;
-    for (auto piece : polygons) {
-        if (piece.outer().size() == 5) {
-            bool check = true;
-            scale_len = 0;
-            for (int i=0; i<4; i++) {
-                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
-                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
-                double len = hypot(x,y) * scale / 2.5;
-                if (fabs(6.0 - len) > 1) {
-                    check = false;
-                } else {
-                    scale_len += hypot(x,y);
-                }
-            }
-
-            if (check) {
-                break;
-            }
-        }
-    }
-
-    scale = 15 * 4 / scale_len;
+//     scale is led from 6*6 piece//    double scale_len;
+    //    for (auto piece : polygons) {
+    //        if (piece.outer().size() == 5) {
+    //            bool check = true;
+    //            scale_len = 0;
+    //            for (int i=0; i<4; i++) {
+    //                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
+    //                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
+    //                double len = hypot(x,y) * scale / 2.5;
+    //                if (fabs(6.0 - len) > 1) {
+    //                    check = false;
+    //                } else {
+    //                    scale_len += hypot(x,y);
+    //                }
+    //            }
+    
+    //            if (check) {
+    //                break;
+    //            }
+    //        }
+    //    }
+    
+    //    scale = 15 * 4 / scale_len;
 
     // change vector's scale to grid
     for (auto& piece : polygons) {
