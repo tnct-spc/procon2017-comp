@@ -1,13 +1,13 @@
 #ifndef TESTSINGLEPOLYGONDOCK_H
 #define TESTSINGLEPOLYGONDOCK_H
-#include "singlepolygondisplay.h"
-#include "field.h"
+#include "neofield.h"
+#include "singlepolygondock.h"
 #include "neopolygonviewer.h"
 #include "neoexpandedpolygon.h"
+#include "neopolygonio.h"
+#include "testerwraper.h"
 
-
-class TestSinglePolygonDock : public TesterWraper
-{
+class TestSinglePolygonDock : public TesterWraper{
 public:
     TestSinglePolygonDock();
     bool run();
