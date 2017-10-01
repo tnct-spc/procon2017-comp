@@ -347,28 +347,32 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 field_buf.setFrame(frames_buf);
 
-                //deplicacte flag
-                bool flag = false;
+                //check hint_conflict and set hints
+                bool check_hint = field_buf.check_hint();
+                if(check_hint) {
+                    //deplicacte flag
+                    bool flag = false;
 
-                //check field is ok
-                {
-                    const std::string now_hash = hashField(field_buf);
-                    std::lock_guard<decltype(mtx)> lock(mtx);
-                    std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
-                        if(!flag){
-                            if(now_hash == hashField(f)){
-                                flag = true;
+                    //check field is ok
+                    {
+                        const std::string now_hash = hashField(field_buf);
+                        std::lock_guard<decltype(mtx)> lock(mtx);
+                        std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
+                            if(!flag){
+                                if(now_hash == hashField(f)){
+                                    flag = true;
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
 
-                if(!flag){
-                    if(!this->checkCanPrune(field_buf)){
-                        {
-                            std::lock_guard<decltype(mtx)> lock(mtx);
-                            field_buf.evaluate_cache.push_back(eval);
-                            next_field.push_back(field_buf);
+                    if(!flag){
+                        if(!this->checkCanPrune(field_buf)){
+                            {
+                                std::lock_guard<decltype(mtx)> lock(mtx);
+                                field_buf.evaluate_cache.push_back(eval);
+                                next_field.push_back(field_buf);
+                            }
                         }
                     }
                 }
