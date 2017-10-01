@@ -29,10 +29,10 @@ private:
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     bool network_error_flag = false;
 
-    std::string SAVE_PROBLEM_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
-    std::string SAVE_ANSWER_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/answer.csv";
-    QString SERVER_URL = "http://192.168.1.130:8016/get";
-    QString SERVER_POST_URL = "http://192.168.1.130:8016/answer";
+    std::string SAVE_PROBLEM_PATH = "../../procon2017-comp/problem.csv";
+    std::string SAVE_ANSWER_PATH = "../../procon2017-comp/answer.csv";
+    QString SERVER_URL = "http://192.168.100.55:8016/get";
+    QString SERVER_POST_URL = "http://192.168.100.55:8016/answer";
 
 private slots:
     void pushGetButton();

@@ -6,7 +6,6 @@ NeoSlaver::NeoSlaver(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NeoSlaver)
 {
-    QDir().mkdir("docroot");
     ui->setupUi(this);
     board = std::make_shared<NeoAnswerBoard>();
     board->showMaximized();
@@ -81,15 +80,11 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
 
     std::cout<<"challenge send"<<std::endl;
     //send
-    QFile answer_file(QString::fromStdString(SAVE_ANSWER_PATH));
+    QFile answer_file;
+    answer_file.setFileName(QString::fromStdString(SAVE_ANSWER_PATH));
     answer_file.open(QIODevice::ReadOnly);
-    QUrlQuery postData;
-//    postData.addQueryItem("answer",answer_file.readAll().toStdString().c_str());
-//    postData.addQueryItem("id",ui->ID->text());
-    QNetworkRequest req(SERVER_POST_URL);
-    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
-    QNetworkReply *postreply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
+    QNetworkReply *postreply = manager->post(QNetworkRequest(QUrl(SERVER_POST_URL)), &answer_file);
     connect(postreply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
 
