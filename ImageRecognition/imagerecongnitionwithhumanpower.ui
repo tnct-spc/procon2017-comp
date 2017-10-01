@@ -19,7 +19,7 @@
      <item>
       <layout class="QHBoxLayout" name="selectIntervalLayout">
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="selectedIntervalLabel1">
          <property name="text">
           <string>選択許容範囲：</string>
          </property>
@@ -29,10 +29,10 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+        <widget class="QDoubleSpinBox" name="selectedIntervalBox"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="selectedIntervalLabel2">
          <property name="text">
           <string>Grid</string>
          </property>
@@ -43,7 +43,7 @@
      <item>
       <layout class="QHBoxLayout" name="intervalLayout" stretch="0,0,0">
        <item>
-        <widget class="QLabel" name="intervalLabel">
+        <widget class="QLabel" name="intervalLabel1">
          <property name="layoutDirection">
           <enum>Qt::LeftToRight</enum>
          </property>
@@ -66,7 +66,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="intervalLabel_2">
+        <widget class="QLabel" name="intervalLabel2">
          <property name="text">
           <string>までとる(0 &lt;= X &lt;= 5)</string>
          </property>

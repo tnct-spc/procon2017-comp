@@ -78,7 +78,7 @@ QPointF imagerecongnitionwithhumanpower::toWindowPoint(QPointF point){
 }
 
 void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
-    const double threshold = ui->doubleSpinBox->value();
+    const double threshold = ui->selectedIntervalBox->value();
     QPointF selected_point = toPolygonPoint(event->x(),event->y());
     std::cout<<selected_point.x()<<","<<selected_point.y()<<std::endl;
     auto itr = std::find_if(points.begin(),points.end(),[&](QPointF p){
