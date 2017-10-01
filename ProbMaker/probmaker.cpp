@@ -102,6 +102,7 @@ ProbMaker::ProbMaker(QWidget *parent) :
     //ドロネーの三角形分割
     delaunay_triangulation();
     GA();
+    makeHint();
 }
 
 ProbMaker::~ProbMaker()
@@ -691,15 +692,11 @@ void ProbMaker::step()
     for(auto polygon: this->print_polygons){
         ++counnnter;
     }
-
     this->update();
 
 //    QEventLoop event;
 //    connect(this,&ProbMaker::nextLoop,&event,&QEventLoop::quit);
 //    event.exec();
-
-
-
 }
 
 std::vector<polygon_i> ProbMaker::getPieces()
@@ -710,6 +707,246 @@ std::vector<polygon_i> ProbMaker::getPieces()
 polygon_i ProbMaker::getFrame()
 {
     return frame;
+}
+int ProbMaker::retRnd(int num){
+    std::random_device rand;
+    std::mt19937 mt(rand());
+    std::uniform_int_distribution<int> rnd(0,num-1);//randomを返すだけ
+    return rnd(mt);
+}
+void ProbMaker::makeHint(){
+    //std::cout << "nngo"<<std::endl;
+    double mostinstanceHintsNumber = print_polygons.size() * 0.9;
+    double miminstanceHintsNumber = print_polygons.size() * 0.8;
+
+    int mostHintsNumber = mostinstanceHintsNumber;
+    int mimHintsNumber = miminstanceHintsNumber;
+    int moke = retRnd(mostHintsNumber - mimHintsNumber);
+    int Hintnum = (mimHintsNumber + moke)/4;
+    int count = 0;
+    std::string str;
+    //std::cout<<"tango2"<<std::endl;
+    do{
+        count = 0;
+        std::vector<polygon_i> piece = print_polygons;
+        disposition.clear();
+    for(int k = 0;k < Hintnum;k++){
+        //std::cout<<"ループ突入"<<std::endl;
+        int hoge = retRnd(3) + 3;
+        count = hoge + count;
+        str.clear();
+        str += std::to_string(hoge);
+        for(int e = 0;e < hoge;e++){
+            //std::cout <<"pieceループ突入"<<std::endl;
+            int rnd = retRnd(piece.size());
+            //std::cout <<"はじめ"<<std::endl;
+            polygon_i poly2 = piece.at(rnd);
+            //std::cout <<"ゆん"<<std::endl;
+            piece.erase(piece.begin() + rnd);
+            //std::cout <<"あおば"<<std::endl;
+            int s = 0;
+            //std::cout <<"代入"<<std::endl;
+            str += ":";
+            str += std::to_string(poly2.outer().size()-1);
+            //std::cout <<"pointループ突入"<<std::endl;
+            for(point_i point : poly2.outer()){
+                //std::cout <<"えへへ"<<std::endl;
+                if(s != 0){
+                    str += " ";
+                    str += std::to_string(point.x());
+                    str += " ";
+                    str += std::to_string(point.y());
+                }
+                //std::cout <<"リゼ可愛い"<<std::endl;
+                s++;
+            }
+        }
+        //std::cout <<"push_back前"<<std::endl;
+        disposition.push_back(str);
+        //std::cout <<"push_back後"<<std::endl;
+    }
+    }while(mostHintsNumber < count || mimHintsNumber > count);
+    std::cout<<"ink"<<std::endl;
+    /*
+    int HintsNumber1,HintsNumber2,HintsNumber3,HintsNumber4;
+    do{
+    HintsNumber1 = retRnd(100) + 1;
+    HintsNumber2 = retRnd(100) + 1;
+    HintsNumber3 = retRnd(100) + 1;
+    HintsNumber4 = retRnd(100) + 1;
+    }while((HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4) < mimHintsNumber || (HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4) > mostHintsNumber);
+    std::string example = std::to_string(HintsNumber1);
+    disposition1 += example;
+    //ヒント一段階目
+    for(int i = 0; i < HintsNumber1;i++){
+        int rnd = retRnd(piece.size());
+       polygon_i instancepiece = piece.at(rnd);
+       piece.erase(piece.begin() + rnd);
+       int counter = 0;
+       disposition1 += ":";
+       disposition1 += std::to_string(instancepiece.outer().size() - 1);
+       for(auto point_a : instancepiece.outer()){
+           int point_x = point_a.x();
+           int point_y = point_a.y();
+           if(counter != 0){
+                   disposition1 += " ";
+                   disposition1 += std::to_string(point_x);
+                   disposition1 += " ";
+                   disposition1 += std::to_string(point_y);
+               }
+           counter++;
+           }
+                }
+
+    //ヒント二段階目
+    example = std::to_string(HintsNumber2);
+    disposition2 += example;
+    for(int a = 0; a < HintsNumber2;a++){
+        int rnd = retRnd(piece.size());
+       polygon_i instancepiece = piece.at(rnd);
+       piece.erase(piece.begin() + rnd);
+       int counter = 0;
+       disposition2 += ":";
+       disposition2 += std::to_string(instancepiece.outer().size() -1);
+       for(auto point_a : instancepiece.outer()){
+           int point_x = point_a.x();
+           int point_y = point_a.y();
+           if(counter != 0){
+                   disposition2 += " ";
+                   disposition2 += std::to_string(point_x);
+                   disposition2 += " ";
+                   disposition2 += std::to_string(point_y);
+               }
+           counter++;
+           }
+                }
+
+    //ヒント三段階目
+    example = std::to_string(HintsNumber3);
+    disposition3 += example;
+    for(int b = 0; b < HintsNumber3;b++){
+        int rnd = retRnd(piece.size());
+       polygon_i instancepiece = piece.at(rnd);
+       piece.erase(piece.begin() + rnd);
+       int counter = 0;
+       disposition3 += ":";
+       disposition3 += std::to_string(instancepiece.outer().size() - 1);
+       for(auto point_a : instancepiece.outer()){
+           int point_x = point_a.x();
+           int point_y = point_a.y();
+           if(counter != 0){
+                   disposition3 += " ";
+                   disposition3 += std::to_string(point_x);
+                   disposition3 += " ";
+                   disposition3 += std::to_string(point_y);
+           }
+           counter++;
+                }
+            }
+    //ヒント四段階目
+    example = std::to_string(HintsNumber4);
+    disposition4 += example;
+    for(int c = 0; c < HintsNumber4;c++){
+        int rnd = retRnd(piece.size());
+       polygon_i instancepiece = piece.at(rnd);
+       piece.erase(piece.begin() + rnd);
+       int counter = 0;
+       disposition4 += ":";
+       disposition4 += std::to_string(instancepiece.outer().size() - 1);
+       for(auto point_a : instancepiece.outer()){
+           int point_x = point_a.x();
+           int point_y = point_a.y();
+           if(counter != 0){
+                   disposition4 += " ";
+                   disposition4 += std::to_string(point_x);
+                   disposition4 += " ";
+                   disposition4 += std::to_string(point_y);
+               }
+                   counter++;
+           }
+                }
+
+    std::cout<<print_polygons.size()<<" "<<mimHintsNumber<<std::endl;
+    std::cout<<HintsNumber1<<" "<<HintsNumber2<<" "<<HintsNumber3<<" "<<HintsNumber4<<" "<< HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4 <<std::endl;
+    std::cout <<disposition4<<std::endl;
+    */
+
+    //ここから形状情報
+    std::vector<polygon_i> shapepiece;
+    polygon_i neoframe;
+    shapeHints += std::to_string(print_polygons.size());
+    polygon_i polygon2;
+    bool result;
+    for(polygon_i shape : print_polygons){
+        polygon2.clear();
+        int random_x = retRnd(1000000);
+        int random_y = retRnd(1000000);
+        do{
+        for(point_i shapepoint : shape.outer()){
+            int point_x = shapepoint.x();
+            int point_y = shapepoint.y();
+            point_x = point_x + random_x;
+            point_y = point_y + random_y;
+            polygon2.outer().push_back(point_i(point_x,point_y));
+            }
+        result = true;
+        //std::cout<<"うふふ"<<std::endl;
+        for(polygon_i poly : shapepiece){
+            result = bg::disjoint(poly,polygon2);
+            if(!result)break;
+            }
+        }while(!result);
+        shapepiece.push_back(polygon2);
+    }
+    //std::cout <<"あははははは一段階目クリアだよ"<<std::endl;
+    for(polygon_i polygonZ : shapepiece){
+        shapeHints += ":";
+        shapeHints += std::to_string(polygonZ.outer().size() - 1);
+        int counter = 0;
+        for(point_i pointZ : polygonZ.outer()){
+            int shape_x = pointZ.x();
+            int shape_y = pointZ.y();
+            if(counter != 0){
+                    shapeHints += " ";
+                    shapeHints += std::to_string(shape_x);
+                    shapeHints += " ";
+                    shapeHints += std::to_string(shape_y);
+            }
+            counter++;
+        }
+    }
+    //std::cout<<"あはは二段階目クリアだよ"<<std::endl;
+    bool result_moke = false;
+    do{
+        int random_x = retRnd(1000000);
+        int random_y = retRnd(1000000);
+        neoframe.clear();
+    for(point_i framepoint : frame.outer()){
+        neoframe.outer().push_back(point_i(framepoint.x() + random_x ,framepoint.y() + random_y ));
+        }
+    for(polygon_i poly2 : shapepiece){
+        result_moke = bg::disjoint(poly2,neoframe);
+        if(!result_moke)break;
+    }
+    }while(!result_moke);
+    int counter = 0;
+    shapeHints += ":";
+    shapeHints += std::to_string(neoframe.outer().size() - 1);
+    for(point_i point :neoframe.outer()){
+        if(counter != 0){
+            shapeHints += " ";
+            shapeHints += std::to_string(point.x());
+            shapeHints += " ";
+            shapeHints += std::to_string(point.y());
+        }
+        counter++;
+    }
+    std::cout <<shapeHints<<std::endl;
+    for(std::string st :disposition){
+        std::cout<< st <<std::endl;
+        st.erase();
+    }
+    std::cout <<print_polygons.size()<<" "<<mostHintsNumber<<" "<<mimHintsNumber<<" "<<count<<std::endl;
 }
 
 void ProbMaker::paintEvent(QPaintEvent *)
