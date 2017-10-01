@@ -38,6 +38,9 @@ protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+
+signals:
+    void returnPolygon(polygon_t polygon);
 };
 
 #endif // IMAGERECONGNITIONWITHHUMANPOWER_H

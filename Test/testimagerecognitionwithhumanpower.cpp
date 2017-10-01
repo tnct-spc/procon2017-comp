@@ -1,6 +1,9 @@
 #include "testimagerecognitionwithhumanpower.h"
 #include "imagerecongnitionwithhumanpower.h"
 
+#include <QObject>
+
+
 TestImageRecognitionWithHumanPower::TestImageRecognitionWithHumanPower()
 {
 
@@ -15,6 +18,13 @@ bool TestImageRecognitionWithHumanPower::run()
     std::cout << "after" << bg::dsv(polygon) << std::endl;
 
     imagerecongnitionwithhumanpower *iwh = new imagerecongnitionwithhumanpower();
+
+    QObject::connect(iwh,&imagerecongnitionwithhumanpower::returnPolygon,[](polygon_t returnpolygon){
+           std::cout << "called" << std::endl;
+
+           std::cout << boost::geometry::dsv(returnpolygon) << std::endl;
+    });
+
     iwh->setPolygon(polygon);
     iwh->show();
 //    iwh->setPolygon(polygon);

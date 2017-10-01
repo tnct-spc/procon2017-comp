@@ -33,6 +33,8 @@ void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
 
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
 
+    emit returnPolygon(this->polygon);
+
 }
 QPointF imagerecongnitionwithhumanpower::toPolygonPoint(double window_x, double window_y){
     const int N = 10;//小数点第Nまでの四捨五入
