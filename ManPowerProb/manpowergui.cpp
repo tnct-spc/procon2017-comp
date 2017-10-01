@@ -42,6 +42,8 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
 
     connect(ManProb,SIGNAL(piece_Changed(QString)),ui->piece_count,SLOT(setText(QString)));
 
+    connect(ManProb,SIGNAL(area_Changed(QString)),ui->area_count,SLOT(setText(QString)));
+
     connect(ManProb,SIGNAL(zoom_In()),this,SLOT(_zoom_In()));
     connect(ManProb,SIGNAL(zoom_Out()),this,SLOT(_zoom_Out()));
 }

@@ -171,7 +171,7 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>234</x>
      <y>50</y>
      <width>81</width>
      <height>16</height>
@@ -179,6 +179,32 @@
    </property>
    <property name="text">
     <string>pieces_size : </string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>70</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>empty_area :</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="area_count">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>73</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>6565</string>
    </property>
   </widget>
  </widget>

@@ -27,6 +27,7 @@ signals:
     void zoom_In();
     void zoom_Out();
     QString piece_Changed(QString value);
+    QString area_Changed(QString value);
 
 public:
     explicit ManPowerProb(QWidget *parent = 0);
@@ -53,6 +54,7 @@ private:
     point_i translateToPointi(QPointF point);
     bool checkCanPlacePiece(point_i point);
     bool checkCanPlaceFrame(point_i point);
+    double empty_area();
 
     int top_bottom_margin;
     int left_right_margin;

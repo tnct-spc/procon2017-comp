@@ -22,6 +22,7 @@ signals:
     void zoom_In();
     void zoom_Out();
     QString piece_Changed(QString value);
+    QString area_Changed(QString value);
 
 
 private:

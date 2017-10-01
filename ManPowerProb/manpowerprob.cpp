@@ -199,6 +199,7 @@ void ManPowerProb::deleteFrame(){
         frames.pop_back();
         logger->info("フレームを削除しました");
     }else logger->error("フレームを削除できませんでした");
+    emit area_Changed(QString::number(empty_area()));
     this->update();
 
 }
@@ -208,6 +209,7 @@ void ManPowerProb::deletePiece(){
         logger->info("ピースを削除しました");
     }else logger->error("ピースを削除できませんでした");
     emit piece_Changed(QString::number(pieces.size()));
+    emit area_Changed(QString::number(empty_area()));
     this->update();
 
 }
@@ -222,14 +224,10 @@ void ManPowerProb::deletePoint(){
 
 void ManPowerProb::exportToCsv(){
 
-    double frame_area=0;
-    double piece_area=0;
-
     std::vector<procon::NeoExpandedPolygon> neopieces;
     std::vector<procon::NeoExpandedPolygon> neoframes;
     int id=0;
     for(auto piece : pieces){
-        piece_area += bg::area(piece);
         procon::NeoExpandedPolygon neopiece(id);
         neopiece.resetPolygonForce(piece);
         neopieces.push_back(neopiece);
@@ -237,13 +235,11 @@ void ManPowerProb::exportToCsv(){
     }
     id=0;
     if(frames.size()==0){
-        frame_area += bg::area(not_put_part);
         procon::NeoExpandedPolygon neoframe(id);
         neoframe.resetPolygonForce(not_put_part);
         neoframes.push_back(neoframe);
     }else{
         for(auto frame : frames){
-            frame_area += bg::area(frame);
             procon::NeoExpandedPolygon neoframe(id);
             neoframe.resetPolygonForce(frame);
             neoframes.push_back(neoframe);
@@ -256,7 +252,7 @@ void ManPowerProb::exportToCsv(){
     NeoPolygonIO::exportPolygon(this->field,"../../procon2017-comp/humanpowerfield.csv");
 
     logger->info("exported CSV");
-    std::cout << "empty area : " << frame_area - piece_area << std::endl;
+    std::cout << "empty area : " << empty_area() << std::endl;
 }
 
 void ManPowerProb::createPolygon(){
@@ -285,6 +281,7 @@ void ManPowerProb::createPolygon(){
         last_polygon.clear();
     }
     emit piece_Changed(QString::number(pieces.size()));
+    emit area_Changed(QString::number(empty_area()));
     this->update();
 }
 
@@ -297,6 +294,18 @@ void ManPowerProb::changeMode(){
                      ? "changed to frame_mode"
                      : "chenged to piece_mode");
     }
+}
+
+double ManPowerProb::empty_area(){
+    double empty=0;
+    for(auto piece : pieces){
+        empty -= bg::area(piece);
+    }
+    for(auto frame : frames){
+        empty += bg::area(frame);
+    }
+    if(frames.size()==0)empty += bg::area(not_put_part);
+    return empty;
 }
 
 bool ManPowerProb::checkCanPlacePiece(point_i point){//pieceが置けるならtrueを返す
