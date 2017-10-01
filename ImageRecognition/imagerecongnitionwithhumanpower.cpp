@@ -63,7 +63,7 @@ void imagerecongnitionwithhumanpower::clickedReduction(){
 }
 
 QPointF imagerecongnitionwithhumanpower::toPolygonPoint(double window_x, double window_y){
-    const int N = ui->spinBox->value();//小数点第Nまでを取る
+    const int N = ui->intervalBox->value();//小数点第Nまでを取る
     double N_10 = std::pow(10,N);
     QPointF buf((window_x - left_right_margin - std::floor(minXY.first))/grid_size,
                   (window_y - top_buttom_margin - std::floor(minXY.second))/grid_size);

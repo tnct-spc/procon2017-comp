@@ -17,6 +17,30 @@
    <item>
     <layout class="QVBoxLayout" name="polygonLayout">
      <item>
+      <layout class="QHBoxLayout" name="selectIntervalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>選択許容範囲：</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Grid</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="intervalLayout" stretch="0,0,0">
        <item>
         <widget class="QLabel" name="intervalLabel">
@@ -24,7 +48,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="text">
-          <string>小数点第</string>
+          <string>座標制度：小数点第</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
