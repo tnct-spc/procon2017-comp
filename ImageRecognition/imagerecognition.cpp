@@ -162,7 +162,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
-    error = getError(pieces);
+    // error = getError(pieces);
 
     // fieldクラスのデータに変換
     procon::NeoField field = makeNeoField(pieces);
@@ -1002,357 +1002,81 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 
 polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 {
-    // 辺の長さでの２分探索
-    struct {
-        int operator() (const std::vector<std::pair<point_i, double>> &tab, const int &start, const int &end, const double &target)
-        {
-            if (start > end) return -1;
+    namespace bg = boost::geometry;
+    namespace trans = bg::strategy::transform;
 
-            int middle = (start + end) * 0.5;
+    // 許容辺誤差（ガバでも平均事情誤差を見ているので大丈夫？）
+    const double allowance_error = 9999;
 
-            if (fabs(tab.at(middle).second - target) <= 0.2) return middle;
+    // 0番目の点を原点に
+    trans::translate_transformer<double, 2, 2> translate(-vertex.outer()[0].x(), -vertex.outer()[0].y());
+    polygon_t translated_vertex;
+    bg::transform(vertex, translated_vertex, translate);
 
-            int p;
-            if (tab.at(middle).second - target > 0.2) p = (*this)(tab, start, middle-1, target);
-            else if (tab.at(middle).second - target < -0.2) p = (*this)(tab, middle+1, end, target);
-
-            return p;
-        }
-    } binarySearch;
-
-    // outer
-    auto& polygon = vertex.outer();
-
-    // 1cm以下の辺があったら加工
-    polygon.pop_back();
-    for (unsigned int i=0; i<polygon.size(); i++) {
-
-        double x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
-        double y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
-
-        double len = hypot(x, y);
-
-        double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
-        double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
-
-        if (len < 1.0) {
-
-            // 異常に短いものは一つに結合
-            polygon.at((i+1)%polygon.size()) = point_t(polygon.at((i+1)%polygon.size()).x() + x * 0.5, polygon.at((i+1)%polygon.size()).y() + y * 0.5);
-            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
-            i--;
-
-        } else if (len < 3.5) {
-
-            // 外積を用いて交点を求める
-            double a1x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+3)%polygon.size()).x();
-            double a1y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+3)%polygon.size()).y();
-            double b2x = polygon.at(i).x() - polygon.at((i+3)%polygon.size()).x();
-            double b2y = polygon.at(i).y() - polygon.at((i+3)%polygon.size()).y();
-            double S1 = (a1x * b2y - a1y * b2x) * 0.5;
-
-            double b1x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
-            double b1y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
-            double S2 = (a1x * b1y - a1y * b1x) * 0.5;
-
-            double a2x = polygon.at((i+1)%polygon.size()).x() - polygon.at(i).x();
-            double a2y = polygon.at((i+1)%polygon.size()).y() - polygon.at(i).y();
-
-            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 170 * M_PI / 180.0) {
-
-                polygon.erase(polygon.begin() + (i + 1) % polygon.size());
-                polygon.erase(polygon.begin() + (i + 2) % polygon.size());
-
-                // 点が2つ減ったのでもう一度同じ点から見直す
-                if ((i+1)%polygon.size() == 0) {
-                    i = i - 3;
-                } else if ((i+2)%polygon.size() == 0){
-                    i = i - 2;
-                } else {
-                    i--;
-                }
-
+    auto setGrid = [&](polygon_t vertex, double theta){
+        // グリッド化されたやつが入るやつ
+        polygon_i set_grid_vertex;
+        // 与えられたtheta分回転
+        polygon_t rotated_vertex;
+        trans::rotate_transformer<bg::radian, double, 2, 2> rotate(-theta);
+        bg::transform(vertex, rotated_vertex, rotate);
+        // 平均二乗誤差（後で最も誤差の少ないやつを選ぶ）
+        double mse = 0;
+        // 各点に対して近似でグリット化を試みる
+        for (auto point : rotated_vertex.outer()) {
+            // 近似点と元の点との誤差が許容以下かどうかチェック
+            double const x_error = std::abs(point.x() - std::round(point.x()));
+            double const y_error = std::abs(point.y() - std::round(point.y()));
+            if (x_error < allowance_error && y_error < allowance_error) {
+                set_grid_vertex.outer().emplace_back(std::round(point.x()), std::round(point.y()));
+                mse += x_error * x_error + y_error * y_error;
             } else {
-
-                double inter_x = polygon.at(i).x() + a2x * S1 / (S1 + S2);
-                double inter_y = polygon.at(i).y() + a2y * S1 / (S1 + S2);
-
-                // 短い辺をはさむ2点を交点に置き換える
-                polygon.at((i+1)%polygon.size()) = point_t(inter_x, inter_y);
-                polygon.erase(polygon.begin() + (i + 2) % polygon.size());
-
-                // 点が1つ減ったのでもう一度同じ点から見直す
-                if ((i+2)%polygon.size() < i) {
-                    i = i - 2;
-                } else {
-                    i--;
-                }
+                // 候補となりえない角度なので帰る
+                return std::move(std::make_tuple(set_grid_vertex, false, -1.0));
             }
+        }
+        // 候補となり得る角度なので正しい値を帰る
+        mse /= rotated_vertex.outer().size() * 2;
+        return std::move(std::make_tuple(set_grid_vertex, true, mse));
+    };
 
-        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 7) {
 
-            // ほぼ平らな２辺は１本に
-            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
-            i--;
+    polygon_i rotated_vertex;
+    double prev_mse = 9999;
+    auto & begin_point = translated_vertex.outer().at(0);
+
+    // すべての点について
+    for (int i = 1; i < translated_vertex.outer().size(); ++i) {
+        // y軸方向がグリッドに乗るための回転角度候補を求める
+        auto & point = translated_vertex.outer().at(i);
+        const double dis = bg::distance(begin_point, point);
+        std::vector<double> candidate_of_theta;
+        const double theta = std::atan2(point.y(), point.x());
+        for (int j = 0; j < std::ceil(dis); j++) {
+            candidate_of_theta.emplace_back(std::asin(j / dis) - theta);
+        }
+        for (auto theta : candidate_of_theta) {
+            // 候補に対して回転させてみる
+            auto result_tuple = setGrid(translated_vertex, theta);
+            if (std::get<1>(result_tuple)) {
+                // もっとも平均二乗誤差が少ないやつを使う
+                if (prev_mse > std::get<2>(result_tuple)) {
+                    prev_mse = std::get<2>(result_tuple);
+                    rotated_vertex = std::move(std::get<0>(result_tuple));
+                }
+            } else {
+                // 正しい点ではない（やばい）
+                std::cout << "Yabai" << std::endl;
+            }
         }
     }
-    polygon.push_back(polygon.at(0));
-
-    // ９０度の角を持つピースはそこを基準に計算
-    bool right_angle = false;
-
-    // polygonのid
-    id++;
-
-    bool frame = false;
-    if (id >= pieces_num - frame_num) {
-
-        right_angle = true;
-
-        frame = true;
+    if (rotated_vertex.outer().size() == 0) {
+        std::cout << "Kanari Yabai" << std::endl;
+        return rotated_vertex;
 
     } else {
-
-        // ９０度角を探す
-        for (unsigned int i=0; i<polygon.size()-1; i++) {
-
-            double vec[4];
-            vec[0] = polygon.at(i).x() - polygon.at(i+1).x();
-            vec[1] = polygon.at(i).y() - polygon.at(i+1).y();
-            vec[2] = polygon.at((i+2) % (polygon.size()-1)).x() - polygon.at(i+1).x();
-            vec[3] = polygon.at((i+2) % (polygon.size()-1)).y() - polygon.at(i+1).y();
-            double degree = acos((vec[0] * vec[2] + vec[1] * vec[3]) / (hypot(vec[0], vec[1]) * hypot(vec[2], vec[3])));
-
-            double hori = hypot(vec[2], vec[3]);
-
-            // 配列を循環
-            if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
-
-                // ９０度角でも傾いている場合を考慮
-                if (fabs(hori - round(hori)) < 0.1) {
-
-                    polygon.pop_back();
-                    polygon_t spin;
-                    for (unsigned int j = 0; j < polygon.size(); j++) {
-                        spin.outer().push_back(vertex.outer().at((j+i+1)%polygon.size()));
-                    }
-
-                    spin.outer().push_back(spin.outer().at(0));
-                    vertex = spin;
-
-                    right_angle = true;
-
-                    break;
-                }
-            }
-//            } else if (fabs(hori - round(hori)) < 0.05) {
-//                polygon.pop_back();
-//                polygon_t spin;
-//                for (unsigned int j = 0; j < polygon.size(); j++) {
-//                    spin.outer().push_back(vertex.outer().at((j+i+1)%polygon.size()));
-//                }
-
-//                spin.outer().push_back(spin.outer().at(0));
-//                vertex = spin;
-
-//                right_angle = true;
-
-//                break;
-//            }
-        }
+        return rotated_vertex;
     }
-
-//    // ９０度がなかったら横になる辺か一番長い辺を最初に持ってくる
-//    if (!right_angle) {
-
-//        // 一番長い辺を探す
-//        double long_len = 0;
-
-//        unsigned int longgest = 0;
-//        unsigned int match;
-//        double error = 1;
-//        for (unsigned int i = 0; i < polygon.size()-1; i++) {
-//            double x = polygon.at(i+1).x() - polygon.at(i).x();
-//            double y = polygon.at(i+1).y() - polygon.at(i).y();
-//            double it_len = hypot(x, y);
-
-//            // もし、辺の長さが横軸のグリッドにのるなら、それを先頭に計算
-//            double grid_len = it_len;
-//            if (fabs(grid_len - round(grid_len)) < error) {
-//                error = fabs(grid_len - round(grid_len));
-//                match = i;
-//            } else if (long_len < it_len) {
-//                long_len = it_len;
-//                longgest = i;
-//            }
-//        }
-
-//        if (error < 0.03) {
-//            longgest = match;
-//            right_angle = true;
-//        }
-
-//        // 配列を循環
-//        if (longgest != 0) {
-//        vertex.outer().pop_back();
-//            polygon_t longer;
-//            for (unsigned int i = 0; i < polygon.size(); i++) {
-//                longer.outer().push_back(vertex.outer().at((i+longgest)%polygon.size()));
-//            }
-//            longer.outer().push_back(longer.outer().at(0));
-//            vertex = longer;
-//        }
-//    }
-
-    // 最初の辺の長さを計算
-    double first_x = polygon.at(1).x() - polygon.at(0).x();
-    double first_y = polygon.at(1).y() - polygon.at(0).y();
-    double len = hypot(first_x, first_y);
-    double to_ver_rad = std::atan2(first_y, first_x);
-    point_i smallest;
-
-    if (right_angle) {
-        smallest = point_i((int)round(len), 0);
-    } else {
-
-        // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
-        std::vector<point_i> first_point;
-
-        // 面積が小さいものは拡大してから探索
-//        double area = bg::area(vertex);
-
-//        if (fabs(area) < 150) {
-//            trans::scale_transformer<double,2,2> reduction(1);
-//            polygon_t reduce;
-//            bg::transform(vertex, reduce, reduction);
-//            vertex = reduce;
-//        }
-
-        // ２分探索
-        int match = binarySearch(this->length_table, 0, this->length_table.size()-1, len);
-
-        // ２分探索から出た座標から距離のにているものをピックアップ
-        int shorter = match;
-        int longer = match + 1;
-        bool s_check = true;
-        bool l_check = true;
-        while (s_check || l_check) {
-
-            if (fabs(this->length_table.at(shorter).second - len) < 1.5) {
-                first_point.push_back(this->length_table.at(shorter).first);
-            } else {
-                s_check = false;
-            }
-
-            if (fabs(this->length_table.at(longer).second - len) < 1.5) {
-                first_point.push_back(this->length_table.at(longer).first);
-            } else {
-                l_check = false;
-            }
-
-            shorter++;
-            longer++;
-        }
-
-        // 可能性のあるものから全角の誤差が最も小さいものを確認
-        double smallest_dif = 100;
-
-        for (auto pi : first_point) {
-
-            // 原点に平行移動
-            trans::translate_transformer<double,2,2> translate(-vertex.outer().at(0).x(), -vertex.outer().at(0).y());
-            polygon_t shift;
-            bg::transform(vertex, shift, translate);
-
-            // 回転
-            double to_po_rad = std::atan2(pi.y() , pi.x());
-            trans::rotate_transformer<bg::radian,double,2,2> rad(-(to_po_rad - to_ver_rad));
-            polygon_t rotate;
-            bg::transform(shift, rotate, rad);
-
-            double dif = 0;
-            for (unsigned int i=1; i<rotate.outer().size(); i++) {
-                double x = rotate.outer().at(i).x();
-                double y = rotate.outer().at(i).y();
-                double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
-                dif += dif_len;
-            }
-
-//            for (unsigned int i=1; i<rotate.outer().size()-1; i++) {
-//                double x = rotate.outer().at(i+1).x() - rotate.outer().at(i).x();
-//                double y = rotate.outer().at(i+1).y() - rotate.outer().at(i).y();
-//                double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
-//                dif += dif_len;
-//            }
-
-            if (smallest_dif > dif) {
-                smallest_dif = dif;
-                smallest = pi;
-            }
-        }
-    }
-
-    // 最終的な回転角度を算出
-    double theta;
-    if (frame) {
-        theta = -frame_rad;
-    } else {
-        theta = std::atan2(smallest.y(), smallest.x()) - to_ver_rad;
-    }
-
-    // グリッドの点番号で保存
-    polygon_i grid_piece;
-
-    // 全ての点を回転後のいちに移動
-    polygon_t shift;
-    polygon_t to_grid;
-    trans::translate_transformer<double,2,2> translate(-vertex.outer().at(0).x(), -vertex.outer().at(0).y());
-    bg::transform(vertex, shift, translate);
-    trans::rotate_transformer<bg::radian,double,2,2> rad(-theta);
-    bg::transform(shift, to_grid, rad);
-
-    for (auto po : to_grid.outer()) {
-        grid_piece.outer().push_back(point_i(round(po.x()), round(po.y())));
-    }
-
-//    for (unsigned int i=0; i<polygon.size(); i++) {
-//        double x = polygon.at(i).x() - polygon.at(0).x();
-//        double y = polygon.at(i).y() - polygon.at(0).y();
-//        double move_x = x * cos(theta) - y * sin(theta);
-//        double move_y = x * sin(theta) + y * cos(theta);
-//        grid_piece.outer().push_back(point_i(round(move_x), round(move_y)));
-//    }
-
-    return grid_piece;
-}
-
-double ImageRecognition::getError(std::vector<polygon_i> p)
-{
-    double piece_area = 0;
-
-    for (unsigned int i=0; i<p.size()-1; i++) {
-        for (unsigned int j=0; j<p[i].outer().size()-1; j++) {
-            auto point1 = p[i].outer().at(j);
-            auto point2 = p[i].outer().at(j+1);
-            piece_area += point1.x() * point2.y() - point1.y() * point2.x();
-        }
-    }
-
-    piece_area = fabs(piece_area);
-
-    double frame_area = 0;
-
-    for (unsigned int j=0; j<p[p.size()-1].outer().size()-1; j++) {
-        auto point1 = p[p.size()-1].outer().at(j);
-        auto point2 = p[p.size()-1].outer().at(j+1);
-        frame_area += point1.x() * point2.y() - point1.y() * point2.x();
-    }
-
-    frame_area = fabs(frame_area);
-
-    double error = (frame_area - piece_area) * 0.5;
-
-    return error;
 }
 
 procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)

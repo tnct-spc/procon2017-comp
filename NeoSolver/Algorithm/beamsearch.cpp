@@ -1111,16 +1111,16 @@ void BeamSearch::run(procon::NeoField field)
 #ifdef DEBUG
     if(true){
 #else
-    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+//    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
 #endif
-        TryNextSearch *next = new TryNextSearch();
-        next->setField(last_fields.at(0));
-        next->show();
+//        TryNextSearch *next = new TryNextSearch();
+//        next->setField(last_fields.at(0));
+//        next->show();
 
-        connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
-            this->tryNextBeamSearch(next_field);
-        });
-    }
+//        connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
+//            this->tryNextBeamSearch(next_field);
+//        });
+//    }
 }
 
 void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)

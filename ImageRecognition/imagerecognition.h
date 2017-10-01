@@ -48,7 +48,6 @@ private:
     cv::Mat HSVDetection(cv::Mat src_image);
     std::vector<cv::Mat> dividePiece(cv::Mat src_image);
     polygon_i placeGrid(polygon_t vertex);
-    double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
     void makeTable();
 
@@ -70,6 +69,7 @@ private:
     int margin = 10;
 
     std::vector<std::pair<point_i,double>> length_table;
+
 };
 
 #endif // IMAGERECOGNITION_H
