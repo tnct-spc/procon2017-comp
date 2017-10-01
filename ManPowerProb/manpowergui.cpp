@@ -46,6 +46,8 @@ ManPowerGui::ManPowerGui(QWidget *parent) :
 
     connect(ManProb,SIGNAL(zoom_In()),this,SLOT(_zoom_In()));
     connect(ManProb,SIGNAL(zoom_Out()),this,SLOT(_zoom_Out()));
+
+    connect(this,SIGNAL(zoom_Changed(double)),ui->zoom,SLOT(setValue(double)));
 }
 
 ManPowerGui::~ManPowerGui()
@@ -62,5 +64,5 @@ void ManPowerGui::zoomIn(double value){
     }
 }
 
-void ManPowerGui::_zoom_In(){zoomIn(zoom+0.5);}
-void ManPowerGui::_zoom_Out(){zoomIn(zoom-0.5);}
+void ManPowerGui::_zoom_In(){zoomIn(zoom+0.5);emit zoom_Changed(zoom);}
+void ManPowerGui::_zoom_Out(){zoomIn(zoom-0.5);emit zoom_Changed(zoom);}
