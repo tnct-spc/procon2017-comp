@@ -55,11 +55,11 @@ void imagerecongnitionwithhumanpower::clickedEditedButton(){
 }
 
 void imagerecongnitionwithhumanpower::clickedEnlargement(){
-
+    ui->graphicsView->scale(1.1,1.1);
 }
 
 void imagerecongnitionwithhumanpower::clickedReduction(){
-
+    ui->graphicsView->scale(0.9,0.9);
 }
 
 QPointF imagerecongnitionwithhumanpower::toPolygonPoint(double window_x, double window_y){

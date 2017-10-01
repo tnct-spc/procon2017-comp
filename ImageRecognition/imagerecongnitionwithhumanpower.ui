@@ -49,14 +49,14 @@
      <item>
       <layout class="QHBoxLayout" name="scalingLayout">
        <item>
-        <widget class="QPushButton" name="reductionButton">
+        <widget class="QPushButton" name="enlargementButton">
          <property name="text">
           <string>+</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="enlargementButton">
+        <widget class="QPushButton" name="reductionButton">
          <property name="text">
           <string>-</string>
          </property>
