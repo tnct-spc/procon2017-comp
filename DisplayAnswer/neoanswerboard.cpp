@@ -14,6 +14,7 @@ NeoAnswerBoard::NeoAnswerBoard(QWidget *parent) :
     ui(new Ui::NeoAnswerBoard)
 {
     ui->setupUi(this);
+
 }
 
 NeoAnswerBoard::~NeoAnswerBoard()

@@ -59,7 +59,7 @@ private:
     procon::NeoField field;
 
     // Only field mode
-    bool single_mode = false;
+    bool single_mode = true;
     bool singleif = false;
     int piece_size = 1;
     bool allif = true;

@@ -1177,6 +1177,7 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
     }
 
     if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+        system("aplay /home/taki/procon2071-comp/mayuri.wav");
         TryNextSearch *next = new TryNextSearch();
         next->setField(last_fields.at(0));
         next->show();
@@ -1185,6 +1186,7 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
             this->tryNextBeamSearch(next_field);
         });
     }
+    system("aplay /home/taki/procon2017-comp/mayuri.wav");
 
     end = std::chrono::system_clock::now();
     double time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
