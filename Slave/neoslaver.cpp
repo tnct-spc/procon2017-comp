@@ -1,4 +1,4 @@
-#include "neoslaver.h"
+﻿#include "neoslaver.h"
 #include "ui_neoslaver.h"
 #include "neosolver.h"
 
@@ -28,7 +28,6 @@ bool NeoSlaver::get()
     QEventLoop eventloop;
 
     std::cout<<"challange get"<<std::endl;
-    //
 
     //get
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
@@ -50,10 +49,11 @@ bool NeoSlaver::get()
     outputfile.close();
 
     //io
-    procon::NeoField PDATA = NeoPolygonIO::importField(SAVE_PROBLEM_PATH);
+    procon::NeoField PDATA;
+    PDATA = NeoPolygonIO::importField(SAVE_PROBLEM_PATH);
 
     //solve puzzle
-    NeoSolver *solver = new NeoSolver();
+    solver = new NeoSolver();
     connect(solver,&NeoSolver::throwAnswer,this,&NeoSlaver::emitAnswer);
     int algorithm_number = 0;
     if(ui->algo1->isChecked()){
@@ -64,6 +64,9 @@ bool NeoSlaver::get()
         throw "poa";
         //poa nari
     }
+
+    procon::NeoField test = PDATA;
+
     solver->run(PDATA, algorithm_number);
     return true;
 }
@@ -96,6 +99,8 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
     std::cout<<"send ok"<<std::endl;
 
     ui->state->setText(QString::fromStdString(std::string(postreply->readAll().constData())));
+
+
 
     return true;
 }

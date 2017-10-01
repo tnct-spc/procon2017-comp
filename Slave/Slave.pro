@@ -20,14 +20,11 @@ CONFIG += c++14
 PRECOMPILED_HEADER  = $$PWD/../Utilities/precompile.h
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     neoslaver.cpp
 
-HEADERS  += mainwindow.h \
-    neoslaver.h
+HEADERS  += neoslaver.h
 
-FORMS    += mainwindow.ui \
-    neoslaver.ui
+FORMS    += neoslaver.ui
 
 LIBS += -L/usr/lib `pkg-config --libs opencv`
 
@@ -37,13 +34,6 @@ else:unix: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 
 INCLUDEPATH += $$PWD/../Polygon
 DEPENDPATH += $$PWD/../Polygon
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Solver/release/ -lSolver
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Solver/debug/ -lSolver
-else:unix: LIBS += -L$$OUT_PWD/../Solver/ -lSolver
-
-INCLUDEPATH += $$PWD/../Solver
-DEPENDPATH += $$PWD/../Solver
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/release/ -lDisplayAnswer
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/debug/ -lDisplayAnswer

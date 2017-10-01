@@ -239,7 +239,7 @@ void Kunugida::run()
     }
 
     if(ui->ServerModeCheckbox->isChecked()){
-        std::string PROBLEM_SAVE_PATH = QCoreApplication::applicationDirPath().toStdString()+"/docroot/problem.csv";
+        std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/problem.csv";
         std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
         NeoPolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
 
