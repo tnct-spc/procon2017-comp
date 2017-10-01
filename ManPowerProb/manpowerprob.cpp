@@ -208,6 +208,7 @@ void ManPowerProb::deletePiece(){
         pieces.pop_back();
         logger->info("ピースを削除しました");
     }else logger->error("ピースを削除できませんでした");
+    emit piece_Changed(QString::number(pieces.size()));
     this->update();
 
 }
@@ -284,6 +285,7 @@ void ManPowerProb::createPolygon(){
         }
         last_polygon.clear();
     }
+    emit piece_Changed(QString::number(pieces.size()));
     this->update();
 }
 

@@ -26,6 +26,7 @@ class ManPowerProb : public QMainWindow
 signals:
     void zoom_In();
     void zoom_Out();
+    QString piece_Changed(QString value);
 
 public:
     explicit ManPowerProb(QWidget *parent = 0);
