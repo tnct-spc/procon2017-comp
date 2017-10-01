@@ -230,7 +230,7 @@ void procon::NeoField::calcFieldID()
 //    }
 }
 
-#define test
+//#define test
 
 bool procon::NeoField::check_hint()
 {

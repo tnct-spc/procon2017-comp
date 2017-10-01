@@ -2,8 +2,8 @@
 #include <boost/geometry/algorithms/union.hpp>
 
 
-#define DEBUG
-#define TEST
+//#define DEBUG
+//#define TEST
 //#define USE_BOOST_TRANSFORM
 
 PolygonConnector::PolygonConnector()
