@@ -60,10 +60,12 @@ QPointF imagerecongnitionwithhumanpower::toWindowPoint(QPointF point){
 }
 
 void imagerecongnitionwithhumanpower::mousePressEvent(QMouseEvent *event){
+    const double threshold = 0.5;
     QPointF selected_point = toPolygonPoint(event->x(),event->y());
     std::cout<<selected_point.x()<<","<<selected_point.y()<<std::endl;
-    auto itr = std::find(points.begin(),points.end(),selected_point);
-
+    auto itr = std::find_if(points.begin(),points.end(),[&](QPointF p){
+        return (std::fabs(p.x() - selected_point.x()) < threshold) && (std::fabs(p.y() - selected_point.y()) < threshold);
+    });
     selecting = itr != points.end();
     if(selecting){
         move_index = std::distance(points.begin(),itr);
