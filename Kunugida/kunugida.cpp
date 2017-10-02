@@ -9,6 +9,7 @@
 #include "polygonio.h"
 #include "http/request_mapper.h"
 #include "Algorithm/beamsearch.h"
+#include "trynextsearch.h"
 
 #include <iostream>
 #include <QDebug>
@@ -144,7 +145,7 @@ void Kunugida::run()
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
         emit requestCSV();
-        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -153,18 +154,17 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-        cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame.png", 1);
-        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pices.png", 1);
+        cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame_image300.png", 1);
+        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pieces_image300.png", 1);
 
         ImageRecognition imrec;
         field = imrec.run(frame, pieces);
 
-        //        imageRecognitonTest();
-//        ImageRecognition imrec;
-//        field = imrec.run(frame, pieces);
-//        board->setScannedPieces(imrec.getPolygonPosition());
+        board->setScannedPieces(imrec.getPolygonPosition());
 
-        //        imageRecognitonTest();
+//        std::vector<cv::Mat> images = imrec.getPiecesImages(pieces);
+//        std::vector<procon::ExpandedPolygon> polygons = imrec.getPolygonForImage();
+
     }else if(ui->csv_button->isChecked()){
         //CSV date
         std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
@@ -185,7 +185,6 @@ void Kunugida::run()
     }else if(ui->sample_data_use_button->isChecked()){
         //read sample
         field = NeoPolygonIO::importField("../../procon2017-comp/sample/comp-sample.csv");
-
         //dummy
         std::vector<procon::ExpandedPolygon> scanned_poly;
         for(const auto& p : field.getElementaryPieces()){
@@ -202,10 +201,6 @@ void Kunugida::run()
 
         board->setScannedPieces(scanned_poly);
 
-
-//        for(auto& p : field.getElementaryPieces()){
-//            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
-//        }
 
     }else if(ui->chinochan_button->isChecked()){
         QRLibrary lib;
@@ -285,11 +280,13 @@ void Kunugida::imageRecognitonTest()
 {
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
-    cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece5", 1);
+    cv::Mat nocframe = cv::imread("../../procon2017-comp/real_frame_200.png", 1);
+    cv::Mat nocpieces = cv::imread("../../procon2017-comp/real_piece_200.png", 1);
 
     ImageRecognition imrec;
     procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
+
+    return;
 }
 
 void Kunugida::getCSV()

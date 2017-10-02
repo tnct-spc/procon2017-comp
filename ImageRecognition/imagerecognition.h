@@ -10,13 +10,15 @@
 #include "singlepolygondisplay.h"
 
 namespace trans = bg::strategy::transform;
-using degree_t = trans::rotate_transformer<boost::geometry::radian,double,2,2>;
 
 class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 {
 
 public:
     procon::NeoField run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
+    std::vector<procon::ExpandedPolygon> getPolygonPosition();
+    std::vector<cv::Mat> getPiecesImages(cv::Mat pieces_image);
+    std::vector<procon::ExpandedPolygon> getPolygonForImage();
 
     const cv::Mat& getRawPiecesPic(){
         return raw_colored_pic;
@@ -29,18 +31,6 @@ public:
     const std::vector<cv::Vec3b>& getRawRandomColors(){
         return raw_random_colors;
     }
-
-    typedef struct {
-        int x;
-        int y;
-        double error;
-    } error_t;
-
-    std::vector<int> area;
-    int field_num;
-    std::vector<procon::ExpandedPolygon> position;
-    int id = 0;
-    int n = 1.8;
 
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
@@ -60,7 +50,6 @@ private:
     polygon_i placeGrid(polygon_t vertex);
     double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
-    std::vector<procon::ExpandedPolygon> getPolygonPosition();
     void makeTable();
 
     cv::Mat raw_pieces_pic;
@@ -69,6 +58,16 @@ private:
     std::vector<cv::Vec3b> raw_random_colors;
     double scale;
     static constexpr double cutting_allowance = 0.0;
+
+    std::vector<int> area;
+    int frame_num;
+    double frame_rad;
+    int pieces_num;
+    std::vector<procon::ExpandedPolygon> position;
+    int id = -1;
+    int n = 1;
+    std::map<point_i, double> tab;
+    int margin = 10;
 
     std::vector<std::pair<point_i,double>> length_table;
 };

@@ -25,6 +25,11 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
+void NeoAnswerBoard::setSelectPieceMode(bool mode)
+{
+    this->select_piece_mode = mode;
+}
+
 void NeoAnswerBoard::setUp()
 {
     QMessageBox msgBox;
@@ -182,6 +187,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 points.push_back(getPosition(point));
             }
             painter.drawPolygon(&points.front(),points.size());
+            polygon_i test = expanded_poly.getPolygon();
     };
 
 
@@ -571,7 +577,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
                 for(procon::NeoExpandedPolygon nep : newframe){
                     field_frame.push_back(nep);
-                }
+                }initialized
                 field_frame.erase(field_frame.begin() + i.frame_index);
                 newField.setFrame(field_frame);
                 newField.setPiece(std::get<1>(connected));
@@ -596,7 +602,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         }
     }
 #endif
-    if(event->button() == Qt::MouseButton::LeftButton){
+    if(event->button() == Qt::MouseButton::LeftButton && this->select_piece_mode){
 //        clickedpiece_id = -1;
         QPointF clickedposition = event->pos();
         //QPointF→point_iへの変換
@@ -617,11 +623,13 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 }else{
                     this->clicked_piece_id.erase(index);
                 }
-
-
-
             }
         }
         this->update();
     }
+}
+
+std::vector<int> NeoAnswerBoard::getSelectedPieceId()
+{
+    return clicked_piece_id;
 }
