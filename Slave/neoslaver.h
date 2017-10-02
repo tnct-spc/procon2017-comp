@@ -35,10 +35,13 @@ private:
     QString SERVER_URL = "http://192.168.100.55:8016/get";
     QString SERVER_POST_URL = "http://192.168.100.55:8016/answer";
 
+    int debug_counter = 1;
+
 private slots:
     void pushGetButton();
     void networkerror(QNetworkReply::NetworkError);
     bool emitAnswer(procon::NeoField);
+    bool debugEmitAnswer(procon::NeoField field);
 };
 
 #endif // NEOSLAVER_H

@@ -109,6 +109,47 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
     return true;
 }
 
+bool NeoSlaver::debugEmitAnswer(procon::NeoField field)
+{
+    QEventLoop eventloop;
+
+    //Display answer
+    board->setField(field);
+
+    SAVE_ANSWER_PATH = "../../procon2017-comp/CSV/debug";
+    SAVE_ANSWER_PATH += debug_counter;
+    SAVE_ANSWER_PATH += ".csv";
+
+    debug_counter++;
+
+    //io
+    NeoPolygonIO::exportPolygon(field,SAVE_ANSWER_PATH);
+
+    std::cout<<"challenge send"<<std::endl;
+
+    //send
+    QFile answer_file;
+    answer_file.setFileName(QString::fromStdString(SAVE_ANSWER_PATH));
+    answer_file.open(QIODevice::ReadOnly);
+    connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
+    QNetworkReply *postreply = manager->post(QNetworkRequest(QUrl(SERVER_POST_URL)), &answer_file);
+    connect(postreply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
+    eventloop.exec();
+
+    //std::cout<<"sending :"<<postData.toString(QUrl::FullyEncoded).toUtf8().toStdString()<<std::endl;
+    answer_file.close();
+
+    if(network_error_flag) return false;
+
+    std::cout<<"send ok"<<std::endl;
+
+    ui->state->setText(QString::fromStdString(std::string(postreply->readAll().constData())));
+    this->board->setField(field);
+    this->board->update();
+
+    return true;
+}
+
 void NeoSlaver::pushGetButton()
 {
     if(!get()){
