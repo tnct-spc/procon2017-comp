@@ -285,7 +285,7 @@ void Kunugida::run()
         algorithm_number = 1;
     }
 
-    NeoSolver *solver = new NeoSolver();
+    NeoSolver *solver = new NeoSolver(ui->beamwidth->value(),ui->answer_progress->isChecked());
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
     connect(solver, SIGNAL(requestCSV()), this, SLOT(getCSV()));
     connect(this, SIGNAL(requestCSVcomplete()), solver, SLOT(requestCSVcomplete()));

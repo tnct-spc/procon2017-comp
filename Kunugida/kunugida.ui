@@ -85,7 +85,7 @@
          <item>
           <widget class="QRadioButton" name="chinochan_button">
            <property name="text">
-            <string>QRcode</string>
+            <string>&amp;QRcode</string>
            </property>
           </widget>
          </item>
@@ -162,6 +162,20 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QSpinBox" name="beamwidth">
+         <property name="maximum">
+          <number>1000</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="answer_progress">
+         <property name="text">
+          <string>AnswewrProgress</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -173,7 +187,7 @@
      <x>0</x>
      <y>0</y>
      <width>854</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
