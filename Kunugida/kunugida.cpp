@@ -145,7 +145,7 @@ void Kunugida::run()
 
         NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/field.csv");
         emit requestCSV();
-        NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+
     }else if(ui->scanner_button->isChecked()){
         //selected scanner
         logger->info("Selected Scanner DataSource");
@@ -185,7 +185,6 @@ void Kunugida::run()
     }else if(ui->sample_data_use_button->isChecked()){
         //read sample
         field = NeoPolygonIO::importField("../../procon2017-comp/sample/comp-sample.csv");
-
         //dummy
         std::vector<procon::ExpandedPolygon> scanned_poly;
         for(const auto& p : field.getElementaryPieces()){
@@ -202,10 +201,6 @@ void Kunugida::run()
 
         board->setScannedPieces(scanned_poly);
 
-
-//        for(auto& p : field.getElementaryPieces()){
-//            NeoPolygonViewer::getInstance().displayPolygon(p.getPolygon(),"hoge",false);
-//        }
 
     }else if(ui->chinochan_button->isChecked()){
         QRLibrary lib;
