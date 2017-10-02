@@ -119,7 +119,7 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     }
 }
 
-bool NeoSinglePolygonDisplay::setNoWordsMode(bool hoge)
+void NeoSinglePolygonDisplay::setNoWordsMode(bool hoge)
 {
     nowordsmode = hoge;
 }

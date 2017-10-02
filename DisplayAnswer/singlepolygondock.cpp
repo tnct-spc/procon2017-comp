@@ -21,6 +21,7 @@ void SinglePolygonDock::addPolygon(const polygon_i poly){
 
    viewer->setPolygon(poly);
    viewer->setIsEnlargedPolygon(false);
+   viewer->setNoWordsMode(true);
 
    const int lineup = 1;
     this->ui->container->addWidget(viewer,(polygons.size()-1)/lineup,(polygons.size()-1)%lineup);
