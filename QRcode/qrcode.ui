@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QRCode</class>
+ <widget class="QWidget" name="QRCode">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>285</width>
+    <height>295</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QPushButton" name="run">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>88</y>
+     <width>101</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>実行</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="settings">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>10</y>
+     <width>131</width>
+     <height>261</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>設定</string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QCheckBox" name="is_hint">
+      <property name="text">
+       <string>ヒントQR</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QSpinBox" name="how_QR"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="is_multi">
+      <property name="text">
+       <string>複数のQR</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

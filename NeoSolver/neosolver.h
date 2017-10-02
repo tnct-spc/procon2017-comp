@@ -27,6 +27,8 @@ signals:
     void throwAnswer(procon::NeoField field);
     void requestCSV();
     void requestCSVcomplete();
+    void requestpostCSV();
+    void requestpostCSVcomplete();
 
 private slots:
     void emitAnswer(procon::NeoField field);
@@ -34,6 +36,8 @@ private slots:
 public slots:
     void _requestCSV();
     void _requestCSVcomplete();
+    void _requestpostCSV();
+    void _requestpostCSVcomplete();
 };
 
 #endif // NEOSOLVER_H
