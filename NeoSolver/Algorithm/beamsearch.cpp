@@ -1053,7 +1053,7 @@ void BeamSearch::run(procon::NeoField field)
     state.push_back(field);
 
 //    ev.resize(2000000);
-    for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size() - 15); ++piece_num) {
+    for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
         std::vector<Evaluate> ev;
 
         logger->info("next step start");
