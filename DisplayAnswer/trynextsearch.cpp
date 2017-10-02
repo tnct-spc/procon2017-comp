@@ -25,9 +25,9 @@ TryNextSearch::TryNextSearch(QWidget *parent) :
 
     connect(go_button,&QPushButton::clicked,this,&TryNextSearch::clickedGoButton);
 
-    ui->gridLayout->addWidget(board,0,0);
-    ui->gridLayout->addWidget(dock,0,1);
-    ui->gridLayout->addWidget(go_button,1,0);
+    ui->gridLayout->addWidget(board,0,0,1,10);
+    ui->gridLayout->addWidget(dock,0,10,1,2);
+    ui->gridLayout->addWidget(go_button,1,0,1,0);
 }
 
 TryNextSearch::~TryNextSearch()
@@ -39,7 +39,7 @@ void TryNextSearch::setField(procon::NeoField field){
     this->field = field;
     board->setField(this->field);
 
-    for(int count=0;count<field.getElementaryPieces().size();++count){
+    for(unsigned int count=0;count<field.getElementaryPieces().size();++count){
         if(!field.getIsPlaced().at(count))dock->addPolygon(field.getElementaryPieces().at(count).getPolygon());
     }
 }

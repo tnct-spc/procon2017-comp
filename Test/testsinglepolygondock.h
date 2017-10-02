@@ -6,6 +6,7 @@
 #include "neoexpandedpolygon.h"
 #include "neopolygonio.h"
 #include "testerwraper.h"
+#include "trynextsearch.h"
 
 class TestSinglePolygonDock : public TesterWraper{
 public:
