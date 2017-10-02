@@ -84,6 +84,7 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
     NeoPolygonIO::exportPolygon(field,SAVE_ANSWER_PATH);
 
     std::cout<<"challenge send"<<std::endl;
+
     //send
     QFile answer_file;
     answer_file.setFileName(QString::fromStdString(SAVE_ANSWER_PATH));
@@ -103,8 +104,6 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
     ui->state->setText(QString::fromStdString(std::string(postreply->readAll().constData())));
     this->board->setField(field);
     this->board->update();
-
-
 
     return true;
 }
