@@ -8,7 +8,7 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
     ui->setupUi(this);
 
     my_graphics_view = new MyGraphicsView();
-    ui->verticalLayout->addWidget(my_graphics_view);
+    ui->horizontalLayout->addWidget(my_graphics_view);
     connect(ui->enlargement,&QPushButton::click,this,&imagerecongnitionwithhumanpower::clickedEnlargement);
     connect(ui->reduction,&QPushButton::click,this,&imagerecongnitionwithhumanpower::clickedReduction);
 }

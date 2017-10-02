@@ -29,6 +29,7 @@ private:
 
     Ui::MyGraphicsView *ui;
 
+    QImage image;
     polygon_t polygon;
     std::vector<QPointF> points;
     int grid_size,left_right_margin,top_buttom_margin;

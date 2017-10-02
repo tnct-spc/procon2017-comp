@@ -24,6 +24,10 @@ void MyGraphicsView::setPolygon(polygon_t polygon){
     this->update();
 }
 
+void MyGraphicsView::setImage(cv::Mat mat){
+    this->image = QImage(mat.data, mat.cols, mat.rows, QImage::Format_RGB888);
+}
+
 QPointF MyGraphicsView::toPolygonPoint(double window_x, double window_y){
     const int N = 0;//小数点第Nまでを取る
     double N_10 = std::pow(10,N);
@@ -86,7 +90,7 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     minXY.first = minmaxX.first->x();
     minXY.second = minmaxY.first->y();
 
-    painter.drawImage(0,0,QImage("../../../Pictures/k-on.png"));
+    painter.drawImage(0,0,this->image);
 
     int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
     int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
