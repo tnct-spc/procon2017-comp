@@ -93,7 +93,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     }
 
     for (auto& polygon : polygons) {
-        polygon = expandPolygon(polygon, 0.25 / scale);
+        polygon = expandPolygon(polygon, 0.15 / scale);
     }
 
     // make ExpandedPolygon for GUI
