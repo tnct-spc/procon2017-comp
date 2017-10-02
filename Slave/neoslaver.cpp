@@ -55,7 +55,7 @@ bool NeoSlaver::get()
     PDATA = NeoPolygonIO::importField(SAVE_PROBLEM_PATH);
 
     //solve puzzle
-    solver = new NeoSolver();
+    solver = new NeoSolver(ui->beamwidth->value(), ui->answer_progress->isChecked());
     connect(solver,&NeoSolver::throwAnswer,this,&NeoSlaver::emitAnswer);
     int algorithm_number = 0;
     if(ui->algo1->isChecked()){
