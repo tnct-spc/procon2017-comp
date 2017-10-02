@@ -1260,7 +1260,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         for (auto pi : first_point) {
 
             // 原点に平行移動
-            trans::translate_transformer<double,2,2> translate(-vertex.outer().at(0).x(), -vertex.outer().at(0).y());
+            trans::translate_transformer<double,2,2> translate(-polygon.at(0).x(), -polygon.at(0).y());
             polygon_t shift;
             bg::transform(vertex, shift, translate);
 
@@ -1270,25 +1270,26 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             polygon_t rotate;
             bg::transform(shift, rotate, rad);
 
+            bool big_dif = false;
+
             double dif = 0;
             for (auto point : rotate.outer()) {
+                double dif_x = fabs(point.x() - round(point.x()));
+                double dif_y = fabs(point.y() - round(point.y()));
+                if ((dif_x > 0.35) || (dif_y > 0.35)) big_dif = true;
+
                 double dif_len = fabs(hypot(point.x(),point.y()) - hypot(round(point.x()),round(point.y())));
                 dif += dif_len;
             }
 
-//            for (unsigned int i=1; i<rotate.outer().size(); i++) {
-//                double x = rotate.outer().at(i).x();
-//                double y = rotate.outer().at(i).y();
-//                double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
-//                dif += dif_len;
-//            }
+            for (unsigned int i=1; i<rotate.outer().size()-1; i++) {
+                double x = rotate.outer().at(i+1).x() - rotate.outer().at(i).x();
+                double y = rotate.outer().at(i+1).y() - rotate.outer().at(i).y();
+                double dif_len = hypot(round(x), round(y)) - hypot(x,y);
+                if (dif_len < 0) big_dif = false;
+            }
 
-//            for (unsigned int i=1; i<rotate.outer().size()-1; i++) {
-//                double x = rotate.outer().at(i+1).x() - rotate.outer().at(i).x();
-//                double y = rotate.outer().at(i+1).y() - rotate.outer().at(i).y();
-//                double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
-//                dif += dif_len;
-//            }
+            if (big_dif) continue;
 
             if (smallest_dif > dif) {
                 smallest_dif = dif;
