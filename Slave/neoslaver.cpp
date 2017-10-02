@@ -25,6 +25,7 @@ bool NeoSlaver::get()
         SERVER_URL = "http://localhost:8016/get";
         SERVER_POST_URL = "http://localhost:8016/answer";
         SAVE_PROBLEM_PATH = "../../procon2017-comp/CSV/problem-slave.csv";
+        SAVE_ANSWER_PATH = "../../procon2017-comp/CSV/answer-slave.csv";
     }
 
     QEventLoop eventloop;

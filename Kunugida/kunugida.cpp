@@ -43,8 +43,6 @@ Kunugida::Kunugida(QWidget *parent) :
     board->show();
     board->showMaximized();
 
-    //Server
-    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
     //    board->setSingleMode(true);
     //    board->setSingleMode(true);
 
