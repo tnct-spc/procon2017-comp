@@ -15,6 +15,9 @@ class NEOSOLVERSHARED_EXPORT NeoSolver : public QObject
 
 public:
     NeoSolver();
+    NeoSolver(int beam_width);
+    NeoSolver(int beam_width,bool answer_progress_enabled);
+
     ~NeoSolver();
     void run(procon::NeoField field,int algorithm_number);
 
@@ -22,6 +25,7 @@ private:
     std::vector<AlgorithmWrapper*> Algorithms;
     std::shared_ptr<spdlog::logger> logger;
     AlgorithmWrapper* Algorithm;
+    int beamwidth = 200;
 
 signals:
     void throwAnswer(procon::NeoField field);
