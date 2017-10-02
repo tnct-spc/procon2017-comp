@@ -17,11 +17,13 @@ public:
     NeoSolver();
     ~NeoSolver();
     void run(procon::NeoField field,int algorithm_number);
+    void setBeamWidth(int beam_wdith);
 
 private:
     std::vector<AlgorithmWrapper*> Algorithms;
     std::shared_ptr<spdlog::logger> logger;
     AlgorithmWrapper* Algorithm;
+    int beamwidth = 200;
 
 signals:
     void throwAnswer(procon::NeoField field);

@@ -162,6 +162,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QSpinBox" name="beamwidth">
+         <property name="maximum">
+          <number>1000</number>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -173,7 +180,7 @@
      <x>0</x>
      <y>0</y>
      <width>854</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>

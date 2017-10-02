@@ -36,6 +36,11 @@ void NeoSolver::run(procon::NeoField field, int algorithm_number)
     return;
 }
 
+void NeoSolver::setBeamWidth(int beam_wdith)
+{
+
+}
+
 void NeoSolver::emitAnswer(procon::NeoField field){
     std::cout << "neoalgrotithm warpper throwanswer called" << std::endl;
     emit throwAnswer(field);
