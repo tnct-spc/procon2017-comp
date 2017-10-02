@@ -17,7 +17,7 @@ class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
 public:
     procon::NeoField run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
     std::vector<procon::ExpandedPolygon> getPolygonPosition();
-    std::vector<cv::Mat> getPiecesImages(cv::Mat pieces_image);
+    std::vector<cv::Mat> getPiecesImages();
     std::vector<procon::ExpandedPolygon> getPolygonForImage();
 
     const cv::Mat& getRawPiecesPic(){

@@ -4,7 +4,7 @@
 #include "neopolygonviewer.h"
 #include "utilities.h"
 #include "neosinglepolygondisplay.h"
-
+#include "imagerecongnitionwithhumanpower.h"
 #include "polygonviewer.h"
 
 #include "math.h"
@@ -104,6 +104,18 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
+    //@yui
+    std::vector<cv::Mat> human_images = getPiecesImages();
+    std::vector<procon::ExpandedPolygon> human_polygons = getPolygonForImage();
+    int i = 0,j = 0;
+    while(i<human_images.size() && j<human_polygons.size()&&i<1){
+        i++; j++;
+        imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
+        irwh->setPolygon(human_polygons.at(1).getPolygon());
+        irwh->show();
+    }
+    //@yui_end
+
 //    // sum polygon_t and piece's image
 //    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
 //    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
@@ -159,7 +171,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+//        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -179,8 +191,8 @@ void ImageRecognition::threshold(cv::Mat& image)
     //500,0,3300,2664
     image = cv::Mat(image,cv::Rect(0,0,3300,2664));
 
-    cv::namedWindow("capture",cv::WINDOW_NORMAL);
-    cv::imshow("capture",image);
+//    cv::namedWindow("capture",cv::WINDOW_NORMAL);
+//    cv::imshow("capture",image);
 
     /* ヒストグラム均一化の残骸
     // get d
@@ -240,8 +252,8 @@ void ImageRecognition::threshold(cv::Mat& image)
     colorExtraction(&image, &normal_area, CV_BGR2HSV, 0, 180, 89, 255, 76, 200);
     colorExtraction(&image, &koge_area, CV_BGR2HSV, 5, 20, 153, 255, 43, 90);
 
-    cv::namedWindow("image",  CV_WINDOW_NORMAL);
-    cv::imshow("image", normal_area);
+//    cv::namedWindow("image",  CV_WINDOW_NORMAL);
+//    cv::imshow("image", normal_area);
 
     // 通常部分とこげ部分をマージ
     cv::bitwise_and(normal_area,koge_area,image);
@@ -876,8 +888,8 @@ void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst, int code, int
     std::vector<int> upper = {ch1Upper,ch2Upper,ch3Upper};
 
     cv::cvtColor(*src, colorImage, code);
-    cv::namedWindow("image",  CV_WINDOW_NORMAL);
-    cv::imshow("image", colorImage);
+//    cv::namedWindow("image",  CV_WINDOW_NORMAL);
+//    cv::imshow("image", colorImage);
 
 
     colorImage.forEach<cv::Vec3b>([&lower, &upper](cv::Vec3b &p, const int*) -> void {
@@ -1446,8 +1458,10 @@ void ImageRecognition::makeTable()
     return;
 }
 
-std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
+std::vector<cv::Mat> ImageRecognition::getPiecesImages()
 {
+    cv::Mat pieces_image = raw_pieces_pic;
+
     std::vector<cv::Mat> piece_images;
 
     std::vector<procon::ExpandedPolygon> polygons = position;
@@ -1462,8 +1476,8 @@ std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
         cv::Mat image(pieces_image, cv::Rect(box.min_corner().x()-margin, box.min_corner().y()-margin, box.max_corner().x()-box.min_corner().x()+margin*2, box.max_corner().y()-box.min_corner().y()+margin*2));
         piece_images.push_back(image);
 
-        cv::namedWindow(std::to_string(i));
-        cv::imshow(std::to_string(i), image);
+//        cv::namedWindow(std::to_string(i));
+//        cv::imshow(std::to_string(i), image);
         i++;
     }
 
