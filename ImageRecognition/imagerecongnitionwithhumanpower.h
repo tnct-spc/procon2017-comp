@@ -2,6 +2,7 @@
 #define IMAGERECONGNITIONWITHHUMANPOWER_H
 
 #include <QWidget>
+#include "mygraphicsview.h"
 #include "precompile.h"
 #include "polygonviewer.h"
 
@@ -16,9 +17,12 @@ class imagerecongnitionwithhumanpower : public QWidget
 public:
     explicit imagerecongnitionwithhumanpower(QWidget *parent = 0);
     ~imagerecongnitionwithhumanpower();
+    void setPolygon(polygon_t polygon);
 
 private:
     Ui::imagerecongnitionwithhumanpower *ui;
+    MyGraphicsView *my_graphics_view;
+    polygon_t polygon;
 
 private slots:
 

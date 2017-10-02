@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch=""/>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch=""/>
  </widget>
  <resources/>
  <connections/>
