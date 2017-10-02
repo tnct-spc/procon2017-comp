@@ -169,6 +169,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="answer_progress">
+         <property name="text">
+          <string>AnswewrProgress</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>

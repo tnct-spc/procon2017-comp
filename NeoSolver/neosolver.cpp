@@ -29,6 +29,19 @@ NeoSolver::NeoSolver(int beam_width)
     }
 }
 
+NeoSolver::NeoSolver(int beam_width, bool answer_progress_enabled)
+{
+    logger = spdlog::get("Solver");
+    Algorithms.push_back(new TestAlgortithm());
+    Algorithms.push_back(new BeamSearch(beam_width,answer_progress_enabled));
+    for(auto& al : Algorithms){
+//        connect(al, &AlgorithmWrapper::requestCSV, this, &NeoSolver::_requestCSV);
+//        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
+//        connect(al, &AlgorithmWrapper::requestpostCSV, this, &NeoSolver::_requestCSV);
+//        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
+    }
+}
+
 NeoSolver::~NeoSolver()
 {
 
