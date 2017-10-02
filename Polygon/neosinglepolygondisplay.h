@@ -22,12 +22,14 @@ public:
     ~NeoSinglePolygonDisplay();
     void setPolygon(polygon_i polygon);
     void setIsEnlargedPolygon(bool is_enlarged_polygon);
+    void setNoWordsMode(bool hoge);
 
 private:
     Ui::NeoSinglePolygonDisplay *ui;
     polygon_i polygon;
     bool enlarged_polygon;
     std::vector<double> angles;
+    bool nowordsmode = false;
 
 protected:
     void paintEvent(QPaintEvent *);
