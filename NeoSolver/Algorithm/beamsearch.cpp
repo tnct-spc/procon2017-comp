@@ -145,6 +145,22 @@ BeamSearch::BeamSearch()
     cpu_num = std::thread::hardware_concurrency();
 }
 
+BeamSearch::BeamSearch(int beamwidth)
+{
+    this->setBeamWidth(beamwidth);
+
+    logger = spdlog::get("BeamSearch");
+//    logger = spdlog::get("beamsearch");
+    dock = std::make_shared<NeoAnswerDock>();
+    dock->show();
+
+    //test
+    neo = std::make_shared<NeoAnswerDock>();
+    neo->show();
+
+    cpu_num = std::thread::hardware_concurrency();
+}
+
 void BeamSearch::setBeamWidth(int beamwidhth)
 {
     this->beam_width = beamwidhth;

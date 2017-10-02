@@ -85,7 +85,7 @@
          <item>
           <widget class="QRadioButton" name="chinochan_button">
            <property name="text">
-            <string>QRcode</string>
+            <string>&amp;QRcode</string>
            </property>
           </widget>
          </item>

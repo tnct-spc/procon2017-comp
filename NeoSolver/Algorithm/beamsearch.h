@@ -32,6 +32,7 @@ class BeamSearch : public AlgorithmWrapper
 {
 public:
     BeamSearch();
+    BeamSearch(int beamwidth);
     void init() override;
     void run(procon::NeoField field) override;
     void makeNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
@@ -43,7 +44,7 @@ public:
 
     static std::string hashField(const procon::NeoField& field);
 
-    void setBeamWidth(int beamwidhth);
+    void setBeamWidth(int beamwidth);
 
 private:
     std::shared_ptr<spdlog::logger> logger;

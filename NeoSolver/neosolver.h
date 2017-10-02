@@ -15,9 +15,10 @@ class NEOSOLVERSHARED_EXPORT NeoSolver : public QObject
 
 public:
     NeoSolver();
+    NeoSolver(int beam_width);
+
     ~NeoSolver();
     void run(procon::NeoField field,int algorithm_number);
-    void setBeamWidth(int beam_wdith);
 
 private:
     std::vector<AlgorithmWrapper*> Algorithms;
