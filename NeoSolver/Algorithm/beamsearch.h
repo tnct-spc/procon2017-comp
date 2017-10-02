@@ -43,6 +43,8 @@ public:
 
     static std::string hashField(const procon::NeoField& field);
 
+    void setBeamWidth(int beamwidhth);
+
 private:
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;

@@ -145,6 +145,11 @@ BeamSearch::BeamSearch()
     cpu_num = std::thread::hardware_concurrency();
 }
 
+void BeamSearch::setBeamWidth(int beamwidhth)
+{
+    this->beam_width = beamwidhth;
+}
+
 std::string BeamSearch::hashField(const procon::NeoField& field){
     std::vector<procon::NeoExpandedPolygon> polygons = field.getFrame();
     std::vector<procon::NeoExpandedPolygon> frame = field.getElementaryFrame();
