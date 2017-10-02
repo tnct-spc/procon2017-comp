@@ -18,7 +18,7 @@ TryNextSearch::TryNextSearch(QWidget *parent) :
 
 
 //    board->setShowUnplacedPieces(true);
-//    board->setSelectPieceMode(true);
+    board->setSelectPieceMode(true);
 
     go_button = new QPushButton();
     go_button->setText("RUN BEAMSEARCH");
