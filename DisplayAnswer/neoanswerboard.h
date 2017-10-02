@@ -18,6 +18,7 @@
 #include "neofield.h"
 #include "expandedpolygon.h"
 #include "neoexpandedpolygon.h"
+#include "neosinglepolygondisplay.h"
 #include <QMessageBox>
 
 namespace Ui {

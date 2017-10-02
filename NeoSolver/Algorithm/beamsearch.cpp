@@ -1004,47 +1004,47 @@ void BeamSearch::run(procon::NeoField field)
     std::vector<procon::NeoField> state;
 
     //フレームの同じ傾きの頂点を除去
-    auto delete_deplicate_point = [](procon::NeoField & field){
-        int frame_index = 0;
-        for(auto & frame : field.getFrame()){
-            std::vector<int> parallel_dot;
-            int count = 0;
-            for(auto const& angle : frame.getSideAngle()){
-                if(angle == M_PI){
-                    parallel_dot.insert(parallel_dot.begin(),count);
-                }
-                ++count;
-            }
-            if(parallel_dot.size()){
-                std::vector<point_i> points;
-                std::vector<procon::NeoExpandedPolygon> frames;
+//    auto delete_deplicate_point = [](procon::NeoField & field){
+//        int frame_index = 0;
+//        for(auto & frame : field.getFrame()){
+//            std::vector<int> parallel_dot;
+//            int count = 0;
+//            for(auto const& angle : frame.getSideAngle()){
+//                if(angle == M_PI){
+//                    parallel_dot.insert(parallel_dot.begin(),count);
+//                }
+//                ++count;
+//            }
+//            if(parallel_dot.size()){
+//                std::vector<point_i> points;
+//                std::vector<procon::NeoExpandedPolygon> frames;
 
-                std::copy(field.getFrame().begin(),field.getFrame().end(),std::back_inserter(frames));
+//                std::copy(field.getFrame().begin(),field.getFrame().end(),std::back_inserter(frames));
 
-                frames.erase(frames.begin() + frame_index);
+//                frames.erase(frames.begin() + frame_index);
 
-                std::copy(frame.getPolygon().outer().begin(),
-                          frame.getPolygon().outer().end(),
-                          std::back_inserter(points)
-                );
+//                std::copy(frame.getPolygon().outer().begin(),
+//                          frame.getPolygon().outer().end(),
+//                          std::back_inserter(points)
+//                );
 
-                for(auto const& c : parallel_dot){
-                    points.erase(points.begin() + c);
-                }
+//                for(auto const& c : parallel_dot){
+//                    points.erase(points.begin() + c);
+//                }
 
-                procon::NeoExpandedPolygon f;
-                polygon_i p;
-                for(auto const& point : points){
-                    p.outer().push_back(point);
-                }
-                f.resetPolygonForce(p);
+//                procon::NeoExpandedPolygon f;
+//                polygon_i p;
+//                for(auto const& point : points){
+//                    p.outer().push_back(point);
+//                }
+//                f.resetPolygonForce(p);
 
-                frames.insert(frames.begin() + frame_index,f);
-                field.setFrame(frames);
-            }
-            ++frame_index;
-        }
-    };
+//                frames.insert(frames.begin() + frame_index,f);
+//                field.setFrame(frames);
+//            }
+//            ++frame_index;
+//        }
+//    };
 
 
 #ifdef DEBUG_MODE
@@ -1073,9 +1073,9 @@ void BeamSearch::run(procon::NeoField field)
         //vectorのメモリ解放って頭悪くね？
         std::vector<Evaluate>().swap(ev);
 
-        for(auto& f : state){
-            delete_deplicate_point(f);
-        }
+//        for(auto& f : state){
+//            delete_deplicate_point(f);
+//        }
 
         bool flag = false;
         for(auto const& _field : state){
