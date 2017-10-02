@@ -92,9 +92,9 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
-//    for (auto& polygon : polygons) {
-//        polygon = expandPolygon(polygon, 0.15 / scale);
-//    }
+    for (auto& polygon : polygons) {
+        polygon = expandPolygon(polygon, 0.25 / scale);
+    }
 
     // make ExpandedPolygon for GUI
     for (int i=0; i<polygons.size()-1; i++) {
@@ -167,7 +167,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-//        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -1079,7 +1079,7 @@ polygon_t ImageRecognition::deleteMispoint(polygon_t vertex)
                 }
             }
 
-        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 7) {
+        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 2) {
 
             // ほぼ平らな２辺は１本に
             polygon.erase(polygon.begin() + (i + 2) % polygon.size());
