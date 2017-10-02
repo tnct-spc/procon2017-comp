@@ -1,5 +1,6 @@
 #include "testimagerecognitionwithhumanpower.h"
 #include "imagerecongnitionwithhumanpower.h"
+#include "mygraphicsview.h"
 
 #include <QObject>
 
@@ -16,5 +17,9 @@ bool TestImageRecognitionWithHumanPower::run()
 
 //    imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
 //    irwh->show();
+
+    MyGraphicsView *mgv = new MyGraphicsView();
+    mgv->setPolygon(polygon);
+    mgv->show();
     return 1;
 }

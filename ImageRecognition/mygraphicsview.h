@@ -34,9 +34,9 @@ private:
     int move_index;
 
 protected:
-//    void paintEvent(QPaintEvent *);
-//    void mousePressEvent(QMouseEvent *event);
-//    void mouseReleaseEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
 };
 
