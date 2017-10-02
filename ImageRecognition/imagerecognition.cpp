@@ -1250,7 +1250,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                 l_check = false;
             }
 
-            shorter++;
+            shorter--;
             longer++;
         }
 
@@ -1266,17 +1266,22 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
             // 回転
             double to_po_rad = std::atan2(pi.y() , pi.x());
-            trans::rotate_transformer<bg::radian,double,2,2> rad(-(to_po_rad - to_ver_rad));
+            trans::rotate_transformer<bg::radian,double,2,2> rad(to_ver_rad - to_po_rad);
             polygon_t rotate;
             bg::transform(shift, rotate, rad);
 
             double dif = 0;
-            for (unsigned int i=1; i<rotate.outer().size(); i++) {
-                double x = rotate.outer().at(i).x();
-                double y = rotate.outer().at(i).y();
-                double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
+            for (auto point : rotate.outer()) {
+                double dif_len = fabs(hypot(point.x(),point.y()) - hypot(round(point.x()),round(point.y())));
                 dif += dif_len;
             }
+
+//            for (unsigned int i=1; i<rotate.outer().size(); i++) {
+//                double x = rotate.outer().at(i).x();
+//                double y = rotate.outer().at(i).y();
+//                double dif_len = fabs(hypot(x,y) - hypot(round(x), round(y)));
+//                dif += dif_len;
+//            }
 
 //            for (unsigned int i=1; i<rotate.outer().size()-1; i++) {
 //                double x = rotate.outer().at(i+1).x() - rotate.outer().at(i).x();
@@ -1295,9 +1300,9 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     // 最終的な回転角度を算出
     double theta;
     if (frame) {
-        theta = -frame_rad;
+        theta = frame_rad;
     } else {
-        theta = std::atan2(smallest.y(), smallest.x()) - to_ver_rad;
+        theta = to_ver_rad - std::atan2(smallest.y(), smallest.x());
     }
 
     // グリッドの点番号で保存
@@ -1308,7 +1313,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     polygon_t to_grid;
     trans::translate_transformer<double,2,2> translate(-vertex.outer().at(0).x(), -vertex.outer().at(0).y());
     bg::transform(vertex, shift, translate);
-    trans::rotate_transformer<bg::radian,double,2,2> rad(-theta);
+    trans::rotate_transformer<bg::radian,double,2,2> rad(theta);
     bg::transform(shift, to_grid, rad);
 
     for (auto po : to_grid.outer()) {
