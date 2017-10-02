@@ -6,19 +6,6 @@ MyGraphicsView::MyGraphicsView(QWidget *parent) :
     ui(new Ui::MyGraphicsView)
 {
     ui->setupUi(this);
-
-   /* QGraphicsView *view = new QGraphicsView();
-    QGraphicsScene *scene = new QGraphicsScene();
-
-    //scene->addRect(0,0,window_width,window_height,QPen(QBrush(Qt::black),0.1),QColor("#0000FF"));
-    NeoAnswerBoard *board = new NeoAnswerBoard();
-
-
-    scene->addWidget(board);
-    view->setScene(scene);
-    view->show();
-    this->ui->verticalLayout->addWidget(view);*/
-
 }
 
 MyGraphicsView::~MyGraphicsView()
@@ -99,9 +86,7 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     minXY.first = minmaxX.first->x();
     minXY.second = minmaxY.first->y();
 
-
-    painter.drawImage(50,50,QImage("../../procon2017-comp/background.png"));
-
+    painter.drawImage(0,0,QImage("../../../Pictures/k-on.png"));
 
     int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
     int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
@@ -131,7 +116,7 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
         str += ",";
         str += QString::number(points[point_index].y());
         str += ")";
-   //     scene.addText(str,font);
+        painter.drawText(window_points[point_index],str);
     }
 
     //grid表示
@@ -143,9 +128,5 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
         int y = current_row * grid_size + top_buttom_margin;
         painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
     }
-   // this->setScene(&scene);
-
-
-
 }
 
