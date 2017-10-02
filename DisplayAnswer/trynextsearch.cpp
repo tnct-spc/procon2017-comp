@@ -22,6 +22,7 @@ TryNextSearch::TryNextSearch(QWidget *parent) :
 
     ui->verticalLayout->addWidget(board,0);
     ui->verticalLayout->addWidget(go_button,1);
+
 }
 
 TryNextSearch::~TryNextSearch()

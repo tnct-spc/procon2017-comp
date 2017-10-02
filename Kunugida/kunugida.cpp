@@ -88,27 +88,6 @@ void Kunugida::run()
         board->update();
         std::vector<polygon_i> pieces_ = PbMaker->getPieces();
         polygon_i frame_ = PbMaker->getFrame();
-
-        procon::NeoExpandedPolygon exframe = *new procon::NeoExpandedPolygon();
-        procon::NeoExpandedPolygon expiece = *new procon::NeoExpandedPolygon();
-
-        exframe.resetPolygonForce(frame_);
-
-        std::vector<procon::NeoExpandedPolygon> exframes;
-        exframes.push_back(exframe);
-
-        procon::NeoField exfield;
-        std::vector<procon::NeoExpandedPolygon> expieces;
-
-        for(polygon_i polygon_z :pieces_){
-            expiece.resetPolygonForce(polygon_z);
-            expieces.push_back(expiece);
-        }
-        exfield.setElementaryPieces(expieces);
-        exfield.setElementaryFrame(exframes);
-
-        NeoPolygonIO::exportPolygon(exfield,"../../procon2017-comp/Rabbithouse.csv");
-
 //#define SHOW_ANGLE
 #ifdef SHOW_ANGLE
         std::cout << "angles ->" << std::endl;
@@ -148,6 +127,7 @@ void Kunugida::run()
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
+        NeoPolygonIO::exportPolygon(field,"../../procon2017-comp/Rabbithouse.csv");
 
         int scanned_dummy_piece_id = 0;
         std::vector<procon::ExpandedPolygon> scanned_dummy_piece;

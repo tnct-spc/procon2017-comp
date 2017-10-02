@@ -1,6 +1,7 @@
 #include "probmaker.h"
 #include "ui_probmaker.h"
 #include "neopolygonviewer.h"
+#include "neopolygonio.h"
 
 #include <boost/geometry/geometry.hpp>
 #include <boost/math/tools/fraction.hpp>
