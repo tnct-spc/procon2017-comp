@@ -38,6 +38,10 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
+    procon::ExpandedPolygon frame;
+    frame.resetPolygonForce(polygons[0]);
+    PolygonViewer::getInstance().pushPolygon(frame, "frame");
+
     // フレームの回転角を計算
     for (unsigned int i=0; i<polygons.at(0).outer().size()-1; i++) {
         double x = polygons.at(0).outer().at(i+1).x() - polygons.at(0).outer().at(i).x();
@@ -88,9 +92,9 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
-    for (auto& polygon : polygons) {
-        polygon = expandPolygon(polygon, 0.15 / scale);
-    }
+//    for (auto& polygon : polygons) {
+//        polygon = expandPolygon(polygon, 0.15 / scale);
+//    }
 
     // make ExpandedPolygon for GUI
     for (int i=0; i<polygons.size()-1; i++) {
@@ -105,7 +109,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        }
 //        std::cout << endl;
 
-//        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
 //    // sum polygon_t and piece's image
@@ -163,7 +167,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+//        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -1004,26 +1008,8 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
     return pieces_images;
 }
 
-polygon_i ImageRecognition::placeGrid(polygon_t vertex)
+polygon_t ImageRecognition::deleteMispoint(polygon_t vertex)
 {
-    // 辺の長さでの２分探索
-    struct {
-        int operator() (const std::vector<std::pair<point_i, double>> &tab, const int &start, const int &end, const double &target)
-        {
-            if (start > end) return -1;
-
-            int middle = (start + end) * 0.5;
-
-            if (fabs(tab.at(middle).second - target) <= 0.2) return middle;
-
-            int p;
-            if (tab.at(middle).second - target > 0.2) p = (*this)(tab, start, middle-1, target);
-            else if (tab.at(middle).second - target < -0.2) p = (*this)(tab, middle+1, end, target);
-
-            return p;
-        }
-    } binarySearch;
-
     // outer
     auto& polygon = vertex.outer();
 
@@ -1101,6 +1087,34 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     }
     polygon.push_back(polygon.at(0));
+
+    return vertex;
+}
+
+polygon_i ImageRecognition::placeGrid(polygon_t vertex)
+{
+    // 辺の長さでの２分探索
+    struct {
+        int operator() (const std::vector<std::pair<point_i, double>> &tab, const int &start, const int &end, const double &target)
+        {
+            if (start > end) return -1;
+
+            int middle = (start + end) * 0.5;
+
+            if (fabs(tab.at(middle).second - target) <= 0.2) return middle;
+
+            int p;
+            if (tab.at(middle).second - target > 0.2) p = (*this)(tab, start, middle-1, target);
+            else if (tab.at(middle).second - target < -0.2) p = (*this)(tab, middle+1, end, target);
+
+            return p;
+        }
+    } binarySearch;
+
+    vertex = deleteMispoint(vertex);
+
+    // outer
+    auto& polygon = vertex.outer();
 
     // ９０度の角を持つピースはそこを基準に計算
     bool right_angle = false;

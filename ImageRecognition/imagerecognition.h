@@ -49,6 +49,7 @@ private:
         );
     cv::Mat HSVDetection(cv::Mat src_image);
     std::vector<cv::Mat> dividePiece(cv::Mat src_image);
+    polygon_t deleteMispoint(polygon_t vertex);
     polygon_i placeGrid(polygon_t vertex);
     double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
