@@ -864,8 +864,8 @@ void ProbMaker::delaunay_triangulation()
 
 //    while()
 
-//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[0],"hogehoge")->show();
-//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[1],"fugapiyo")->show();
+//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[0],"hogehoge", false)->show();
+//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[1],"fugapiyo", false)->show();
 //    for (unsigned int index = 1; index < this->print_polygons.size(); ++index) {
 //        boost::geometry::difference(out[0],this->print_polygons[index],out);
 //    }

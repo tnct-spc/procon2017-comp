@@ -9,8 +9,10 @@ NeoSolver::NeoSolver()
     Algorithms.push_back(new TestAlgortithm());
     Algorithms.push_back(new BeamSearch());
     for(auto& al : Algorithms){
-        connect(al, &AlgorithmWrapper::requestCSV, this, &NeoSolver::_requestCSV);
-        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
+//        connect(al, &AlgorithmWrapper::requestCSV, this, &NeoSolver::_requestCSV);
+//        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
+//        connect(al, &AlgorithmWrapper::requestpostCSV, this, &NeoSolver::_requestCSV);
+//        connect(this, SIGNAL(requestCSVcomplete()), al, SLOT(_requestCSVcomplete()));
     }
 }
 
@@ -30,7 +32,7 @@ void NeoSolver::run(procon::NeoField field, int algorithm_number)
 
     std::cout << "neosolver " << std::endl;
 
-    system("aplay /home/taki/procon2017-comp/p.wav");
+    system("aplay /home/taki/procon2017-comp/umaru.wav");
     return;
 }
 
@@ -47,4 +49,14 @@ void NeoSolver::_requestCSV()
 void NeoSolver::_requestCSVcomplete()
 {
     emit requestCSVcomplete();
+}
+
+void NeoSolver::_requestpostCSV()
+{
+    emit requestpostCSV();
+}
+
+void NeoSolver::_requestpostCSVcomplete()
+{
+    emit requestpostCSVcomplete();
 }

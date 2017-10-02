@@ -1178,14 +1178,14 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
 
     if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
         TryNextSearch *next = new TryNextSearch();
-        system("aplay /home/taki/procon2017-comp/p.wav");
+        system("aplay /home/taki/procon2017-comp/umaru.wav");
         next->setField(last_fields.at(0));
         next->show();
         connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
             this->tryNextBeamSearch(next_field);
         });
     }
-    system("aplay /home/taki/procon2017-comp/p.wav");
+    system("aplay /home/taki/procon2017-comp/umaru.wav");
 
     end = std::chrono::system_clock::now();
     double time = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
