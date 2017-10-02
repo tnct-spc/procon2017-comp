@@ -4,16 +4,20 @@
 #include <QGraphicsView>
 #include <QGraphicsWidget>
 #include "polygonviewer.h"
+#include <QPaintEvent>
+
+#include "../DisplayAnswer/neoanswerboard.h"
+
 namespace Ui {
 class MyGraphicsView;
 }
 
-class MyGraphicsView : public QGraphicsView
+class MyGraphicsView : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit MyGraphicsView(QGraphicsView *parent = 0);
+    explicit MyGraphicsView(QWidget *parent = 0);
     ~MyGraphicsView();
 
     void setPolygon(polygon_t polygon);

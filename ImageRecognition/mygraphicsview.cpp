@@ -1,11 +1,24 @@
 #include "mygraphicsview.h"
 #include "ui_mygraphicsview.h"
 
-MyGraphicsView::MyGraphicsView(QGraphicsView *parent) :
-    QGraphicsView(parent),
+MyGraphicsView::MyGraphicsView(QWidget *parent) :
+    QWidget(parent),
     ui(new Ui::MyGraphicsView)
 {
     ui->setupUi(this);
+
+   /* QGraphicsView *view = new QGraphicsView();
+    QGraphicsScene *scene = new QGraphicsScene();
+
+    //scene->addRect(0,0,window_width,window_height,QPen(QBrush(Qt::black),0.1),QColor("#0000FF"));
+    NeoAnswerBoard *board = new NeoAnswerBoard();
+
+
+    scene->addWidget(board);
+    view->setScene(scene);
+    view->show();
+    this->ui->verticalLayout->addWidget(view);*/
+
 }
 
 MyGraphicsView::~MyGraphicsView()
@@ -66,20 +79,29 @@ void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
 
 void MyGraphicsView::paintEvent(QPaintEvent *event)
 {
-    QGraphicsScene scene;
 
-    const int grid_margin = 4;
 
     int window_width = this->width();
     int window_height = this->height();
 
-    scene.addRect(0,0,window_width,window_height,QPen(),QBrush(QColor("#E5E6DB")));
+    QPen pen(QColor("#000000"));
+
+    const int grid_margin = 4;
+
+    QPainter painter(this);
+    painter.setPen(pen);
+
+    painter.drawRect(0,0,window_width,window_height);
 
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.x() < b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.y() < b.y(); });
 
     minXY.first = minmaxX.first->x();
     minXY.second = minmaxY.first->y();
+
+
+    painter.drawImage(50,50,QImage("../../procon2017-comp/background.png"));
+
 
     int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
     int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
@@ -96,12 +118,11 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
         window_points.push_back(toWindowPoint(i));
     }
     QPolygonF window_polygon(window_points);
-    scene.addPolygon(window_polygon,QPen(),QBrush(QColor("#00FFFF")));
+    painter.drawPolygon(window_polygon);
 
     //index表示
     QFont font;
     font.setPixelSize(20);
-    scene.setFont(font);
     for(unsigned int point_index = 0; point_index < window_points.size() ; ++point_index){
         QString str;
         str += QString::number(point_index);
@@ -110,18 +131,21 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
         str += ",";
         str += QString::number(points[point_index].y());
         str += ")";
-        scene.addText(str,font);
+   //     scene.addText(str,font);
     }
 
     //grid表示
-    QPen pen = QPen(QColor("#000000"));
     for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
         int x = current_col * grid_size + left_right_margin;
-        scene.addLine(x,top_buttom_margin,x,window_height - top_buttom_margin,pen);
+        painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
     }
     for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
         int y = current_row * grid_size + top_buttom_margin;
-        scene.addLine(left_right_margin,y,window_width - left_right_margin,y,pen);
+        painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
     }
-    this->setScene(&scene);
+   // this->setScene(&scene);
+
+
+
 }
+
