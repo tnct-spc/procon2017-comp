@@ -1,16 +1,23 @@
-//旧世代
-#include "qrtranslatetopolygon.h"
-#include "qrlibrary.h"
+//新世代
+#include "qrcode.h"
+#include "ui_qrcode.h"
 
 using namespace cv;
 using namespace zbar;
 
-QRLibrary::QRLibrary()
+QRCode::QRCode(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::QRCode)
 {
-    std::cout << "QR Libruary initialized" << std::endl;
+    ui->setupUi(this);
 }
 
-std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool s, bool is_hint)
+QRCode::~QRCode()
+{
+    delete ui;
+}
+
+std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRCode::Decoder(bool s, bool is_hint, bool hint_multi, int how_qr)
 {
     VideoCapture cap(0);
     if (!cap.isOpened())  // if not success, exit program
@@ -26,6 +33,7 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
     std::string code = {""};
     std::string bcode = {"."};
     std::string type = {""};
+    int much = 0;
 
     ImageScanner scanner;
     scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
@@ -36,11 +44,6 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
     std::cout << "Camera size : " << dWidth << " x " << dHeight << std::endl;
 
     resizedW = (dWidth - dHeight) / 2;
-
-//    namedWindow("Press Esc to exit",CV_WINDOW_NORMAL);
-//    if(dHeight < 600){
-//        resizeWindow("Press Esc to exit", 600, 600);
-//    }
 
     while (1)
     {
@@ -99,16 +102,27 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool
                     decoded_polygons.second.push_back(f);
                     std::cout << "frame: " << decoded_polygons.second.size() << std::endl;
                 }
+                much++;
             }
         }
 
         imshow("QR", frame);
-
         int key = waitKey(1);
         if(code.length() > 2 && s){
-            if(!is_multi){
+            if(is_hint){
+                if(hint_multi){
+                    if(much == how_qr){
+                        std::cout << "QRCode detected" << std::endl;
+                        if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons, is_hint);
+                        read = true;
+                        std::cout << "a: " << decoded_polygons.first.size() << std::endl;
+                        std::cout << "b: " << decoded_polygons.second.size() << std::endl;
+                        break;
+                    }
+                }
+            }else if(!is_multi){
                 std::cout << "QRCode detected" << std::endl;
-                if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons, false);
+                if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons, is_hint);
                 read = true;
                 std::cout << "a: " << decoded_polygons.first.size() << std::endl;
                 std::cout << "b: " << decoded_polygons.second.size() << std::endl;

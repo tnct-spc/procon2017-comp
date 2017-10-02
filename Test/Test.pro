@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     testalgorithmwrapper.cpp \
     testevaluation.cpp \
     testcheckoddfield.cpp \
-    testqrtranslatetopolygon.cpp
+    testqrtranslatetopolygon.cpp \
+    testsinglepolygondock.cpp
     testcheckcanprume.cpp
 
 HEADERS += testdisplayanswer.h\
@@ -40,7 +41,8 @@ HEADERS += testdisplayanswer.h\
     testalgorithmwrapper.h \
     testevaluation.h \
     testcheckoddfield.h \
-    testqrtranslatetopolygon.h
+    testqrtranslatetopolygon.h \
+    testsinglepolygondock.h
     testcheckcanprume.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
