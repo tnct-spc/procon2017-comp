@@ -15,11 +15,12 @@ bool TestImageRecognitionWithHumanPower::run()
     bg::exterior_ring(polygon) = boost::assign::list_of<point_t>(0.5, 0.5)(0.1, 3.0)(3.0, 3.1)(0.5, 0.5);
     std::cout << "polygon" << bg::dsv(polygon) << std::endl;
 
-//    imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
-//    irwh->show();
+    imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
+    irwh->setPolygon(polygon);
+    irwh->show();
 
-    MyGraphicsView *mgv = new MyGraphicsView();
-    mgv->setPolygon(polygon);
-    mgv->show();
+//    MyGraphicsView *mgv = new MyGraphicsView();
+//    mgv->setPolygon(polygon);
+//    mgv->show();
     return 1;
 }

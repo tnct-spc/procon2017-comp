@@ -1,23 +1,22 @@
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
 
-#include <QWidget>
 #include <QGraphicsView>
+#include <QGraphicsWidget>
 #include "polygonviewer.h"
 namespace Ui {
 class MyGraphicsView;
 }
 
-class MyGraphicsView : public QWidget
+class MyGraphicsView : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    explicit MyGraphicsView(QWidget *parent = 0);
+    explicit MyGraphicsView(QGraphicsView *parent = 0);
     ~MyGraphicsView();
 
     void setPolygon(polygon_t polygon);
-    void setImage(QString path);
     void setImage(cv::Mat mat);
 
 private:
