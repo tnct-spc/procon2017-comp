@@ -239,7 +239,7 @@ void Kunugida::run()
     if(ui->ServerModeCheckbox->isChecked()){
         std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/CSV/problem.csv";
         std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
-        NeoPolygonIO::exportPolygon(PDATA, PROBLEM_SAVE_PATH);
+        NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
 
     }else{
     //    TODO: ここまでで各データソースから読み込むようにする

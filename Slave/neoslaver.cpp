@@ -10,6 +10,7 @@ NeoSlaver::NeoSlaver(QWidget *parent) :
     board = std::make_shared<NeoAnswerBoard>();
     board->showMaximized();
     connect(ui->run, &QPushButton::clicked, this, &NeoSlaver::pushGetButton);
+    board->setSingleMode(true);
 }
 
 NeoSlaver::~NeoSlaver()
@@ -23,6 +24,7 @@ bool NeoSlaver::get()
     if(ui->boss->isChecked()){
         SERVER_URL = "http://localhost:8016/get";
         SERVER_POST_URL = "http://localhost:8016/answer";
+        SAVE_PROBLEM_PATH = "../../procon2017-comp/CSV/problem-slave.csv";
     }
 
     QEventLoop eventloop;
@@ -99,6 +101,8 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
     std::cout<<"send ok"<<std::endl;
 
     ui->state->setText(QString::fromStdString(std::string(postreply->readAll().constData())));
+    this->board->setField(field);
+    this->board->update();
 
 
 
