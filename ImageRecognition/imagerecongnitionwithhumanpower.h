@@ -25,7 +25,8 @@ private:
     polygon_t polygon;
 
 private slots:
-
+    void clickedEnlargement();
+    void clickedReduction();
 protected:
 
 signals:
