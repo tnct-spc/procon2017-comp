@@ -112,6 +112,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         i++; j++;
         imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
         irwh->setPolygon(human_polygons.at(1).getPolygon());
+        irwh->setImage(cv::Mat(human_images.at(1)));
         irwh->show();
     }
     //@yui_end

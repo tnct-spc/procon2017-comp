@@ -28,3 +28,7 @@ void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
     this->polygon = polygon;
     my_graphics_view->setPolygon(polygon);
 }
+
+void imagerecongnitionwithhumanpower::setImage(cv::Mat image){
+    my_graphics_view->setImage(image);
+}

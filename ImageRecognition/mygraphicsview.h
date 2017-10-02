@@ -21,7 +21,7 @@ public:
     ~MyGraphicsView();
 
     void setPolygon(polygon_t polygon);
-    void setImage(cv::Mat mat);
+    void setImage(cv::Mat image);
 
 private:
     QPointF toPolygonPoint(double window_x,double window_y);
@@ -29,7 +29,7 @@ private:
 
     Ui::MyGraphicsView *ui;
 
-    QImage image;
+    cv::Mat image;
     polygon_t polygon;
     std::vector<QPointF> points;
     int grid_size,left_right_margin,top_buttom_margin;

@@ -24,8 +24,8 @@ void MyGraphicsView::setPolygon(polygon_t polygon){
     this->update();
 }
 
-void MyGraphicsView::setImage(cv::Mat mat){
-    this->image = QImage(mat.data, mat.cols, mat.rows, QImage::Format_RGB888);
+void MyGraphicsView::setImage(cv::Mat image){
+    this->image = image;
 }
 
 QPointF MyGraphicsView::toPolygonPoint(double window_x, double window_y){
@@ -79,13 +79,17 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
 
+    cv::Mat buf_mat;
+    cv::cvtColor(image, buf_mat, CV_RGB2BGR);
+    QImage qimage((uchar *)buf_mat.data, buf_mat.cols, buf_mat.rows,(int)buf_mat.step, QImage::Format_RGB888);
+
+    painter.drawImage(QPoint(0,0),qimage);
+
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.x() < b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.y() < b.y(); });
 
     minXY.first = minmaxX.first->x();
     minXY.second = minmaxY.first->y();
-
-//    painter.drawImage(0,0,this->image);
 
     int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
     int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
