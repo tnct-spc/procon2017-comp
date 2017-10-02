@@ -53,6 +53,7 @@ private:
 public slots:
     void getCSV();
     void postCSV();
+    cv::Mat scanImage();
 
 private slots:
     void clickedRunButton();

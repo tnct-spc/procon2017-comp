@@ -24,6 +24,15 @@ NeoAnswerBoard::~NeoAnswerBoard()
 void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
+/*
+void NeoAnswerBoard::setShowUnplacedPieces(bool input){
+    showunplacedpieces = input;
+}
+*/
+void NeoAnswerBoard::setSelectPieceMode(bool mode)
+{
+    this->select_piece_mode = mode;
+}
 
 void NeoAnswerBoard::setUp()
 {
@@ -47,8 +56,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 {
     const QString up_back_ground_color = "#7BAB4F";
     const QString down_back_ground_color = "#118822";
-    const int window_width = this->width();
+    const QString unplaced_back_ground_color = "#EEEEEE";
+    const int width_size = (this->width());
     const int window_height = this->height();
+    const int window_width = this->width();
 
     //色リスト
     QStringList colorlist;
@@ -115,12 +126,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                                ?window_height
                                :window_height/2);
     grid_size =
-            window_width <= splitedheight
-            ? window_width / (grid_col + grid_margin)
+            width_size <= splitedheight
+            ? width_size / (grid_col + grid_margin)
             : splitedheight / (grid_row + grid_margin);
     //grid_size -= grid_size*8;
     top_bottom_margin = (splitedheight - grid_size * grid_row) / 2;
-    left_right_margin = (window_width - grid_size * grid_col) / 2;
+    left_right_margin = (width_size - grid_size * grid_col) / 2;
     down_up_y = splitedheight + top_bottom_margin;
 
     //余白(枠の部分)を設定
@@ -131,10 +142,12 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //背景を描画
     painter.setBrush(QBrush(QColor(up_back_ground_color)));
-    painter.drawRect(QRect(0,0,window_width,splitedheight));
+    painter.drawRect(QRect(0,0,width_size,splitedheight));
     painter.setBrush(QBrush(QColor(down_back_ground_color)));
-    painter.drawRect(QRect(0, splitedheight, window_width, window_height));
+    painter.drawRect(QRect(0, splitedheight, width_size, window_height));
 
+    painter.setBrush(QBrush(QColor(unplaced_back_ground_color)));
+    painter.drawRect(QRect(width_size,0,window_width,splitedheight));
 
     //グリッドを描画
     auto drawGrid = [&]{
@@ -145,7 +158,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         }
         for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
             int y = current_row * grid_size + top_bottom_margin;
-            painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
+            painter.drawLine(left_right_margin,y,width_size - left_right_margin,y);
         }
     };
 
@@ -182,6 +195,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 points.push_back(getPosition(point));
             }
             painter.drawPolygon(&points.front(),points.size());
+            polygon_i test = expanded_poly.getPolygon();
     };
 
 
@@ -292,7 +306,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         int evalution_size = (top_bottom_margin > left_right_margin*5
                     ?top_bottom_margin/3
                     :left_right_margin/6);
-        if(window_width < evalution_size * 6)evalution_size = window_width / 6;
+        if(width_size < evalution_size * 6)evalution_size = width_size / 6;
         painter.setFont(QFont("Deciratuve",evalution_size,QFont::Bold));
         QPointF evalution_point;
         evalution_point.setX(grid_size);
@@ -332,9 +346,61 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                     drawProcessingLine(sorted_poly.at(red_id), false);
         }
     }
+
+/*    auto drawunplacedpieces = [&]{//人力beamsearch用
+
+        int unplacedpiececount = field.getElementaryPieces().size() - field.getPieces().size();
+
+        auto getUnplacedPosition = [&](point_i point,int value){
+
+            QPointF q_point = getPosition(point);
+            if(value * 2 < unplacedpiececount){
+                q_point.setX(q_point.x() + width_size);
+                q_point.setY(point.y()*grid_size + window_height*0.5 + (unplacedpiececount/4 - value) * window_height/unplacedpiececount*1.4);
+            }else{
+                q_point.setX(q_point.x() + width_size + (window_width - width_size) / 2);
+                q_point.setY(point.y()*grid_size + window_height*0.5 + (unplacedpiececount/4 - (value - unplacedpiececount/2)) * window_height/unplacedpiececount*1.4);
+            }
+
+            return q_point;
+        };
+
+        auto drawPiece = [&](polygon_i poly,int id,int count){
+            painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1)); // draw piece
+            painter.setBrush(QBrush(QColor(list[id])));
+            std::vector<QPointF> points;
+
+            //中央に揃える処理
+            point_i center_point;
+            polygon_i center_poly;
+            bg::centroid(poly , center_point);
+            bg::strategy::transform::translate_transformer<int,2,2>translate(-center_point.x(),-center_point.y());
+            bg::transform(poly,center_poly,translate);
+
+            for(auto point : center_poly.outer()){
+                points.push_back(getUnplacedPosition(point,count));
+            }
+            painter.drawPolygon(&points.front(),points.size());
+
+        };
+
+
+        int value=1;
+        for(unsigned int count=0;count<field.getElementaryPieces().size();++count){
+            if(!field.getIsPlaced().at(count)){//置かれてないなら
+                polygon_i poly = field.getElementaryPieces().at(count).getPolygon();
+                int poly_id = field.getElementaryPieces().at(count).getId();
+                drawPiece(poly,poly_id,value);
+                ++value;
+            }
+        }
+    };*/
+
     drawPolygonPointNum();
     drawEvalution();
     drawGrid();
+   // if(showunplacedpieces)drawunplacedpieces();
+
 }
 
 void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
@@ -571,7 +637,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 std::vector<procon::NeoExpandedPolygon> newframe = std::get<0>(connected);
                 for(procon::NeoExpandedPolygon nep : newframe){
                     field_frame.push_back(nep);
-                }
+                }initialized
                 field_frame.erase(field_frame.begin() + i.frame_index);
                 newField.setFrame(field_frame);
                 newField.setPiece(std::get<1>(connected));
@@ -596,7 +662,7 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         }
     }
 #endif
-    if(event->button() == Qt::MouseButton::LeftButton){
+    if(event->button() == Qt::MouseButton::LeftButton && this->select_piece_mode){
 //        clickedpiece_id = -1;
         QPointF clickedposition = event->pos();
         //QPointF→point_iへの変換
@@ -617,11 +683,13 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 }else{
                     this->clicked_piece_id.erase(index);
                 }
-
-
-
             }
         }
         this->update();
     }
+}
+
+std::vector<int> NeoAnswerBoard::getSelectedPieceId()
+{
+    return clicked_piece_id;
 }

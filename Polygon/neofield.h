@@ -46,6 +46,7 @@ public:
     void setElementaryPieces(std::vector<procon::NeoExpandedPolygon> const& pieces);
     void setIsPlaced(std::array<bool,50> const& IsPlaced);
     void setIsPlaced(int const& piece_id);
+    void setIsPlaced(int const& piece_id,bool is_placed);
     void sumTotalEvaluation(double const& eva);
 
     //getter
