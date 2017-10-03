@@ -19,12 +19,12 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response)
 }
 
 void AnswerForm::ReceiveData(QByteArray lowdata){
-    std::cout<<"request data receive"<<std::endl;
+    std::cout<<"[http/answer_form] request data receive..."<<std::endl;
     received_data += lowdata;
 }
 
 void AnswerForm::ServiceRequestCompleted(){
-    std::cout<<"request completed"<<std::endl;
+    std::cout<<"[http/answer_form] request complete!"<<std::endl;
     QByteArray lowdata = received_data;
     received_data = "";
 
@@ -60,10 +60,8 @@ void AnswerForm::ServiceRequestCompleted(){
     // compare posted and answer
     procon::NeoField field_posted = NeoPolygonIO::importField(filename_posted.toUtf8().constData());
     procon::NeoField field_answer = NeoPolygonIO::importField(filename_answer.toUtf8().constData());
-//    if(field_posted.getPiecesSize() > field_answer.getPiecesSize())
+    if(field_posted.getPiecesSize() > field_answer.getPiecesSize())
         NeoPolygonIO::exportPolygon(field_posted, filename_answer.toUtf8().constData());
-
-    std::cout<<"emit: getanswer"<<std::endl;
 
     emit getAnswer(filename_answer);
 
