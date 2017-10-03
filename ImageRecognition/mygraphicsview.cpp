@@ -75,7 +75,7 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     int window_width = this->width();
     int window_height = this->height();
 
-    const int grid_margin = 4;
+    const int grid_margin = 2;
 
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.x() < b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.y() < b.y(); });
@@ -99,15 +99,16 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     cv::Mat buf_mat;
     cv::cvtColor(image, buf_mat, CV_RGB2BGR);
     QImage qimage((uchar *)buf_mat.data, buf_mat.cols, buf_mat.rows,(int)buf_mat.step, QImage::Format_RGB888);
-    painter.drawImage(QPoint(0,0),qimage);
-
+    QRect image_rect(QPoint(left_right_margin,top_buttom_margin),
+                     QPoint(left_right_margin + grid_size * grid_col , top_buttom_margin + grid_size * grid_row));
+    painter.drawImage(image_rect,qimage);
 
     //polygon表示
     QVector<QPointF> window_points;
     for(QPointF i : points){
         window_points.push_back(toWindowPoint(i));
     }
-    painter.setBrush(QBrush(QColor("#00FFFF")));
+    painter.setBrush(QBrush(QColor("#5500FFFF")));
     painter.drawPolygon(&window_points.front(),window_points.size());
 
     //index表示
