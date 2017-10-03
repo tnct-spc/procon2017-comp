@@ -145,6 +145,46 @@ BeamSearch::BeamSearch()
     cpu_num = std::thread::hardware_concurrency();
 }
 
+BeamSearch::BeamSearch(int beamwidth)
+{
+    this->setBeamWidth(beamwidth);
+
+    logger = spdlog::get("BeamSearch");
+//    logger = spdlog::get("beamsearch");
+    dock = std::make_shared<NeoAnswerDock>();
+    dock->show();
+
+    //test
+    neo = std::make_shared<NeoAnswerDock>();
+    neo->show();
+
+    cpu_num = std::thread::hardware_concurrency();
+}
+
+BeamSearch::BeamSearch(int beamwidth, bool answerprogress_enabled)
+{
+    this->setBeamWidth(beamwidth);
+
+    this->answer_progress_enabled = answerprogress_enabled;
+
+    logger = spdlog::get("BeamSearch");
+//    logger = spdlog::get("beamsearch");
+    dock = std::make_shared<NeoAnswerDock>();
+    neo = std::make_shared<NeoAnswerDock>();
+
+    if(answer_progress_enabled){
+        neo->show();
+        dock->show();
+    }
+
+    cpu_num = std::thread::hardware_concurrency();
+}
+
+void BeamSearch::setBeamWidth(int beamwidhth)
+{
+    this->beam_width = beamwidhth;
+}
+
 std::string BeamSearch::hashField(const procon::NeoField& field){
     std::vector<procon::NeoExpandedPolygon> polygons = field.getFrame();
     std::vector<procon::NeoExpandedPolygon> frame = field.getElementaryFrame();
@@ -1160,7 +1200,11 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
 
         bool flag = false;
         for(auto const& _field : state){
-            neo->addAnswer(_field);
+
+            if(this->answer_progress_enabled){
+                neo->addAnswer(_field);
+            }
+
             if(!flag){
                 submitAnswer(_field);
                 flag = true;

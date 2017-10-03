@@ -18,6 +18,7 @@
 #include "neofield.h"
 #include "expandedpolygon.h"
 #include "neoexpandedpolygon.h"
+#include "neosinglepolygondisplay.h"
 #include <QMessageBox>
 
 namespace Ui {
@@ -37,6 +38,8 @@ public:
     void setScannedPieces(std::vector<procon::ExpandedPolygon> vec);
     void setUp();
     void setSelectPieceMode(bool mode);
+
+    void setShowUnplacedPieces(bool input);
 
     std::vector<int> getSelectedPieceId();
 
@@ -64,6 +67,7 @@ private:
     int piece_size = 1;
     bool allif = true;
     bool select_piece_mode = false;
+ //   bool showunplacedpieces = false;
 
     //make id_list
     std::vector<polygon_i> polygon_list;

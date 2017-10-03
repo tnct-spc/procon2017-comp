@@ -17,14 +17,17 @@ public:
 
 private:
     void getCSV();
+    void postCSV();
     std::shared_ptr<spdlog::logger> logger;
 
 public slots:
     void requestCSVcomplete();
+    void requestpostCSVcomplete();
 
 signals:
     void throwAnswer(procon::NeoField field);
     void requestCSV();
+    void requestpostCSV();
 };
 
 #endif // ALGORITHMWRAPPER_H

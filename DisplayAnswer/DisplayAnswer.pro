@@ -23,14 +23,16 @@ SOURCES += \
     answerdock.cpp \
     neoanswerboard.cpp \
     neoanswerdock.cpp \
-    trynextsearch.cpp
+    trynextsearch.cpp \
+    singlepolygondock.cpp
 
 HEADERS +=\
     answerboard.h \
     answerdock.h \
     neoanswerboard.h \
     neoanswerdock.h \
-    trynextsearch.h
+    trynextsearch.h \
+    singlepolygondock.h
 
 LIBS += -L/usr/lib `pkg-config --libs opencv`
 
@@ -44,7 +46,8 @@ FORMS += \
     answerdock.ui \
     neoanswerboard.ui \
     neoanswerdock.ui \
-    trynextsearch.ui
+    trynextsearch.ui \
+    singlepolygondock.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
