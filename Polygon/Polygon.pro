@@ -35,7 +35,8 @@ SOURCES += \
     neopolygonio.cpp \
     Evaluation/evaluate.cpp \
     Evaluation/evaluation.cpp \
-    Utils/polygonconnector.cpp
+    Utils/polygonconnector.cpp \
+    neosinglepolygonretoucher.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -55,7 +56,8 @@ HEADERS += \
     neopolygonio.h \
     Evaluation/evaluate.h \
     Evaluation/evaluation.h \
-    Utils/polygonconnector.h
+    Utils/polygonconnector.h \
+    neosinglepolygonretoucher.h
 
 LIBS += -lboost_system -lboost_thread
 LIBS += -L/usr/lib `pkg-config --libs opencv`
@@ -70,7 +72,8 @@ unix {
 FORMS += \
     singlepolygondisplay.ui \
     form.ui \
-    neosinglepolygondisplay.ui
+    neosinglepolygondisplay.ui \
+    neosinglepolygonretoucher.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Utilities/release/ -lUtilities
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Utilities/debug/ -lUtilities
