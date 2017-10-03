@@ -187,6 +187,11 @@ void Kunugida::run()
                 cv::imshow("にこめ",second_scan);
             }
         }
+
+        ImageRecognition imrec;
+        field = imrec.run(first_scan,second_scan);
+        board->setScannedPieces(imrec.getPolygonPosition());
+
     }else if(ui->image_data_button->isChecked()){
         //selected image
         logger->info("Selected ImageData DataSource");

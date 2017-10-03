@@ -9,7 +9,7 @@ if [ "${devicename}" = ""  ]; then
 fi
 
 wait
-scanimage --device "${devicename}" --format=png --mode Color --resolution 100 > $1
+scanimage --device "${devicename}" --format=png --mode Color --resolution 300 > $1
 
 if [ $? -gt 0 ]; then
     # エラー処理
