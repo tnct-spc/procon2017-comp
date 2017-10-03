@@ -54,7 +54,7 @@ private:
 
     unsigned int cpu_num = 0;
     unsigned int beam_width = 1;
-    bool mode_with_hint = false; //ヒントモード
+    bool mode_with_hint = false; //ヒントモード陥穽版（※たまに堕ちるのは私用です）
 
 private slots:
     void tryNextBeamSearch(procon::NeoField next_field);
