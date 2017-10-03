@@ -23,7 +23,6 @@ public:
 private:
     Ui::imagerecongnitionwithhumanpower *ui;
     MyGraphicsView *my_graphics_view;
-    polygon_t polygon;
 
 private slots:
     void clickedEnlargement();

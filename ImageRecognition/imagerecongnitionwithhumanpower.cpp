@@ -25,7 +25,6 @@ imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
 }
 
 void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
-    this->polygon = polygon;
     my_graphics_view->setPolygon(polygon);
 }
 
