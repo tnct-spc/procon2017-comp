@@ -36,6 +36,7 @@ public:
     void setText(std::string text);
     void setScannedPieces(std::vector<procon::ExpandedPolygon> vec);
     void setUp();
+    void setProcessingLineMode(bool inp);
     void setIsEmptyColorFill(bool inp);
 
 private:
@@ -61,6 +62,7 @@ private:
     bool singleif = false;
     int piece_size = 1;
     bool allif = true;
+    void processinglinemode = false;
 
     //make id_list
     std::vector<polygon_i> polygon_list;
