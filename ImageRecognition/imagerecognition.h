@@ -68,7 +68,6 @@ private:
     int pieces_num;
     std::vector<procon::ExpandedPolygon> position;
     int id = -1;
-    int n = 1;
     std::map<point_i, double> tab;
     int margin = 10;
 

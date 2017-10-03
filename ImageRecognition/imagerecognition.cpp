@@ -92,8 +92,16 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
-    for (auto& polygon : polygons) {
-        polygon = expandPolygon(polygon, 0.15 / scale);
+//    for (auto& polygon : polygons) {
+//       polygon = expandPolygon(polygon, 0.1 / scale);
+//    }
+
+    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.105 / scale);
+    }
+
+    for (int i=0; i<frame_num; i++) {
+        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), 0.1 / scale);
     }
 
     // make ExpandedPolygon for GUI
@@ -109,7 +117,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        }
 //        std::cout << endl;
 
-        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+//        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
 //    // sum polygon_t and piece's image
@@ -151,11 +159,17 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
 //        scale = 15 * 4 / scale_len;
 
+    int count = 0;
     // change vector's scale to grid
     for (auto& piece : polygons) {
         for (auto& side : piece.outer()) {
             side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
         }
+
+        procon::ExpandedPolygon pos;
+        pos.resetPolygonForce(piece);
+        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
+        count++;
     }
 
     makeTable();
@@ -167,7 +181,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+//        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
@@ -1675,7 +1689,7 @@ polygon_t ImageRecognition::expandPolygon(polygon_t polygon, double dxy)
         std::array<point_t,2> vec_a = { points[index].first,points[index].second };
         std::array<point_t,2> vec_b = { points[index + 1].first,points[index + 1].second };
 
-        point_t point = calculateIntersection(calcuateAnotherPoint(vec_a,1),calcuateAnotherPoint(vec_b,1));
+        point_t point = calculateIntersection(calcuateAnotherPoint(vec_a,dxy),calcuateAnotherPoint(vec_b,dxy));
 
         new_polygon.outer().push_back(point);
     }
