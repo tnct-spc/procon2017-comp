@@ -43,17 +43,20 @@ QPoint MyGraphicsView::toWindowPoint(QPointF point){
     return QPoint(x_buf,y_buf);
 }
 
+int MyGraphicsView::isInTolerance(QPointF point){
+    std::cout<<point.x()<<","<<point.y()<<std::endl;
+    auto itr = std::find_if(points.begin(),points.end(),[&](QPointF p){
+        return (std::fabs(p.x() - point.x()) <= threshold) && (std::fabs(p.y() - point.y()) <= threshold);
+    });
+    return itr == points.end() ? -1 : std::distance(points.begin(),itr);
+}
 
 void MyGraphicsView::mousePressEvent(QMouseEvent *event){
-    const double threshold = 0.5;//許容範囲
     QPointF selected_point = toPolygonPoint(event->x(),event->y());
-    std::cout<<selected_point.x()<<","<<selected_point.y()<<std::endl;
-    auto itr = std::find_if(points.begin(),points.end(),[&](QPointF p){
-        return (std::fabs(p.x() - selected_point.x()) <= threshold) && (std::fabs(p.y() - selected_point.y()) <= threshold);
-    });
-    selecting = itr != points.end();
+    int is_in_tolerance = isInTolerance(selected_point);
+    selecting = is_in_tolerance != -1;
     if(selecting){
-        move_index = std::distance(points.begin(),itr);
+        move_index = is_in_tolerance;
     }
 }
 
