@@ -18,14 +18,22 @@ void MyGraphicsView::setPolygon(polygon_t polygon){
     this->polygon = polygon;
     points.clear();
     for(int i = 0 ; i<polygon.outer().size() - 1;i++){
-        QPointF point(polygon.outer()[i].x() * magnification , polygon.outer()[i].y() * magnification);
-        points.push_back(point);
+        points.push_back(QPointF(polygon.outer()[i].x() * magnification , polygon.outer()[i].y() * magnification));
     }
     this->update();
 }
 
 void MyGraphicsView::setImage(cv::Mat image){
     this->image = image;
+    this->update();
+}
+
+void MyGraphicsView::polygonUpdate(){
+    polygon_t changed_polygon;
+    for(QPointF i : points){
+        changed_polygon.outer().push_back(point_t(i.x() / magnification , i.y() / magnification));
+    }
+    setPolygon(changed_polygon);
 }
 
 QPointF MyGraphicsView::toPolygonPoint(double window_x, double window_y){
@@ -44,74 +52,42 @@ QPoint MyGraphicsView::toWindowPoint(QPointF point){
 }
 
 int MyGraphicsView::isInTolerance(QPointF point){
-//    std::cout<<point.x()<<","<<point.y()<<std::endl;
     auto itr = std::find_if(points.begin(),points.end(),[&](QPointF p){
         return (std::fabs(p.x() - point.x()) <= threshold) && (std::fabs(p.y() - point.y()) <= threshold);
     });
     return itr == points.end() ? -1 : std::distance(points.begin(),itr);
 }
 
+void MyGraphicsView::removePoint(int index,int x,int y)
+{
+    points.erase(points.begin() + index);
+    polygonUpdate();
+}
+
+void MyGraphicsView::insertPoint(int x, int y){
+    points.push_back(QPointF(x,y));
+    polygonUpdate();
+}
+
 void MyGraphicsView::mousePressEvent(QMouseEvent *event){
+    int is_in_tolerance = isInTolerance(toPolygonPoint(event->x(),event->y()));
+    selecting = is_in_tolerance != -1;
     if(event->button() == Qt::MouseButton::LeftButton){
-        std::cout<<"mousepress"<<std::endl;
-        QPointF selected_point = toPolygonPoint(event->x(),event->y());
-        int is_in_tolerance = isInTolerance(selected_point);
-        selecting = is_in_tolerance != -1;
-        if(selecting){
-            move_index = is_in_tolerance;
-        }
+        //pointの移動(releaseとセット)
+        if(selecting) move_index = is_in_tolerance;
     }else if(event->button() == Qt::MouseButton::RightButton){
-        QPointF selected_point = toPolygonPoint(event->x(),event->y());
-        int is_in_tolerance = isInTolerance(selected_point);
-        if(is_in_tolerance == -1){
-            insertPoint(event->x(),event->y());
-        }else{
-            inOutPoint(event->x(),event->y());
-        }
+        //pointの追加、消去
+        if(is_in_tolerance == -1) insertPoint(event->x(),event->y());
+        else removePoint(is_in_tolerance,event->x(),event->y());
     }
 }
 
 void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
-    std::cout<<"mouserelease"<<std::endl;
-    if(!selecting) return;
-    points[move_index] = toPolygonPoint(event->x(),event->y());
-    polygon_t changed_polygon;
-    for(QPointF i : points){
-        changed_polygon.outer().push_back(point_t(i.x() / magnification , i.y() / magnification));
+    if(selecting && (event->button() == Qt::MouseButton::LeftButton)){
+        selecting = false;
+        points[move_index] = toPolygonPoint(event->x(),event->y());
+        polygonUpdate();
     }
-    setPolygon(changed_polygon);
-    this->update();
-}
-
-void MyGraphicsView::inOutPoint(int x,int y)
-{
-    std::cout<<"mousedoubleclick"<<std::endl;
-    QPointF selected_point = toPolygonPoint(x,y);
-    int is_in_tolerance = isInTolerance(selected_point);
-    bool is_on_point = is_in_tolerance != -1;
-    if(is_on_point){
-        points.erase(points.begin() + is_in_tolerance);
-    }else{
-        points.push_back(selected_point);
-    }
-    polygon_t changed_polygon;
-    for(QPointF i : points){
-        changed_polygon.outer().push_back(point_t(i.x() / magnification , i.y() / magnification));
-    }
-    setPolygon(changed_polygon);
-    this->update();
-}
-
-void MyGraphicsView::insertPoint(int x, int y){
-    std::cout<<"hello insert"<<std::endl;
-    polygon_t changed_polygon;
-    for(QPointF i : points){
-        changed_polygon.outer().push_back(point_t(i.x() / magnification , i.y() / magnification));
-    }
-    bg::append(changed_polygon,point_t(x,y));
-
-    setPolygon(changed_polygon);
-    this->update();
 }
 
 void MyGraphicsView::paintEvent(QPaintEvent *event)
