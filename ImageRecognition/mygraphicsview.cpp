@@ -13,9 +13,10 @@ MyGraphicsView::~MyGraphicsView()
     delete ui;
 }
 
-void MyGraphicsView::setPolygon(polygon_t polygon){
+void MyGraphicsView::setPolygon(polygon_t const& polygon_){
+    polygon = polygon_;
     bg::correct(polygon);
-    this->polygon = polygon;
+
     points.clear();
     for(int i = 0 ; i<polygon.outer().size() - 1;i++){
         QPointF point(polygon.outer()[i].x() * magnification , polygon.outer()[i].y() * magnification);
@@ -24,8 +25,8 @@ void MyGraphicsView::setPolygon(polygon_t polygon){
     this->update();
 }
 
-void MyGraphicsView::setImage(cv::Mat image){
-    this->image = image;
+void MyGraphicsView::setImage(cv::Mat const& image_){
+    this->image = image_;
 }
 
 QPointF MyGraphicsView::toPolygonPoint(double window_x, double window_y){

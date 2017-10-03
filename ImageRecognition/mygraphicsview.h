@@ -20,8 +20,8 @@ public:
     explicit MyGraphicsView(QWidget *parent = 0);
     ~MyGraphicsView();
 
-    void setPolygon(polygon_t polygon);
-    void setImage(cv::Mat image);
+    void setPolygon(polygon_t const& polygon_);
+    void setImage(cv::Mat const& image_);
 
 private:
     QPointF toPolygonPoint(double window_x,double window_y);

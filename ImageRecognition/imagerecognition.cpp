@@ -108,6 +108,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     std::vector<cv::Mat> human_images = getPiecesImages();
     std::vector<procon::ExpandedPolygon> human_polygons = getPolygonForImage();
     int i = 0,j = 0;
+    /*デバッグなので最初の一つだけ*/
     while(i<human_images.size() && j<human_polygons.size()&&i<1){
         i++; j++;
         imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();

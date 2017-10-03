@@ -24,10 +24,10 @@ imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
     delete ui;
 }
 
-void imagerecongnitionwithhumanpower::setPolygon(polygon_t polygon){
+void imagerecongnitionwithhumanpower::setPolygon(polygon_t const& polygon){
     my_graphics_view->setPolygon(polygon);
 }
 
-void imagerecongnitionwithhumanpower::setImage(cv::Mat image){
+void imagerecongnitionwithhumanpower::setImage(cv::Mat const& image){
     my_graphics_view->setImage(image);
 }

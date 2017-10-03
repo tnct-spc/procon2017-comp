@@ -17,8 +17,8 @@ class imagerecongnitionwithhumanpower : public QWidget
 public:
     explicit imagerecongnitionwithhumanpower(QWidget *parent = 0);
     ~imagerecongnitionwithhumanpower();
-    void setPolygon(polygon_t polygon);
-    void setImage(cv::Mat image);
+    void setPolygon(polygon_t const& polygon);
+    void setImage(cv::Mat const& image);
 
 private:
     Ui::imagerecongnitionwithhumanpower *ui;
