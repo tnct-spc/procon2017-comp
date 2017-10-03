@@ -32,15 +32,18 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         qrlibrary.cpp \
-        qrtranslatetopolygon.cpp
+        qrtranslatetopolygon.cpp \
+    qrcode.cpp
 
 HEADERS += \
         mainwindow.h \
         qrlibrary.h \
-        qrtranslatetopolygon.h
+        qrtranslatetopolygon.h \
+    qrcode.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    qrcode.ui
 
 LIBS += -L/usr/lib -lzbar
 LIBS += -L/usr/lib `pkg-config --libs opencv`
@@ -49,7 +52,6 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Polygon/release/ -lPolygon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Polygon/debug/ -lPolygon
 else:unix: LIBS += -L$$OUT_PWD/../Polygon -lPolygon

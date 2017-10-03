@@ -21,7 +21,7 @@ using namespace cv;
 void MainWindow::takePicture()
 {
     QRLibrary lib;
-    auto decodedCode = lib.Decoder(isAuto());
+    auto decodedCode = lib.Decoder(isAuto(), false);
     Quit(0);
 
 }

@@ -32,6 +32,8 @@ public:
         return raw_random_colors;
     }
 
+    polygon_t expandPolygon(polygon_t polygon,double dxy);
+
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
     std::vector<cv::Mat> preprocessingPieces(cv::Mat image);
@@ -48,6 +50,9 @@ private:
     cv::Mat HSVDetection(cv::Mat src_image);
     std::vector<cv::Mat> dividePiece(cv::Mat src_image);
     polygon_i placeGridByAsazuma(polygon_t vertex);
+    polygon_t deleteMispoint(polygon_t vertex);
+    polygon_i placeGrid(polygon_t vertex);
+    double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
     void makeTable();
 
@@ -56,7 +61,6 @@ private:
     std::vector<cv::Point> raw_pieces_pos;
     std::vector<cv::Vec3b> raw_random_colors;
     double scale;
-    static constexpr double cutting_allowance = 0.0;
 
     std::vector<int> area;
     int frame_num;
@@ -64,8 +68,6 @@ private:
     int pieces_num;
     std::vector<procon::ExpandedPolygon> position;
     int id = -1;
-    int n = 1;
-    std::map<point_i, double> tab;
     int margin = 10;
 
     std::vector<std::pair<point_i,double>> length_table;

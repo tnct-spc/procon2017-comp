@@ -11,6 +11,9 @@
 
 procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
+    // グローバル変数を初期化
+    position.clear();
+    id = -1;
     raw_pieces_pic = raw_pieces_image;
 
     // スケールを計算
@@ -19,13 +22,6 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ピースに分割
     std::vector<cv::Mat> frame_image = dividePiece(raw_frame_image);
     std::vector<cv::Mat> pieces_images = dividePiece(raw_pieces_image);
-
-    /*
-    for (unsigned int i = 0; i < pieces_images.size(); i++) {
-        cv::namedWindow("piece" + std::to_string(i));
-        cv::imshow("piece" + std::to_string(i),pieces_images[i]);
-    }
-    */
 
     // つなげてるだけ
     std::vector<cv::Mat> images;
@@ -38,41 +34,32 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
+//    // フレームのベクターの表示
+//    procon::ExpandedPolygon frame;
+//    frame.resetPolygonForce(polygons[0]);
+//    PolygonViewer::getInstance().pushPolygon(frame, "frame");
+
     // フレームの回転角を計算
+    int longgest = 0;
+    point_t long_point;
     for (unsigned int i=0; i<polygons.at(0).outer().size()-1; i++) {
         double x = polygons.at(0).outer().at(i+1).x() - polygons.at(0).outer().at(i).x();
         double y = polygons.at(0).outer().at(i+1).y() - polygons.at(0).outer().at(i).y();
         double len = hypot(x,y);
-        if (fabs(len * scale - 297) < 10) {
-            x = polygons.at(0).outer().at(i+1).x() - polygons.at(0).outer().at(0).x();
-            y = polygons.at(0).outer().at(i+1).y() - polygons.at(0).outer().at(0).y();
-            frame_rad = std::atan2(y,x);
-            break;
+        if (longgest < len) {
+            longgest = len;
+            long_point = point_t(x,y);
         }
     }
 
-    /*
-    cv::Mat line_image;
-    line_image = cv::imread("/home/spc/workspace/procon2017-image/and_image.png", 1);
-    int count = 0;
-    for (auto pol : polygons) {
-        if (count == 0) {
-            for (int i=0; i<pol.inners().at(0).size()-1; i++) {
-                cv::line(line_image, cv::Point(pol.inners().at(0).at(i).x(),pol.inners().at(0).at(i).y()), cv::Point(pol.inners().at(0).at(i+1).x(),pol.inners().at(0).at(i+1).y()), cv::Scalar(200.0), 3,CV_AA);
-            }
-        }
-        count++;
-    });
-
-    cv::imwrite("/home/spc/workspace/procon2017-image/topiece_image.png", line_image);
-    */
+    frame_rad = std::atan2(long_point.y(), long_point.x());
 
     // frameのinnersをouterに入れ替える
     frame_num = polygons[0].inners().size();
     for (int i=0; i<frame_num; i++) {
         polygon_t inside;
-        for (unsigned int j=0; j<polygons[0].inners()[i].size(); j++) {
-            inside.outer().push_back(polygons[0].inners()[i].at(j));
+        for (auto& point : polygons.at(0).inners().at(i)) {
+            inside.outer().push_back(point);
         }
         polygons.push_back(inside);
     }
@@ -88,18 +75,21 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
+    // ポリゴンの各辺を伸ばす
+    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.11 / scale);
+    }
+
+    for (int i=0; i<frame_num; i++) {
+        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), 0.1 / scale);
+    }
+
     // make ExpandedPolygon for GUI
-    for (int i=0; i<polygons.size()-1; i++) {
+    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
 
         procon::ExpandedPolygon pos(i);
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
-
-//        printf("%d : ", i);
-//        for (auto line : pos.getSideLength()) {
-//            std::cout << line * scale << " ";
-//        }
-//        std::cout << endl;
 
 //        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
@@ -119,35 +109,17 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        count++;
 //    }
 
-    //     scale is led from 6*6 piece//    double scale_len;
-//    for (auto piece : polygons) {
-//        if (piece.outer().size() == 5) {
-//            bool check = true;
-//            scale_len = 0;
-//            for (int i=0; i<4; i++) {
-//                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
-//                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
-//                double len = hypot(x,y) * scale / 2.5;
-//                if (fabs(6.0 - len) > 1) {
-//                    check = false;
-//                } else {
-//                    scale_len += hypot(x,y);
-//                }
-//            }
-
-//            if (check) {
-//                break;
-//            }
-//        }
-//    }
-
-//        scale = 15 * 4 / scale_len;
-
+    int count = 0;
     // change vector's scale to grid
     for (auto& piece : polygons) {
         for (auto& side : piece.outer()) {
             side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
         }
+
+        procon::ExpandedPolygon pos;
+        pos.resetPolygonForce(piece);
+        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
+        count++;
     }
 
     makeTable();
@@ -155,15 +127,15 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // Gridに乗せる
     std::vector<polygon_i> pieces;
     double error;
-    pieces_num = polygons.size();
-    for (unsigned int i=0; i<polygons.size(); i++) {
-        // pieces.push_back(placeGrid(polygons[i]));
-        pieces.push_back(placeGridByAsazuma(polygons[i]));
+    pieces_num = polygons.size();    count = 0;
+    for (auto polygon : polygons) {
+        pieces.push_back((placeGridByAsazuma(polygon)));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+        count++;
     }
 
-    // error = getError(pieces);
+    error = getError(pieces);
 
     // fieldクラスのデータに変換
     procon::NeoField field = makeNeoField(pieces);
@@ -429,11 +401,6 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 {
     std::vector<std::vector<cv::Vec4f>> pieces_lines;
 
-    /*
-    cv::Mat and_image;
-    and_image = cv::imread("/home/spc/workspace/procon2017-image/and_image.png", 1);
-*/
-
     int count = 0;
     for(auto &image : images){
         pieces_lines.push_back(std::vector<cv::Vec4f>());
@@ -442,7 +409,6 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         //cv::LSD_REFINE_STD,threshold::LSDthrehold
         cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.75); // 300->0.75
         lsd->detect(image, pieces_lines[count]);
-
 
         //描画
 //        cv::Mat pic(and_image);
@@ -454,12 +420,6 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
 //            }
 //        }
 
-//        lsd->drawSegments(image, pieces_lines[count]);
-//      Debug
-//        if (count == 0) {
-//            cv::namedWindow(std::to_string(count+1));
-//            cv::imshow(std::to_string(count+1), image);
-//        }
         count++;
     }
 
@@ -647,7 +607,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     auto removeShortLines = [&](std::vector<cv::Vec4f> const& lines)->std::vector<cv::Vec4f>{
         std::vector<cv::Vec4f> return_lines;
         for(auto line : lines){
-            if ((calcDistance(line[0],line[1],line[2],line[3]) * scale) >= 1.5) { // 0.5 -> 1.0
+            if ((calcDistance(line[0],line[1],line[2],line[3]) * scale) >= 2.0) {
                 return_lines.push_back(std::move(line));
             }
         }
@@ -680,55 +640,10 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
 
         if (frame_flag == true){
 
-            // pick up 3 long line
-//            std::vector<cv::Vec4f> sorted;
-//            double longgest = 1000000;
-
-//            for (int i=0; i<3; i++) {
-//                cv::Vec4f box;
-//                double shorter = 0;
-//                for (auto line : piece_lines) {
-//                    double len = calcDistance(line[0],line[1],line[2],line[3]);
-//                    if ((shorter < len) && (longgest > len)) {
-//                        shorter = len;
-//                        box = line;
-//                    }
-//                }
-//                sorted.push_back(box);
-//                longgest = shorter;
-//            }
-
-//            for (int i=0; i<3; i++) {
-//                double len1 = calcDistance(sorted.at(i)[0],sorted.at(i)[1],sorted.at(i)[2],sorted.at(i)[3]);
-//                double len2 = calcDistance(sorted.at((i+1)%3)[0],sorted.at((i+1)%3)[1],sorted.at((i+1)%3)[2],sorted.at((i+1)%3)[3]);
-//                if (fabs(len1-len2) < 100) { // regulation
-//                    scale = 297.0 * 2 / (len1 + len2);
-//                    break;
-//                }
-//            }
-
-            //謎の長さtoセンチメートル→ミリメートル
-            //scaleを頑張って測る
-            //コードが最高にキモい
-//            const cv::Vec4f start_line = piece_lines.at(0);
-
-//            auto func = [&](cv::Vec4f line1,cv::Vec4f line2)->double {
-//                const double line1_distance = calcDistance(start_line[0],start_line[1],line1[2],line1[3]);
-//                const double line2_distance = calcDistance(start_line[0],start_line[1],line2[2],line2[3]);
-//                return line1_distance < line2_distance;
-//            };
-//            auto end_line = *(std::min_element(piece_lines.begin(),piece_lines.end(),func));
-//            double sum = 0;
-//            for (auto line : piece_lines) {
-//                sum += calcDistance(line[0],line[1],line[2],line[3]);
-//                if (line == end_line) break;    //キモい
-//            }
-//            scale = (210.0 * 2 + 297.0 * 2) / sum; // まわりの実際の長さ/計算上の合計？　変更
-
             std::vector<std::vector<cv::Vec4f>> rings;
             std::vector<cv::Vec4f> ring;
 
-            polygon_t outer_polygon,inner_polygon,frame_polygon;
+            polygon_t inner_polygon,frame_polygon;
 
             for (int i = 0;i < static_cast<int>(piece_lines.size());i++){
                 double distance = 0;
@@ -952,18 +867,6 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
     // 2値化
     cv::Mat binary_image = HSVDetection(src_image);
 
-/*
-    cv::Mat origin_image;
-    cv::Mat channel[3];
-    cv::split(src_image, channel);
-    channel[0].convertTo(origin_image, CV_8UC1);
-    cv::Mat and_image;
-    cv::bitwise_or(origin_image, binary_image, and_image);
-    cv::namedWindow("and", CV_WINDOW_NORMAL);
-    cv::imshow("and", and_image);
-
-    cv::imwrite("/home/spc/workspace/procon2017-image/and_image.png", and_image);
-*/
     // ラベリング
     cv::Mat label_Image(cv::Size(width, height), CV_32S);
     cv::Mat stats;
@@ -978,7 +881,7 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
 
         // 面積の小さいものは省く
         int piece_area = param[cv::ConnectedComponentsTypes::CC_STAT_AREA];
-        if (piece_area * scale * scale > 90) { // 調節 1600
+        if (piece_area * scale * scale > 90) {
 
             // 各ピースごとに移し替える
             cv::Mat piece_image(cv::Size(width, height), CV_8UC1);
@@ -999,6 +902,667 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
     }
 
     return pieces_images;
+}
+
+polygon_t ImageRecognition::deleteMispoint(polygon_t vertex)
+{
+    // outer
+    auto& polygon = vertex.outer();
+
+    // 1cm以下の辺があったら加工
+    polygon.pop_back();
+    for (unsigned int i=0; i<polygon.size(); i++) {
+
+        double x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
+        double y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
+
+        double len = hypot(x, y);
+
+        double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
+        double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
+
+//        if (len < 1.0) {
+
+//            // 異常に短いものは一つに結合
+//            polygon.at((i+1)%polygon.size()) = point_t(polygon.at((i+1)%polygon.size()).x() + x * 0.5, polygon.at((i+1)%polygon.size()).y() + y * 0.5);
+//            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+//            i--;
+
+//        } else if (len < 3.5) {
+        if (len < 3.5) {
+
+            // 外積を用いて交点を求める
+            double a1x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+3)%polygon.size()).x();
+            double a1y = polygon.at((i+2)%polygon.size()).y() - polygon.at((i+3)%polygon.size()).y();
+            double b2x = polygon.at(i).x() - polygon.at((i+3)%polygon.size()).x();
+            double b2y = polygon.at(i).y() - polygon.at((i+3)%polygon.size()).y();
+            double S1 = (a1x * b2y - a1y * b2x) * 0.5;
+
+            double b1x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+1)%polygon.size()).x();
+            double b1y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+1)%polygon.size()).y();
+            double S2 = (a1x * b1y - a1y * b1x) * 0.5;
+
+            double a2x = polygon.at((i+1)%polygon.size()).x() - polygon.at(i).x();
+            double a2y = polygon.at((i+1)%polygon.size()).y() - polygon.at(i).y();
+
+            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 170 * M_PI / 180.0) {
+
+                polygon.erase(polygon.begin() + (i + 1) % polygon.size());
+                polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+
+                // 点が2つ減ったのでもう一度同じ点から見直す
+                if ((i+1)%polygon.size() == 0) {
+                    i = i - 3;
+                } else if ((i+2)%polygon.size() == 0){
+                    i = i - 2;
+                } else {
+                    i--;
+                }
+
+            } else {
+
+                double inter_x = polygon.at(i).x() + a2x * S1 / (S1 + S2);
+                double inter_y = polygon.at(i).y() + a2y * S1 / (S1 + S2);
+
+                // 短い辺をはさむ2点を交点に置き換える
+                polygon.at((i+1)%polygon.size()) = point_t(inter_x, inter_y);
+                polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+
+                // 点が1つ減ったのでもう一度同じ点から見直す
+                if ((i+2)%polygon.size() < i) {
+                    i = i - 2;
+                } else {
+                    i--;
+                }
+            }
+
+        } else if (acos((x * deg_x + y * deg_y) / (hypot(x, y) * hypot(deg_x, deg_y))) * 180 / M_PI < 2) {
+
+            // ほぼ平らな２辺は１本に
+            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+            i--;
+        }
+    }
+    polygon.push_back(polygon.at(0));
+
+    return vertex;
+}
+
+polygon_i ImageRecognition::placeGrid(polygon_t vertex)
+{
+    // 辺の長さでの２分探索
+    struct {
+        int operator() (const std::vector<std::pair<point_i, double>> &tab, const int &start, const int &end, const double &target)
+        {
+            if (start > end) return -1;
+
+            int middle = (start + end) * 0.5;
+
+            if (fabs(tab.at(middle).second - target) <= 0.2) return middle;
+
+            int p;
+            if (tab.at(middle).second - target > 0.2) p = (*this)(tab, start, middle-1, target);
+            else if (tab.at(middle).second - target < -0.2) p = (*this)(tab, middle+1, end, target);
+
+            return p;
+        }
+    } binarySearch;
+
+    vertex = deleteMispoint(vertex);
+
+    // outer
+    auto& polygon = vertex.outer();
+
+    // ９０度の角を持つピースはそこを基準に計算
+    bool right_angle = false;
+
+    // polygonのid
+    id++;
+
+    bool frame = false;
+    if (id >= pieces_num - frame_num) {
+
+        right_angle = true;
+
+        frame = true;
+
+    } else {
+
+        // ９０度角を探す
+        for (unsigned int i=0; i<polygon.size()-1; i++) {
+
+            double vec[4];
+            vec[0] = polygon.at(i).x() - polygon.at(i+1).x();
+            vec[1] = polygon.at(i).y() - polygon.at(i+1).y();
+            vec[2] = polygon.at((i+2) % (polygon.size()-1)).x() - polygon.at(i+1).x();
+            vec[3] = polygon.at((i+2) % (polygon.size()-1)).y() - polygon.at(i+1).y();
+            double degree = acos((vec[0] * vec[2] + vec[1] * vec[3]) / (hypot(vec[0], vec[1]) * hypot(vec[2], vec[3])));
+
+            double hori = hypot(vec[2], vec[3]);
+
+            // 配列を循環
+            if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
+
+                // ９０度角でも傾いている場合を考慮
+                if (fabs(hori - round(hori)) < 0.1) {
+
+                    polygon.pop_back();
+                    polygon_t spin;
+                    for (unsigned int j = 0; j < polygon.size(); j++) {
+                        spin.outer().push_back(vertex.outer().at((j+i+1)%polygon.size()));
+                    }
+
+                    spin.outer().push_back(spin.outer().at(0));
+                    vertex = spin;
+
+                    right_angle = true;
+
+                    break;
+                }
+            }
+        }
+    }
+
+//    // ９０度がなかったら横になる辺か一番長い辺を最初に持ってくる
+//    if (!right_angle) {
+
+//        // 一番長い辺を探す
+//        double long_len = 0;
+
+//        unsigned int longgest = 0;
+//        unsigned int match;
+//        double error = 1;
+//        for (unsigned int i = 0; i < polygon.size()-1; i++) {
+//            double x = polygon.at(i+1).x() - polygon.at(i).x();
+//            double y = polygon.at(i+1).y() - polygon.at(i).y();
+//            double it_len = hypot(x, y);
+
+//            // もし、辺の長さが横軸のグリッドにのるなら、それを先頭に計算
+//            double grid_len = it_len;
+//            if (fabs(grid_len - round(grid_len)) < error) {
+//                error = fabs(grid_len - round(grid_len));
+//                match = i;
+//            } else if (long_len < it_len) {
+//                long_len = it_len;
+//                longgest = i;
+//            }
+//        }
+
+//        if (error < 0.03) {
+//            longgest = match;
+//            right_angle = true;
+//        }
+
+//        // 配列を循環
+//        if (longgest != 0) {
+//        vertex.outer().pop_back();
+//            polygon_t longer;
+//            for (unsigned int i = 0; i < polygon.size(); i++) {
+//                longer.outer().push_back(vertex.outer().at((i+longgest)%polygon.size()));
+//            }
+//            longer.outer().push_back(longer.outer().at(0));
+//            vertex = longer;
+//        }
+//    }
+
+    // 最初の辺の長さを計算
+    double first_x = polygon.at(1).x() - polygon.at(0).x();
+    double first_y = polygon.at(1).y() - polygon.at(0).y();
+    double len = hypot(first_x, first_y);
+    double to_ver_rad = std::atan2(first_y, first_x);
+    point_i smallest;
+
+    if (right_angle) {
+        smallest = point_i((int)round(len), 0);
+    } else {
+
+        // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
+        std::vector<point_i> first_point;
+
+        // ２分探索
+        int match = binarySearch(this->length_table, 0, this->length_table.size()-1, len);
+
+        // ２分探索から出た座標から距離のにているものをピックアップ
+        int shorter = match;
+        int longer = match + 1;
+        bool s_check = true;
+        bool l_check = true;
+        while (s_check || l_check) {
+
+            if (fabs(this->length_table.at(shorter).second - len) < 1.5) {
+                first_point.push_back(this->length_table.at(shorter).first);
+            } else {
+                s_check = false;
+            }
+
+            if (fabs(this->length_table.at(longer).second - len) < 1.5) {
+                first_point.push_back(this->length_table.at(longer).first);
+            } else {
+                l_check = false;
+            }
+
+            shorter--;
+            longer++;
+        }
+
+        // 可能性のあるものから全角の誤差が最も小さいものを確認
+        double smallest_dif = 100;
+
+        // 原点に平行移動
+        trans::translate_transformer<double,2,2> translate(-polygon.at(0).x(), -polygon.at(0).y());
+        polygon_t shift;
+        bg::transform(vertex, shift, translate);
+
+        for (auto pi : first_point) {
+
+            // 回転
+            double to_po_rad = std::atan2(pi.y() , pi.x());
+            trans::rotate_transformer<bg::radian,double,2,2> rad(to_ver_rad - to_po_rad);
+            polygon_t rotate;
+            bg::transform(shift, rotate, rad);
+
+            bool big_dif = false;
+
+            double dif = 0;
+            for (auto point : rotate.outer()) {
+//                double dif_x = fabs(point.x() - round(point.x()));
+//                double dif_y = fabs(point.y() - round(point.y()));
+//                if ((dif_x > 0.35) || (dif_y > 0.35)) big_dif = true;
+
+                double dif_len = fabs(hypot(point.x(),point.y()) - hypot(round(point.x()),round(point.y())));
+                dif += dif_len;
+            }
+
+//            for (unsigned int i=1; i<rotate.outer().size()-1; i++) {
+//                double x = rotate.outer().at(i+1).x() - rotate.outer().at(i).x();
+//                double y = rotate.outer().at(i+1).y() - rotate.outer().at(i).y();
+//                double dif_len = hypot(round(x), round(y)) - hypot(x,y);
+//                if (dif_len < 0) big_dif = false;
+//            }
+
+//            if (big_dif) continue;
+
+            if (smallest_dif > dif) {
+                smallest_dif = dif;
+                smallest = pi;
+            }
+        }
+    }
+
+    // 最終的な回転角度を算出
+    double theta;
+    if (frame) {
+        theta = frame_rad;
+    } else {
+        theta = to_ver_rad - std::atan2(smallest.y(), smallest.x());
+    }
+
+    // グリッドの点番号で保存
+    polygon_i grid_piece;
+
+    // 全ての点を回転後のいちに移動
+    polygon_t shift;
+    polygon_t to_grid;
+    trans::translate_transformer<double,2,2> translate(-vertex.outer().at(0).x(), -vertex.outer().at(0).y());
+    bg::transform(vertex, shift, translate);
+    trans::rotate_transformer<bg::radian,double,2,2> rad(theta);
+    bg::transform(shift, to_grid, rad);
+
+    for (auto po : to_grid.outer()) {
+        grid_piece.outer().push_back(point_i(round(po.x()), round(po.y())));
+    }
+
+//    for (unsigned int i=0; i<polygon.size(); i++) {
+//        double x = polygon.at(i).x() - polygon.at(0).x();
+//        double y = polygon.at(i).y() - polygon.at(0).y();
+//        double move_x = x * cos(theta) - y * sin(theta);
+//        double move_y = x * sin(theta) + y * cos(theta);
+//        grid_piece.outer().push_back(point_i(round(move_x), round(move_y)));
+//    }
+
+    return grid_piece;
+}
+
+double ImageRecognition::getError(std::vector<polygon_i> p)
+{
+    double piece_area = 0;
+
+    for (unsigned int i=0; i<p.size()-1; i++) {
+        for (unsigned int j=0; j<p[i].outer().size()-1; j++) {
+            auto point1 = p[i].outer().at(j);
+            auto point2 = p[i].outer().at(j+1);
+            piece_area += point1.x() * point2.y() - point1.y() * point2.x();
+        }
+    }
+
+    piece_area = fabs(piece_area);
+
+    double frame_area = 0;
+
+    for (unsigned int j=0; j<p[p.size()-1].outer().size()-1; j++) {
+        auto point1 = p[p.size()-1].outer().at(j);
+        auto point2 = p[p.size()-1].outer().at(j+1);
+        frame_area += point1.x() * point2.y() - point1.y() * point2.x();
+    }
+
+    frame_area = fabs(frame_area);
+
+    double error = (frame_area - piece_area) * 0.5;
+
+    return error;
+}
+procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
+{
+    procon::NeoField field;
+
+    std::vector<procon::NeoExpandedPolygon> neo_pieces;
+
+    for (unsigned int i=0; i<pieces.size() - (unsigned int)frame_num; i++) {
+        procon::NeoExpandedPolygon polygon(i);
+        polygon.resetPolygonForce(pieces[i]);
+        neo_pieces.push_back(polygon);
+
+//        field.setPiece(polygon);
+    }
+
+    field.setElementaryPieces(neo_pieces);
+
+    std::vector<procon::NeoExpandedPolygon> neo_frame;
+
+    for (int i=0; i<frame_num; i++) {
+
+        int smallest_x = 0;
+        int smallest_y = 0;
+        auto& outer = pieces[pieces.size() - 1 - i].outer();
+
+        for (unsigned int j=0; j<outer.size(); j++) {
+            if (smallest_x > outer.at(j).x()) smallest_x = outer.at(j).x();
+            if (smallest_y > outer.at(j).y()) smallest_y = outer.at(j).y();
+        }
+
+        for (unsigned int j=0; j<outer.size(); j++) {
+            outer.at(j) = point_i(outer.at(j).x() - smallest_x, outer.at(j).y() - smallest_y);
+        }
+
+        procon::NeoExpandedPolygon polygon;
+        polygon.resetPolygonForce(pieces[pieces.size() - 1 - i]);
+        neo_frame.push_back(polygon);
+    }
+
+    field.setElementaryFrame(neo_frame);
+
+    return field;
+}
+
+std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
+{
+    std::vector<procon::ExpandedPolygon> polygons;
+
+    std::copy(position.begin(), position.end(), std::back_inserter(polygons));
+
+    trans::rotate_transformer<bg::degree,double,2,2> deg(90);
+
+    for (auto& polygon : polygons) {
+        polygon_t p = polygon.getPolygon();
+        for (auto& point : p.outer()) {
+            point = point_t(-point.x(), point.y());
+        }
+        bg::correct(p);
+        polygon_t r;
+        bg::transform(p, r, deg);
+        polygon.resetPolygonForce(r);
+    }
+
+    return polygons;
+}
+
+void ImageRecognition::makeTable()
+{
+    struct {
+        bool operator() (const std::pair<point_i, double> &First, const std::pair<point_i, double> &Second)
+        {
+            return First.second < Second.second;
+        }
+    } waySort;
+
+    // 配列をクリーン
+    length_table.clear();
+
+    for (int x_count = 0; x_count < 101; ++x_count) {
+        for (int y_count = 0; y_count < 65; ++y_count) {
+            this->length_table.push_back(std::make_pair(point_i(x_count,y_count),static_cast<double>(hypot(x_count, y_count))));
+        }
+    }
+
+    // sort
+    std::sort(this->length_table.begin(), this->length_table.end(), waySort);
+
+    return;
+}
+
+std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
+{
+    std::vector<cv::Mat> piece_images;
+
+    std::vector<procon::ExpandedPolygon> polygons = position;
+
+    int i = 0;
+
+    for (auto polygon : polygons) {
+
+        bg::model::box<bg::model::d2::point_xy<double>> box;
+        bg::envelope(polygon.getPolygon(), box);
+
+        cv::Mat image(pieces_image, cv::Rect(box.min_corner().x()-margin, box.min_corner().y()-margin, box.max_corner().x()-box.min_corner().x()+margin*2, box.max_corner().y()-box.min_corner().y()+margin*2));
+        piece_images.push_back(image);
+
+        cv::namedWindow(std::to_string(i));
+        cv::imshow(std::to_string(i), image);
+        i++;
+    }
+
+    return piece_images;
+}
+
+std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
+{
+    std::vector<procon::ExpandedPolygon> polygons = position;
+    std::vector<procon::ExpandedPolygon> trans_polygon;
+
+    for (auto polygon : polygons) {
+
+        bg::model::box<bg::model::d2::point_xy<double>> box;
+        bg::envelope(polygon.getPolygon(), box);
+
+        bg::strategy::transform::translate_transformer<double, 2, 2> translate(-box.min_corner().x()+margin, -box.min_corner().y()+margin);
+        polygon_t result;
+        bg::transform(polygon.getPolygon(), result, translate);
+        procon::ExpandedPolygon set_pol;
+        set_pol.resetPolygonForce(result);
+        trans_polygon.push_back(set_pol);
+    }
+
+    return trans_polygon;
+}
+
+polygon_t ImageRecognition::expandPolygon(polygon_t polygon, double dxy)
+{
+    auto calculateIntersection = [](std::array<point_t,2> line_a,std::array<point_t,2> line_b){
+        // y = slope_a * x + segment_a
+        double dy_a = line_a[1].y() - line_a[0].y();
+        double dx_a = line_a[1].x() - line_a[0].x();
+
+        double slope_a = dy_a / dx_a;
+        double segment_a = line_a[0].y() - line_a[0].x() * slope_a;
+
+        double dy_b = line_b[1].y() - line_b[0].y();
+        double dx_b = line_b[1].x() - line_b[0].x();
+
+        double slope_b = dy_b / dx_b;
+        double segment_b = line_b[0].y() - line_b[0].x() * slope_b;
+
+        double x = ( segment_b - segment_a ) / ( slope_a - slope_b );
+        double y = slope_b * x + segment_b;
+
+        return point_t(x,y);
+    };
+
+    auto parallel_displacement = [](point_t t,double dx,double dy){
+        return point_t(t.x() + dx,t.y() + dy);
+    };
+
+    /*
+     *            ^
+     *            |
+     * 　　　　　　 |
+     * cross  　+ |   cross -
+     * 　　　　　　 |
+     * 　　　　　　 |
+     * 　　　　　　 |
+     *
+     */
+    auto calcuateCrossProduct = [](std::array<point_t,2> vec_a,std::array<point_t,2> vec_b){
+        double dx_a = vec_a[1].x() - vec_a[0].x();
+        double dy_a = vec_a[1].y() - vec_a[0].y();
+
+        double dx_b = vec_b[1].x() - vec_b[0].x();
+        double dy_b = vec_b[1].y() - vec_b[0].y();
+
+        return dx_a * dy_b - dy_a * dx_b;
+    };
+
+    auto calcuateMidPoint = [](std::array<point_t,2> vec){
+        double dx = vec[1].x() - vec[0].x();
+        double dy = vec[1].y() - vec[0].y();
+
+        double x = vec[0].x() + dx / 2;
+        double y = vec[0].y() + dy / 2;
+
+        return point_t(x,y);
+    };
+
+    auto another_point = [&](std::array<point_t,2> vec){
+        auto calcAngle = [](std::array<point_t,2> vec){
+            double dx = vec[1].x() - vec[0].x();
+            double dy = vec[1].y() - vec[0].y();
+
+            return std::atan2(dy,dx);
+        };
+
+        //外積検証時のyの移動量
+        const double dy = 5.0;
+
+
+        point_t n_point = parallel_displacement(vec[1],0,dy);
+
+        std::array<point_t,2> first_vec = { vec[0],vec[1] };
+        std::array<point_t,2> second_vec = { vec[0],n_point };
+
+        double cross = calcuateCrossProduct(first_vec,second_vec);
+
+//        std::cout << cross << "cross" << std::endl;
+
+        if(cross < 0 ){
+            return -1;
+        }else if(cross > 0){
+            return 1;
+        }else if(cross == 0){
+            return 0;
+        }
+    };
+
+    auto calcuateAngle = [](std::array<point_t,2> vec){
+
+        double dx = vec[1].x() - vec[0].x();
+        double dy = vec[1].y() - vec[0].y();
+
+        std::complex<double> angle_vec(dx,dy);
+
+        double angle = std::arg(angle_vec);
+
+        if(dy < 0){
+            angle = 2 * M_PI + angle;
+        }
+
+        return angle;
+
+    };
+
+    auto calcuateAnotherPoint = [&](std::array<point_t,2> vec,double d){
+
+        double angle = calcuateAngle(vec);
+        double sin_value = std::sin(angle);
+        double cos_value = std::cos(angle);
+
+        double dx = 0;
+        double dy = 0;
+
+        if(sin_value >= 0){
+            dx = -1;
+        }else{
+            dx = 1;
+        }
+
+        if(cos_value >= 0){
+            dy = 1;
+        }else{
+            dy = -1;
+        }
+
+        dx = dx * d * std::abs(cos_value);
+        dy = dy * d * std::abs(sin_value);
+
+        std::array<point_t,2> new_vec = {
+                                            point_t(vec[0].x() + dx,vec[0].y() + dy),
+                                            point_t(vec[1].x() + dx,vec[1].y() + dy)
+                                        };
+
+        return new_vec;
+
+    };
+
+
+
+    std::array<point_t,2> pw = { point_t(0,0),point_t(-1,-1) };
+
+    std::array<point_t,2> pew = calcuateAnotherPoint(pw,dxy);
+
+    auto print_array_point = [&](std::array<point_t,2> print_array){
+          std::cout << print_array[0].x() << "," << print_array[0].y() << ","
+                    << print_array[1].x() << "," << print_array[1].y() << std::endl;
+    };
+
+    print_array_point(pw);
+    print_array_point(pew);
+
+    std::vector<std::pair<point_t,point_t>> points;
+
+    points.push_back(std::make_pair(polygon.outer().at(polygon.outer().size() - 2),polygon.outer().at(polygon.outer().size() - 1)));
+
+    for(int point_index = 0; point_index < polygon.outer().size() - 1; ++point_index){
+        points.push_back(std::make_pair(polygon.outer().at(point_index),polygon.outer().at(point_index + 1)));
+    }
+
+    polygon_t new_polygon;
+
+    for(int index = 0; index < points.size() - 1; ++index){
+
+        std::array<point_t,2> vec_a = { points[index].first,points[index].second };
+        std::array<point_t,2> vec_b = { points[index + 1].first,points[index + 1].second };
+
+        point_t point = calculateIntersection(calcuateAnotherPoint(vec_a,dxy),calcuateAnotherPoint(vec_b,dxy));
+
+        new_polygon.outer().push_back(point);
+    }
+
+    new_polygon.outer().push_back(new_polygon.outer()[0]);
+
+//    PolygonViewer::getInstance().pushPolygon();
+
+//    std::cout << calculateIntersection(vec1,vec2).x() << "," << calculateIntersection(vec1,vec2).y() << std::endl;
+
+    return new_polygon;
+
 }
 
 polygon_i ImageRecognition::placeGridByAsazuma(polygon_t vertex)
@@ -1078,135 +1642,4 @@ polygon_i ImageRecognition::placeGridByAsazuma(polygon_t vertex)
     } else {
         return rotated_vertex;
     }
-}
-
-procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
-{
-    procon::NeoField field;
-
-    std::vector<procon::NeoExpandedPolygon> neo_pieces;
-
-    for (unsigned int i=0; i<pieces.size() - (unsigned int)frame_num; i++) {
-        procon::NeoExpandedPolygon polygon(i);
-        polygon.resetPolygonForce(pieces[i]);
-        neo_pieces.push_back(polygon);
-
-//        field.setPiece(polygon);
-    }
-
-    field.setElementaryPieces(neo_pieces);
-
-    std::vector<procon::NeoExpandedPolygon> neo_frame;
-
-    for (int i=0; i<frame_num; i++) {
-
-        int smallest_x = 0;
-        int smallest_y = 0;
-        auto& outer = pieces[pieces.size() - 1 - i].outer();
-
-        for (unsigned int j=0; j<outer.size(); j++) {
-            if (smallest_x > outer.at(j).x()) smallest_x = outer.at(j).x();
-            if (smallest_y > outer.at(j).y()) smallest_y = outer.at(j).y();
-        }
-
-        for (unsigned int j=0; j<outer.size(); j++) {
-            outer.at(j) = point_i(outer.at(j).x() - smallest_x, outer.at(j).y() - smallest_y);
-        }
-
-        procon::NeoExpandedPolygon polygon;
-        polygon.resetPolygonForce(pieces[pieces.size() - 1 - i]);
-        neo_frame.push_back(polygon);
-    }
-
-    field.setElementaryFrame(neo_frame);
-
-    return field;
-}
-
-std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonPosition()
-{
-    std::vector<procon::ExpandedPolygon> polygons;
-
-    std::copy(position.begin(), position.end(), std::back_inserter(polygons));
-
-    trans::rotate_transformer<bg::degree,double,2,2> deg(90);
-
-    for (auto& polygon : polygons) {
-        polygon_t p = polygon.getPolygon();
-        for (auto& point : p.outer()) {
-            point = point_t(-point.x(), point.y());
-        }
-        bg::correct(p);
-        polygon_t r;
-        bg::transform(p, r, deg);
-        polygon.resetPolygonForce(r);
-    }
-
-    return polygons;
-}
-
-void ImageRecognition::makeTable()
-{
-    struct {
-        bool operator() (const std::pair<point_i, double> &First, const std::pair<point_i, double> &Second)
-        {
-            return First.second < Second.second;
-        }
-    } waySort;
-
-    for (int x_count = 0; x_count < 101; ++x_count) {
-        for (int y_count = 0; y_count < 65; ++y_count) {
-            this->length_table.push_back(std::make_pair(point_i(x_count,y_count),static_cast<double>(hypot(x_count, y_count))));
-        }
-    }
-
-    // sort
-    std::sort(this->length_table.begin(), this->length_table.end(), waySort);
-
-    return;
-}
-
-std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
-{
-    std::vector<cv::Mat> piece_images;
-
-    std::vector<procon::ExpandedPolygon> polygons = position;
-
-    int i = 0;
-
-    for (auto polygon : polygons) {
-
-        bg::model::box<bg::model::d2::point_xy<double>> box;
-        bg::envelope(polygon.getPolygon(), box);
-
-        cv::Mat image(pieces_image, cv::Rect(box.min_corner().x()-margin, box.min_corner().y()-margin, box.max_corner().x()-box.min_corner().x()+margin*2, box.max_corner().y()-box.min_corner().y()+margin*2));
-        piece_images.push_back(image);
-
-        cv::namedWindow(std::to_string(i));
-        cv::imshow(std::to_string(i), image);
-        i++;
-    }
-
-    return piece_images;
-}
-
-std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
-{
-    std::vector<procon::ExpandedPolygon> polygons = position;
-    std::vector<procon::ExpandedPolygon> trans_polygon;
-
-    for (auto polygon : polygons) {
-
-        bg::model::box<bg::model::d2::point_xy<double>> box;
-        bg::envelope(polygon.getPolygon(), box);
-
-        bg::strategy::transform::translate_transformer<double, 2, 2> translate(-box.min_corner().x()+margin, -box.min_corner().y()+margin);
-        polygon_t result;
-        bg::transform(polygon.getPolygon(), result, translate);
-        procon::ExpandedPolygon set_pol;
-        set_pol.resetPolygonForce(result);
-        trans_polygon.push_back(set_pol);
-    }
-
-    return trans_polygon;
 }
