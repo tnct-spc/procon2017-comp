@@ -17,8 +17,8 @@ void MyGraphicsView::setPolygon(polygon_t polygon){
     bg::correct(polygon);
     this->polygon = polygon;
     points.clear();
-    for(int i = 0 ; i<polygon.outer().size()-1;i++){
-        QPointF point(polygon.outer()[i].x(),polygon.outer()[i].y());
+    for(int i = 0 ; i<polygon.outer().size() - 1;i++){
+        QPointF point(polygon.outer()[i].x() * magnification , polygon.outer()[i].y() * magnification);
         points.push_back(point);
     }
     this->update();
@@ -37,10 +37,10 @@ QPointF MyGraphicsView::toPolygonPoint(double window_x, double window_y){
     return point;
 }
 
-QPointF MyGraphicsView::toWindowPoint(QPointF point){
+QPoint MyGraphicsView::toWindowPoint(QPointF point){
     int x_buf = grid_size * point.x() - std::floor(minXY.first) + left_right_margin;
     int y_buf = grid_size * point.y() - std::floor(minXY.second) + top_buttom_margin;
-    return QPointF(x_buf,y_buf);
+    return QPoint(x_buf,y_buf);
 }
 
 
@@ -62,7 +62,7 @@ void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
     points[move_index] = toPolygonPoint(event->x(),event->y());
     polygon_t changed_polygon;
     for(QPointF i : points){
-        changed_polygon.outer().push_back(point_t(i.x(),i.y()));
+        changed_polygon.outer().push_back(point_t(i.x() / magnification , i.y() / magnification));
     }
     setPolygon(changed_polygon);
     this->update();
@@ -70,8 +70,6 @@ void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
 
 void MyGraphicsView::paintEvent(QPaintEvent *event)
 {
-
-
     int window_width = this->width();
     int window_height = this->height();
 
@@ -100,11 +98,15 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     cv::cvtColor(image, buf_mat, CV_RGB2BGR);
     QImage qimage((uchar *)buf_mat.data, buf_mat.cols, buf_mat.rows,(int)buf_mat.step, QImage::Format_RGB888);
     QRect image_rect(QPoint(left_right_margin,top_buttom_margin),
-                     QPoint(left_right_margin + grid_size * grid_col , top_buttom_margin + grid_size * grid_row));
+                            toWindowPoint(QPointF(
+                                minmaxX.second->x() + photo_margin * magnification ,
+                                minmaxY.second->y() + photo_margin * magnification
+                            )
+                     ));
     painter.drawImage(image_rect,qimage);
 
     //polygon表示
-    QVector<QPointF> window_points;
+    QVector<QPoint> window_points;
     for(QPointF i : points){
         window_points.push_back(toWindowPoint(i));
     }

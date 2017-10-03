@@ -25,10 +25,12 @@ public:
 
 private:
     QPointF toPolygonPoint(double window_x,double window_y);
-    QPointF toWindowPoint(QPointF point);
+    QPoint toWindowPoint(QPointF point);
 
     Ui::MyGraphicsView *ui;
 
+    const double magnification = 0.1;
+    const int photo_margin = 10; //単位はpixel
     cv::Mat image;
     polygon_t polygon;
     std::vector<QPointF> points;
