@@ -20,6 +20,20 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     std::vector<cv::Mat> frame_image = dividePiece(raw_frame_image);
     std::vector<cv::Mat> pieces_images = dividePiece(raw_pieces_image);
 
+    polygon_t test_polygon;
+
+    boost::geometry::exterior_ring(test_polygon) = boost::assign::list_of<point_t>(0,0)(5,0)(5,5)(0,5)(0,0);
+
+    procon::ExpandedPolygon a,b,c;
+    a.resetPolygonForce(test_polygon);
+    b.resetPolygonForce(expandPolygon(test_polygon,-1.0));
+    c.resetPolygonForce(expandPolygon(test_polygon,1.0));
+
+    PolygonViewer::getInstance().pushPolygon(a,"hgoehoge");
+    PolygonViewer::getInstance().pushPolygon(b,"hogehoge");
+    PolygonViewer::getInstance().pushPolygon(c,"hogehoge");
+
+
     /*
     for (unsigned int i = 0; i < pieces_images.size(); i++) {
         cv::namedWindow("piece" + std::to_string(i));
@@ -40,7 +54,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     procon::ExpandedPolygon frame;
     frame.resetPolygonForce(polygons[0]);
-    PolygonViewer::getInstance().pushPolygon(frame, "frame");
+//    PolygonViewer::getInstance().pushPolygon(frame, "frame");
 
     // フレームの回転角を計算
     for (unsigned int i=0; i<polygons.at(0).outer().size()-1; i++) {
@@ -109,7 +123,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        }
 //        std::cout << endl;
 
-        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+//        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
 //    // sum polygon_t and piece's image
@@ -158,6 +172,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         }
     }
 
+    for(auto p : polygons){
+        procon::ExpandedPolygon polygon;
+        polygon.resetPolygonForce(p);
+
+//        PolygonViewer::getInstance().pushPolygon(polygon,"hogehoge");
+    }
+
     makeTable();
 
     // Gridに乗せる
@@ -167,7 +188,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (unsigned int i=0; i<polygons.size(); i++) {
         pieces.push_back(placeGrid(polygons[i]));
 
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
+//        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
