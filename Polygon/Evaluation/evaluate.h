@@ -13,6 +13,7 @@ public:
     int piece_index = -1;
     int fields_index = -1;
     bool is_inversed = false;
+    int pieses_size = -1;
 };
 
 #endif // EVALUATE_H

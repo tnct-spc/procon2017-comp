@@ -347,32 +347,28 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 field_buf.setFrame(frames_buf);
 
-                //check hint_conflict and set hints
-                bool check_hint = field_buf.check_hint();
-                if(check_hint) {
-                    //deplicacte flag
-                    bool flag = false;
+                //deplicacte flag
+                bool flag = false;
 
-                    //check field is ok
-                    {
-                        const std::string now_hash = hashField(field_buf);
-                        std::lock_guard<decltype(mtx)> lock(mtx);
-                        std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
-                            if(!flag){
-                                if(now_hash == hashField(f)){
-                                    flag = true;
-                                }
+                //check field is ok
+                {
+                    const std::string now_hash = hashField(field_buf);
+                    std::lock_guard<decltype(mtx)> lock(mtx);
+                    std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
+                        if(!flag){
+                            if(now_hash == hashField(f)){
+                                flag = true;
                             }
-                        });
-                    }
+                        }
+                    });
+                }
 
-                    if(!flag){
-                        if(!this->checkCanPrune(field_buf)){
-                            {
-                                std::lock_guard<decltype(mtx)> lock(mtx);
-                                field_buf.evaluate_cache.push_back(eval);
-                                next_field.push_back(field_buf);
-                            }
+                if(!flag){
+                    if(!this->checkCanPrune(field_buf)){
+                        {
+                            std::lock_guard<decltype(mtx)> lock(mtx);
+                            field_buf.evaluate_cache.push_back(eval);
+                            next_field.push_back(field_buf);
                         }
                     }
                 }
@@ -392,10 +388,15 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
         }
     };
 
-
-    std::sort(evaluations.begin(),evaluations.end(),[](Evaluate l,Evaluate r){
-        return l.score < r.score;
-    });
+    if(mode_with_hint) {
+        std::sort(evaluations.begin(),evaluations.end(),[](Evaluate l,Evaluate r){
+            return (l.pieses_size != r.pieses_size) ? (l.pieses_size < r.pieses_size) : (l.score < r.score);
+        });
+    } else {
+        std::sort(evaluations.begin(),evaluations.end(),[](Evaluate l,Evaluate r){
+            return l.score < r.score;
+        });
+    }
 
     std::vector<std::thread> threads(cpu_num);
     for(auto& th : threads){
@@ -912,6 +913,7 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
                     ev_buf.frame_index = frame_index;
                     ev_buf.piece_index = piece_index;
                     ev_buf.is_inversed = false;
+                    ev_buf.pieses_size = field.getPiecesSize();
 
                     {
                         std::lock_guard<decltype(mtx)> lock(mtx);
@@ -928,6 +930,7 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
                     ev_buf.frame_index = frame_index;
                     ev_buf.piece_index = piece_index;
                     ev_buf.is_inversed = true;
+                    ev_buf.pieses_size = field.getPiecesSize();
 
                     {
                         std::lock_guard<decltype(mtx)> lock(mtx);
@@ -941,13 +944,13 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
     };
 
 
-    int global_field_index = 0;
+    unsigned int global_field_index = 0;
 
     auto evaluateNextState = [&](){
         while(true){
 
             procon::NeoField field_buf;
-            int now_field_index = 0;
+            unsigned int now_field_index = 0;
 
             {
                 std::lock_guard<decltype(mtx)> lock(mtx);
@@ -964,11 +967,24 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
                 ++global_field_index;
             }
 
-            for (int piece_index = 0; piece_index < field_buf.getElementaryPieces().size(); ++piece_index) {
-                //すでに置いてあったら評価しません
-                if(field_buf.getIsPlaced().at(piece_index)) continue;
+            //check hint_conflict and set hints
+            bool check_hint = (mode_with_hint) ? field_buf.check_hint() : true;
+            if(check_hint) {
+                for (unsigned int piece_index = 0; piece_index < field_buf.getElementaryPieces().size(); ++piece_index) {
+                    //すでに置いてあったら評価しません
+                    if(field_buf.getIsPlaced().at(piece_index)) continue;
 
-                evaluateWrapper(field_buf,piece_index,now_field_index);
+                    bool piece_is_hint = false;
+                    for(const auto &hint : field_buf.getElementaryFrameInnerPices()) {
+                        if(hint.getId() == field_buf.getElementaryPieces().at(piece_index).getId()) {
+                            piece_is_hint = true;
+                            break;
+                        }
+                    }
+                    if(piece_is_hint) continue;
+
+                    evaluateWrapper(field_buf, static_cast<int>(piece_index), static_cast<int>(now_field_index));
+                }
             }
         }
     };
@@ -994,6 +1010,50 @@ void BeamSearch::init()
     logger->info("efficient mode");
 #endif
 }
+
+void BeamSearch::goState(std::vector<procon::NeoField> &now_state, int piece_num, procon::NeoField &field)
+{
+    std::vector<Evaluate> ev;
+
+    logger->info("next step start");
+
+    evaluateNextState(now_state,ev);
+
+    logger->info("evaluating field process has finished");
+
+    makeNextState(now_state,ev);
+
+    logger->info("making field process has finished");
+
+    std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() - field.getPieces().size() << " (hint:" << field.getElementaryFrameInnerPices().size() << ")" << std::endl;
+    std::cout << "evaluated state size:" << ev.size() << std::endl;
+    std::cout << "field size:" << now_state.size() << std::endl;
+
+    //vectorのメモリ解放って頭悪くね？
+    std::vector<Evaluate>().swap(ev);
+
+//        for(auto& f : now_state){
+//            delete_deplicate_point(f);
+//        }
+
+    bool flag = false;
+    for(auto const& _field : now_state){
+        dock->addAnswer(_field);
+        if(!flag){
+            submitAnswer(_field);
+            flag = true;
+        }
+    }
+
+    if(flag){
+        last_fields.clear();
+        std::copy(now_state.begin(),now_state.end(),std::back_inserter(last_fields));
+    }
+//        if(piece_num == 4){
+//            break;
+//        }
+}
+
 void BeamSearch::run(procon::NeoField field)
 {
     logger->info("beamsearch run");
@@ -1054,49 +1114,17 @@ void BeamSearch::run(procon::NeoField field)
 #ifdef DEBUG_MODE
 //    delete_deplicate_point(field);
 #endif
+
+    bool check_hint = (mode_with_hint) ? field.check_hint() : true;
+    if(!check_hint) logger->info("!!!!WARNING!!!! Hint is broken!?");
+    dock->addAnswer(field);
+
     state.push_back(field);
 
 //    ev.resize(2000000);
-    for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size()); ++piece_num) {
-        std::vector<Evaluate> ev;
-
-        logger->info("next step start");
-
-        evaluateNextState(state,ev);
-
-        logger->info("evaluating field process has finished");
-
-        makeNextState(state,ev);
-
-        logger->info("making field process has finished");
-
-        std::cout << "now" << (piece_num + 1) << "/" << field.getElementaryPieces().size() - field.getPieces().size() << std::endl;
-        std::cout << "evaluated state size:" << ev.size() << std::endl;
-        std::cout << "field size:" << state.size() << std::endl;
-
-        //vectorのメモリ解放って頭悪くね？
-        std::vector<Evaluate>().swap(ev);
-
-//        for(auto& f : state){
-//            delete_deplicate_point(f);
-//        }
-
-        bool flag = false;
-        for(auto const& _field : state){
-            dock->addAnswer(_field);
-            if(!flag){
-                submitAnswer(_field);
-                flag = true;
-            }
-        }
-
-        if(flag){
-            last_fields.clear();
-            std::copy(state.begin(),state.end(),std::back_inserter(last_fields));
-        }
-//        if(piece_num == 4){
-//            break;
-//        }
+    unsigned long int minus = (mode_with_hint) ? field.getElementaryFrameInnerPices().size() : 0;
+    for (int piece_num = 0; piece_num < static_cast<int>(field.getElementaryPieces().size() - minus); ++piece_num) {
+        goState(state, piece_num, field);
     }
 
     end = std::chrono::system_clock::now();
@@ -1143,41 +1171,7 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
 
 //    ev.resize(2000000);
     for (int piece_num = 0; piece_num < static_cast<int>(next_field.getElementaryPieces().size() - next_field.getPieces().size()); ++piece_num) {
-        std::vector<Evaluate> ev;
-
-        logger->info("next step start");
-
-        evaluateNextState(state,ev);
-
-        logger->info("evaluating field process has finished");
-
-        makeNextState(state,ev);
-
-        logger->info("making field process has finished");
-
-        std::cout << "now" << (piece_num + 1) << "/" << next_field.getElementaryPieces().size() << std::endl;
-        std::cout << "evaluated state size:" << ev.size() << std::endl;
-        std::cout << "field size:" << state.size() << std::endl;
-
-        //vectorのメモリ解放って頭悪くね？
-        std::vector<Evaluate>().swap(ev);
-
-        bool flag = false;
-        for(auto const& _field : state){
-            neo->addAnswer(_field);
-            if(!flag){
-                submitAnswer(_field);
-                flag = true;
-            }
-        }
-
-        if(flag){
-            last_fields.clear();
-            std::copy(state.begin(),state.end(),std::back_inserter(last_fields));
-        }
-//        if(piece_num == 4){
-//            break;
-//        }
+        goState(state, piece_num, next_field);
     }
 
     if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){

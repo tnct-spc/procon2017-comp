@@ -112,6 +112,7 @@ void Kunugida::run()
 
         std::vector<procon::NeoExpandedPolygon> pieces;
         procon::NeoExpandedPolygon frame;
+        std::vector<procon::NeoExpandedPolygon> hints;
 
         int id = 0;
         for(auto& piece : pieces_){
@@ -122,11 +123,16 @@ void Kunugida::run()
             //break;
 
         }
+        for(auto& piece : pieces) {
+            int rnd = PbMaker->retRnd(100);
+            if(50 <= rnd) hints.push_back(piece);
+        }
         frame.resetPolygonForce(frame_);
         std::vector<procon::NeoExpandedPolygon> vec_frame;
         vec_frame.push_back(frame);
         field.setElementaryFrame(vec_frame);
         field.setElementaryPieces(pieces);
+        field.setElementaryFrameInnerPieces(hints);
 
         int scanned_dummy_piece_id = 0;
         std::vector<procon::ExpandedPolygon> scanned_dummy_piece;

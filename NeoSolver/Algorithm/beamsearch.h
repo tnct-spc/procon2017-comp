@@ -43,6 +43,8 @@ public:
 
     static std::string hashField(const procon::NeoField& field);
 
+    void goState(std::vector<procon::NeoField> &now_state, int piece_num, procon::NeoField &field);
+
 private:
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;
@@ -51,7 +53,8 @@ private:
     std::vector<procon::NeoField> last_fields;
 
     unsigned int cpu_num = 0;
-    unsigned int beam_width = 200;
+    unsigned int beam_width = 1;
+    bool mode_with_hint = false; //ヒントモード
 
 private slots:
     void tryNextBeamSearch(procon::NeoField next_field);
