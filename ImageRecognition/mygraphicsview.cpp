@@ -61,7 +61,13 @@ void MyGraphicsView::mousePressEvent(QMouseEvent *event){
             move_index = is_in_tolerance;
         }
     }else if(event->button() == Qt::MouseButton::RightButton){
-        inOutPoint(event->x(),event->y());
+        QPointF selected_point = toPolygonPoint(event->x(),event->y());
+        int is_in_tolerance = isInTolerance(selected_point);
+        if(is_in_tolerance == -1){
+            insertPoint(event->x(),event->y());
+        }else{
+            inOutPoint(event->x(),event->y());
+        }
     }
 }
 
@@ -94,6 +100,10 @@ void MyGraphicsView::inOutPoint(int x,int y)
     }
     setPolygon(changed_polygon);
     this->update();
+}
+
+void MyGraphicsView::insertPoint(int x, int y){
+    std::cout<<"hello insert"<<std::endl;
 }
 
 void MyGraphicsView::paintEvent(QPaintEvent *event)
