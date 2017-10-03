@@ -225,14 +225,14 @@ void Kunugida::run()
         field = NeoPolygonIO::importField("../../procon2017-comp/sample/comp-sample.csv");
         //dummy
         std::vector<procon::ExpandedPolygon> scanned_poly;
-        for(const auto& p : field.getElementaryPieces()){
+        for(const auto& piece : field.getElementaryPieces()){
             polygon_t poly_buf;
 
-            for(const auto& p : p.getPolygon().outer()){
+            for(const auto& p : piece.getPolygon().outer()){
                 poly_buf.outer().push_back(point_t(p.x(),p.y()));
             }
 
-            procon::ExpandedPolygon exp_buf(p.getId());
+            procon::ExpandedPolygon exp_buf(piece.getId());
             exp_buf.resetPolygonForce(poly_buf);
             scanned_poly.push_back(exp_buf);
         }
