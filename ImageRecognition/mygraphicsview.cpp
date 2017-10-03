@@ -77,28 +77,30 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
 
     const int grid_margin = 4;
 
-    QPainter painter(this);
-
-    cv::Mat buf_mat;
-    cv::cvtColor(image, buf_mat, CV_RGB2BGR);
-    QImage qimage((uchar *)buf_mat.data, buf_mat.cols, buf_mat.rows,(int)buf_mat.step, QImage::Format_RGB888);
-
-    painter.drawImage(QPoint(0,0),qimage);
-
     auto minmaxX = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.x() < b.x(); });
     auto minmaxY = std::minmax_element(points.begin(),points.end(), [](QPointF a,QPointF b){ return a.y() < b.y(); });
 
     minXY.first = minmaxX.first->x();
     minXY.second = minmaxY.first->y();
 
-    int grid_col = std::ceil(minmaxX.second->x() - minmaxX.first->x());
-    int grid_row = std::ceil(minmaxY.second->y() - minmaxY.first->y());
+    int grid_col = std::ceil(minmaxX.second->x()) - std::floor(minmaxX.first->x());
+    int grid_row = std::ceil(minmaxY.second->y()) - std::floor(minmaxY.first->y());
 
     grid_size =window_width <= window_height
                     ? window_width / (grid_col + grid_margin)
                     : window_height / (grid_row + grid_margin);
     top_buttom_margin = (window_height - grid_size * grid_row) / 2;
     left_right_margin = (window_width - grid_size * grid_col) / 2;
+
+
+    QPainter painter(this);
+
+    //画像表示
+    cv::Mat buf_mat;
+    cv::cvtColor(image, buf_mat, CV_RGB2BGR);
+    QImage qimage((uchar *)buf_mat.data, buf_mat.cols, buf_mat.rows,(int)buf_mat.step, QImage::Format_RGB888);
+    painter.drawImage(QPoint(0,0),qimage);
+
 
     //polygon表示
     QVector<QPointF> window_points;
