@@ -25,6 +25,10 @@ void NeoAnswerBoard::setSingleMode(bool inp){
     single_mode = inp;
 }
 
+void NeoAnswerBoard::setIsEmptyColorFill(bool inp){
+    isemptycolorfill = inp;
+}
+
 void NeoAnswerBoard::setUp()
 {
     QMessageBox msgBox;
@@ -151,8 +155,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 
     //上画面フレームを描画
     auto drawFrame = [&]{
-        painter.setBrush(QBrush(QColor(236,182,138, 200))); //frame color
         painter.setPen(QPen(QBrush(Qt::black),grid_size*0.1));
+        painter.setBrush(QBrush(QColor(236,182,138, 255))); //frame color
         painter.drawRect(QRect(left_right_margin,top_bottom_margin,grid_col*grid_size,grid_row*grid_size));
 
 
@@ -161,7 +165,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             for(auto point : frame.getPolygon().outer()){
                 frame_points.push_back(getPosition(point));
             }
-            painter.setBrush(QBrush(QColor(up_back_ground_color)));
+            if(isemptycolorfill) painter.setBrush(QBrush(QColor(128,128,128)));
+            else painter.setBrush(QBrush(QColor(up_back_ground_color)));
             painter.drawPolygon(&frame_points.front(),frame_points.size());
         }
     };

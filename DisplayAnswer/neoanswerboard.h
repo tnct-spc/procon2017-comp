@@ -36,6 +36,7 @@ public:
     void setText(std::string text);
     void setScannedPieces(std::vector<procon::ExpandedPolygon> vec);
     void setUp();
+    void setIsEmptyColorFill(bool inp);
 
 private:
     int frame_margin;
@@ -75,6 +76,8 @@ private:
     bool paintif = false;
 
     QString output_string;//ここのメンバ変数に入ってる文字列をAnswerBoardの画面下に表示するようにする
+
+    bool isemptycolorfill = true;
 
 protected:
     void beforePolygon();
