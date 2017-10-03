@@ -148,7 +148,7 @@ void TryNextSearch::clickedGoButton()
 #endif
 
 
-    if(checkFloatPiece(next_field,processed_expolygon))std::cout << "エラー！！！！" << std::endl; //ここでエラー吐いた時の処理(QMessageBoxとかloggerとか)をやる
+    if(checkFloatPiece(processed_frame))std::cout << "エラー！！！！" << std::endl; //ここでエラー吐いた時の処理(QMessageBoxとかloggerとか)をやる
     else{
 
     emit startBeamSearch(next_field);
@@ -157,10 +157,10 @@ void TryNextSearch::clickedGoButton()
     }
 }
 
-bool TryNextSearch::checkFloatPiece(procon::NeoField field , std::vector<procon::NeoExpandedPolygon> expolygon){
+bool TryNextSearch::checkFloatPiece(std::vector<polygon_i> frames){
 
-    for(auto frame : expolygon){
-        if(frame.getPolygon().inners().size()!=0)return true;
+    for(auto frame : frames){
+        if(frame.inners().size()!=0)return true;
     }
 
     return false;//問題ないならfalse

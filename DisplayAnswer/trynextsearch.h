@@ -29,7 +29,7 @@ private:
     NeoAnswerBoard *board;
 
     procon::NeoField field;
-    bool checkFloatPiece(procon::NeoField field , std::vector<procon::NeoExpandedPolygon> expolygon);
+    bool checkFloatPiece(std::vector<polygon_i> frames);
 
 
 private slots:
