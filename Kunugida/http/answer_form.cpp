@@ -4,6 +4,7 @@
 
 AnswerForm::AnswerForm(QObject *parent) : QObject(parent)
 {
+    received_data = "";
 }
 
 void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response)
@@ -12,11 +13,21 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response)
 
     if(request->body().isEmpty()){
         //Wait get body
-        connect(request,SIGNAL(data(QByteArray)),this,SLOT(ServiceRequestCompleted(QByteArray)));
+        connect(request,SIGNAL(data(QByteArray)),this,SLOT(ReceiveData(QByteArray)));
+        connect(request,SIGNAL(end()),this,SLOT(ServiceRequestCompleted()));
     }
 }
 
-void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
+void AnswerForm::ReceiveData(QByteArray lowdata){
+    std::cout<<"request data receive"<<std::endl;
+    received_data += lowdata;
+}
+
+void AnswerForm::ServiceRequestCompleted(){
+    std::cout<<"request completed"<<std::endl;
+    QByteArray lowdata = received_data;
+    received_data = "";
+
     QHttpResponse *response=new_response_;
 
     //Get request data
@@ -49,8 +60,10 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
     // compare posted and answer
     procon::NeoField field_posted = NeoPolygonIO::importField(filename_posted.toUtf8().constData());
     procon::NeoField field_answer = NeoPolygonIO::importField(filename_answer.toUtf8().constData());
-    if(field_posted.getPiecesSize() > field_answer.getPiecesSize())
+//    if(field_posted.getPiecesSize() > field_answer.getPiecesSize())
         NeoPolygonIO::exportPolygon(field_posted, filename_answer.toUtf8().constData());
+
+    std::cout<<"emit: getanswer"<<std::endl;
 
     emit getAnswer(filename_answer);
 
