@@ -29,7 +29,7 @@ void MyGraphicsView::setImage(cv::Mat image){
 }
 
 QPointF MyGraphicsView::toPolygonPoint(double window_x, double window_y){
-    const int N = 0;//小数点第Nまでを取る
+    const int N = 5;//小数点第Nまでを取る
     double N_10 = std::pow(10,N);
     QPointF buf((window_x - left_right_margin - std::floor(minXY.first))/grid_size,
                   (window_y - top_buttom_margin - std::floor(minXY.second))/grid_size);
@@ -73,7 +73,20 @@ void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
 
 void MyGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-
+    QPointF selected_point = toPolygonPoint(event->x(),event->y());
+    int is_in_tolerance = isInTolerance(selected_point);
+    bool is_on_point = is_in_tolerance != -1;
+    if(is_on_point){
+        points.erase(points.begin() + is_in_tolerance -1);
+    }else{
+        points.push_back(selected_point);
+    }
+    polygon_t changed_polygon;
+    for(QPointF i : points){
+        changed_polygon.outer().push_back(point_t(i.x() / magnification , i.y() / magnification));
+    }
+    setPolygon(changed_polygon);
+    this->update();
 }
 
 void MyGraphicsView::paintEvent(QPaintEvent *event)
@@ -98,7 +111,7 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     top_buttom_margin = (window_height - grid_size * grid_row) / 2;
     left_right_margin = (window_width - grid_size * grid_col) / 2;
 
-    this->setMinimumSize(minmaxX.first->x(),minmaxY.first->y());
+//    this->setMinimumSize(minmaxX.first->x(),minmaxY.first->y());
 
     QPainter painter(this);
 

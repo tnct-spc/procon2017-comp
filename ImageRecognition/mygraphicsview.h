@@ -29,8 +29,8 @@ private:
     int isInTolerance(QPointF point);
     Ui::MyGraphicsView *ui;
 
-    const double threshold = 0.5;//許容範囲
-    const double magnification = 0.1;
+    const double threshold = 0.1;//許容範囲
+    const double magnification = 0.01;
     const int photo_margin = 10; //単位はpixel
     cv::Mat image;
     polygon_t polygon;
