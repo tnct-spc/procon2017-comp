@@ -44,7 +44,7 @@ QPoint MyGraphicsView::toWindowPoint(QPointF point){
 }
 
 int MyGraphicsView::isInTolerance(QPointF point){
-    std::cout<<point.x()<<","<<point.y()<<std::endl;
+//    std::cout<<point.x()<<","<<point.y()<<std::endl;
     auto itr = std::find_if(points.begin(),points.end(),[&](QPointF p){
         return (std::fabs(p.x() - point.x()) <= threshold) && (std::fabs(p.y() - point.y()) <= threshold);
     });
@@ -52,15 +52,21 @@ int MyGraphicsView::isInTolerance(QPointF point){
 }
 
 void MyGraphicsView::mousePressEvent(QMouseEvent *event){
-    QPointF selected_point = toPolygonPoint(event->x(),event->y());
-    int is_in_tolerance = isInTolerance(selected_point);
-    selecting = is_in_tolerance != -1;
-    if(selecting){
-        move_index = is_in_tolerance;
+    if(event->button() == Qt::MouseButton::LeftButton){
+        std::cout<<"mousepress"<<std::endl;
+        QPointF selected_point = toPolygonPoint(event->x(),event->y());
+        int is_in_tolerance = isInTolerance(selected_point);
+        selecting = is_in_tolerance != -1;
+        if(selecting){
+            move_index = is_in_tolerance;
+        }
+    }else if(event->button() == Qt::MouseButton::RightButton){
+        inOutPoint(event->x(),event->y());
     }
 }
 
 void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
+    std::cout<<"mouserelease"<<std::endl;
     if(!selecting) return;
     points[move_index] = toPolygonPoint(event->x(),event->y());
     polygon_t changed_polygon;
@@ -71,13 +77,14 @@ void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
     this->update();
 }
 
-void MyGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
+void MyGraphicsView::inOutPoint(int x,int y)
 {
-    QPointF selected_point = toPolygonPoint(event->x(),event->y());
+    std::cout<<"mousedoubleclick"<<std::endl;
+    QPointF selected_point = toPolygonPoint(x,y);
     int is_in_tolerance = isInTolerance(selected_point);
     bool is_on_point = is_in_tolerance != -1;
     if(is_on_point){
-        points.erase(points.begin() + is_in_tolerance -1);
+        points.erase(points.begin() + is_in_tolerance);
     }else{
         points.push_back(selected_point);
     }

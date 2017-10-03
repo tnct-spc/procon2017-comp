@@ -26,6 +26,7 @@ public:
 private:
     QPointF toPolygonPoint(double window_x,double window_y);
     QPoint toWindowPoint(QPointF point);
+    void inOutPoint(int x,int y);
     int isInTolerance(QPointF point);
     Ui::MyGraphicsView *ui;
 
@@ -45,7 +46,6 @@ protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
-    void mouseDoubleClickEvent(QMouseEvent *event);
 
 };
 
