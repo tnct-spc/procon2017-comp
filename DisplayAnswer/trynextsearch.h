@@ -29,6 +29,8 @@ private:
     NeoAnswerBoard *board;
 
     procon::NeoField field;
+    bool checkFloatPiece(procon::NeoField field , std::vector<procon::NeoExpandedPolygon> expolygon);
+
 
 private slots:
     void clickedGoButton();

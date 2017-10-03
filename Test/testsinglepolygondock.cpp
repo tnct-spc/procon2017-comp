@@ -9,7 +9,7 @@ bool TestSinglePolygonDock::run(){
     procon::NeoField field;
     SinglePolygonDock *dock = new SinglePolygonDock;
     TryNextSearch *search = new TryNextSearch;
-    field = NeoPolygonIO::importField("../../procon2017-comp/field.csv");
+    field = NeoPolygonIO::importField("../../../humanpowerfield.csv");
 
    // dock->show();
     search->show();
