@@ -4,6 +4,7 @@
 
 AnswerForm::AnswerForm(QObject *parent) : QObject(parent)
 {
+    received_data = "";
 }
 
 void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response)
@@ -12,11 +13,21 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response)
 
     if(request->body().isEmpty()){
         //Wait get body
-        connect(request,SIGNAL(data(QByteArray)),this,SLOT(ServiceRequestCompleted(QByteArray)));
+        connect(request,SIGNAL(data(QByteArray)),this,SLOT(ReceiveData(QByteArray)));
+        connect(request,SIGNAL(end()),this,SLOT(ServiceRequestCompleted()));
     }
 }
 
-void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
+void AnswerForm::ReceiveData(QByteArray lowdata){
+    std::cout<<"[http/answer_form] request data receive..."<<std::endl;
+    received_data += lowdata;
+}
+
+void AnswerForm::ServiceRequestCompleted(){
+    std::cout<<"[http/answer_form] request complete!"<<std::endl;
+    QByteArray lowdata = received_data;
+    received_data = "";
+
     QHttpResponse *response=new_response_;
 
     //Get request data

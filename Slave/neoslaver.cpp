@@ -146,6 +146,7 @@ bool NeoSlaver::debugEmitAnswer(procon::NeoField field)
 
 void NeoSlaver::pushGetButton()
 {
+    setIPaddress(ui->ip_address->text());
     if(!get()){
         ui->getLabel->setText("Faild Run");
     }else{
@@ -165,4 +166,10 @@ void NeoSlaver::networkerror(QNetworkReply::NetworkError e)
     std::cout << "network error! error code  : " << code  << std::endl;
     network_error_flag = true;
     //net_error_num = e;
+}
+
+void NeoSlaver::setIPaddress(QString ip_address)
+{
+    SERVER_URL = "http://" + ip_address + "/get";
+    SERVER_POST_URL = "http://" + ip_address + "/answer";
 }
