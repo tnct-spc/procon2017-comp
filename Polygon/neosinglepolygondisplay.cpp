@@ -87,22 +87,25 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     painter.drawPolygon(&polygon_points.front(),polygon_points.size());
 
     painter.setPen(QPen(QColor("#F15A22")));
-    QFont font;
-    font.setPixelSize(20);
-    painter.setFont(font);
-    QString str;
-    getDegree();
-    for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
-        str.clear();
-        str += QString::number(point_index);
-        str += "(";
-        str += QString::number(polygon_points[point_index].x());
-        str += ",";
-        str += QString::number(polygon_points[point_index].y());
-        str += ")";
-        str += "Angle:";
-        str += QString::number(angles.at(point_index));
-        painter.drawText(polygon_points[point_index] ,str);
+
+    if(!nowordsmode){
+        QFont font;
+        font.setPixelSize(20);
+        painter.setFont(font);
+        QString str;
+        getDegree();
+        for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
+            str.clear();
+            str += QString::number(point_index);
+            str += "(";
+            str += QString::number(polygon_points[point_index].x());
+            str += ",";
+            str += QString::number(polygon_points[point_index].y());
+            str += ")";
+            str += "Angle:";
+            str += QString::number(angles.at(point_index));
+            painter.drawText(polygon_points[point_index] ,str);
+        }
     }
 
     painter.setPen(QPen(QColor("#000000")));
@@ -114,4 +117,9 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
         int y = current_row * grid_size + top_buttom_margin;
         painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
     }
+}
+
+void NeoSinglePolygonDisplay::setNoWordsMode(bool hoge)
+{
+    nowordsmode = hoge;
 }

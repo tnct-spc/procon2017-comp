@@ -13,15 +13,17 @@ TryNextSearch::TryNextSearch(QWidget *parent) :
 
     board = new NeoAnswerBoard();
     board->setSingleMode(true);
+
+    dock = new SinglePolygonDock();
+
+
+//    board->setShowUnplacedPieces(true);
     board->setSelectPieceMode(true);
 
     go_button = new QPushButton();
     go_button->setText("RUN BEAMSEARCH");
 
     connect(go_button,&QPushButton::clicked,this,&TryNextSearch::clickedGoButton);
-
-    ui->verticalLayout->addWidget(board,0);
-    ui->verticalLayout->addWidget(go_button,1);
 
 }
 
@@ -33,6 +35,10 @@ TryNextSearch::~TryNextSearch()
 void TryNextSearch::setField(procon::NeoField field){
     this->field = field;
     board->setField(this->field);
+
+    for(unsigned int count=0;count<field.getElementaryPieces().size();++count){
+        if(!field.getIsPlaced().at(count))dock->addPolygon(field.getElementaryPieces().at(count).getPolygon());
+    }
 }
 
 void TryNextSearch::clickedGoButton()
