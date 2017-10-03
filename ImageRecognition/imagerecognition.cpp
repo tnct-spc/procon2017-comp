@@ -68,16 +68,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     polygons.erase(polygons.begin());
 
     // correct vector
-    for(auto p : polygons){
-        std::cerr << boost::geometry::is_valid(p);
-    }
     for(auto& p : polygons){
         boost::geometry::correct(p);
     }
 
     // ポリゴンの各辺を伸ばす
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-        polygons.at(i) = expandPolygon(polygons.at(i), 0.11 / scale);
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);
     }
 
     for (int i=0; i<frame_num; i++) {
@@ -608,7 +605,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     auto removeShortLines = [&](std::vector<cv::Vec4f> const& lines)->std::vector<cv::Vec4f>{
         std::vector<cv::Vec4f> return_lines;
         for(auto line : lines){
-            if ((calcDistance(line[0],line[1],line[2],line[3]) * scale) >= 2.0) {
+            if ((calcDistance(line[0],line[1],line[2],line[3]) * scale) >= 5.0) {
                 return_lines.push_back(std::move(line));
             }
         }
@@ -922,14 +919,15 @@ polygon_t ImageRecognition::deleteMispoint(polygon_t vertex)
         double deg_x = polygon.at((i+3)%polygon.size()).x() - polygon.at((i+2)%polygon.size()).x();
         double deg_y = polygon.at((i+3)%polygon.size()).y() - polygon.at((i+2)%polygon.size()).y();
 
-        if (len < 1.0) {
+//        if (len < 1.0) {
 
-            // 異常に短いものは一つに結合
-            polygon.at((i+1)%polygon.size()) = point_t(polygon.at((i+1)%polygon.size()).x() + x * 0.5, polygon.at((i+1)%polygon.size()).y() + y * 0.5);
-            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
-            i--;
+//            // 異常に短いものは一つに結合
+//            polygon.at((i+1)%polygon.size()) = point_t(polygon.at((i+1)%polygon.size()).x() + x * 0.5, polygon.at((i+1)%polygon.size()).y() + y * 0.5);
+//            polygon.erase(polygon.begin() + (i + 2) % polygon.size());
+//            i--;
 
-        } else if (len < 3.5) {
+//        } else if (len < 3.5) {
+        if (len < 3.5) {
 
             // 外積を用いて交点を求める
             double a1x = polygon.at((i+2)%polygon.size()).x() - polygon.at((i+3)%polygon.size()).x();
