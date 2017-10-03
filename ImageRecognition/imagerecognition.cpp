@@ -157,7 +157,8 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     double error;
     pieces_num = polygons.size();
     for (unsigned int i=0; i<polygons.size(); i++) {
-        pieces.push_back(placeGrid(polygons[i]));
+        // pieces.push_back(placeGrid(polygons[i]));
+        pieces.push_back(placeGridByAsazuma(polygons[i]));
 
         NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
@@ -1000,7 +1001,7 @@ std::vector<cv::Mat> ImageRecognition::dividePiece(cv::Mat src_image)
     return pieces_images;
 }
 
-polygon_i ImageRecognition::placeGrid(polygon_t vertex)
+polygon_i ImageRecognition::placeGridByAsazuma(polygon_t vertex)
 {
     namespace bg = boost::geometry;
     namespace trans = bg::strategy::transform;

@@ -47,7 +47,7 @@ private:
         );
     cv::Mat HSVDetection(cv::Mat src_image);
     std::vector<cv::Mat> dividePiece(cv::Mat src_image);
-    polygon_i placeGrid(polygon_t vertex);
+    polygon_i placeGridByAsazuma(polygon_t vertex);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
     void makeTable();
 
