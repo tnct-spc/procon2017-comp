@@ -68,6 +68,11 @@ void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
     this->update();
 }
 
+void MyGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+
+}
+
 void MyGraphicsView::paintEvent(QPaintEvent *event)
 {
     int window_width = this->width();
@@ -90,6 +95,7 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     top_buttom_margin = (window_height - grid_size * grid_row) / 2;
     left_right_margin = (window_width - grid_size * grid_col) / 2;
 
+    this->setMinimumSize(minmaxX.first->x(),minmaxY.first->y());
 
     QPainter painter(this);
 
