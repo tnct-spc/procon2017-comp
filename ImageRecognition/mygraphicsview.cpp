@@ -104,6 +104,14 @@ void MyGraphicsView::inOutPoint(int x,int y)
 
 void MyGraphicsView::insertPoint(int x, int y){
     std::cout<<"hello insert"<<std::endl;
+    polygon_t changed_polygon;
+    for(QPointF i : points){
+        changed_polygon.outer().push_back(point_t(i.x() / magnification , i.y() / magnification));
+    }
+    bg::append(changed_polygon,point_t(x,y));
+
+    setPolygon(changed_polygon);
+    this->update();
 }
 
 void MyGraphicsView::paintEvent(QPaintEvent *event)
