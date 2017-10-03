@@ -77,7 +77,7 @@ private:
 
     QString output_string;//ここのメンバ変数に入ってる文字列をAnswerBoardの画面下に表示するようにする
 
-    bool isemptycolorfill = true;
+    bool isemptycolorfill = false;
 
 protected:
     void beforePolygon();
