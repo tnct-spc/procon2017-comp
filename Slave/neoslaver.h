@@ -32,8 +32,8 @@ private:
 
     std::string SAVE_PROBLEM_PATH = "../../procon2017-comp/CSV/problem.csv";
     std::string SAVE_ANSWER_PATH = "../../procon2017-comp/CSV/answer.csv";
-    QString SERVER_URL = "http://192.168.100.55:8016/get";
-    QString SERVER_POST_URL = "http://192.168.100.55:8016/answer";
+    QString SERVER_URL = "http://192.168.100.130:8016/get";
+    QString SERVER_POST_URL = "http://192.168.100.130:8016/answer";
 
     int debug_counter = 1;
 

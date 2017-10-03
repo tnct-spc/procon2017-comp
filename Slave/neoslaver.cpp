@@ -116,12 +116,6 @@ bool NeoSlaver::debugEmitAnswer(procon::NeoField field)
     //Display answer
     board->setField(field);
 
-    SAVE_ANSWER_PATH = "../../procon2017-comp/CSV/debug";
-    SAVE_ANSWER_PATH += debug_counter;
-    SAVE_ANSWER_PATH += ".csv";
-
-    debug_counter++;
-
     //io
     NeoPolygonIO::exportPolygon(field,SAVE_ANSWER_PATH);
 
