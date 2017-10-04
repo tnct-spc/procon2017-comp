@@ -236,7 +236,7 @@ void QrTranslateToPolygon::translateToCSV(std::pair<std::vector<polygon_i>, std:
         field.setElementaryPieces(elementarypieces);
         field.setElementaryFrame(elementaryframe);
     }
-    NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/fromQRcode.csv");
+    NeoPolygonIO::exportPolygon(field, "../../procon2017-comp/CSV/fromQRcode.csv");
 }
 
 /*

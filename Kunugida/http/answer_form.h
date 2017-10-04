@@ -28,7 +28,7 @@ private:
     bool PutStone();
 
     //pass
-    QString AnswerFolderName=QCoreApplication::applicationDirPath()+"/docroot/answer/";
+    QString AnswerFolderName="../../procon2017-comp/CSV/answer.csv";
 
     //stage data
     int stage_state_[48][48];//0=empty;1=block;2=answer_block

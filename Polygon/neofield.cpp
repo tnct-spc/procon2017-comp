@@ -64,6 +64,11 @@ void procon::NeoField::setIsPlaced(int const& piece_id)
     isPlaced.at(piece_id) = true;
 }
 
+void procon::NeoField::setIsPlaced(const int &piece_id, bool is_placed)
+{
+    isPlaced.at(piece_id) = is_placed;
+}
+
 void procon::NeoField::sumTotalEvaluation(const double &eva)
 {
     total_evaluation += eva;
