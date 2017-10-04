@@ -245,7 +245,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直した
-        std::cout << "debug" << std::endl;
         if(!single_mode){
 
            int poly_id = neoexpanded_poly.getId();
@@ -386,7 +385,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     for(auto neopoly : field.getPieces()){
         poly_vec.push_back(neopoly);
     }
-    std::cout << field.getPieces().size() << " がああああああああああああああああああああああ " << poly_vec.size() << std::endl;
 
     std::vector<int> touches_index;
 
@@ -397,9 +395,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             }
         }
         for(auto id : touches_index){
-            std::cout << "ほげえええええええええええええええええええええええええ" << poly_vec.size() << std::endl;
             for(unsigned int index=0;index<=poly_vec.size();++index){
-                std::cout << "うわあああああああああああああああ" << touches_poly.size() << " " << poly_vec.size() << std::endl;
                 if(poly_vec.at(index).getId() == id){
                     touches_poly.push_back(poly_vec.at(index));
 
@@ -411,7 +407,6 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                     bg::union_(inner_frame,poly,union_poly);
                     inner_frame=union_poly[0];
                     poly_vec.erase(poly_vec.begin() + index);
-                    std::cout << "さくじょおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお" << std::endl;
                     break;
                 }
             }
@@ -523,6 +518,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
                 }
             }
         }*/
+        if(!processinglinemode){
         if(event->key() == Qt::Key_0){
             std::cout << "push 0" << red_id << "   " << blue_id << std::endl;
         }
@@ -545,13 +541,30 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 
         if(event->key() == Qt::Key_M){
             setProcessingLineMode(!processinglinemode);
-
-            for(auto poly : touches_poly){
-                std::cout << poly.getId() << " ";
-            }
-            std::cout << std::endl << touches_poly.size() << std::endl;
-
         }
+        }else{//ここの中に書いてほしい
+
+        if(event->key() == Qt::Key_0){
+            std::cout << "push 0" << red_id << "   " << blue_id << std::endl;
+        }
+
+        if(event->key() == Qt::Key_A && red_id!=0){
+            --red_id;
+        }
+        if(event->key() == Qt::Key_S){
+            if(red_id != blue_id - 1)++red_id;
+        }
+
+        if(event->key() == Qt::Key_K){
+            if(red_id != blue_id - 1)--blue_id;
+        }
+        if(event->key() == Qt::Key_L && !processinglinemode){
+            if(blue_id!=sorted_poly.size() - 1)++blue_id;
+        }else if(event->key() == Qt::Key_L && processinglinemode){
+            if(blue_id!=touches_poly.size() - 1)++blue_id;
+        }
+        }
+
     }
 
 
