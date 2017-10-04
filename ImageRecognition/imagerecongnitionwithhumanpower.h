@@ -28,12 +28,11 @@ private:
     MyGraphicsView *my_graphics_view;
 
 private slots:
-    void clickedEnlargement();
-    void clickedReduction();
+    void clickedEditedButton();
 protected:
 
 signals:
-
+    void returnPolygon(polygon_t polygon);
 };
 
 #endif // IMAGERECONGNITIONWITHHUMANPOWER_H

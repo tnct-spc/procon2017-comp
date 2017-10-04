@@ -81,9 +81,6 @@ private:
     std::vector<std::pair<point_i,double>> length_table;
 
     std::vector<polygon_t> currentRawPolygons;
-
-private slots:
-    void acceptUpdatePiece(polygon_t const& piece, int piece_number);
 };
 
 #endif // IMAGERECOGNITION_H

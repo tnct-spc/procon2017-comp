@@ -9,14 +9,12 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
 
     my_graphics_view = new MyGraphicsView();
     ui->horizontalLayout->addWidget(my_graphics_view);
-    connect(ui->enlargement,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEnlargement);
-    connect(ui->reduction,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedReduction);
+    connect(ui->editedButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
 }
 
-void imagerecongnitionwithhumanpower::clickedEnlargement(){
-}
-
-void imagerecongnitionwithhumanpower::clickedReduction(){
+void imagerecongnitionwithhumanpower::clickedEditedButton(){
+    emit returnPolygon(my_graphics_view->getPolygon());
+    this->close();
 }
 
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()

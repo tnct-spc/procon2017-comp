@@ -127,16 +127,25 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     //@yui
     std::vector<cv::Mat> human_images = getPiecesImages();
     std::vector<procon::ExpandedPolygon> human_polygons = getPolygonForImage();
-    int i = 0,j = 0;
-    /*デバッグなので最初の一つだけ*/
-    while(i<human_images.size() && j<human_polygons.size()&&i<1){
-        i++; j++;
+    int i = 0;
+    while(i<human_images.size()){
         imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
-        irwh->setPolygon(human_polygons.at(1).getPolygon());
-        irwh->setImage(cv::Mat(human_images.at(1)));
+        QObject::connect(irwh,&imagerecongnitionwithhumanpower::returnPolygon,[&, i](polygon_t returnpolygon){
+            //ここで編集したpolygon_tを受け取る
+            std::cout << i << " : " << boost::geometry::dsv(returnpolygon) << std::endl;
+
+            // うけとったピースでcurrentRawPolygonを更新してFieldを送る
+            currentRawPolygons.at(i) = returnpolygon;
+            std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(currentRawPolygons);
+            procon::NeoField field = makeNeoField(pieces);
+
+            emit updateField(field);
+        });
+        irwh->setPolygon(human_polygons.at(i).getPolygon());
+        irwh->setImage(cv::Mat(human_images.at(i)));
         irwh->show();
         irwhs.emplace_back(irwh);
-        connect(irwh, SIGNAL(updatePiece(polygon_t,int)), this, SLOT(acceptUpdatePiece(polygon_t,int)));
+        i++;
     }
     //@yui_end
 
@@ -1534,14 +1543,4 @@ std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
     }
 
     return trans_polygon;
-}
-
-void ImageRecognition::acceptUpdatePiece(polygon_t const& piece, int piece_number)
-{
-    /* うけとったpieceでcurrentFieldを更新 */
-    currentRawPolygons.at(piece_number) = piece;
-    std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(currentRawPolygons);
-    procon::NeoField field = makeNeoField(pieces);
-
-    emit updateField(field);
 }

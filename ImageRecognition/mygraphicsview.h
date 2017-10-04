@@ -20,17 +20,21 @@ public:
     explicit MyGraphicsView(QWidget *parent = 0);
     ~MyGraphicsView();
 
+    polygon_t getPolygon();
     void setPolygon(polygon_t const& polygon_);
     void setImage(cv::Mat const& image_);
 
 private:
     QPointF toPolygonPoint(double window_x,double window_y);
     QPoint toWindowPoint(QPointF point);
+    void removePoint(int index, int x, int y);
+    void insertPoint(int x,int y);
+    void polygonUpdate();
     int isInTolerance(QPointF point);
     Ui::MyGraphicsView *ui;
 
-    const double threshold = 0.5;//許容範囲
-    const double magnification = 0.1;
+    const double threshold = 0.1;//許容範囲
+    const double magnification = 0.01;
     const int photo_margin = 10; //単位はpixel
     cv::Mat image;
     polygon_t polygon;
@@ -45,7 +49,6 @@ protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
-    void mouseDoubleClickEvent(QMouseEvent *event);
 
 };
 
