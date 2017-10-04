@@ -1320,3 +1320,183 @@ void ImageRecognition::makeTable()
     }
 
 }
+
+polygon_t ImageRecognition::expandPolygon(polygon_t polygon, double dxy)
+{
+    auto calculateIntersection = [](std::array<point_t,2> line_a,std::array<point_t,2> line_b){
+        // y = slope_a * x + segment_a
+        double dy_a = line_a[1].y() - line_a[0].y();
+        double dx_a = line_a[1].x() - line_a[0].x();
+        
+        double slope_a = dy_a / dx_a;
+        double segment_a = line_a[0].y() - line_a[0].x() * slope_a;
+        
+        double dy_b = line_b[1].y() - line_b[0].y();
+        double dx_b = line_b[1].x() - line_b[0].x();
+        
+        double slope_b = dy_b / dx_b;
+        double segment_b = line_b[0].y() - line_b[0].x() * slope_b;
+        
+        double x = ( segment_b - segment_a ) / ( slope_a - slope_b );
+        double y = slope_b * x + segment_b;
+
+        return point_t(x,y);
+    };
+
+    auto parallel_displacement = [](point_t t,double dx,double dy){
+        return point_t(t.x() + dx,t.y() + dy);
+    };
+    
+    /*
+     *            ^
+     *            |
+     * 　　　　　　 |
+     * cross  　+ |   cross -
+     * 　　　　　　 |
+     * 　　　　　　 |
+     * 　　　　　　 |
+     * 
+     */
+    auto calcuateCrossProduct = [](std::array<point_t,2> vec_a,std::array<point_t,2> vec_b){
+    	double dx_a = vec_a[1].x() - vec_a[0].x();
+        double dy_a = vec_a[1].y() - vec_a[0].y();
+        
+        double dx_b = vec_b[1].x() - vec_b[0].x();
+        double dy_b = vec_b[1].y() - vec_b[0].y();
+        
+        return dx_a * dy_b - dy_a * dx_b;
+    };
+
+    auto calcuateMidPoint = [](std::array<point_t,2> vec){
+        double dx = vec[1].x() - vec[0].x();
+        double dy = vec[1].y() - vec[0].y();
+
+        double x = vec[0].x() + dx / 2;
+        double y = vec[0].y() + dy / 2;
+
+        return point_t(x,y);
+    };
+
+    auto another_point = [&](std::array<point_t,2> vec){
+        auto calcAngle = [](std::array<point_t,2> vec){
+            double dx = vec[1].x() - vec[0].x();
+            double dy = vec[1].y() - vec[0].y();
+
+            return std::atan2(dy,dx);
+        };
+
+        //外積検証時のyの移動量
+        const double dy = 5.0;
+
+
+        point_t n_point = parallel_displacement(vec[1],0,dy);
+
+        std::array<point_t,2> first_vec = { vec[0],vec[1] };
+        std::array<point_t,2> second_vec = { vec[0],n_point };
+
+        double cross = calcuateCrossProduct(first_vec,second_vec);
+
+//        std::cout << cross << "cross" << std::endl;
+
+        if(cross < 0 ){
+            return -1;
+        }else if(cross > 0){
+            return 1;
+        }else if(cross == 0){
+            return 0;
+        }
+    };
+
+    auto calcuateAngle = [](std::array<point_t,2> vec){
+
+        double dx = vec[1].x() - vec[0].x();
+        double dy = vec[1].y() - vec[0].y();
+
+        std::complex<double> angle_vec(dx,dy);
+
+        double angle = std::arg(angle_vec);
+
+        if(dy < 0){
+            angle = 2 * M_PI + angle;
+        }
+
+        return angle;
+
+    };
+
+    auto calcuateAnotherPoint = [&](std::array<point_t,2> vec,double d){
+
+        double angle = calcuateAngle(vec);
+        double sin_value = std::sin(angle);
+        double cos_value = std::cos(angle);
+
+        double dx = 0;
+        double dy = 0;
+
+        if(sin_value >= 0){
+            dx = -1;
+        }else{
+            dx = 1;
+        }
+
+        if(cos_value >= 0){
+            dy = 1;
+        }else{
+            dy = -1;
+        }
+
+        dx = dx * d * std::abs(cos_value);
+        dy = dy * d * std::abs(sin_value);
+
+        std::array<point_t,2> new_vec = {
+                                            point_t(vec[0].x() + dx,vec[0].y() + dy),
+                                            point_t(vec[1].x() + dx,vec[1].y() + dy)
+                                        };
+
+        return new_vec;
+
+    };
+    
+
+
+    std::array<point_t,2> pw = { point_t(0,0),point_t(-1,-1) };
+
+    std::array<point_t,2> pew = calcuateAnotherPoint(pw,1);
+
+    auto print_array_point = [&](std::array<point_t,2> print_array){
+          std::cout << print_array[0].x() << "," << print_array[0].y() << ","
+                    << print_array[1].x() << "," << print_array[1].y() << std::endl;
+    };
+
+    print_array_point(pw);
+    print_array_point(pew);
+
+    std::vector<std::pair<point_t,point_t>> points;
+
+    points.push_back(std::make_pair(polygon.outer().at(polygon.outer().size() - 2),polygon.outer().at(polygon.outer().size() - 1)));
+
+    for(int point_index = 0; point_index < polygon.outer().size() - 1; ++point_index){
+        points.push_back(std::make_pair(polygon.outer().at(point_index),polygon.outer().at(point_index + 1)));
+    }
+
+    polygon_t new_polygon;
+
+    for(int index = 0; index < points.size() - 1; ++index){
+
+        std::array<point_t,2> vec_a = { points[index].first,points[index].second };
+        std::array<point_t,2> vec_b = { points[index + 1].first,points[index + 1].second };
+
+        point_t point = calculateIntersection(calcuateAnotherPoint(vec_a,1),calcuateAnotherPoint(vec_b,1));
+
+        new_polygon.outer().push_back(point);
+    }
+
+    new_polygon.outer().push_back(new_polygon.outer()[0]);
+    
+//    PolygonViewer::getInstance().pushPolygon();
+
+//    std::cout << calculateIntersection(vec1,vec2).x() << "," << calculateIntersection(vec1,vec2).y() << std::endl;
+
+    return new_polygon;
+
+}
