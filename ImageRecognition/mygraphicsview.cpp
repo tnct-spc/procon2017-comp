@@ -65,7 +65,15 @@ void MyGraphicsView::removePoint(int index,int x,int y)
 }
 
 void MyGraphicsView::insertPoint(int x, int y){
-    points.push_back(QPointF(x,y));
+    std::vector<QPointF> sentor_points;
+    for(int i = 0 ; i < points.size() ; i++){
+        int next_index = i + 1;
+        if(next_index == points.size()) next_index = 0;
+        sentor_points.push_back(QPointF(
+                                    (points.at(i).x() + points.at(next_index).x())/2,
+                                    (points.at(i).y() + points.at(next_index).y())/2
+                                ));
+    }
     polygonUpdate();
 }
 
