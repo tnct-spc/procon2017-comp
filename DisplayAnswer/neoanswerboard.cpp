@@ -249,7 +249,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setPen(QPen(QBrush(Qt::black), 0.3));
 
-        for(auto polygon : field.getElementaryPieces()){
+        for(auto polygon : scanned_poly){
             bool drawflag = true;
             for(auto neopoly : field.getPieces()){
                 if(polygon.getId() == neopoly.getId()){
@@ -257,13 +257,10 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 }
             }
             if(drawflag){//対応するIDのピースがないのでマークをつける
-                point_i cent;
+                point_t cent;
                 bg::centroid(polygon.getPolygon(),cent);
                 QPointF cent_point = getPiecePosition(cent);
                 painter.setBackground(QBrush(QColor(list[polygon.getId()])));
-
-                cent_point.setX(cent_point.x() + grid_size);
-                cent_point.setY(cent_point.y() - grid_size);
                 painter.drawText(cent_point,QString("$"));
             }
         }
@@ -277,14 +274,8 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
            point_i up_center;
            point_t down_center;
            procon::ExpandedPolygon expanded_poly;
-           if(processinglinemode){
-            for(auto sc_poly : scanned_poly){
+           for(auto sc_poly : scanned_poly){
                if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
-            }
-           }else{
-            for(auto poly : scanned_poly){
-               if(poly.getId() == poly_id)expanded_poly = poly;
-            }
            }
 
 
