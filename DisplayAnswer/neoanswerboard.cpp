@@ -245,14 +245,21 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
 
     auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直した
+        std::cout << "debug" << std::endl;
         if(!single_mode){
 
            int poly_id = neoexpanded_poly.getId();
            point_i up_center;
            point_t down_center;
            procon::ExpandedPolygon expanded_poly;
-           for(auto sc_poly : scanned_poly){
+           if(processinglinemode){
+            for(auto sc_poly : scanned_poly){
                if(sc_poly.getId() == poly_id)expanded_poly = sc_poly;
+            }
+           }else{
+            for(auto poly : scanned_poly){
+               if(poly.getId() == poly_id)expanded_poly = poly;
+            }
            }
 
 
@@ -347,10 +354,72 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
       //  }
 
         if(blue_id != -1){
+            if(!processinglinemode){
                     drawProcessingLine(sorted_poly.at(blue_id), true);
                     drawProcessingLine(sorted_poly.at(red_id), false);
+            }else{
+                drawProcessingLine(touches_poly.at(blue_id),true);
+                drawProcessingLine(touches_poly.at(red_id),false);
+            }
         }
     }
+
+    auto setTouchesPiece = [&]{
+    touches_poly.clear();
+    std::vector<procon::NeoExpandedPolygon> poly_vec;
+    polygon_i inner_frame;
+    inner_frame.outer().push_back(point_i(-1,-1));
+    inner_frame.outer().push_back(point_i(102,-1));
+    inner_frame.outer().push_back(point_i(102,66));
+    inner_frame.outer().push_back(point_i(-1,66));
+    inner_frame.outer().push_back(point_i(-1,1));
+    bg::correct(inner_frame);
+
+    for(auto frame : field.getFrame()){
+        inner_frame.inners().push_back(polygon_i::ring_type());
+        for(auto point : frame.getPolygon().outer()){
+            inner_frame.inners().back().push_back(point);
+        }
+        bg::correct(inner_frame);
+    }
+
+    for(auto neopoly : field.getPieces()){
+        poly_vec.push_back(neopoly);
+    }
+    std::cout << field.getPieces().size() << " がああああああああああああああああああああああ " << poly_vec.size() << std::endl;
+
+    std::vector<int> touches_index;
+
+    while(poly_vec.size()!=0){
+        for(auto poly : poly_vec){
+            if(bg::intersects( poly.getPolygon() ,inner_frame)){
+                touches_index.push_back(poly.getId());
+            }
+        }
+        for(auto id : touches_index){
+            std::cout << "ほげえええええええええええええええええええええええええ" << poly_vec.size() << std::endl;
+            for(unsigned int index=0;index<=poly_vec.size();++index){
+                std::cout << "うわあああああああああああああああ" << touches_poly.size() << " " << poly_vec.size() << std::endl;
+                if(poly_vec.at(index).getId() == id){
+                    touches_poly.push_back(poly_vec.at(index));
+
+                    //ここからframeの結合処理(クッソめんどい)
+                    std::vector<polygon_i> union_poly;
+                    bg::correct(inner_frame);
+                    polygon_i poly = poly_vec.at(index).getPolygon();
+                    bg::correct(poly);
+                    bg::union_(inner_frame,poly,union_poly);
+                    inner_frame=union_poly[0];
+                    poly_vec.erase(poly_vec.begin() + index);
+                    std::cout << "さくじょおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお" << std::endl;
+                    break;
+                }
+            }
+        }
+        touches_index.clear();
+    }
+    };
+
 
 /*    auto drawunplacedpieces = [&]{//人力beamsearch用
 
@@ -400,7 +469,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             }
         }
     };*/
-
+    if(field.getPieces().size()!=0) setTouchesPiece();
     drawPolygonPointNum();
     drawEvalution();
     drawGrid();
@@ -468,12 +537,19 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
         if(event->key() == Qt::Key_K){
             if(red_id != blue_id - 1)--blue_id;
         }
-        if(event->key() == Qt::Key_L && blue_id!=sorted_poly.size() - 1){
-            ++blue_id;
+        if(event->key() == Qt::Key_L && !processinglinemode){
+            if(blue_id!=sorted_poly.size() - 1)++blue_id;
+        }else if(event->key() == Qt::Key_L && processinglinemode){
+            if(blue_id!=touches_poly.size() - 1)++blue_id;
         }
 
         if(event->key() == Qt::Key_M){
             setProcessingLineMode(!processinglinemode);
+
+            for(auto poly : touches_poly){
+                std::cout << poly.getId() << " ";
+            }
+            std::cout << std::endl << touches_poly.size() << std::endl;
 
         }
     }
@@ -596,7 +672,8 @@ void NeoAnswerBoard::setField(procon::NeoField input_field){//fieldを設定
 //        std::cout << bg::dsv(center_point) << std::endl;
 //    }
 
-    blue_id = sorted_poly.size()-1;
+    if(!processinglinemode)blue_id = sorted_poly.size()-1;
+    if(processinglinemode)blue_id = touches_poly.size()-1;
 }
 
 //#define OUT_FILE

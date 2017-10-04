@@ -61,6 +61,7 @@ private:
     int top_bottom_margin;
     int down_up_y;
     std::vector<procon::ExpandedPolygon> scanned_poly;
+    std::vector<procon::NeoExpandedPolygon> touches_poly;
     procon::NeoField field;
 
     // Only field mode
