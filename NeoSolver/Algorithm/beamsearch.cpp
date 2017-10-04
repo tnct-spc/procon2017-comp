@@ -358,6 +358,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
 
                 ++evaluate_counter;
                 logger->info("evaluate counter:" + std::to_string(evaluate_counter));
+                logger->warn(std::to_string(eval.score));
             }
 
             logger->info("evaluating");
@@ -409,6 +410,8 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
                     if(!this->checkCanPrune(field_buf)){
                         {
                             std::lock_guard<decltype(mtx)> lock(mtx);
+                            field_buf.evaluation_accumulate = field_buf.evaluation_accumulate + eval.score;
+
                             field_buf.evaluate_cache.push_back(eval);
                             next_field.push_back(field_buf);
                         }
@@ -935,16 +938,19 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
         int frame_index = 0;
         for(const auto& f : field.getFrame()){
             //inverseしていない方のpiece評価
-            std::vector<std::pair<double,Connect>> evaluate = Evaluation::evaluation(f,field.getElementaryPieces()[piece_index],1.0,1.0,true);
-            //inverseしている方のpiece評価
-            std::vector<std::pair<double,Connect>> evaluate_inversed = Evaluation::evaluation(f,field.getElementaryInversePieces()[piece_index],1.0,1.0,true);
+            std::vector<std::pair<double,Connect>> evaluate = Evaluation::evaluation(f,field.getElementaryPieces()[piece_index],1.0,2.0,true);
+            //inverseしている方のpiece
+            std::vector<std::pair<double,Connect>> evaluate_inversed = Evaluation::evaluation(f,field.getElementaryInversePieces()[piece_index],1.0,2.0,true);
 
             //一時保存用の変数
 //            TODO: いい感じにここをパフォーマンスよくする
+
+            const double omomi = 0.2 / (field.getPieces().size() + 1);
+
             Evaluate ev_buf;
             for(const auto& e : evaluate){
                 if(e.first){
-                    ev_buf.score = e.first;
+                    ev_buf.score = e.first + omomi * field.evaluation_accumulate;
                     ev_buf.connection = e.second;
                     ev_buf.fields_index = fields_index;
                     ev_buf.frame_index = frame_index;
@@ -960,7 +966,7 @@ void BeamSearch::evaluateNextState(std::vector<procon::NeoField> & fields,std::v
             }
             for(const auto& e : evaluate_inversed){
                 if(e.first){
-                    ev_buf.score = e.first;
+                    ev_buf.score = e.first + omomi * field.evaluation_accumulate;
                     ev_buf.connection = e.second;
                     ev_buf.fields_index = fields_index;
                     ev_buf.frame_index = frame_index;
