@@ -838,7 +838,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if (s > 70 && v > 70) { // 300->60,50
+            if (s > 60 && v > 50) { // 300->60,50
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
