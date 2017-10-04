@@ -51,6 +51,7 @@ private:
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;
     std::shared_ptr<NeoAnswerDock> neo;
+    std::shared_ptr<NeoAnswerDock> last_selector;
 
     std::vector<procon::NeoField> last_fields;
     bool answer_progress_enabled = true;
