@@ -20,6 +20,9 @@ public:
     void setPolygon(polygon_t const& polygon);
     void setImage(cv::Mat const& image);
 
+signals:
+    void updatePiece(polygon_t const& piece, int piece_number);
+
 private:
     Ui::imagerecongnitionwithhumanpower *ui;
     MyGraphicsView *my_graphics_view;
