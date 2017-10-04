@@ -297,7 +297,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         int evalution_size = (top_bottom_margin > left_right_margin*5
                     ?top_bottom_margin/3
                     :left_right_margin/6);
-        if(window_width < evalution_size * 1000)evalution_size = window_width / 100;
+        if(window_width < evalution_size * 200)evalution_size = window_width / 50;
         painter.setFont(QFont("Deciratuve",evalution_size,QFont::Bold));
         QPointF evalution_point;
         evalution_point.setX(grid_size);
