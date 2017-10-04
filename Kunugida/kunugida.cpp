@@ -36,6 +36,8 @@ Kunugida::Kunugida(QWidget *parent) :
     board->show();
     //    board->setSingleMode(true);
 //    board->setSingleMode(true);
+
+    connect(&imrec, SIGNAL(updateField(procon::NeoField const&)), this, SLOT(acceptUpdateField(procon::NeoField const&)));
 }
 
 Kunugida::~Kunugida()
@@ -157,7 +159,6 @@ void Kunugida::run()
         cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame_image300.png", 1);
         cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pieces_image300.png", 1);
 
-        ImageRecognition imrec;
         field = imrec.run(frame, pieces);
 
         board->setScannedPieces(imrec.getPolygonPosition());
@@ -283,7 +284,6 @@ void Kunugida::imageRecognitonTest()
     cv::Mat nocframe = cv::imread("../../procon2017-comp/real_frame_200.png", 1);
     cv::Mat nocpieces = cv::imread("../../procon2017-comp/real_piece_200.png", 1);
 
-    ImageRecognition imrec;
     procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
 
     return;
@@ -315,4 +315,9 @@ void Kunugida::replyFinished(QNetworkReply *reply)
     }
     qDebug() << str;
     emit requestCSVcomplete();
+}
+
+void Kunugida::acceptUpdateField(procon::NeoField const& field)
+{
+    /*ここで問題csvを更新する*/
 }

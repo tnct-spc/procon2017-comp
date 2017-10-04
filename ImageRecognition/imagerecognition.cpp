@@ -9,6 +9,19 @@
 
 #include "math.h"
 
+ImageRecognition::ImageRecognition()
+{
+
+}
+
+ImageRecognition::~ImageRecognition()
+{
+    for(std::vector<imagerecongnitionwithhumanpower*>::iterator it = irwhs.begin();it!=irwhs.end();++it){
+        delete (*it);
+    }
+    irwhs.clear();
+}
+
 procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
     raw_pieces_pic = raw_pieces_image;
@@ -88,6 +101,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
+    // save
+    currentRawPolygons.clear();
+    currentRawPolygons.reserve(polygons.size());
+    for(auto& p : polygons){
+        currentRawPolygons.push_back(p);
+    }
+
     // make ExpandedPolygon for GUI
     for (int i=0; i<polygons.size()-1; i++) {
 
@@ -115,6 +135,8 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         irwh->setPolygon(human_polygons.at(1).getPolygon());
         irwh->setImage(cv::Mat(human_images.at(1)));
         irwh->show();
+        irwhs.emplace_back(irwh);
+        connect(irwh, SIGNAL(updatePiece(polygon_t,int)), this, SLOT(acceptUpdatePiece(polygon_t,int)));
     }
     //@yui_end
 
@@ -157,31 +179,38 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
 //        scale = 15 * 4 / scale_len;
 
+    makeTable();
+
+    std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(polygons);
+
+    // fieldクラスのデータに変換
+    procon::NeoField field = makeNeoField(pieces);
+
+    return field;
+}
+
+std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector<polygon_t> rawPolygons)
+{
     // change vector's scale to grid
-    for (auto& piece : polygons) {
+    for (auto& piece : rawPolygons) {
         for (auto& side : piece.outer()) {
             side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
         }
     }
 
-    makeTable();
-
     // Gridに乗せる
     std::vector<polygon_i> pieces;
     double error;
-    pieces_num = polygons.size();
-    for (unsigned int i=0; i<polygons.size(); i++) {
-        pieces.push_back(placeGrid(polygons[i]));
+    pieces_num = rawPolygons.size();
+    for (unsigned int i=0; i<rawPolygons.size(); i++) {
+        pieces.push_back(placeGrid(rawPolygons[i]));
 
 //        NeoPolygonViewer::getInstance().displayPolygon(pieces[i], std::to_string(i), false);
     }
 
     error = getError(pieces);
 
-    // fieldクラスのデータに変換
-    procon::NeoField field = makeNeoField(pieces);
-
-    return field;
+    return std::move(pieces);
 }
 
 void ImageRecognition::threshold(cv::Mat& image)
@@ -1505,4 +1534,14 @@ std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
     }
 
     return trans_polygon;
+}
+
+void ImageRecognition::acceptUpdatePiece(polygon_t const& piece, int piece_number)
+{
+    /* うけとったpieceでcurrentFieldを更新 */
+    currentRawPolygons.at(piece_number) = piece;
+    std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(currentRawPolygons);
+    procon::NeoField field = makeNeoField(pieces);
+
+    emit updateField(field);
 }
