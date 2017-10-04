@@ -561,11 +561,86 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
             setProcessingLineMode(!processinglinemode);
         }
         }else{//ここの中に書いてほしい
+        int moke,hoge;
+        bool result1,result2;
+        if(event->key() == Qt::Key_A){
+            result1 = false;
+            result2 = false;
+            moke = red_id - 1;
+            hoge = red_id - 2;
+            if(moke > 0 && moke < field.getPieces().size() && moke != blue_id){
+                result1 = true;
+            }
+            if(hoge > 0 && hoge < field.getPieces().size()&& moke == blue_id){
+                result2 = true;
+            }
+            if(result1 && !result2){
+                red_id--;
+            }
+            if(result2){
+                red_id = red_id - 2;
+            }
+        }
+        if(event->key() == Qt::Key_S){
+            result1 = false;
+            result2 = false;
+            moke = red_id + 1;
+            hoge = red_id + 2;
+            if(moke > 0 && moke < field.getPieces().size() && moke != blue_id){
+                result1 = true;
+            }
+            if(hoge > 0 && hoge < field.getPieces().size()&& moke == blue_id ){
+                result2 = true;
+            }
+            if(result1){
+                red_id++;
+            }
+            if(result2){
+                red_id = red_id + 2;
+            }
+        }
+        if(event->key() == Qt::Key_K){
+            result1 =false;
+            result2 = false;
+            moke = blue_id + 1;
+            hoge = blue_id + 2;
+            if(moke > 0 && moke < field.getPieces().size() && moke != red_id){
+                result1 = true;
+            }
+            if(hoge > 0 && hoge < field.getPieces().size() && moke == red_id){
+                result2 = true;
+            }
+            if(result1 && !result2){
+                blue_id++;
+            }
+            if(result2){
+                blue_id = blue_id + 2;
+            }
+        }
+        if(event->key() == Qt::Key_L){
+            result1 = false;
+            result2 = false;
+            moke = blue_id - 1;
+            hoge = blue_id - 2;
+            if(moke > 0 && moke < field.getPieces().size() && moke != red_id){
+                result1 = true;
+            }
+            if(hoge > 0 && hoge < field.getPieces().size() && moke == red_id){
+                result2 = true;
+            }
+            if(result1 && !result2){
+                blue_id--;
+            }
+            if(result2){
+                blue_id = blue_id - 2;
+            }
+        }
+
 
         if(event->key() == Qt::Key_0){
             std::cout << "push 0" << red_id << "   " << blue_id << std::endl;
         }
-
+        /*
         if(event->key() == Qt::Key_A && red_id!=0){
             --red_id;
         }
@@ -581,18 +656,20 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
         }else if(event->key() == Qt::Key_L && processinglinemode){
             if(blue_id!=touches_poly.size() - 1)++blue_id;
         }
+        */
         }
-
     }
+
 
 
     this->update();
 
+        }
 
 
 
 
-}
+
 void NeoAnswerBoard::setProcessingLineMode(bool inp){
     processinglinemode = inp;
     std::cout << processinglinemode << std::endl;
