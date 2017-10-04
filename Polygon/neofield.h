@@ -32,6 +32,9 @@ private:
 
 public:
     std::vector<Evaluate> evaluate_cache;
+
+    double evaluation_accumulate;
+
     //constructor
     NeoField();
 
