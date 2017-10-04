@@ -144,10 +144,16 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     cv::Mat buf_mat;
     cv::cvtColor(image, buf_mat, CV_RGB2BGR);
     QImage qimage((uchar *)buf_mat.data, buf_mat.cols, buf_mat.rows,(int)buf_mat.step, QImage::Format_RGB888);
+    bool width_shorter = qimage.width() < qimage.height();
+    double image_window_width = (double) minmaxX.second->x() + photo_margin * magnification;
+    double image_window_height = (double) minmaxY.second->y() + photo_margin * magnification;
+    if(width_shorter) image_window_height = image_window_width * qimage.height() / qimage.width();
+    else image_window_width = image_window_height * qimage.width() / qimage.height();
+
     QRect image_rect(QPoint(left_right_margin,top_buttom_margin),
                             toWindowPoint(QPointF(
-                                minmaxX.second->x() + photo_margin * magnification ,
-                                minmaxY.second->y() + photo_margin * magnification
+                                image_window_width ,
+                                image_window_height
                             )
                      ));
     painter.drawImage(image_rect,qimage);
