@@ -65,16 +65,27 @@ void MyGraphicsView::removePoint(int index,int x,int y)
 }
 
 void MyGraphicsView::insertPoint(int x, int y){
+    QPointF selected_point = toPolygonPoint(x,y);
+
     std::vector<QPointF> sentor_points;
     for(int i = 0 ; i < points.size() ; i++){
-        int next_index = i + 1;
-        if(next_index == points.size()) next_index = 0;
-        sentor_points.push_back(QPointF(
-                                    (points.at(i).x() + points.at(next_index).x())/2,
-                                    (points.at(i).y() + points.at(next_index).y())/2
-                                ));
+        int next_index = (i + 1) == points.size() ? 0 : i + 1;
+        std::cout<<(points[i].x() + points[next_index].x()) / 2 <<" "<< (points[i].y() + points[next_index].y()) / 2 <<std::endl;
+        sentor_points.push_back(QPointF((points[i].x() + points[next_index].x()) / 2 ,
+                                        (points[i].y() + points[next_index].y()) / 2));
     }
-    polygonUpdate();
+
+    std::cout<<"selected "<<selected_point.x()<<" "<<selected_point.y()<<std::endl;
+
+    auto itr = std::find_if(sentor_points.begin(),sentor_points.end(),[&](QPointF p){
+        return (std::fabs(p.x() - selected_point.x()) <= threshold) && (std::fabs(p.y() - selected_point.y()) <= threshold);
+    });
+
+    int insert_index = std::distance(sentor_points.begin(),itr);
+    if(itr != sentor_points.end()){
+        points.insert(points.begin() + insert_index + 1 , selected_point);
+        polygonUpdate();
+    }
 }
 
 void MyGraphicsView::mousePressEvent(QMouseEvent *event){
@@ -160,15 +171,15 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
         painter.drawText(window_points[point_index],str);
     }
 
-//    //grid表示
-//    painter.setPen(QPen(QColor("#000000")));
-//    for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
-//        int x = current_col * grid_size + left_right_margin;
-//        painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
-//    }
-//    for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
-//        int y = current_row * grid_size + top_buttom_margin;
-//        painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
-//    }
+    //grid表示
+    painter.setPen(QPen(QColor("#000000")));
+    for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
+        int x = current_col * grid_size + left_right_margin;
+        painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
+    }
+    for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
+        int y = current_row * grid_size + top_buttom_margin;
+        painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
+    }
 }
 
