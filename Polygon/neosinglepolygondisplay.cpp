@@ -2,7 +2,6 @@
 #include "ui_neosinglepolygondisplay.h"
 #include "neoexpandedpolygon.h"
 
-#include <QPoint>
 #include <vector>
 #include <QPainter>
 
@@ -70,7 +69,11 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     const int top_buttom_margin = (window_height - grid_size * grid_row) / 2;
     const int left_right_margin = (window_width - grid_size * grid_col) / 2;
 
-
+    auto getDegree = [&](){
+       procon::NeoExpandedPolygon expandedpolygon;
+       expandedpolygon.resetPolygonForce(polygon);
+       angles = expandedpolygon.getSideAngle_degree();
+    };
 
     painter.setBrush(QBrush(QColor("#00FFFF")));
 
@@ -84,18 +87,25 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     painter.drawPolygon(&polygon_points.front(),polygon_points.size());
 
     painter.setPen(QPen(QColor("#F15A22")));
-    QFont font;
-    font.setPixelSize(20);
-    painter.setFont(font);
-    QString str;
-    for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
-        str += QString::number(point_index);
-        str += "(";
-        str += QString::number(polygon_points[point_index].x());
-        str += ",";
-        str += QString::number(polygon_points[point_index].y());
-        str += ")";
-        painter.drawText(polygon_points[point_index] ,str);
+
+    if(!nowordsmode){
+        QFont font;
+        font.setPixelSize(20);
+        painter.setFont(font);
+        QString str;
+        getDegree();
+        for(unsigned int point_index = 0; point_index < polygon_points.size() - 1; ++point_index){
+            str.clear();
+            str += QString::number(point_index);
+            str += "(";
+            str += QString::number(polygon_points[point_index].x());
+            str += ",";
+            str += QString::number(polygon_points[point_index].y());
+            str += ")";
+            str += "Angle:";
+            str += QString::number(angles.at(point_index));
+            painter.drawText(polygon_points[point_index] ,str);
+        }
     }
 
     painter.setPen(QPen(QColor("#000000")));
@@ -109,3 +119,7 @@ void NeoSinglePolygonDisplay::paintEvent(QPaintEvent *)
     }
 }
 
+void NeoSinglePolygonDisplay::setNoWordsMode(bool hoge)
+{
+    nowordsmode = hoge;
+}

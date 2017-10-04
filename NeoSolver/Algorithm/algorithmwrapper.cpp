@@ -41,3 +41,13 @@ void AlgorithmWrapper::requestCSVcomplete()
     logger->info("success");
 }
 
+void AlgorithmWrapper::postCSV()
+{
+    emit requestpostCSV();
+}
+
+void AlgorithmWrapper::requestpostCSVcomplete()
+{
+    logger->info("success");
+}
+
