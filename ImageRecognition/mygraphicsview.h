@@ -21,6 +21,7 @@ public:
     ~MyGraphicsView();
 
     void setPolygon(polygon_t polygon);
+    polygon_t getPolygon();
     void setImage(cv::Mat image);
 
 private:

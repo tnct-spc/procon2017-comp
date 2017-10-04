@@ -29,7 +29,7 @@ private slots:
 protected:
 
 signals:
-
+    void returnPolygon(polygon_t polygon);
 };
 
 #endif // IMAGERECONGNITIONWITHHUMANPOWER_H

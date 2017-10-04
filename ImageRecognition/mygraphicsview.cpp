@@ -23,6 +23,10 @@ void MyGraphicsView::setPolygon(polygon_t polygon){
     this->update();
 }
 
+polygon_t MyGraphicsView::getPolygon(){
+    return this->polygon;
+}
+
 void MyGraphicsView::setImage(cv::Mat image){
     this->image = image;
     this->update();
