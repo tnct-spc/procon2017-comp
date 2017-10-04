@@ -422,6 +422,7 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
 }
 void NeoAnswerBoard::setProcessingLineMode(bool inp){
     processinglinemode = inp;
+    std::cout << processinglinemode << std::endl;
 }
 
 void NeoAnswerBoard::setScannedPieces(std::vector<procon::ExpandedPolygon> vec){

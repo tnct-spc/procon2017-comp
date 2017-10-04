@@ -62,7 +62,7 @@ private:
     bool singleif = false;
     int piece_size = 1;
     bool allif = true;
-    void processinglinemode = false;
+    bool processinglinemode = false;
 
     //make id_list
     std::vector<polygon_i> polygon_list;
