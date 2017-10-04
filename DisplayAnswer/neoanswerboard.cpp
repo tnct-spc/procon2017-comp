@@ -244,6 +244,32 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         painter.drawText(cent_point, QString(QString("@")));
     };
 
+    auto drawNotPutMark = [&]{//id参照して置かれてないピースに印をつける
+        painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setPen(QPen(QBrush(Qt::black), 0.3));
+
+        for(auto polygon : field.getElementaryPieces()){
+            bool drawflag = true;
+            for(auto neopoly : field.getPieces()){
+                if(polygon.getId() == neopoly.getId()){
+                    drawflag = false;
+                }
+            }
+            if(drawflag){//対応するIDのピースがないのでマークをつける
+                point_i cent;
+                bg::centroid(polygon.getPolygon(),cent);
+                QPointF cent_point = getPiecePosition(cent);
+                painter.setBackground(QBrush(QColor(list[polygon.getId()])));
+
+                cent_point.setX(cent_point.x() + grid_size);
+                cent_point.setY(cent_point.y() - grid_size);
+                painter.drawText(cent_point,QString("$"));
+            }
+        }
+
+    };
+
     auto drawProcessingLine = [&](procon::NeoExpandedPolygon neoexpanded_poly, bool color){//引数かえて書き直した
         if(!single_mode){
 
@@ -361,6 +387,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
                 drawProcessingLine(touches_poly.at(red_id),false);
             }
         }
+        drawNotPutMark();
     }
 
     auto setTouchesPiece = [&]{
