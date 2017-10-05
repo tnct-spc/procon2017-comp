@@ -74,7 +74,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // ポリゴンの各辺を伸ばす
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);// 0.115
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.15 / scale);// 0.115
     }
 
     for (int i=0; i<frame_num; i++) {
@@ -949,7 +949,7 @@ polygon_t ImageRecognition::deleteMispoint(polygon_t vertex)
             double a2x = polygon.at((i+1)%polygon.size()).x() - polygon.at(i).x();
             double a2y = polygon.at((i+1)%polygon.size()).y() - polygon.at(i).y();
 
-            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 177.5 * M_PI / 180.0) {
+            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 179.5 * M_PI / 180.0) {
 
                 polygon.erase(polygon.begin() + (i + 1) % polygon.size());
                 polygon.erase(polygon.begin() + (i + 2) % polygon.size());
