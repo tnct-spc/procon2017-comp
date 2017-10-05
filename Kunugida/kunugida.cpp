@@ -194,11 +194,11 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-//        cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
-//        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
+        cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
+        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
 
-        cv::Mat frame = cv::imread("/home/spc/Downloads/Wed_Oct__4_19-20-12_2017_.png", 1);
-        cv::Mat pieces = cv::imread("/home/spc/Downloads/Wed_Oct__4_19-22-37_2017_.png", 1);
+//        cv::Mat frame = cv::imread("/home/spc/Downloads/Wed_Oct__4_19-20-12_2017_.png", 1);
+//        cv::Mat pieces = cv::imread("/home/spc/Downloads/Wed_Oct__4_19-22-37_2017_.png", 1);
 
         ImageRecognition imrec;
         field = imrec.run(frame, pieces);
