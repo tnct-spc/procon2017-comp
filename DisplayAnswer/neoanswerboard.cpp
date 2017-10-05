@@ -386,6 +386,19 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         poly_vec.push_back(neopoly);
     }
 
+
+    for(auto poly : poly_vec){
+        if(bg::intersects(poly.getPolygon(),inner_frame))touches_poly.push_back(poly);
+    }
+    while(poly_vec.size()!=touches_poly.size()){
+        for(auto poly : poly_vec){
+            for(auto poly_ : touches_poly){
+                if(bg::intersects(poly.getPolygon(),poly_.getPolygon()) && !bg::equals(poly.getPolygon(),poly_.getPolygon()))touches_poly.push_back(poly);
+            }
+        }
+    }
+
+    /*     この中の処理がひどいせいで落ちてるんで修正
     std::vector<int> touches_index;
 
     while(poly_vec.size()!=0){
@@ -412,7 +425,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             }
         }
         touches_index.clear();
-    }
+    }*/
     };
 
 
