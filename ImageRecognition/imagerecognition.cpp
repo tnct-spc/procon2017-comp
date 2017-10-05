@@ -4,10 +4,23 @@
 #include "neopolygonviewer.h"
 #include "utilities.h"
 #include "neosinglepolygondisplay.h"
-
+#include "imagerecongnitionwithhumanpower.h"
 #include "polygonviewer.h"
 
 #include "math.h"
+
+ImageRecognition::ImageRecognition()
+{
+
+}
+
+ImageRecognition::~ImageRecognition()
+{
+    for(std::vector<imagerecongnitionwithhumanpower*>::iterator it = irwhs.begin();it!=irwhs.end();++it){
+        delete (*it);
+    }
+    irwhs.clear();
+}
 
 procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image)
 {
@@ -82,6 +95,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
     }
 
+    // save
+    currentRawPolygons.clear();
+    currentRawPolygons.reserve(polygons.size());
+    for(auto& p : polygons){
+        currentRawPolygons.push_back(p);
+    }
+
     // make ExpandedPolygon for GUI
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
 
@@ -91,6 +111,31 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
 //        if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
+
+    //@yui
+    std::vector<cv::Mat> human_images = getPiecesImages();
+    std::vector<procon::ExpandedPolygon> human_polygons = getPolygonForImage();
+    int i = 0;
+    while(i<human_images.size()){
+        imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
+        QObject::connect(irwh,&imagerecongnitionwithhumanpower::returnPolygon,[&, i](polygon_t returnpolygon){
+            //ここで編集したpolygon_tを受け取る
+            std::cout << i << " : " << boost::geometry::dsv(returnpolygon) << std::endl;
+
+            // うけとったピースでcurrentRawPolygonを更新してFieldを送る
+            currentRawPolygons.at(i) = returnpolygon;
+            std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(currentRawPolygons);
+            procon::NeoField field = makeNeoField(pieces);
+
+            emit updateField(field);
+        });
+        irwh->setPolygon(human_polygons.at(i).getPolygon());
+        irwh->setImage(cv::Mat(human_images.at(i)));
+        irwh->show();
+        irwhs.emplace_back(irwh);
+        i++;
+    }
+    //@yui_end
 
 //    // sum polygon_t and piece's image
 //    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
@@ -107,9 +152,47 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //        count++;
 //    }
 
-    int count = 0;
+    //     scale is led from 6*6 piece//    double scale_len;
+//    for (auto piece : polygons) {
+//        if (piece.outer().size() == 5) {
+//            bool check = true;
+//            scale_len = 0;
+//            for (int i=0; i<4; i++) {
+//                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
+//                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
+//                double len = hypot(x,y) * scale / 2.5;
+//                if (fabs(6.0 - len) > 1) {
+//                    check = false;
+//                } else {
+//                    scale_len += hypot(x,y);
+//                }
+//            }
+
+//            if (check) {
+//                break;
+//            }
+//        }
+//    }
+
+//        scale = 15 * 4 / scale_len;
+
+    makeTable();
+
+    std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(polygons);
+
+    // fieldクラスのデータに変換
+    procon::NeoField field = makeNeoField(pieces);
+
+    return field;
+}
+
+std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector<polygon_t> rawPolygons)
+{
+    id = -1;
+    int count=0;
+
     // change vector's scale to grid
-    for (auto& piece : polygons) {
+    for (auto& piece : rawPolygons) {
         for (auto& side : piece.outer()) {
             side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
         }
@@ -122,26 +205,18 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         }
     }
 
-    makeTable();
-
     // Gridに乗せる
     std::vector<polygon_i> pieces;
     double error;
-    pieces_num = polygons.size();
+    pieces_num = rawPolygons.size();
     count = 0;
-    for (auto polygon : polygons) {
+    for (auto& polygon : rawPolygons) {
         pieces.push_back((placeGrid(polygon)));
-
-//        if (showImage) NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
-        count++;
     }
 
     error = getError(pieces);
 
-    // fieldクラスのデータに変換
-    procon::NeoField field = makeNeoField(pieces);
-
-    return field;
+    return std::move(pieces);
 }
 
 void ImageRecognition::threshold(cv::Mat& image)
@@ -153,8 +228,8 @@ void ImageRecognition::threshold(cv::Mat& image)
     //500,0,3300,2664
     image = cv::Mat(image,cv::Rect(0,0,3300,2664));
 
-    cv::namedWindow("capture",cv::WINDOW_NORMAL);
-    cv::imshow("capture",image);
+//    cv::namedWindow("capture",cv::WINDOW_NORMAL);
+//    cv::imshow("capture",image);
 
     /* ヒストグラム均一化の残骸
     // get d
@@ -214,8 +289,8 @@ void ImageRecognition::threshold(cv::Mat& image)
     colorExtraction(&image, &normal_area, CV_BGR2HSV, 0, 180, 89, 255, 76, 200);
     colorExtraction(&image, &koge_area, CV_BGR2HSV, 5, 20, 153, 255, 43, 90);
 
-    cv::namedWindow("image",  CV_WINDOW_NORMAL);
-    cv::imshow("image", normal_area);
+//    cv::namedWindow("image",  CV_WINDOW_NORMAL);
+//    cv::imshow("image", normal_area);
 
     // 通常部分とこげ部分をマージ
     cv::bitwise_and(normal_area,koge_area,image);
@@ -797,8 +872,8 @@ void ImageRecognition::colorExtraction(cv::Mat* src, cv::Mat* dst, int code, int
     std::vector<int> upper = {ch1Upper,ch2Upper,ch3Upper};
 
     cv::cvtColor(*src, colorImage, code);
-    cv::namedWindow("image",  CV_WINDOW_NORMAL);
-    cv::imshow("image", colorImage);
+//    cv::namedWindow("image",  CV_WINDOW_NORMAL);
+//    cv::imshow("image", colorImage);
 
 
     colorImage.forEach<cv::Vec3b>([&lower, &upper](cv::Vec3b &p, const int*) -> void {
@@ -1338,8 +1413,10 @@ void ImageRecognition::makeTable()
     return;
 }
 
-std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
+std::vector<cv::Mat> ImageRecognition::getPiecesImages()
 {
+    cv::Mat pieces_image = raw_pieces_pic;
+
     std::vector<cv::Mat> piece_images;
 
     std::vector<procon::ExpandedPolygon> polygons = position;
@@ -1354,8 +1431,8 @@ std::vector<cv::Mat> ImageRecognition::getPiecesImages(cv::Mat pieces_image)
         cv::Mat image(pieces_image, cv::Rect(box.min_corner().x()-margin, box.min_corner().y()-margin, box.max_corner().x()-box.min_corner().x()+margin*2, box.max_corner().y()-box.min_corner().y()+margin*2));
         piece_images.push_back(image);
 
-        cv::namedWindow(std::to_string(i));
-        cv::imshow(std::to_string(i), image);
+//        cv::namedWindow(std::to_string(i));
+//        cv::imshow(std::to_string(i), image);
         i++;
     }
 

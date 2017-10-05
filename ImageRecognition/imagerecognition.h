@@ -8,16 +8,20 @@
 #include "expandedpolygon.h"
 #include "neoexpandedpolygon.h"
 #include "singlepolygondisplay.h"
+#include "imagerecongnitionwithhumanpower.h"
 
 namespace trans = bg::strategy::transform;
 
-class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition
+class IMAGERECOGNITIONSHARED_EXPORT ImageRecognition : public QObject
 {
+    Q_OBJECT
 
 public:
+    ImageRecognition();
+    ~ImageRecognition();
     procon::NeoField run(cv::Mat raw_frame_image, cv::Mat raw_pieces_image);
     std::vector<procon::ExpandedPolygon> getPolygonPosition();
-    std::vector<cv::Mat> getPiecesImages(cv::Mat pieces_image);
+    std::vector<cv::Mat> getPiecesImages();
     std::vector<procon::ExpandedPolygon> getPolygonForImage();
 
     const cv::Mat& getRawPiecesPic(){
@@ -33,6 +37,9 @@ public:
     }
 
     polygon_t expandPolygon(polygon_t polygon,double dxy);
+
+signals:
+    void updateField(procon::NeoField const&);
 
 private:
     cv::Mat preprocessingFrame(cv::Mat image);
@@ -53,7 +60,9 @@ private:
     polygon_i placeGrid(polygon_t vertex);
     double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
+//    std::vector<procon::ExpandedPolygon> getPolygonPosition();
     void makeTable();
+    std::vector<polygon_i> rawPolygonsToGridedPolygons(std::vector<polygon_t> rawPolygons);
 
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;
@@ -68,10 +77,13 @@ private:
     std::vector<procon::ExpandedPolygon> position;
     int id = -1;
     int margin = 10;
+    std::vector<imagerecongnitionwithhumanpower*> irwhs;
 
     bool showImage = false;
 
     std::vector<std::pair<point_i,double>> length_table;
+
+    std::vector<polygon_t> currentRawPolygons;
 };
 
 #endif // IMAGERECOGNITION_H
