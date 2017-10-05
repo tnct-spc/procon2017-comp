@@ -116,7 +116,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         if (showImage) {
             procon::ExpandedPolygon pos;
             pos.resetPolygonForce(piece);
-//            PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
+            PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
             count++;
         }
     }
@@ -131,7 +131,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (auto polygon : polygons) {
         pieces.push_back((placeGrid(polygon)));
 
-        if (showImage) NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+//        if (showImage) NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
         count++;
     }
 
@@ -949,7 +949,7 @@ polygon_t ImageRecognition::deleteMispoint(polygon_t vertex)
             double a2x = polygon.at((i+1)%polygon.size()).x() - polygon.at(i).x();
             double a2y = polygon.at((i+1)%polygon.size()).y() - polygon.at(i).y();
 
-            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 179.5 * M_PI / 180.0) {
+            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 177.5 * M_PI / 180.0) {
 
                 polygon.erase(polygon.begin() + (i + 1) % polygon.size());
                 polygon.erase(polygon.begin() + (i + 2) % polygon.size());
