@@ -36,6 +36,8 @@ public:
         return raw_random_colors;
     }
 
+    polygon_t expandPolygon(polygon_t polygon,double dxy);
+
 signals:
     void updateField(procon::NeoField const&);
 
@@ -57,6 +59,7 @@ private:
     polygon_i placeGrid(polygon_t vertex);
     double getError(std::vector<polygon_i> p);
     procon::NeoField makeNeoField(std::vector<polygon_i> pieces);
+//    std::vector<procon::ExpandedPolygon> getPolygonPosition();
     void makeTable();
     std::vector<polygon_i> rawPolygonsToGridedPolygons(std::vector<polygon_t> rawPolygons);
 

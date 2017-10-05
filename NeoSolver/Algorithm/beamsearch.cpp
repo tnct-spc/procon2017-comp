@@ -145,6 +145,48 @@ BeamSearch::BeamSearch()
     cpu_num = std::thread::hardware_concurrency();
 }
 
+BeamSearch::BeamSearch(int beamwidth)
+{
+    this->setBeamWidth(beamwidth);
+
+    logger = spdlog::get("BeamSearch");
+//    logger = spdlog::get("beamsearch");
+    dock = std::make_shared<NeoAnswerDock>();
+    dock->show();
+
+    //test
+    neo = std::make_shared<NeoAnswerDock>();
+    neo->show();
+
+    cpu_num = std::thread::hardware_concurrency();
+}
+
+BeamSearch::BeamSearch(int beamwidth, bool answerprogress_enabled)
+{
+    this->setBeamWidth(beamwidth);
+
+    this->answer_progress_enabled = answerprogress_enabled;
+
+    logger = spdlog::get("BeamSearch");
+//    logger = spdlog::get("beamsearch");
+    dock = std::make_shared<NeoAnswerDock>();
+    neo = std::make_shared<NeoAnswerDock>();
+
+    if(answer_progress_enabled){
+        neo->show();
+        dock->show();
+    }
+
+    last_selector = std::make_shared<NeoAnswerDock>();
+
+    cpu_num = std::thread::hardware_concurrency();
+}
+
+void BeamSearch::setBeamWidth(int beamwidhth)
+{
+    this->beam_width = beamwidhth;
+}
+
 std::string BeamSearch::hashField(const procon::NeoField& field){
     std::vector<procon::NeoExpandedPolygon> polygons = field.getFrame();
     std::vector<procon::NeoExpandedPolygon> frame = field.getElementaryFrame();
@@ -1111,15 +1153,17 @@ void BeamSearch::run(procon::NeoField field)
 #ifdef DEBUG
     if(true){
 #else
-    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+    if(!last_fields.empty()){
+        if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
 #endif
-        TryNextSearch *next = new TryNextSearch();
-        next->setField(last_fields.at(0));
-        next->show();
+            TryNextSearch *next = new TryNextSearch();
+            next->setField(last_fields.at(0));
+            next->show();
 
-        connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
-            this->tryNextBeamSearch(next_field);
-        });
+            connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
+                this->tryNextBeamSearch(next_field);
+            });
+        }
     }
 }
 
@@ -1160,7 +1204,11 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
 
         bool flag = false;
         for(auto const& _field : state){
-            neo->addAnswer(_field);
+
+            if(this->answer_progress_enabled){
+                neo->addAnswer(_field);
+            }
+
             if(!flag){
                 submitAnswer(_field);
                 flag = true;
@@ -1176,14 +1224,26 @@ void BeamSearch::tryNextBeamSearch(procon::NeoField next_field)
 //        }
     }
 
-    if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
-        TryNextSearch *next = new TryNextSearch();
-        next->setField(last_fields.at(0));
-        next->show();
+    if(!last_fields.empty()){
+        if(last_fields.at(0).getPieces().size() != last_fields.at(0).getElementaryPieces().size()){
+            TryNextSearch *next = new TryNextSearch();
+            next->setField(last_fields.at(0));
+            next->show();
 
-        connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
-            this->tryNextBeamSearch(next_field);
-        });
+            connect(next,&TryNextSearch::startBeamSearch,[&](procon::NeoField next_field){
+                this->tryNextBeamSearch(next_field);
+            });
+
+            last_selector->show();
+
+            for(auto& f : last_fields){
+                last_selector->addAnswer(f);
+            }
+
+            last_selector->show();
+        }
+    }else{
+        logger->warn("FIELD OR PUZZULE DATA IS INVALID");
     }
 
     end = std::chrono::system_clock::now();

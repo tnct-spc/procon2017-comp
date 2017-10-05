@@ -1,4 +1,4 @@
-#include "kunugida.h"
+﻿#include "kunugida.h"
 #include "ui_kunugida.h"
 #include "qrlibrary.h"
 #include "neofield.h"
@@ -10,8 +10,14 @@
 #include "http/request_mapper.h"
 #include "Algorithm/beamsearch.h"
 #include "trynextsearch.h"
+#include "qrcode.h"
 
 #include <iostream>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <cstdlib>
+
 #include <QDebug>
 #include <QPushButton>
 #include <QCheckBox>
@@ -30,18 +36,35 @@ Kunugida::Kunugida(QWidget *parent) :
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     connect(this, SIGNAL(requestCSV()), this, SLOT(getCSV()));
+    connect(this, SIGNAL(requestpostCSV()), this, SLOT(postCSV()));
     manager = new QNetworkAccessManager(this);
 
     board = std::make_shared<NeoAnswerBoard>();
     board->show();
-    //    board->setSingleMode(true);
-//    board->setSingleMode(true);
+    board->showMaximized();
 
-    connect(&imrec, SIGNAL(updateField(procon::NeoField const&)), this, SLOT(acceptUpdateField(procon::NeoField const&)));
+    //Server
+    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
+    //    board->setSingleMode(true);
+    //    board->setSingleMode(true);
+
+    // Replace field by HumanPower
+    connect(&imrec, SIGNAL(updateField(procon::NeoField const&)), this, SLOT(replaceField(procon::NeoField const&)));
+
+    //スキャナのデバイス名を取得
+    char command[256]="sh ../../procon2017-comp/Kunugida/getdevicename.sh";
+    if(system(command)==0){
+        //うまくデバイス名を取得できたときの処理
+        std::cout<<"デバイス名取得できた"<<std::endl;
+    }else{
+        //デバイス名を取得できなかったときの処理
+        std::cout<<"デバイス名取得できない"<<std::endl;
+    }
 }
 
 Kunugida::~Kunugida()
 {
+    system("echo > devicename.txt");
     delete ui;
 }
 
@@ -74,8 +97,6 @@ void Kunugida::run()
         return expanded_pieces;
 
     };
-    // Server
-    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
 
     if(ui->probmaker_button->isChecked()){
         //selected probmaker
@@ -152,6 +173,28 @@ void Kunugida::run()
         //selected scanner
         logger->info("Selected Scanner DataSource");
 
+        cv::Mat first_scan = scanImage();
+        cv::Mat second_scan;
+        if(!first_scan.empty()){
+            cv::imshow("いっこめ",first_scan);
+            QMessageBox message_box;
+            message_box.setText("スキャン実行");
+            QPushButton *button0 = message_box.addButton(tr("cansel"),QMessageBox::ActionRole);
+            QPushButton *button1 = message_box.addButton(tr("start"),QMessageBox::ActionRole);
+            message_box.exec();
+            if(message_box.clickedButton() == button0){
+                //キャンセル時
+            }else if(message_box.clickedButton() == button1){
+                //二回目実行時
+                second_scan = scanImage();
+                cv::imshow("にこめ",second_scan);
+            }
+        }
+
+        ImageRecognition imrec;
+        field = imrec.run(first_scan,second_scan);
+        board->setScannedPieces(imrec.getPolygonPosition());
+
     }else if(ui->image_data_button->isChecked()){
         //selected image
         logger->info("Selected ImageData DataSource");
@@ -165,6 +208,10 @@ void Kunugida::run()
 
 //        std::vector<cv::Mat> images = imrec.getPiecesImages(pieces);
 //        std::vector<procon::ExpandedPolygon> polygons = imrec.getPolygonForImage();
+        //        imageRecognitonTest();
+//        ImageRecognition imrec;
+//        field = imrec.run(frame, pieces);
+
 
     }else if(ui->csv_button->isChecked()){
         //CSV date
@@ -188,14 +235,14 @@ void Kunugida::run()
         field = NeoPolygonIO::importField("../../procon2017-comp/sample/comp-sample.csv");
         //dummy
         std::vector<procon::ExpandedPolygon> scanned_poly;
-        for(const auto& p : field.getElementaryPieces()){
+        for(const auto& piece : field.getElementaryPieces()){
             polygon_t poly_buf;
 
-            for(const auto& p : p.getPolygon().outer()){
+            for(const auto& p : piece.getPolygon().outer()){
                 poly_buf.outer().push_back(point_t(p.x(),p.y()));
             }
 
-            procon::ExpandedPolygon exp_buf(p.getId());
+            procon::ExpandedPolygon exp_buf(piece.getId());
             exp_buf.resetPolygonForce(poly_buf);
             scanned_poly.push_back(exp_buf);
         }
@@ -204,9 +251,17 @@ void Kunugida::run()
 
 
     }else if(ui->chinochan_button->isChecked()){
-        QRLibrary lib;
-        lib.Decoder(true);
-        field = NeoPolygonIO::importField("../../procon2017-comp/fromQRcode.csv");
+        bool is_hint = false;
+        bool is_multi = false;
+        int how_qr = 1;
+        if(ui->is_hint->isChecked()) is_hint = true;
+        if(ui->is_multi->isChecked()){
+            is_multi = true;
+            how_qr = ui->how_qr->value();
+        }
+        QRCode qrcode;
+        qrcode.Decoder(true, is_hint, is_multi, how_qr);
+        field = NeoPolygonIO::importField("../../procon2017-comp/CSV/fromQRcode.csv");
         int scanned_dummy_piece_id = 0;
 
         std::vector<procon::ExpandedPolygon> scanned_dummy_piece;
@@ -224,6 +279,12 @@ void Kunugida::run()
         board->setScannedPieces(scanned_dummy_piece);
     }
 
+    if(ui->ServerModeCheckbox->isChecked()){
+        std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/CSV/problem.csv";
+        std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
+        NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
+
+    }else{
     //    TODO: ここまでで各データソースから読み込むようにする
 
     int algorithm_number = 0;
@@ -234,17 +295,17 @@ void Kunugida::run()
         algorithm_number = 1;
     }
 
-    NeoSolver *solver = new NeoSolver();
+    NeoSolver *solver = new NeoSolver(ui->beamwidth->value(),ui->answer_progress->isChecked());
     connect(solver,&NeoSolver::throwAnswer,this,&Kunugida::emitAnswer);
     connect(solver, SIGNAL(requestCSV()), this, SLOT(getCSV()));
     connect(this, SIGNAL(requestCSVcomplete()), solver, SLOT(requestCSVcomplete()));
     solver->run(field,algorithm_number);
 
 #endif
-
-    //    QRLibrary lib;
-    //    lib.Decoder(true);
+//    QRLibrary lib;
+//    lib.Decoder(true);
     this->finishedProcess();
+    }
 }
 
 void Kunugida::clickedRunButton()
@@ -272,6 +333,7 @@ void Kunugida::finishedProcess()
     this->is_running = false;
 }
 
+
 void Kunugida::startProcess()
 {
     this->is_running = true;
@@ -294,10 +356,18 @@ void Kunugida::getCSV()
     connect(manager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(replyFinished(QNetworkReply*)));
 
-    file.setFileName("../../procon2017-comp/receivedfield.csv");
+    file.setFileName("../../procon2017-comp/CSV/receivedfield.csv");
     if(!file.open(QIODevice::WriteOnly))
         return;
     manager->get(QNetworkRequest(QUrl("http://localhost:8016/get")));
+}
+
+void Kunugida::postCSV()
+{
+    file.setFileName("../../procon2017-comp/CSV/post.csv");
+    if(!file.open(QIODevice::ReadOnly))
+        return;
+    manager->post(QNetworkRequest(QUrl("http://localhost:8016/answer")), &file);
 }
 
 void Kunugida::replyFinished(QNetworkReply *reply)
@@ -317,7 +387,31 @@ void Kunugida::replyFinished(QNetworkReply *reply)
     emit requestCSVcomplete();
 }
 
-void Kunugida::acceptUpdateField(procon::NeoField const& field)
+void Kunugida::replaceField(procon::NeoField const& field)
 {
     /*ここで問題csvを更新する*/
+}
+
+cv::Mat Kunugida::scanImage()
+{
+    time_t t = time(NULL);
+    char fileName[256];
+    strcpy(fileName , ctime(&t));
+    for(char &c : fileName) if(c == ' ' || c == '\n') c = '_';
+    strcat(fileName , ".png");
+    std::cout<<fileName<<std::endl;
+
+    char command[256]="sh ../../procon2017-comp/Kunugida/getimage.sh ";
+    strcat(command , fileName);
+
+    cv::Mat mat;
+    if(system(command)==0){
+        //うまくスキャンしたときの処理
+        std::cout<<"スキャンできた"<<std::endl;
+        mat = cv::imread(fileName);
+    }else{
+        //残念ながらスキャンできなかったときの処理
+        std::cout<<"スキャンできない"<<std::endl;
+    }
+    return mat;
 }

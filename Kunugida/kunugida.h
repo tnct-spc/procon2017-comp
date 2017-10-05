@@ -10,6 +10,7 @@
 #include "qrlibrary.h"
 #include "neofield.h"
 #include "http/request_mapper.h"
+#include "qrcode.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -34,6 +35,7 @@ public:
 signals:
     void requestCSV();
     void requestCSVcomplete();
+    void requestpostCSV();
 
 private:
     Ui::Kunugida *ui;
@@ -42,7 +44,6 @@ private:
     std::shared_ptr<NeoAnswerBoard> board;
     void finishedProcess();
     void startProcess();
-    QRLibrary QR;
     RequestMapper request_mapper;
     QNetworkAccessManager *manager;
     QFile file;
@@ -53,12 +54,14 @@ private:
 
 public slots:
     void getCSV();
+    void postCSV();
+    cv::Mat scanImage();
 
 private slots:
     void clickedRunButton();
     void emitAnswer(procon::NeoField field);
     void replyFinished(QNetworkReply* reply);
-    void acceptUpdateField(procon::NeoField const& field);
+    void replaceField(procon::NeoField const& field);
 };
 
 #endif // KUNUGIDA_H

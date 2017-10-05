@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 
     for(auto logger : loggers){
         //configre loggers
+        logger->set_level(spdlog::level::warn);
     }
 
     unsigned int i = 100;
