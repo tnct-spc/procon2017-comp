@@ -69,11 +69,7 @@ private:
     int id = -1;
     int margin = 10;
 
-<<<<<<< HEAD
-    bool showImage = true;
-=======
     bool showImage = false;
->>>>>>> d19d15f531df2e6090f61b1fcc4906195977c6b3
 
     std::vector<std::pair<point_i,double>> length_table;
 };

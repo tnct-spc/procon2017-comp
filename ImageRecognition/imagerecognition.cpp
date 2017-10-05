@@ -40,19 +40,20 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 //    PolygonViewer::getInstance().pushPolygon(frame, "frame");
 
     // フレームの回転角を計算
-    int longgest = 0;
-    point_t long_point;
-    for (unsigned int i=0; i<polygons.at(0).outer().size()-1; i++) {
-        double x = polygons.at(0).outer().at(i+1).x() - polygons.at(0).outer().at(i).x();
-        double y = polygons.at(0).outer().at(i+1).y() - polygons.at(0).outer().at(i).y();
-        double len = hypot(x,y);
-        if (longgest < len) {
-            longgest = len;
-            long_point = point_t(x,y);
-        }
+
+    point_t x_point(100000,100000);
+    point_t y_point(100000,100000);
+    for (auto point : polygons.at(0).outer()) {
+        if (x_point.x() > point.x()) x_point = point;
+        if (y_point.y() > point.y()) y_point = point;
     }
 
-    frame_rad = std::atan2(long_point.y(), long_point.x());
+    double len = hypot(x_point.y() - y_point.y(), x_point.x() - y_point.x()) * scale;
+    if (fabs(297 - len) < 50) {
+        frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x());
+    } else {
+        frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x()) - M_PI / 2;
+    }
 
     // frameのinnersをouterに入れ替える
     frame_num = polygons[0].inners().size();
@@ -88,11 +89,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
 
-<<<<<<< HEAD
-        if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
-=======
 //        if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
->>>>>>> d19d15f531df2e6090f61b1fcc4906195977c6b3
     }
 
 //    // sum polygon_t and piece's image
@@ -848,7 +845,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if (s > 80 && v > 70) { // 300->60,50
+            if (s > 80 && v > 80) { // 300->60,50
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
