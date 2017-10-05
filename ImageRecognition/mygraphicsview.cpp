@@ -192,11 +192,11 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     for(int point_index = 0; point_index < window_points.size() ; ++point_index){
         QString str;
         str += QString::number(point_index);
-        str += "(";
-        str += QString::number(points[point_index].x());
-        str += ",";
-        str += QString::number(points[point_index].y());
-        str += ")";
+//        str += "(";
+//        str += QString::number(points[point_index].x());
+//        str += ",";
+//        str += QString::number(points[point_index].y());
+//        str += ")";
         painter.drawText(window_points[point_index],str);
     }
 
