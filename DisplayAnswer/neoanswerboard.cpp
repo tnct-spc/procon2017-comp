@@ -536,6 +536,11 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
                 }
             }
         }*/
+        if(event->key() == Qt::Key_M){
+            setProcessingLineMode(!processinglinemode);
+            if(processinglinemode)blue_id=1;
+            else blue_id=sorted_poly.size() - 1;
+        }
         if(!processinglinemode){
         if(event->key() == Qt::Key_0){
             std::cout << "push 0" << red_id << "   " << blue_id << std::endl;
@@ -557,9 +562,6 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
             if(blue_id!=touches_poly.size() - 1)++blue_id;
         }
 
-        if(event->key() == Qt::Key_M){
-            setProcessingLineMode(!processinglinemode);
-        }
         }else{//ここの中に書いてほしい
         int moke,hoge;
         bool result1,result2;
