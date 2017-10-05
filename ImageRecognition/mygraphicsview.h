@@ -36,9 +36,11 @@ private:
     const double threshold = 0.1;//許容範囲
     const double magnification = 0.01;
     const int photo_margin = 10; //単位はpixel
+
     cv::Mat image;
     polygon_t polygon;
     std::vector<QPointF> points;
+
     double grid_size;
     int left_right_margin,top_buttom_margin;
     std::pair<double,double> minXY;

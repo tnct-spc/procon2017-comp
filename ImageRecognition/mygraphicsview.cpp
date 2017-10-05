@@ -176,6 +176,15 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
         painter.drawRect(point_rect);
     }
 
+    //point中点を表示
+    painter.setBrush(QColor("#55FF0000"));
+    for(int i = 0 ; i < window_points.size() ; i++){
+        int next_index = i+1 == window_points.size() ? 0 : i+1;
+        QPoint centor_point((window_points[i].x() + window_points[next_index].x())/2 , (window_points[i].y() + window_points[next_index].y())/2);
+        painter.drawRect(centor_point.x() - threshold * grid_size / 2 , centor_point.y() - threshold * grid_size / 2 ,
+                         threshold * grid_size , threshold * grid_size);
+    }
+
     //index表示
     painter.setPen(QPen(QColor("#F15A22")));
     QFont font;
