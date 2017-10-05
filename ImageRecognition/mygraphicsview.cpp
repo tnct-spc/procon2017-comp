@@ -73,6 +73,7 @@ int MyGraphicsView::isInTolerance(QPointF point){
 
 void MyGraphicsView::removePoint(int index)
 {
+    if(points.size() == 3) return;
     points.erase(points.begin() + index);
     polygonUpdate();
 }
