@@ -112,7 +112,7 @@ void MyGraphicsView::mousePressEvent(QMouseEvent *event){
 void MyGraphicsView::mouseMoveEvent(QMouseEvent *event){
     if(is_point_retouch_mode){
         points[move_index] = toPolygonPoint(event->x(),event->y());
-        this->update();
+        polygonUpdate();
     }
 }
 
