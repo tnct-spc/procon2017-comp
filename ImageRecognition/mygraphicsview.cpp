@@ -49,12 +49,13 @@ void MyGraphicsView::setImage(cv::Mat const& image_){
 }
 
 QPointF MyGraphicsView::toPolygonPoint(double window_x, double window_y){
-    const int N = 5;//小数点第Nまでを取る
-    double N_10 = std::pow(10,N);
+//    const int N = 5;//小数点第Nまでを取る
+//    double N_10 = std::pow(10,N);
     QPointF buf((window_x - left_right_margin - std::floor(minXY.first))/grid_size,
                   (window_y - top_buttom_margin - std::floor(minXY.second))/grid_size);
-    QPointF point(std::round(buf.x()*N_10) / N_10 , std::round(buf.y()*N_10) / N_10);
-    return point;
+//    QPointF point(std::round(buf.x()*N_10) / N_10 , std::round(buf.y()*N_10) / N_10);
+//    return point;
+    return buf;
 }
 
 QPoint MyGraphicsView::toWindowPoint(QPointF point){
