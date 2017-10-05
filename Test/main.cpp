@@ -35,7 +35,7 @@ int Test()
 //    TESTER.push_back(new testCheckOddField);
 //    TESTER.push_back(new TestQrTranslateToPolygon);
     TESTER.push_back(new TestImageRecognitionWithHumanPower);
-    TESTER.push_back(new TestSinglePolygonDock);
+//    TESTER.push_back(new TestSinglePolygonDock);
 
     for(auto tester : TESTER){
         if(!tester->run()){
