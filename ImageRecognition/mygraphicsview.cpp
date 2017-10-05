@@ -79,24 +79,12 @@ void MyGraphicsView::removePoint(int index)
 void MyGraphicsView::insertPoint(int x, int y){
     QPointF selected_point = toPolygonPoint(x,y);
 
-    std::vector<QPointF> sentor_points;
-    for(unsigned int i = 0 ; i < points.size() ; i++){
-        int next_index = (i + 1) == points.size() ? 0 : i + 1;
-        sentor_points.push_back(QPointF((points[i].x() + points[next_index].x()) / 2 ,
-                                        (points[i].y() + points[next_index].y()) / 2));
-    }
-
-    std::cout<<"sentor_points"<<std::endl;
-    for(QPointF i : sentor_points) std::cout<<i.x()<<" , "<<i.y()<<std::endl;
-    std::cout<<"centor_points"<<std::endl;
-    for(QPointF i : centor_points) std::cout<<i.x()<<" , "<<i.y()<<std::endl;
-
-    auto itr = std::find_if(sentor_points.begin(),sentor_points.end(),[&](QPointF p){
+    auto itr = std::find_if(centor_points.begin(),centor_points.end(),[&](QPointF p){
         return (std::fabs(p.x() - selected_point.x()) <= threshold) && (std::fabs(p.y() - selected_point.y()) <= threshold);
     });
 
-    int insert_index = std::distance(sentor_points.begin(),itr);
-    if(itr != sentor_points.end()){
+    int insert_index = std::distance(centor_points.begin(),itr);
+    if(itr != centor_points.end()){
         points.insert(points.begin() + insert_index + 1 , selected_point);
         polygonUpdate();
     }
@@ -186,12 +174,14 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     }
 
     //point中点を表示
+    QVector<QPoint> window_centor_points;
+    for(QPointF i : centor_points) window_centor_points.push_back(toWindowPoint(i));
+    painter.setPen(QPen(QColor("#000000")));
     painter.setBrush(QColor("#55FF0000"));
-    for(int i = 0 ; i < window_points.size() ; i++){
-        int next_index = i+1 == window_points.size() ? 0 : i+1;
-        QPoint centor_point((window_points[i].x() + window_points[next_index].x())/2 , (window_points[i].y() + window_points[next_index].y())/2);
-        painter.drawRect(centor_point.x() - threshold * grid_size / 2 , centor_point.y() - threshold * grid_size / 2 ,
-                         threshold * grid_size , threshold * grid_size);
+    for(QPoint i : window_centor_points){
+        point_rect = QRect(i.x() - (threshold * grid_size) / 2 , i.y() - (threshold * grid_size) / 2 ,
+                           threshold * grid_size,threshold * grid_size);
+        painter.drawRect(point_rect);
     }
 
     //index表示
