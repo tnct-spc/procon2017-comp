@@ -29,11 +29,21 @@ public:
     void makePieceList(procon::NeoField const& field);
 
     void addAnswer(const procon::NeoField &field , const std::string &text);
+    void setSelectAnswerMode(bool mode);
 
 private:
     Ui::NeoAnswerDock *ui;
     std::vector<procon::NeoField> fields;
     std::vector<procon::NeoField> pieces;
+
+    bool select_answer_mode = false;
+
+private slots:
+    void submitedField(procon::NeoField field);
+
+signals:
+    void selectedAnswer(procon::NeoField field);
+
 };
 
 #endif // NEOANSWERDOCK_H
