@@ -200,6 +200,8 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
 std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector<polygon_t> rawPolygons)
 {
+    id = -1;
+
     // change vector's scale to grid
     for (auto& piece : rawPolygons) {
         for (auto& side : piece.outer()) {
