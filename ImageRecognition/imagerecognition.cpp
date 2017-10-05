@@ -34,10 +34,10 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
-//    // フレームのベクターの表示
-//    procon::ExpandedPolygon frame;
-//    frame.resetPolygonForce(polygons[0]);
-//    PolygonViewer::getInstance().pushPolygon(frame, "frame");
+    // フレームのベクターの表示
+    procon::ExpandedPolygon frame;
+    frame.resetPolygonForce(polygons[0]);
+    PolygonViewer::getInstance().pushPolygon(frame, "frame");
 
     // フレームの回転角を計算
     int longgest = 0;
@@ -72,14 +72,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
-    // ポリゴンの各辺を伸ばす
-    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);
-    }
+//    // ポリゴンの各辺を伸ばす
+//    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
+//        polygons.at(i) = expandPolygon(polygons.at(i), 0.20 / scale);// 0.115
+//    }
 
-    for (int i=0; i<frame_num; i++) {
-        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), 0.1 / scale);
-    }
+//    for (int i=0; i<frame_num; i++) {
+//        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
+//    }
 
     // make ExpandedPolygon for GUI
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
@@ -130,7 +130,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pieces.push_back((placeGrid(polygon)));
 
 //        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
-//        count++;
+        count++;
     }
 
     error = getError(pieces);
@@ -408,14 +408,18 @@ std::vector<std::vector<cv::Vec4f>> ImageRecognition::LineDetection(std::vector<
         cv::Ptr<cv::LineSegmentDetector> lsd = cv::createLineSegmentDetector(cv::LSD_REFINE_STD,0.75); // 300->0.75
         lsd->detect(image, pieces_lines[count]);
 
-        //描画
-//        cv::Mat pic(and_image);
-//        if (count == 0) {
-//            for (auto line : pieces_lines[count]) {
-//                cv::line(image, cv::Point(line[0],line[1]), cv::Point(line[2],line[3]),cv::Scalar(50.0), 5,CV_AA);
+//        //描画
+//        for (auto line : pieces_lines[count]) {
+//            cv::line(image, cv::Point(line[0],line[1]), cv::Point(line[2],line[3]),cv::Scalar(200.0), 20,CV_AA);
+//        }
 
-                //cv::imwrite("/home/spc/workspace/procon2017-image/line_image.png", and_image);
-//            }
+//        cv::imwrite("/home/spc/workspace/procon2017-comp/line_image.png", image);
+
+//        lsd->drawSegments(image, pieces_lines[count]);
+//      // Debug
+//        if (count == 0) {
+//            cv::namedWindow(std::to_string(count),CV_WINDOW_NORMAL);
+//            cv::imshow(std::to_string(count), image);
 //        }
 
         count++;
@@ -838,7 +842,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if (s > 60 && v > 50) { // 300->60,50
+            if (s > 70 && v > 70) { // 300->60,50
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -847,8 +851,8 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
         }
     }
 
-//    cv::namedWindow("bainary", CV_WINDOW_NORMAL);
-//    cv::imshow("bainary", piece_image);
+    cv::namedWindow("bainary", CV_WINDOW_NORMAL);
+    cv::imshow("bainary", piece_image);
 
     return piece_image;
 }
@@ -943,7 +947,7 @@ polygon_t ImageRecognition::deleteMispoint(polygon_t vertex)
             double a2x = polygon.at((i+1)%polygon.size()).x() - polygon.at(i).x();
             double a2y = polygon.at((i+1)%polygon.size()).y() - polygon.at(i).y();
 
-            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 170 * M_PI / 180.0) {
+            if (acos((a1x * a2x + a1y * a2y) / (hypot(a1x, a1y) * hypot(a2x, a2y))) > 177.5 * M_PI / 180.0) {
 
                 polygon.erase(polygon.begin() + (i + 1) % polygon.size());
                 polygon.erase(polygon.begin() + (i + 2) % polygon.size());
@@ -955,7 +959,7 @@ polygon_t ImageRecognition::deleteMispoint(polygon_t vertex)
                     i = i - 2;
                 } else {
                     i--;
-                }
+                   }
 
             } else {
 
@@ -1159,7 +1163,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             polygon_t rotate;
             bg::transform(shift, rotate, rad);
 
-            bool big_dif = false;
+//            bool big_dif = false;
 
             double dif = 0;
             for (auto point : rotate.outer()) {
@@ -1209,14 +1213,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     for (auto po : to_grid.outer()) {
         grid_piece.outer().push_back(point_i(round(po.x()), round(po.y())));
     }
-
-//    for (unsigned int i=0; i<polygon.size(); i++) {
-//        double x = polygon.at(i).x() - polygon.at(0).x();
-//        double y = polygon.at(i).y() - polygon.at(0).y();
-//        double move_x = x * cos(theta) - y * sin(theta);
-//        double move_y = x * sin(theta) + y * cos(theta);
-//        grid_piece.outer().push_back(point_i(round(move_x), round(move_y)));
-//    }
 
     return grid_piece;
 }
