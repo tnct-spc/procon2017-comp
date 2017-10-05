@@ -33,6 +33,9 @@ Kunugida::Kunugida(QWidget *parent) :
 
     //    imageRecognitonTest();
 
+    QDir dir("../../procon2017-comp/");
+    dir.mkdir("CSV");
+
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
 
     connect(this, SIGNAL(requestCSV()), this, SLOT(getCSV()));
@@ -45,6 +48,9 @@ Kunugida::Kunugida(QWidget *parent) :
 
     //    board->setSingleMode(true);
     //    board->setSingleMode(true);
+
+    // Replace field by HumanPower
+    connect(&imrec, SIGNAL(updateField(procon::NeoField const&)), this, SLOT(replaceField(procon::NeoField const&)));
 
     //スキャナのデバイス名を取得
     char command[256]="sh ../../procon2017-comp/Kunugida/getdevicename.sh";
@@ -200,13 +206,14 @@ void Kunugida::run()
 //        cv::Mat frame = cv::imread("/home/spc/Downloads/Wed_Oct__4_19-20-12_2017_.png", 1);
 //        cv::Mat pieces = cv::imread("/home/spc/Downloads/Wed_Oct__4_19-22-37_2017_.png", 1);
 
-        ImageRecognition imrec;
         field = imrec.run(frame, pieces);
 
         board->setScannedPieces(imrec.getPolygonPosition());
 
 //        std::vector<cv::Mat> images = imrec.getPiecesImages(pieces);
 //        std::vector<procon::ExpandedPolygon> polygons = imrec.getPolygonForImage();
+        //        imageRecognitonTest();
+//        field = imrec.run(frame, pieces);
 
     }else if(ui->csv_button->isChecked()){
         //CSV date
@@ -275,10 +282,8 @@ void Kunugida::run()
     }
 
     if(ui->ServerModeCheckbox->isChecked()){
-        std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/CSV/problem.csv";
         std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
         NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
-
     }else{
     //    TODO: ここまでで各データソースから読み込むようにする
 
@@ -341,7 +346,6 @@ void Kunugida::imageRecognitonTest()
     cv::Mat nocframe = cv::imread("../../procon2017-comp/real_frame_200.png", 1);
     cv::Mat nocpieces = cv::imread("../../procon2017-comp/real_piece_200.png", 1);
 
-    ImageRecognition imrec;
     procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
 
     return;
@@ -381,6 +385,12 @@ void Kunugida::replyFinished(QNetworkReply *reply)
     }
     qDebug() << str;
     emit requestCSVcomplete();
+}
+
+void Kunugida::replaceField(procon::NeoField const& field)
+{
+    std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
+    NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
 }
 
 cv::Mat Kunugida::scanImage()
