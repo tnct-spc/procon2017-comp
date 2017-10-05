@@ -194,18 +194,20 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-        cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame.png", 1);
-        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pices.png", 1);
+        cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
+        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
+
+//        cv::Mat frame = cv::imread("/home/spc/Downloads/Wed_Oct__4_19-20-12_2017_.png", 1);
+//        cv::Mat pieces = cv::imread("/home/spc/Downloads/Wed_Oct__4_19-22-37_2017_.png", 1);
 
         ImageRecognition imrec;
         field = imrec.run(frame, pieces);
 
-        //        imageRecognitonTest();
-//        ImageRecognition imrec;
-//        field = imrec.run(frame, pieces);
         board->setScannedPieces(imrec.getPolygonPosition());
 
-        //        imageRecognitonTest();
+//        std::vector<cv::Mat> images = imrec.getPiecesImages(pieces);
+//        std::vector<procon::ExpandedPolygon> polygons = imrec.getPolygonForImage();
+
     }else if(ui->csv_button->isChecked()){
         //CSV date
         std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
@@ -336,11 +338,13 @@ void Kunugida::imageRecognitonTest()
 {
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
-    cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece5", 1);
+    cv::Mat nocframe = cv::imread("../../procon2017-comp/real_frame_200.png", 1);
+    cv::Mat nocpieces = cv::imread("../../procon2017-comp/real_piece_200.png", 1);
 
     ImageRecognition imrec;
     procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
+
+    return;
 }
 
 void Kunugida::getCSV()

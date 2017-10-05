@@ -88,7 +88,11 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
 
+<<<<<<< HEAD
         if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+=======
+//        if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+>>>>>>> d19d15f531df2e6090f61b1fcc4906195977c6b3
     }
 
 //    // sum polygon_t and piece's image
