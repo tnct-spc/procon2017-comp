@@ -166,6 +166,16 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     painter.setBrush(QBrush(QColor("#5500FFFF")));
     painter.drawPolygon(&window_points.front(),window_points.size());
 
+    //point表示
+    painter.setPen(QPen(QColor("#000000")));
+    painter.setBrush(QColor("#55FFFFFF"));
+    QRect point_rect;
+    for(QPoint i : window_points){
+        point_rect = QRect(i.x() - (threshold * grid_size) / 2 , i.y() - (threshold * grid_size) / 2 ,
+                           threshold * grid_size,threshold * grid_size);
+        painter.drawRect(point_rect);
+    }
+
     //index表示
     painter.setPen(QPen(QColor("#F15A22")));
     QFont font;
@@ -182,15 +192,15 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
         painter.drawText(window_points[point_index],str);
     }
 
-    //grid表示
-    painter.setPen(QPen(QColor("#000000")));
-    for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
-        int x = current_col * grid_size + left_right_margin;
-        painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
-    }
-    for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
-        int y = current_row * grid_size + top_buttom_margin;
-        painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
-    }
+//    //grid表示
+//    painter.setPen(QPen(QColor("#000000")));
+//    for (int current_col = 0; current_col < grid_col + 1; ++current_col) {
+//        int x = current_col * grid_size + left_right_margin;
+//        painter.drawLine(x,top_buttom_margin,x,window_height - top_buttom_margin);
+//    }
+//    for (int current_row = 0; current_row < grid_row + 1; ++current_row) {
+//        int y = current_row * grid_size + top_buttom_margin;
+//        painter.drawLine(left_right_margin,y,window_width - left_right_margin,y);
+//    }
 }
 
