@@ -40,6 +40,7 @@ private:
     cv::Mat image;
     polygon_t polygon;
     std::vector<QPointF> points;
+    std::vector<QPointF> centor_points;
 
     double grid_size;
     int left_right_margin,top_buttom_margin;

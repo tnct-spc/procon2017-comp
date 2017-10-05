@@ -108,7 +108,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     std::vector<cv::Mat> human_images = getPiecesImages();
     std::vector<procon::ExpandedPolygon> human_polygons = getPolygonForImage();
     int i = 0;
-    while(i<human_images.size()){
+//    while(i<human_images.size()){
         imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
         QObject::connect(irwh,&imagerecongnitionwithhumanpower::returnPolygon,[](polygon_t returnpolygon){
             //ここで編集したpolygon_tを受け取る
@@ -118,7 +118,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         irwh->setImage(cv::Mat(human_images.at(i)));
         irwh->show();
         i++;
-    }
+//    }
     //@yui_end
 
 //    // sum polygon_t and piece's image

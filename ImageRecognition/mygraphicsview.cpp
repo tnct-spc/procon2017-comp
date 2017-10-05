@@ -21,6 +21,13 @@ void MyGraphicsView::setPolygon(polygon_t const& polygon_){
     for(unsigned int i = 0 ; i<polygon.outer().size() - 1;i++){
         points.push_back(QPointF(polygon.outer()[i].x() * magnification , polygon.outer()[i].y() * magnification));
     }
+
+    centor_points.clear();
+    for(unsigned int i = 0 ; i<polygon.outer().size() -1 ; i++){
+        int next_index = i+1 == polygon.outer().size() ? 0 : i+1;
+        centor_points.push_back(QPointF(((polygon.outer()[i].x() + polygon.outer()[next_index].x()) / 2) * magnification ,
+                                        ((polygon.outer()[i].y() + polygon.outer()[next_index].y()) / 2) * magnification));
+    }
     this->update();
 }
 
@@ -75,12 +82,14 @@ void MyGraphicsView::insertPoint(int x, int y){
     std::vector<QPointF> sentor_points;
     for(unsigned int i = 0 ; i < points.size() ; i++){
         int next_index = (i + 1) == points.size() ? 0 : i + 1;
-        std::cout<<(points[i].x() + points[next_index].x()) / 2 <<" "<< (points[i].y() + points[next_index].y()) / 2 <<std::endl;
         sentor_points.push_back(QPointF((points[i].x() + points[next_index].x()) / 2 ,
                                         (points[i].y() + points[next_index].y()) / 2));
     }
 
-    std::cout<<"selected "<<selected_point.x()<<" "<<selected_point.y()<<std::endl;
+    std::cout<<"sentor_points"<<std::endl;
+    for(QPointF i : sentor_points) std::cout<<i.x()<<" , "<<i.y()<<std::endl;
+    std::cout<<"centor_points"<<std::endl;
+    for(QPointF i : centor_points) std::cout<<i.x()<<" , "<<i.y()<<std::endl;
 
     auto itr = std::find_if(sentor_points.begin(),sentor_points.end(),[&](QPointF p){
         return (std::fabs(p.x() - selected_point.x()) <= threshold) && (std::fabs(p.y() - selected_point.y()) <= threshold);
