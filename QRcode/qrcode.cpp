@@ -126,6 +126,7 @@ std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRCode::Decoder(bool s,
                 read = true;
                 std::cout << "a: " << decoded_polygons.first.size() << std::endl;
                 std::cout << "b: " << decoded_polygons.second.size() << std::endl;
+                destroyAllWindows();
                 break;
             }
         }
