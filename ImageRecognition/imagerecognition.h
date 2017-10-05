@@ -69,6 +69,8 @@ private:
     int id = -1;
     int margin = 10;
 
+    bool showImage = false;
+
     std::vector<std::pair<point_i,double>> length_table;
 };
 

@@ -34,10 +34,10 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
-    // フレームのベクターの表示
-    procon::ExpandedPolygon frame;
-    frame.resetPolygonForce(polygons[0]);
-    PolygonViewer::getInstance().pushPolygon(frame, "frame");
+//    // フレームのベクターの表示
+//    procon::ExpandedPolygon frame;
+//    frame.resetPolygonForce(polygons[0]);
+//    PolygonViewer::getInstance().pushPolygon(frame, "frame");
 
     // フレームの回転角を計算
     int longgest = 0;
@@ -88,7 +88,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
 
-//        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+//        if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
 //    // sum polygon_t and piece's image
@@ -113,10 +113,12 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
             side = point_t(side.x() * scale / 2.5, side.y() * scale / 2.5);
         }
 
-        procon::ExpandedPolygon pos;
-        pos.resetPolygonForce(piece);
-        PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
-        count++;
+        if (showImage) {
+            procon::ExpandedPolygon pos;
+            pos.resetPolygonForce(piece);
+            PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
+            count++;
+        }
     }
 
     makeTable();
@@ -129,7 +131,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (auto polygon : polygons) {
         pieces.push_back((placeGrid(polygon)));
 
-//        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+//        if (showImage) NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
         count++;
     }
 
@@ -842,7 +844,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if (s > 70 && v > 70) { // 300->60,50
+            if (s > 80 && v > 70) { // 300->60,50
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
