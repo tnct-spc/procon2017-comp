@@ -74,7 +74,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // ポリゴンの各辺を伸ばす
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-        polygons.at(i) = expandPolygon(polygons.at(i), 0.15 / scale);// 0.115
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);// 0.115
     }
 
     for (int i=0; i<frame_num; i++) {
@@ -116,7 +116,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         if (showImage) {
             procon::ExpandedPolygon pos;
             pos.resetPolygonForce(piece);
-            PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
+//            PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
             count++;
         }
     }
@@ -131,7 +131,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     for (auto polygon : polygons) {
         pieces.push_back((placeGrid(polygon)));
 
-//        if (showImage) NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+        if (showImage) NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
         count++;
     }
 
@@ -844,7 +844,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if (s > 80 && v > 70) { // 300->60,50
+            if (s > 80 && v > 80) { // 300->60,50
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
