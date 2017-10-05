@@ -95,9 +95,13 @@ void MyGraphicsView::insertPoint(int x, int y){
 void MyGraphicsView::mousePressEvent(QMouseEvent *event){
     int is_in_tolerance = isInTolerance(toPolygonPoint(event->x(),event->y()));
     selecting = is_in_tolerance != -1;
+    is_point_retouch_mode = false;
     if(event->button() == Qt::MouseButton::LeftButton){
         //pointの移動(releaseとセット)
-        if(selecting) move_index = is_in_tolerance;
+        if(selecting){
+            is_point_retouch_mode = true;
+            move_index = is_in_tolerance;
+        }
     }else if(event->button() == Qt::MouseButton::RightButton){
         //pointの追加、消去
         if(is_in_tolerance == -1) insertPoint(event->x(),event->y());
@@ -105,9 +109,17 @@ void MyGraphicsView::mousePressEvent(QMouseEvent *event){
     }
 }
 
+void MyGraphicsView::mouseMoveEvent(QMouseEvent *event){
+    if(is_point_retouch_mode){
+        points[move_index] = toPolygonPoint(event->x(),event->y());
+        this->update();
+    }
+}
+
 void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event){
-    if(selecting && (event->button() == Qt::MouseButton::LeftButton)){
-        selecting = false;
+    selecting = false;
+    if(is_point_retouch_mode){
+        is_point_retouch_mode = false;
         points[move_index] = toPolygonPoint(event->x(),event->y());
         polygonUpdate();
     }

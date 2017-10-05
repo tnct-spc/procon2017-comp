@@ -46,11 +46,13 @@ private:
     int left_right_margin,top_buttom_margin;
     std::pair<double,double> minXY;
     bool selecting;
+    bool is_point_retouch_mode;
     int move_index;
 
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
 };
