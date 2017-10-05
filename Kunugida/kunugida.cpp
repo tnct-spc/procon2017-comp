@@ -191,7 +191,6 @@ void Kunugida::run()
             }
         }
 
-        ImageRecognition imrec;
         field = imrec.run(first_scan,second_scan);
         board->setScannedPieces(imrec.getPolygonPosition());
 
