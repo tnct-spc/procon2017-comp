@@ -280,10 +280,8 @@ void Kunugida::run()
     }
 
     if(ui->ServerModeCheckbox->isChecked()){
-        std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/CSV/problem.csv";
         std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
         NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
-
     }else{
     //    TODO: ここまでで各データソースから読み込むようにする
 
@@ -389,7 +387,8 @@ void Kunugida::replyFinished(QNetworkReply *reply)
 
 void Kunugida::replaceField(procon::NeoField const& field)
 {
-    /*ここで問題csvを更新する*/
+    std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
+    NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
 }
 
 cv::Mat Kunugida::scanImage()

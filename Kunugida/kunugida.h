@@ -52,6 +52,8 @@ private:
     procon::NeoField best_answer;
     ImageRecognition imrec;
 
+    std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/CSV/problem.csv";
+
 public slots:
     void getCSV();
     void postCSV();
