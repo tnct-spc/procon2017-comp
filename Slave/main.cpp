@@ -16,8 +16,6 @@ int main(int argc, char *argv[])
         //configre loggers
     }
 
-//    MainWindow w;
-//    w.show();
     NeoSlaver s;
     s.show();
 
