@@ -30,6 +30,12 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field)
     answer_board->setFixedSize(300, 300);
     this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 5, (fields.size() - 1 ) % 5);
 
+    if(this->select_answer_mode){
+        answer_board->setGoodAnswerSelectMode(true);
+    }
+
+    connect(answer_board,&NeoAnswerBoard::selectedField,this,&NeoAnswerDock::submitedField);
+
     QEventLoop loop;
     QTimer::singleShot(2, &loop, SLOT(quit()));
     loop.exec();
@@ -63,4 +69,14 @@ void NeoAnswerDock::addAnswer(const procon::NeoField &field , const std::string 
     answer_board->setFixedSize(400, 400);
     answer_board->setText(text);
     this->ui->board_container->addWidget(answer_board, (fields.size() - 1 ) / 3, (fields.size() - 1 ) % 3);
+}
+
+void NeoAnswerDock::submitedField(procon::NeoField field)
+{
+    emit selectedAnswer(field);
+}
+
+void NeoAnswerDock::setSelectAnswerMode(bool mode)
+{
+    this->select_answer_mode = mode;
 }

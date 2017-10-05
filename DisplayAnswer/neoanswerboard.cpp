@@ -888,9 +888,18 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         }
         this->update();
     }
+
+    if(this->is_select_good_asnwer_mode){
+        emit selectedField(this->field);
+    }
 }
 
 std::vector<int> NeoAnswerBoard::getSelectedPieceId()
 {
     return clicked_piece_id;
+}
+
+void NeoAnswerBoard::setGoodAnswerSelectMode(bool mode)
+{
+    this->is_select_good_asnwer_mode = mode;
 }

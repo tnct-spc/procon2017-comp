@@ -171,6 +171,8 @@ BeamSearch::BeamSearch(int beamwidth, bool answerprogress_enabled)
 //    logger = spdlog::get("beamsearch");
     dock = std::make_shared<NeoAnswerDock>();
     neo = std::make_shared<NeoAnswerDock>();
+//    dock->setSelectAnswerMode(true);
+
 
     if(answer_progress_enabled){
         neo->show();
@@ -178,6 +180,11 @@ BeamSearch::BeamSearch(int beamwidth, bool answerprogress_enabled)
     }
 
     last_selector = std::make_shared<NeoAnswerDock>();
+    last_selector->setSelectAnswerMode(true);
+
+    connect(last_selector.get(),&NeoAnswerDock::selectedAnswer,[&](procon::NeoField field){
+        this->submitAnswer(field);
+    });
 
     cpu_num = std::thread::hardware_concurrency();
 }

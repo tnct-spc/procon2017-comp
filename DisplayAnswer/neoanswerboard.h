@@ -40,6 +40,7 @@ public:
     void setProcessingLineMode(bool inp);
     void setIsEmptyColorFill(bool inp);
     void setSelectPieceMode(bool mode);
+    void setGoodAnswerSelectMode(bool mode);
 
     void setShowUnplacedPieces(bool input);
 
@@ -89,6 +90,10 @@ private:
     QString output_string;//ここのメンバ変数に入ってる文字列をAnswerBoardの画面下に表示するようにする
 
     bool isemptycolorfill = false;
+    bool is_select_good_asnwer_mode = false;
+
+signals:
+    void selectedField(procon::NeoField field);
 
 protected:
     void beforePolygon();
