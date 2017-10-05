@@ -25,6 +25,7 @@ bool NeoSlaver::get()
         SERVER_URL = "http://localhost:8016/get";
         SERVER_POST_URL = "http://localhost:8016/answer";
         SAVE_PROBLEM_PATH = "../../procon2017-comp/CSV/problem-slave.csv";
+        SAVE_ANSWER_PATH = "../../procon2017-comp/CSV/answer-slave.csv";
     }
 
     QEventLoop eventloop;
@@ -55,7 +56,7 @@ bool NeoSlaver::get()
     PDATA = NeoPolygonIO::importField(SAVE_PROBLEM_PATH);
 
     //solve puzzle
-    solver = new NeoSolver();
+    solver = new NeoSolver(ui->beamwidth->value(), ui->answer_progress->isChecked());
     connect(solver,&NeoSolver::throwAnswer,this,&NeoSlaver::emitAnswer);
     int algorithm_number = 0;
     if(ui->algo1->isChecked()){
@@ -84,6 +85,7 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
     NeoPolygonIO::exportPolygon(field,SAVE_ANSWER_PATH);
 
     std::cout<<"challenge send"<<std::endl;
+
     //send
     QFile answer_file;
     answer_file.setFileName(QString::fromStdString(SAVE_ANSWER_PATH));
@@ -104,13 +106,47 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
     this->board->setField(field);
     this->board->update();
 
+    return true;
+}
 
+bool NeoSlaver::debugEmitAnswer(procon::NeoField field)
+{
+    QEventLoop eventloop;
+
+    //Display answer
+    board->setField(field);
+
+    //io
+    NeoPolygonIO::exportPolygon(field,SAVE_ANSWER_PATH);
+
+    std::cout<<"challenge send"<<std::endl;
+
+    //send
+    QFile answer_file;
+    answer_file.setFileName(QString::fromStdString(SAVE_ANSWER_PATH));
+    answer_file.open(QIODevice::ReadOnly);
+    connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
+    QNetworkReply *postreply = manager->post(QNetworkRequest(QUrl(SERVER_POST_URL)), &answer_file);
+    connect(postreply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
+    eventloop.exec();
+
+    //std::cout<<"sending :"<<postData.toString(QUrl::FullyEncoded).toUtf8().toStdString()<<std::endl;
+    answer_file.close();
+
+    if(network_error_flag) return false;
+
+    std::cout<<"send ok"<<std::endl;
+
+    ui->state->setText(QString::fromStdString(std::string(postreply->readAll().constData())));
+    this->board->setField(field);
+    this->board->update();
 
     return true;
 }
 
 void NeoSlaver::pushGetButton()
 {
+    setIPaddress(ui->ip_address->text());
     if(!get()){
         ui->getLabel->setText("Faild Run");
     }else{
@@ -130,4 +166,10 @@ void NeoSlaver::networkerror(QNetworkReply::NetworkError e)
     std::cout << "network error! error code  : " << code  << std::endl;
     network_error_flag = true;
     //net_error_num = e;
+}
+
+void NeoSlaver::setIPaddress(QString ip_address)
+{
+    SERVER_URL = "http://" + ip_address + "/get";
+    SERVER_POST_URL = "http://" + ip_address + "/answer";
 }
