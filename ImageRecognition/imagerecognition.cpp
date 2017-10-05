@@ -72,14 +72,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
-//    // ポリゴンの各辺を伸ばす
-//    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-//        polygons.at(i) = expandPolygon(polygons.at(i), 0.20 / scale);// 0.115
-//    }
+    // ポリゴンの各辺を伸ばす
+    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);// 0.115
+    }
 
-//    for (int i=0; i<frame_num; i++) {
-//        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
-//    }
+    for (int i=0; i<frame_num; i++) {
+        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
+    }
 
     // make ExpandedPolygon for GUI
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
@@ -609,7 +609,7 @@ std::vector<polygon_t> ImageRecognition::Vectored(std::vector<std::vector<cv::Ve
     auto removeShortLines = [&](std::vector<cv::Vec4f> const& lines)->std::vector<cv::Vec4f>{
         std::vector<cv::Vec4f> return_lines;
         for(auto line : lines){
-            if ((calcDistance(line[0],line[1],line[2],line[3]) * scale) >= 5.0) {
+            if ((calcDistance(line[0],line[1],line[2],line[3]) * scale) >= 2.5) {
                 return_lines.push_back(std::move(line));
             }
         }
