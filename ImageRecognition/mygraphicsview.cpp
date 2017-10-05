@@ -177,8 +177,8 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     //point中点を表示
     QVector<QPoint> window_centor_points;
     for(QPointF i : centor_points) window_centor_points.push_back(toWindowPoint(i));
-    painter.setPen(QPen(QColor("#000000")));
-    painter.setBrush(QColor("#55FF0000"));
+    painter.setPen(QPen(QColor("#FFFFFF")));
+    painter.setBrush(QColor("#55000000"));
     for(QPoint i : window_centor_points){
         point_rect = QRect(i.x() - (threshold * grid_size) / 2 , i.y() - (threshold * grid_size) / 2 ,
                            threshold * grid_size,threshold * grid_size);
