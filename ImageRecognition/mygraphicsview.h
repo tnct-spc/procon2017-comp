@@ -27,7 +27,7 @@ public:
 private:
     QPointF toPolygonPoint(double window_x,double window_y);
     QPoint toWindowPoint(QPointF point);
-    void removePoint(int index, int x, int y);
+    void removePoint(int index);
     void insertPoint(int x,int y);
     void polygonUpdate();
     int isInTolerance(QPointF point);

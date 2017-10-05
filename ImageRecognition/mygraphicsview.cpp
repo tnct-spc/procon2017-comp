@@ -18,7 +18,7 @@ void MyGraphicsView::setPolygon(polygon_t const& polygon_){
     bg::correct(polygon);
 
     points.clear();
-    for(int i = 0 ; i<polygon.outer().size() - 1;i++){
+    for(unsigned int i = 0 ; i<polygon.outer().size() - 1;i++){
         points.push_back(QPointF(polygon.outer()[i].x() * magnification , polygon.outer()[i].y() * magnification));
     }
     this->update();
@@ -63,7 +63,7 @@ int MyGraphicsView::isInTolerance(QPointF point){
     return itr == points.end() ? -1 : std::distance(points.begin(),itr);
 }
 
-void MyGraphicsView::removePoint(int index,int x,int y)
+void MyGraphicsView::removePoint(int index)
 {
     points.erase(points.begin() + index);
     polygonUpdate();
@@ -73,7 +73,7 @@ void MyGraphicsView::insertPoint(int x, int y){
     QPointF selected_point = toPolygonPoint(x,y);
 
     std::vector<QPointF> sentor_points;
-    for(int i = 0 ; i < points.size() ; i++){
+    for(unsigned int i = 0 ; i < points.size() ; i++){
         int next_index = (i + 1) == points.size() ? 0 : i + 1;
         std::cout<<(points[i].x() + points[next_index].x()) / 2 <<" "<< (points[i].y() + points[next_index].y()) / 2 <<std::endl;
         sentor_points.push_back(QPointF((points[i].x() + points[next_index].x()) / 2 ,
@@ -102,7 +102,7 @@ void MyGraphicsView::mousePressEvent(QMouseEvent *event){
     }else if(event->button() == Qt::MouseButton::RightButton){
         //pointの追加、消去
         if(is_in_tolerance == -1) insertPoint(event->x(),event->y());
-        else removePoint(is_in_tolerance,event->x(),event->y());
+        else removePoint(is_in_tolerance);
     }
 }
 
@@ -190,7 +190,7 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     QFont font;
     font.setPixelSize(20);
     painter.setFont(font);
-    for(unsigned int point_index = 0; point_index < window_points.size() ; ++point_index){
+    for(int point_index = 0; point_index < window_points.size() ; ++point_index){
         QString str;
         str += QString::number(point_index);
         str += "(";
