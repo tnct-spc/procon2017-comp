@@ -173,7 +173,10 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
         window_points.push_back(toWindowPoint(i));
     }
     painter.setBrush(QBrush(QColor("#5500FFFF")));
-    painter.drawPolygon(&window_points.front(),window_points.size());
+    painter.setPen(QPen(QColor("#FFFFFF00")));
+    window_points.push_back(toWindowPoint(points.at(0)));
+    painter.drawPolyline(&window_points.front(),window_points.size());
+    window_points.erase(window_points.end()-1);
 
     //point表示
     painter.setPen(QPen(QColor("#000000")));
