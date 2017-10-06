@@ -23,6 +23,8 @@ public:
     std::vector<procon::ExpandedPolygon> getPolygonPosition();
     std::vector<cv::Mat> getPiecesImages();
     std::vector<procon::ExpandedPolygon> getPolygonForImage();
+    std::vector<cv::Mat> getFrameImages();
+    std::vector<procon::ExpandedPolygon> getFrameForImage();
 
     const cv::Mat& getRawPiecesPic(){
         return raw_colored_pic;
@@ -68,6 +70,7 @@ private:
     cv::Mat raw_colored_pic;
     std::vector<cv::Point> raw_pieces_pos;
     std::vector<cv::Vec3b> raw_random_colors;
+    cv::Mat raw_frame_pic;
     double scale;
 
     std::vector<int> area;
@@ -75,11 +78,12 @@ private:
     double frame_rad;
     int pieces_num;
     std::vector<procon::ExpandedPolygon> position;
+    std::vector<procon::ExpandedPolygon> expanded_frame;
     int id = -1;
     int margin = 10;
     std::vector<imagerecongnitionwithhumanpower*> irwhs;
 
-    bool showImage = false;
+    bool showImage = true;
 
     std::vector<std::pair<point_i,double>> length_table;
 
