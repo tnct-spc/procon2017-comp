@@ -64,6 +64,7 @@ private slots:
     void emitAnswer(procon::NeoField field);
     void replyFinished(QNetworkReply* reply);
     void replaceField(procon::NeoField const& field);
+    void acceptAnswer();
 };
 
 #endif // KUNUGIDA_H

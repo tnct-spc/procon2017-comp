@@ -63,7 +63,7 @@ void AnswerForm::ServiceRequestCompleted(){
     if(field_posted.getPiecesSize() > field_answer.getPiecesSize())
         NeoPolygonIO::exportPolygon(field_posted, filename_answer.toUtf8().constData());
 
-    emit getAnswer(filename_answer);
+    emit getAnswer();
 
     // Response end
     response->end();

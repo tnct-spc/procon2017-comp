@@ -20,7 +20,7 @@ private slots:
     void ServiceRequestCompleted();
 
 signals:
-    void getAnswer(QString file_path);
+    void getAnswer();
 
 private:
     QHttpResponse *new_response_;
