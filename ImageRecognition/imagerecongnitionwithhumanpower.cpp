@@ -14,7 +14,7 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
 
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
     emit returnPolygon(my_graphics_view->getPolygon());
-    this->close();
+//    this->close();
 }
 
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()

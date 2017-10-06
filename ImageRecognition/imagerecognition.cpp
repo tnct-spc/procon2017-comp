@@ -130,7 +130,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
             //ここで編集したpolygon_tを受け取る
             std::cout << i << " : " << boost::geometry::dsv(returnpolygon) << std::endl;
 
-            currentRawPolygons.erase(currentRawPolygons.end());
+            currentRawPolygons.erase(currentRawPolygons.end() - 1);
             currentRawPolygons.push_back(returnpolygon);
             std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(currentRawPolygons);
             procon::NeoField field = makeNeoField(pieces);
