@@ -905,11 +905,15 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 {
     // RGB画像をHSVに変換
     cv::Mat hsv_image;
-    cv::cvtColor(src_image, hsv_image, CV_BGR2HSV);
+    cv::cvtColor(src_image, hsv_image, cv::COLOR_BGR2HSV);
 
     // HSVに画像を分解
     cv::Mat channels[3];
     cv::split(hsv_image, channels);
+
+    cv::Mat binaries[3];
+    cv::threshold(channels[1], binaries[1], 70, 140,CV_THRESH_BINARY);
+    cv::threshold(channels[2], binaries[2], 120, 200,CV_THRESH_BINARY);
 
     // 色相と彩度から色抽出int
     int width = src_image.cols;
@@ -920,11 +924,8 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-<<<<<<< HEAD
-            if (s > 80 && v > 80) { // 300->60,50
-=======
-            if ((s > 70) && (s < 140) && (v > 120) && (v < 200)) {
->>>>>>> develop
+
+            if ((s > 80) && (s < 150) && (v > 140) && (v < 200)) {
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -939,9 +940,9 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     cv::namedWindow("H", CV_WINDOW_NORMAL);
     cv::imshow("H", channels[0]);
     cv::namedWindow("S", CV_WINDOW_NORMAL);
-    cv::imshow("S", channels[1]);
+    cv::imshow("S", binaries[1]);
     cv::namedWindow("V", CV_WINDOW_NORMAL);
-    cv::imshow("V", channels[3]);
+    cv::imshow("V", binaries[2]);
 
     return piece_image;
 }
