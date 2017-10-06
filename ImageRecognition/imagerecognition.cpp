@@ -129,6 +129,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
             emit updateField(field);
         });
+        irwh->setWindowTitle(QString::number(i));
         irwh->setPolygon(human_polygons.at(i).getPolygon());
         irwh->setImage(cv::Mat(human_images.at(i)));
         irwh->show();
