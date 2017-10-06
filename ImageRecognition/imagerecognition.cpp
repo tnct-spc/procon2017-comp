@@ -28,6 +28,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     position.clear();
     id = -1;
     raw_pieces_pic = raw_pieces_image;
+    raw_frame_pic = raw_frame_image;
 
     // スケールを計算
     scale = 437.0 / 5150.0;
@@ -86,14 +87,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
-    // ポリゴンの各辺を伸ばす
-    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);// 0.115
-    }
+//    // ポリゴンの各辺を伸ばす
+//    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
+//        polygons.at(i) = expandPolygon(polygons.at(i), 0.2 / scale);// 0.115
+//    }
 
-    for (int i=0; i<frame_num; i++) {
-        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
-    }
+//    for (int i=0; i<frame_num; i++) {
+//        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
+//    }
 
     // save
     currentRawPolygons.clear();
@@ -110,6 +111,13 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         position.push_back(pos);
 
 //        if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+    }
+
+    for (int i=0; i<frame_num; i++) {
+
+        procon::ExpandedPolygon fra(i);
+        fra.resetPolygonForce(polygons.at(polygons.size()-i-1));
+        expanded_frame.push_back(fra);
     }
 
     //@yui
@@ -138,45 +146,6 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     }
     //@yui_end
 
-//    // sum polygon_t and piece's image
-//    std::vector<procon::ExpandedPolygon> pfi = getPolygonForImage();
-//    std::vector<cv::Mat> pimage = getPiecesImages(raw_pieces_image);
-
-//    int count = 0;
-//    for (auto polygon : pfi) {
-//        polygon_t p = polygon.getPolygon();
-//        for (unsigned int i=0; i<p.outer().size()-1; i++) {
-//            cv::line(pimage.at(count), cv::Point(p.outer().at(i).x(),p.outer().at(i).y()), cv::Point(p.outer().at(i+1).x(), p.outer().at(i+1).y()),cv::Scalar(50.0), 1,CV_AA);
-//        }
-//        cv::namedWindow(std::to_string(count));
-//        cv::imshow(std::to_string(count), pimage.at(count));
-//        count++;
-//    }
-
-    //     scale is led from 6*6 piece//    double scale_len;
-//    for (auto piece : polygons) {
-//        if (piece.outer().size() == 5) {
-//            bool check = true;
-//            scale_len = 0;
-//            for (int i=0; i<4; i++) {
-//                double x = piece.outer().at(i+1).x() - piece.outer().at(i).x();
-//                double y = piece.outer().at(i+1).y() - piece.outer().at(i).y();
-//                double len = hypot(x,y) * scale / 2.5;
-//                if (fabs(6.0 - len) > 1) {
-//                    check = false;
-//                } else {
-//                    scale_len += hypot(x,y);
-//                }
-//            }
-
-//            if (check) {
-//                break;
-//            }
-//        }
-//    }
-
-//        scale = 15 * 4 / scale_len;
-
     makeTable();
 
     std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(polygons);
@@ -191,6 +160,8 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
 {
     id = -1;
     int count=0;
+    errors.clear();
+    radians.clear();
 
     // change vector's scale to grid
     for (auto& piece : rawPolygons) {
@@ -213,6 +184,8 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
     count = 0;
     for (auto& polygon : rawPolygons) {
         pieces.push_back((placeGrid(polygon)));
+//        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+        count++;
     }
 
     error = getError(pieces);
@@ -906,11 +879,15 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 {
     // RGB画像をHSVに変換
     cv::Mat hsv_image;
-    cv::cvtColor(src_image, hsv_image, CV_BGR2HSV);
+    cv::cvtColor(src_image, hsv_image, cv::COLOR_BGR2HSV);
 
     // HSVに画像を分解
     cv::Mat channels[3];
     cv::split(hsv_image, channels);
+
+    cv::Mat binaries[3];
+    cv::threshold(channels[1], binaries[1], 70, 140,CV_THRESH_BINARY);
+    cv::threshold(channels[2], binaries[2], 120, 200,CV_THRESH_BINARY);
 
     // 色相と彩度から色抽出int
     int width = src_image.cols;
@@ -921,7 +898,8 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if (s > 80 && v > 80) { // 300->60,50
+
+            if ((s > 80) && (s < 200) && (v > 120) && (v < 200)) {
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -932,6 +910,13 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 
     cv::namedWindow("bainary", CV_WINDOW_NORMAL);
     cv::imshow("bainary", piece_image);
+
+//    cv::namedWindow("H", CV_WINDOW_NORMAL);
+//    cv::imshow("H", channels[0]);
+//    cv::namedWindow("S", CV_WINDOW_NORMAL);
+//    cv::imshow("S", binaries[1]);
+//    cv::namedWindow("V", CV_WINDOW_NORMAL);
+//    cv::imshow("V", binaries[2]);
 
     return piece_image;
 }
@@ -1191,7 +1176,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     double first_y = polygon.at(1).y() - polygon.at(0).y();
     double len = hypot(first_x, first_y);
     double to_ver_rad = std::atan2(first_y, first_x);
-    point_i smallest;
+    point_i smallest;        // 可能性のあるものから全角の誤差が最も小さいものを確認
+    double smallest_dif = 100;
 
     if (right_angle) {
         smallest = point_i((int)round(len), 0);
@@ -1225,9 +1211,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             shorter--;
             longer++;
         }
-
-        // 可能性のあるものから全角の誤差が最も小さいものを確認
-        double smallest_dif = 100;
 
         // 原点に平行移動
         trans::translate_transformer<double,2,2> translate(-polygon.at(0).x(), -polygon.at(0).y());
@@ -1270,6 +1253,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     }
 
+    errors.push_back(smallest_dif);
+
     // 最終的な回転角度を算出
     double theta;
     if (frame) {
@@ -1277,6 +1262,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     } else {
         theta = to_ver_rad - std::atan2(smallest.y(), smallest.x());
     }
+
+    radians.push_back(theta);
 
     // グリッドの点番号で保存
     polygon_i grid_piece;
@@ -1460,6 +1447,52 @@ std::vector<procon::ExpandedPolygon> ImageRecognition::getPolygonForImage()
 
     return trans_polygon;
 }
+std::vector<cv::Mat> ImageRecognition::getFrameImages()
+{
+    cv::Mat frame_image = raw_frame_pic;
+
+    std::vector<cv::Mat> frame_images;
+
+    std::vector<procon::ExpandedPolygon> frames = expanded_frame;
+
+    int i = 0;
+
+    for (auto frame : frames) {
+
+        bg::model::box<bg::model::d2::point_xy<double>> box;
+        bg::envelope(frame.getPolygon(), box);
+
+        cv::Mat image(frame_image, cv::Rect(box.min_corner().x()-margin, box.min_corner().y()-margin, box.max_corner().x()-box.min_corner().x()+margin*2, box.max_corner().y()-box.min_corner().y()+margin*2));
+        frame_images.push_back(image);
+
+        cv::namedWindow(std::to_string(i));
+        cv::imshow(std::to_string(i), image);
+        i++;
+    }
+
+    return frame_images;
+}
+
+std::vector<procon::ExpandedPolygon> ImageRecognition::getFrameForImage()
+{
+    std::vector<procon::ExpandedPolygon> frames = expanded_frame;
+    std::vector<procon::ExpandedPolygon> trans_frame;
+
+    for (auto frame : frames) {
+
+        bg::model::box<bg::model::d2::point_xy<double>> box;
+        bg::envelope(frame.getPolygon(), box);
+
+        bg::strategy::transform::translate_transformer<double, 2, 2> translate(-box.min_corner().x()+margin, -box.min_corner().y()+margin);
+        polygon_t result;
+        bg::transform(frame.getPolygon(), result, translate);
+        procon::ExpandedPolygon set_pol;
+        set_pol.resetPolygonForce(result);
+        trans_frame.push_back(set_pol);
+    }
+
+    return trans_frame;
+}
 
 polygon_t ImageRecognition::expandPolygon(polygon_t polygon, double dxy)
 {
@@ -1639,4 +1672,14 @@ polygon_t ImageRecognition::expandPolygon(polygon_t polygon, double dxy)
 
     return new_polygon;
 
+}
+
+std::vector<double> ImageRecognition::getErrors()
+{
+    return errors;
+}
+
+std::vector<double> ImageRecognition::getRadians()
+{
+    return radians;
 }
