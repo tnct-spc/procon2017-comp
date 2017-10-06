@@ -25,6 +25,8 @@ public:
     std::vector<procon::ExpandedPolygon> getPolygonForImage();
     std::vector<cv::Mat> getFrameImages();
     std::vector<procon::ExpandedPolygon> getFrameForImage();
+    std::vector<double> getErrors();
+    std::vector<double> getRadians();
 
     const cv::Mat& getRawPiecesPic(){
         return raw_colored_pic;
@@ -82,8 +84,10 @@ private:
     int id = -1;
     int margin = 10;
     std::vector<imagerecongnitionwithhumanpower*> irwhs;
+    std::vector<double> errors;
+    std::vector<double> radians;
 
-    bool showImage = true;
+    bool showImage = false;
 
     std::vector<std::pair<point_i,double>> length_table;
 

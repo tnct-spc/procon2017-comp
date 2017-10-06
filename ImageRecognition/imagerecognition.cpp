@@ -159,6 +159,8 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
 {
     id = -1;
     int count=0;
+    errors.clear();
+    radians.clear();
 
     // change vector's scale to grid
     for (auto& piece : rawPolygons) {
@@ -186,10 +188,6 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
     }
 
     error = getError(pieces);
-
-    std::vector<cv::Mat> imag = getFrameImages();
-    std::vector<procon::ExpandedPolygon> fr = getFrameForImage();
-
 
     return std::move(pieces);
 }
@@ -1177,7 +1175,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     double first_y = polygon.at(1).y() - polygon.at(0).y();
     double len = hypot(first_x, first_y);
     double to_ver_rad = std::atan2(first_y, first_x);
-    point_i smallest;
+    point_i smallest;        // 可能性のあるものから全角の誤差が最も小さいものを確認
+    double smallest_dif = 100;
 
     if (right_angle) {
         smallest = point_i((int)round(len), 0);
@@ -1211,9 +1210,6 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             shorter--;
             longer++;
         }
-
-        // 可能性のあるものから全角の誤差が最も小さいものを確認
-        double smallest_dif = 100;
 
         // 原点に平行移動
         trans::translate_transformer<double,2,2> translate(-polygon.at(0).x(), -polygon.at(0).y());
@@ -1256,6 +1252,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         }
     }
 
+    errors.push_back(smallest_dif);
+
     // 最終的な回転角度を算出
     double theta;
     if (frame) {
@@ -1263,6 +1261,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     } else {
         theta = to_ver_rad - std::atan2(smallest.y(), smallest.x());
     }
+
+    radians.push_back(theta);
 
     // グリッドの点番号で保存
     polygon_i grid_piece;
@@ -1671,4 +1671,14 @@ polygon_t ImageRecognition::expandPolygon(polygon_t polygon, double dxy)
 
     return new_polygon;
 
+}
+
+std::vector<double> ImageRecognition::getErrors()
+{
+    return errors;
+}
+
+std::vector<double> ImageRecognition::getRadians()
+{
+    return radians;
 }
