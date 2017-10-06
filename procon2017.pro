@@ -17,4 +17,3 @@ SUBDIRS += \
     AbilityCheck \
     Test \
     FindBug
-
