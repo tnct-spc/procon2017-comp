@@ -126,6 +126,17 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     int i = 0;
     while(i<human_images_frame.size()){
         imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
+        QObject::connect(irwh,&imagerecongnitionwithhumanpower::returnPolygon,[&, i](polygon_t returnpolygon){
+            //ここで編集したpolygon_tを受け取る
+            std::cout << i << " : " << boost::geometry::dsv(returnpolygon) << std::endl;
+
+            currentRawPolygons.erase(currentRawPolygons.end());
+            currentRawPolygons.push_back(returnpolygon);
+            std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(currentRawPolygons);
+            procon::NeoField field = makeNeoField(pieces);
+
+            emit updateField(field);
+        });
         irwh->setWindowTitle("frame");
         irwh->setPolygon(human_polygons_frame[i].getPolygon());
         irwh->setImage(human_images_frame[i]);
@@ -921,7 +932,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     }
 
     cv::namedWindow("bainary", CV_WINDOW_NORMAL);
-    cv::imshow("bainary", piece_image);
+//    cv::imshow("bainary", piece_image);
 
 //    cv::namedWindow("H", CV_WINDOW_NORMAL);
 //    cv::imshow("H", channels[0]);
@@ -1478,7 +1489,7 @@ std::vector<cv::Mat> ImageRecognition::getFrameImages()
         frame_images.push_back(image);
 
         cv::namedWindow(std::to_string(i));
-        cv::imshow(std::to_string(i), image);
+//        cv::imshow(std::to_string(i), image);
         i++;
     }
 
