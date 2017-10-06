@@ -845,7 +845,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 //            int h = channels[0].at<uchar>(y, x);
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
-            if (s > 80 && v > 80) { // 300->60,50
+            if ((s > 70) && (s < 140) && (v > 120) && (v < 200)) {
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -856,6 +856,13 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
 
     cv::namedWindow("bainary", CV_WINDOW_NORMAL);
     cv::imshow("bainary", piece_image);
+
+    cv::namedWindow("H", CV_WINDOW_NORMAL);
+    cv::imshow("H", channels[0]);
+    cv::namedWindow("S", CV_WINDOW_NORMAL);
+    cv::imshow("S", channels[1]);
+    cv::namedWindow("V", CV_WINDOW_NORMAL);
+    cv::imshow("V", channels[3]);
 
     return piece_image;
 }
