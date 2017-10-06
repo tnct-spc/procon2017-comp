@@ -1,0 +1,72 @@
+--- a/DisplayAnswer/neoanswerboard.cpp
++++ b/DisplayAnswer/neoanswerboard.cpp
+@@ -482,7 +482,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
+             }
+         }
+     };*/
+-    if(field.getPieces().size()!=0) setTouchesPiece();
++//    if(field.getPieces().size()!=0) setTouchesPiece();
+     drawPolygonPointNum();
+     drawEvalution();
+     drawGrid();
+--- a/ImageRecognition/imagerecognition.cpp
++++ b/ImageRecognition/imagerecognition.cpp
+@@ -34,25 +34,25 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
+     // ベクター化
+     std::vector<polygon_t> polygons = Vectored(pieces_lines);
+ 
+-//    // フレームのベクターの表示
+-//    procon::ExpandedPolygon frame;
+-//    frame.resetPolygonForce(polygons[0]);
+-//    PolygonViewer::getInstance().pushPolygon(frame, "frame");
++    // フレームのベクターの表示
++    procon::ExpandedPolygon frame;
++    frame.resetPolygonForce(polygons[0]);
++    PolygonViewer::getInstance().pushPolygon(frame, "frame");
+ 
+     // フレームの回転角を計算
+-    int longgest = 0;
+-    point_t long_point;
+-    for (unsigned int i=0; i<polygons.at(0).outer().size()-1; i++) {
+-        double x = polygons.at(0).outer().at(i+1).x() - polygons.at(0).outer().at(i).x();
+-        double y = polygons.at(0).outer().at(i+1).y() - polygons.at(0).outer().at(i).y();
+-        double len = hypot(x,y);
+-        if (longgest < len) {
+-            longgest = len;
+-            long_point = point_t(x,y);
+-        }
++    point_t x_point(100000,100000);
++    point_t y_point(100000,100000);
++    for (auto point : polygons.at(0).outer()) {
++        if (x_point.x() > point.x()) x_point = point;
++        if (y_point.y() > point.y()) y_point = point;
+     }
+ 
+-    frame_rad = std::atan2(long_point.y(), long_point.x());
++    double len = hypot(x_point.y() - y_point.y(), x_point.x() - y_point.x()) * scale;
++    if (fabs(297 - len) < 50) {
++        frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x());
++    } else {
++        frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x()) - M_PI / 2;
++    }
+ 
+     // frameのinnersをouterに入れ替える
+     frame_num = polygons[0].inners().size();
+@@ -74,7 +74,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
+ 
+     // ポリゴンの各辺を伸ばす
+     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
+-        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);// 0.115
++        polygons.at(i) = expandPolygon(polygons.at(i), 0.1 / scale);// 0.115
+     }
+ 
+     for (int i=0; i<frame_num; i++) {
+@@ -844,7 +844,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
+ //            int h = channels[0].at<uchar>(y, x);
+             int s = channels[1].at<uchar>(y, x);
+             int v = channels[2].at<uchar>(y, x);
+-            if (s > 80 && v > 70) { // 300->60,50
++            if (s > 80 && v > 40 && v < 80) { // 300->60,50
+                 piece_image.at<uchar>(y, x) = 255;
+             }
+             else {

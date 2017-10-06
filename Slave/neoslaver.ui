@@ -63,6 +63,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QCheckBox" name="forbeamserch">
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QCheckBox" name="boss">

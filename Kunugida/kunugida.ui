@@ -138,6 +138,9 @@
         <property name="text">
          <string>Server Mode</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -196,7 +199,7 @@
      <x>0</x>
      <y>0</y>
      <width>879</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
