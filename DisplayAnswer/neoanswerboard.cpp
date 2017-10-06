@@ -482,7 +482,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
             }
         }
     };*/
-    if(field.getPieces().size()!=0) setTouchesPiece();
+//    if(field.getPieces().size()!=0) setTouchesPiece();
     drawPolygonPointNum();
     drawEvalution();
     drawGrid();
