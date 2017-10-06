@@ -58,12 +58,12 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     point_t x_point(100000,100000);
     point_t y_point(100000,100000);
     for (auto point : polygons.at(0).outer()) {
-        if (x_point.x() > point.x()) x_point = point;
-        if (y_point.y() > point.y()) y_point = point;
+        if (x_point.x() < point.x()) x_point = point;
+        if (y_point.y() < point.y()) y_point = point;
     }
 
     double len = hypot(x_point.y() - y_point.y(), x_point.x() - y_point.x()) * scale;
-    if (fabs(297 - len) < 50) {
+    if (fabs(297 - len) < 70) {
         frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x());
     } else {
         frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x()) - M_PI / 2;
@@ -87,14 +87,14 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         boost::geometry::correct(p);
     }
 
-//    // ポリゴンの各辺を伸ばす
-//    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-//        polygons.at(i) = expandPolygon(polygons.at(i), 0.2 / scale);// 0.115
-//    }
+    // ポリゴンの各辺を伸ばす
+    for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.2 / scale);// 0.115
+    }
 
-//    for (int i=0; i<frame_num; i++) {
-//        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
-//    }
+    for (int i=0; i<frame_num; i++) {
+        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
+    }
 
     // save
     currentRawPolygons.clear();
@@ -171,7 +171,7 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
         if (showImage) {
             procon::ExpandedPolygon pos;
             pos.resetPolygonForce(piece);
-            PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
+//            PolygonViewer::getInstance().pushPolygon(pos,std::to_string(count));
             count++;
         }
     }
@@ -183,7 +183,7 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
     count = 0;
     for (auto& polygon : rawPolygons) {
         pieces.push_back((placeGrid(polygon)));
-//        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
         count++;
     }
 
