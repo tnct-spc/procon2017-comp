@@ -121,9 +121,21 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     }
 
     //@yui
+    std::vector<cv::Mat> human_images_frame = getFrameImages();
+    std::vector<procon::ExpandedPolygon> human_polygons_frame = getFrameForImage();
+    int i = 0;
+    while(i<human_images_frame.size()){
+        imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
+        irwh->setWindowTitle("frame");
+        irwh->setPolygon(human_polygons_frame[i].getPolygon());
+        irwh->setImage(human_images_frame[i]);
+        irwh->show();
+        i++;
+    }
+
     std::vector<cv::Mat> human_images = getPiecesImages();
     std::vector<procon::ExpandedPolygon> human_polygons = getPolygonForImage();
-    int i = 0;
+    i = 0;
     while(i<human_images.size()){
         imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
         QObject::connect(irwh,&imagerecongnitionwithhumanpower::returnPolygon,[&, i](polygon_t returnpolygon){
