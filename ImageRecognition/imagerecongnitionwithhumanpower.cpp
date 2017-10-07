@@ -7,8 +7,14 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
 {
     ui->setupUi(this);
 
+    view = new QGraphicsView();
+    scene = new QGraphicsScene();
     my_graphics_view = new MyGraphicsView();
-    ui->horizontalLayout->addWidget(my_graphics_view);
+
+    scene->addWidget(my_graphics_view);
+    view->setScene(scene);
+
+    ui->horizontalLayout->addWidget(view);
     connect(ui->editedButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
 }
 
