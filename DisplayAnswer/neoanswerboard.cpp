@@ -300,7 +300,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
         if(single_mode){
         painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
-        painter.setBackground(QBrush(Qt::white));
+        painter.setBackground(QBrush(QColor(255, 255, 255, 100)));
 
 //        int number=0;
 //        for(auto expanded_polygon: field.getPieces()){
@@ -312,7 +312,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
 //            }
 //            ++number;
 //        }
-        painter.setPen(QPen(QBrush(QColor(236,182,138, 200)),0.1));
+        painter.setPen(QPen(QBrush(Qt::yellow),0.1));
         int count=0;
         for(auto frame : field.getFrame()){
             for(auto point : frame.getPolygon().outer()){
