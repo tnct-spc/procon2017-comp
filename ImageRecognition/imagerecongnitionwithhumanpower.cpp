@@ -23,6 +23,15 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
 }
 
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
+    auto polygonIO = [](std::string path , polygon_t polygon){
+        std::ofstream output(path);
+        for(point_t i : polygon.outer()){
+            output << bg::dsv(i) << std::endl;
+        }
+        output.close();
+    };
+
+    polygonIO("../../procon2017-comp/CSV/edited_polygon.csv",my_graphics_view->getPolygon());
     emit returnPolygon(my_graphics_view->getPolygon());
 //    this->close();
 }
