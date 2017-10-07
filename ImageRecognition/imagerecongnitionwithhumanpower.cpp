@@ -25,6 +25,14 @@ void imagerecongnitionwithhumanpower::clickedEditedButton(){
 //    this->close();
 }
 
+void imagerecongnitionwithhumanpower::clickedEnlargementButton(){
+
+}
+
+void imagerecongnitionwithhumanpower::clickedReductionButton(){
+
+}
+
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
 {
     delete ui;

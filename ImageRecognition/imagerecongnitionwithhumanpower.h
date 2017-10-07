@@ -33,6 +33,8 @@ private:
 
 private slots:
     void clickedEditedButton();
+    void clickedEnlargementButton();
+    void clickedReductionButton();
 protected:
 
 signals:
