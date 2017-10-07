@@ -207,7 +207,7 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
     count = 0;
     for (auto& polygon : rawPolygons) {
         pieces.push_back((placeGrid(polygon)));
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+//        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
         count++;
     }
 
