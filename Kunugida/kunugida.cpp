@@ -208,7 +208,7 @@ void Kunugida::run()
 //        cv::Mat pieces = cv::imread("/home/spc/Downloads/Fri_Oct__6_18-56-31_2017_.png", 1);
 
 //        cv::Mat frame = cv::imread("/home/spc/Downloads/Fri_Oct__6_20-13-14_2017_.png", 1);
-//        cv::Mat pieces = cv::imread("/home/spc/Downloads/Fri_Oct__6_20-15-54_2017_.png", 1);
+//        cv::Mat pieces = cv::imread("//home/spc/Downloads/Fri_Oct__6_20-15-54_2017_.png", 1);
 
         field = imrec.run(frame, pieces);
 

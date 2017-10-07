@@ -48,42 +48,54 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
-//    // フレームのベクターの表示
-//    procon::ExpandedPolygon frame;
-//    frame.resetPolygonForce(polygons[0]);
-//    PolygonViewer::getInstance().pushPolygon(frame, "frame");
+    // フレームのベクターの表示
+    procon::ExpandedPolygon frame;
+    frame.resetPolygonForce(polygons[0]);
+    PolygonViewer::getInstance().pushPolygon(frame, "frame");
 
-    // フレームの回転角を計算
-
-    point_t x_point(100000,100000);
-    point_t y_point(100000,100000);
-    for (auto point : polygons.at(0).outer()) {
-        if (x_point.x() > point.x()) x_point = point;
-        if (y_point.y() > point.y()) y_point = point;
-    }
-
-//    point_t min_point(100000,100000);
-//    point_t max_point(0,0);
-//    point_t next_point(100000,0);
+//    // フレームの回転角を計算
+//    point_t point1(100000,0);
+//    point_t point2(0,100000);
+//    point_t point3(0,0);
+//    point_t point4(0,0);
 //    for (auto point : polygons.at(0).outer()) {
-//        if (min_point.y() > point.y()) min_point = point;
-//        if (max_point.y() < point.y()) max_point = point;
-//        if (next_point.x() > point.x()) next_point = point;
+//        if (point1.x() > point.x()) point1 = point;
+//        if (point2.y() > point.y()) point2 = point;
+//        if (point3.y() < point.y()) point3 = point;
+//        if (point4.x() < point.x()) point4 = point;
 //    }
 
-//    double len = hypot(min_point.x() - next_point.x(), min_point.y() - next_point.y()) * scale;
+//    double len = hypot(point1.x() - point2.x(), point1.y() - point2.y()) * scale;
+//    double rads[3];
 //    if (fabs(297 - len) < 20) {
-//        frame_rad = std::atan2(max_point.y() - min_point.y(), max_point.x() - min_point.x()) + std::atan2(210.0, 297.0);
+//        rads[0] = std::atan2(point1.y() - point2.y(), point1.x() - point2.x());
+//        rads[1] = std::atan2(point3.y() - point2.y(), point3.x() - point2.x()) + std::atan2(210,297);
+//        rads[2] = std::atan2(point4.y() - point2.y(), point4.x() - point2.x()) + M_PI * 0.5;
 //    } else {
-//        frame_rad = std::atan2(max_point.y() - min_point.y(), max_point.x() - min_point.x()) - std::atan2(210.0, 297.0);
+//        rads[0] = std::atan2(point1.y() - point2.y(), point1.x() - point2.x()) - M_PI * 0.5;
+//        rads[1] = std::atan2(point3.y() - point2.y(), point3.x() - point2.x()) - std::atan2(210,297);
+//        rads[2] = std::atan2(point4.y() - point2.y(), point4.x() - point2.x());
 //    }
 
-    double len = hypot(x_point.y() - y_point.y(), x_point.x() - y_point.x()) * scale;
-    if (fabs(297 - len) < 20) {
-        frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x());
-    } else {
-        frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x()) - M_PI / 2.0;
-    }
+//    double sum = 0;
+//    for (auto r : rads) {
+//        sum += r;
+//    }
+//    frame_rad = sum / 3;
+
+//    point_t x_point(100000,100000);
+//    point_t y_point(100000,100000);
+//    for (auto point : polygons.at(0).outer()) {
+//        if (x_point.x() > point.x()) x_point = point;
+//        if (y_point.y() > point.y()) y_point = point;
+//    }
+
+//    double len = hypot(x_point.y() - y_point.y(), x_point.x() - y_point.x()) * scale;
+//    if (fabs(297 - len) < 20) {
+//        frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x());
+//    } else {
+//        frame_rad = std::atan2(y_point.y() - x_point.y(), y_point.x() - x_point.x()) - M_PI / 2.0;
+//    }
 
     // frameのinnersをouterに入れ替える
     frame_num = polygons[0].inners().size();
@@ -111,7 +123,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     }
 
 //    for (int i=0; i<frame_num; i++) {
-//        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), -0.1 / scale);
+//        polygons.at(polygons.size()-i-1) = expandPolygon(polygons.at(polygons.size()-i-1), 0.15 / scale);
 //    }
 
     // save
@@ -936,9 +948,9 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     cv::Mat channels[3];
     cv::split(hsv_image, channels);
 
-    cv::Mat binaries[3];
-    cv::threshold(channels[1], binaries[1], 70, 140,CV_THRESH_BINARY);
-    cv::threshold(channels[2], binaries[2], 120, 200,CV_THRESH_BINARY);
+//    cv::Mat binaries[3];
+//    cv::threshold(channels[1], binaries[1], 70, 140,CV_THRESH_BINARY);
+//    cv::threshold(channels[2], binaries[2], 120, 200,CV_THRESH_BINARY);
 
     // 色相と彩度から色抽出int
     int width = src_image.cols;
@@ -960,9 +972,9 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     }
 
     cv::namedWindow("bainary", CV_WINDOW_NORMAL);
-//    cv::imshow("bainary", piece_image);
+    cv::imshow("bainary", piece_image);
 
-    cv::imwrite("/home/spc/Pictures/bainary.png", piece_image);
+//    cv::imwrite("/home/spc/Pictures/bainary.png", piece_image);
 
 //    cv::namedWindow("H", CV_WINDOW_NORMAL);
 //    cv::imshow("H", channels[0]);
@@ -1139,11 +1151,11 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     id++;
 
     bool frame = false;
-    if (id >= pieces_num - frame_num) {
+    if (id >= pieces_num - frame_num) frame = true;
 
-        frame = true;
+//        right_angle = true;
 
-    } else {
+//    } else {
 
         // ９０度角を探す
         for (unsigned int i=0; i<polygon.size()-1; i++) {
@@ -1161,7 +1173,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
 
                 // ９０度角でも傾いている場合を考慮
-                if (fabs(hori - round(hori)) < 0.1) {
+                if (fabs(hori - round(hori)) < 0.2) {
 
                     polygon.pop_back();
                     polygon_t spin;
@@ -1178,7 +1190,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                 }
             }
         }
-    }
+//    }
 
 //    // ９０度がなかったら横になる辺か一番長い辺を最初に持ってくる
 //    if (!right_angle) {
@@ -1234,45 +1246,45 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
         smallest = point_i((int)round(len), 0);
     } else {
 
-        if (frame) {
+//        if (frame) {
 
-            std::vector<double> tras;
+//            std::vector<double> tras;
 
-            tras.push_back(frame_rad);
-            for (int i=1; i<20; i++) {
-                tras.push_back(frame_rad+i*M_PI/180);
-                tras.push_back(frame_rad-i*M_PI/180);
-            }
+//            tras.push_back(frame_rad);
+//            for (int i=1; i<20; i++) {
+//                tras.push_back(frame_rad+i*M_PI/180);
+//                tras.push_back(frame_rad-i*M_PI/180);
+//            }
 
-            // 原点に平行移動
-            trans::translate_transformer<double,2,2> translate(-polygon.at(0).x(), -polygon.at(0).y());
-            polygon_t shift;
-            bg::transform(vertex, shift, translate);
+//            // 原点に平行移動
+//            trans::translate_transformer<double,2,2> translate(-polygon.at(0).x(), -polygon.at(0).y());
+//            polygon_t shift;
+//            bg::transform(vertex, shift, translate);
 
-            double smallest_dif_rad;
+//            double smallest_dif_rad;
 
-            for (auto r : tras) {
+//            for (auto r : tras) {
 
-                // 回転
-                trans::rotate_transformer<bg::radian,double,2,2> rad(r);
-                polygon_t rotate;
-                bg::transform(shift, rotate, rad);
+//                // 回転
+//                trans::rotate_transformer<bg::radian,double,2,2> rad(r);
+//                polygon_t rotate;
+//                bg::transform(shift, rotate, rad);
 
-                double dif = 0;
-                for (auto point : rotate.outer()) {
-                    double dif_len = fabs(hypot(point.x(),point.y()) - hypot(round(point.x()),round(point.y())));
-                    dif += dif_len;
-                }
+//                double dif = 0;
+//                for (auto point : rotate.outer()) {
+//                    double dif_len = fabs(hypot(point.x(),point.y()) - hypot(round(point.x()),round(point.y())));
+//                    dif += dif_len;
+//                }
 
-                if (smallest_dif > dif) {
-                    smallest_dif = dif;
-                    smallest_dif_rad = r;
-                }
-            }
+//                if (smallest_dif > dif) {
+//                    smallest_dif = dif;
+//                    smallest_dif_rad = r;
+//                }
+//            }
 
-            frame_rad = smallest_dif_rad;
+//            frame_rad = smallest_dif_rad;
 
-        } else {
+//        } else {
 
             // 存在しうる全てのグリッドの原点との距離と辺の長さの誤差から当てはまる可能性のあるものをピックアップ
             std::vector<point_i> first_point;
@@ -1340,6 +1352,19 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
     //            if (big_dif) continue;
 
                 if (smallest_dif > dif) {
+
+                    if (frame) {
+
+                        bg::model::box<bg::model::d2::point_xy<double>> box;
+                        bg::envelope(vertex, box);
+
+                        double x_dif = box.max_corner().x() - box.min_corner().x();
+                        double y_dif = box.max_corner().y() - box.min_corner().y();
+                        if ((x_dif > 101) || (y_dif > 101)) {
+                            continue;
+                        }
+                    }
+
                     smallest_dif = dif;
                     smallest = pi;
 
@@ -1350,23 +1375,22 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                         }
                         others.push_back(other);
                     }
-
                 }
             }
 
             otherPolygons.push_back(others);
-        }
+
     }
 
     errors.push_back(smallest_dif);
 
     // 最終的な回転角度を算出
     double theta;
-    if (frame) {
-        theta = frame_rad;
-    } else {
+//    if (frame) {
+//        theta = frame_rad;
+//    } else {
         theta = to_ver_rad - std::atan2(smallest.y(), smallest.x());
-    }
+//    }
 
     radians.push_back(theta);
 
@@ -1440,9 +1464,20 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
         bg::model::box<bg::model::d2::point_xy<int>> box;
         bg::envelope(pieces.at(pieces_num - 1 - i), box);
 
+        polygon_i frame;
+
+        if (box.max_corner().x() - box.min_corner().x() < 90) {
+            trans::rotate_transformer<bg::radian,double,2,2> rad(M_PI * 0.5);
+            bg::transform(pieces.at(pieces_num - 1 - i), frame, rad);
+        } else {
+            frame = pieces.at(pieces_num - 1 - i);
+        }
+
+        bg::envelope(frame, box);
+
         bg::strategy::transform::translate_transformer<int, 2, 2> translate(-box.min_corner().x(), -box.min_corner().y());
         polygon_i result;
-        bg::transform(pieces.at(pieces_num - 1 - i), result, translate);
+        bg::transform(frame, result, translate);
 
         procon::NeoExpandedPolygon polygon;
         polygon.resetPolygonForce(result);
