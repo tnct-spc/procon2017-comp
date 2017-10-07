@@ -15,10 +15,10 @@ public:
     explicit RequestMapper(QObject *parent = 0);
 
 signals:
-    void getAnswer(QString file_path);
+    void getAnswer();
 
 private slots:
-    void acceptAnswer(QString file_path);
+    void acceptAnswer();
     void service(QHttpRequest* request, QHttpResponse* response);
 
 private:

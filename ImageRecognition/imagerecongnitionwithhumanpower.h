@@ -2,6 +2,8 @@
 #define IMAGERECONGNITIONWITHHUMANPOWER_H
 
 #include <QWidget>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 #include "mygraphicsview.h"
 #include "precompile.h"
 #include "polygonviewer.h"
@@ -25,10 +27,14 @@ signals:
 
 private:
     Ui::imagerecongnitionwithhumanpower *ui;
+    QGraphicsView *view;
+    QGraphicsScene *scene;
     MyGraphicsView *my_graphics_view;
 
 private slots:
     void clickedEditedButton();
+    void clickedEnlargementButton();
+    void clickedReductionButton();
 protected:
 
 signals:

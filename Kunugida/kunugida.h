@@ -51,9 +51,10 @@ private:
     bool first_answer_flag = true;
     procon::NeoField best_answer;
     ImageRecognition imrec;
+    procon::NeoField nullfield;
 
     std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/CSV/problem.csv";
-
+    std::string ANSWER_SAVE_PATH = "../../procon2017-comp/CSV/answer.csv";
 public slots:
     void getCSV();
     void postCSV();
@@ -64,6 +65,7 @@ private slots:
     void emitAnswer(procon::NeoField field);
     void replyFinished(QNetworkReply* reply);
     void replaceField(procon::NeoField const& field);
+    void acceptAnswer();
 };
 
 #endif // KUNUGIDA_H

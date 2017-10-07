@@ -16,15 +16,11 @@ public:
     QString SimulateAnswerPoint(QString answer_file_name);
 
 private slots:
-    void ReceiveData(QByteArray lowdata);
-    void ServiceRequestCompleted();
 
 signals:
-    void getAnswer(QString file_path);
+    void getAnswer();
 
 private:
-    QHttpResponse *new_response_;
-
     //put a stone on stage
     bool PutStone();
 
@@ -39,8 +35,6 @@ private:
     int answer_flow_[256][4];
     int answer_num_;
     int stone_flow_count_;
-
-    QByteArray received_data;
 };
 
 #endif // ANSWERFORM_H

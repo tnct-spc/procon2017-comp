@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>677</width>
+    <width>528</width>
     <height>300</height>
    </rect>
   </property>
@@ -63,6 +63,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QCheckBox" name="forbeamserch">
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QCheckBox" name="boss">
@@ -102,8 +109,8 @@
     <rect>
      <x>340</x>
      <y>30</y>
-     <width>151</width>
-     <height>241</height>
+     <width>171</width>
+     <height>121</height>
     </rect>
    </property>
    <property name="title">
@@ -129,10 +136,10 @@
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>500</x>
-     <y>30</y>
+     <x>340</x>
+     <y>160</y>
      <width>171</width>
-     <height>241</height>
+     <height>121</height>
     </rect>
    </property>
    <property name="title">

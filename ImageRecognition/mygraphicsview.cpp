@@ -159,13 +159,12 @@ void MyGraphicsView::paintEvent(QPaintEvent *event)
     double image_window_width = qimage.width() * magnification;
     double image_window_height = qimage.height() * magnification;
 
-    if(image_window_width < image_window_height) image_window_height = image_window_width * qimage.height() / qimage.width();
-    else image_window_width = image_window_height * qimage.width() / qimage.height();
-
     QRect image_rect(QPoint(left_right_margin,top_buttom_margin),
                             toWindowPoint(QPointF(image_window_width , image_window_height)
                      ));
     painter.drawImage(image_rect,qimage);
+
+    this->resize(image_window_width / magnification,image_window_height / magnification);
 
     //polygon表示
     QVector<QPoint> window_points;

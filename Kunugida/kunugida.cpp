@@ -51,6 +51,9 @@ Kunugida::Kunugida(QWidget *parent) :
     // Replace field by HumanPower
     connect(&imrec, SIGNAL(updateField(procon::NeoField const&)), this, SLOT(replaceField(procon::NeoField const&)));
 
+    // Server
+    QObject::connect(&request_mapper,SIGNAL(getAnswer()),this,SLOT(acceptAnswer()));
+
     //スキャナのデバイス名を取得
     char command[256]="sh ../../procon2017-comp/Kunugida/getdevicename.sh";
     if(system(command)==0){
@@ -284,6 +287,7 @@ void Kunugida::run()
 
     if(ui->ServerModeCheckbox->isChecked()){
         std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
+        NeoPolygonIO::exportPolygon(nullfield, ANSWER_SAVE_PATH);
         NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
     }else{
     //    TODO: ここまでで各データソースから読み込むようにする
@@ -418,4 +422,15 @@ cv::Mat Kunugida::scanImage()
         std::cout<<"スキャンできない"<<std::endl;
     }
     return mat;
+}
+
+void Kunugida::acceptAnswer()
+{
+   procon::NeoField field = NeoPolygonIO::importField("../../procon2017-comp/CSV/answer.csv");
+//   cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
+//   cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
+//   field = imrec.run(frame, pieces);
+//   board->setScannedPieces(imrec.getPolygonPosition());
+   board->setField(field);
+   board->update();
 }

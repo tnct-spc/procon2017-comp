@@ -139,9 +139,32 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     }
 
     //@yui
+    std::vector<cv::Mat> human_images_frame = getFrameImages();
+    std::vector<procon::ExpandedPolygon> human_polygons_frame = getFrameForImage();
+    int i = 0;
+    while(i<human_images_frame.size()){
+        imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
+        QObject::connect(irwh,&imagerecongnitionwithhumanpower::returnPolygon,[&, i](polygon_t returnpolygon){
+            //ここで編集したpolygon_tを受け取る
+            std::cout << i << " : " << boost::geometry::dsv(returnpolygon) << std::endl;
+
+            currentRawPolygons.erase(currentRawPolygons.end() - 1);
+            currentRawPolygons.push_back(returnpolygon);
+            std::vector<polygon_i> pieces = rawPolygonsToGridedPolygons(currentRawPolygons);
+            procon::NeoField field = makeNeoField(pieces);
+
+            emit updateField(field);
+        });
+        irwh->setWindowTitle("frame");
+        irwh->setPolygon(human_polygons_frame[i].getPolygon());
+        irwh->setImage(human_images_frame[i]);
+        irwh->show();
+        i++;
+    }
+
     std::vector<cv::Mat> human_images = getPiecesImages();
     std::vector<procon::ExpandedPolygon> human_polygons = getPolygonForImage();
-    int i = 0;
+    i = 0;
     while(i<human_images.size()){
         imagerecongnitionwithhumanpower *irwh = new imagerecongnitionwithhumanpower();
         QObject::connect(irwh,&imagerecongnitionwithhumanpower::returnPolygon,[&, i](polygon_t returnpolygon){
@@ -155,6 +178,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
             emit updateField(field);
         });
+        irwh->setWindowTitle(QString::number(i));
         irwh->setPolygon(human_polygons.at(i).getPolygon());
         irwh->setImage(cv::Mat(human_images.at(i)));
         irwh->show();
@@ -936,7 +960,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
     }
 
     cv::namedWindow("bainary", CV_WINDOW_NORMAL);
-    cv::imshow("bainary", piece_image);
+//    cv::imshow("bainary", piece_image);
 
     cv::imwrite("/home/spc/Pictures/bainary.png", piece_image);
 
@@ -1541,7 +1565,7 @@ std::vector<cv::Mat> ImageRecognition::getFrameImages()
         frame_images.push_back(image);
 
         cv::namedWindow(std::to_string(i));
-        cv::imshow(std::to_string(i), image);
+//        cv::imshow(std::to_string(i), image);
         i++;
     }
 

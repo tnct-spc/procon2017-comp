@@ -7,14 +7,32 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
 {
     ui->setupUi(this);
 
+    view = new QGraphicsView();
+    scene = new QGraphicsScene();
     my_graphics_view = new MyGraphicsView();
-    ui->horizontalLayout->addWidget(my_graphics_view);
+
+    scene->addWidget(my_graphics_view);
+    view->setScene(scene);
+
+    ui->forMyWidgetLayout->addWidget(view);
+    view->resize(my_graphics_view->width() , my_graphics_view->height());
+
     connect(ui->editedButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
+    connect(ui->enlargementButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEnlargementButton);
+    connect(ui->reductionButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedReductionButton);
 }
 
 void imagerecongnitionwithhumanpower::clickedEditedButton(){
     emit returnPolygon(my_graphics_view->getPolygon());
-    this->close();
+//    this->close();
+}
+
+void imagerecongnitionwithhumanpower::clickedEnlargementButton(){
+    view->scale(1.1,1.1);
+}
+
+void imagerecongnitionwithhumanpower::clickedReductionButton(){
+    view->scale(0.9,0.9);
 }
 
 imagerecongnitionwithhumanpower::~imagerecongnitionwithhumanpower()
