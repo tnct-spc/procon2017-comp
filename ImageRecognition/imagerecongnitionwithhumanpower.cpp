@@ -15,6 +15,8 @@ imagerecongnitionwithhumanpower::imagerecongnitionwithhumanpower(QWidget *parent
     view->setScene(scene);
 
     ui->horizontalLayout->addWidget(view);
+    view->resize(my_graphics_view->width() , my_graphics_view->height());
+
     connect(ui->editedButton,&QPushButton::clicked,this,&imagerecongnitionwithhumanpower::clickedEditedButton);
 }
 
