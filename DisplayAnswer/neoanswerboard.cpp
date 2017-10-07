@@ -32,6 +32,7 @@ void NeoAnswerBoard::setShowUnplacedPieces(bool input){
 void NeoAnswerBoard::setSelectPieceMode(bool mode)
 {
     this->select_piece_mode = mode;
+    this->select_frame_point_mode = mode;
 }
 
 void NeoAnswerBoard::setIsEmptyColorFill(bool inp){
@@ -655,6 +656,14 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
         if(event->key() == Qt::Key_0){
             std::cout << "push 0" << red_id << "   " << blue_id << std::endl;
         }
+
+//        if(event->key() == Qt::Key_Control){
+//            if(event->type() == QEvent::KeyPress){
+//                select_frame_point_mode = true;
+//            }else if(event->type() == QEvent::KeyRelease){
+//                select_frame_point_mode = false;
+//            }
+//        }
         /*
         if(event->key() == Qt::Key_A && red_id!=0){
             --red_id;
@@ -900,6 +909,41 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
             }
         }
         this->update();
+    }
+
+    if(event->button() == Qt::MouseButton::RightButton && this->select_frame_point_mode){
+        QPointF clickedposition = event->pos();
+        //QPointF→point_iへの変換
+
+        int pointx = clickedposition.x() - left_right_margin;
+        int pointy = clickedposition.y() - top_bottom_margin;
+
+        point_i clickedpos( pointx / grid_size - 8, pointy / grid_size - 8);
+
+        if(event->type() == QEvent::MouseButtonPress){
+            std::cout << "clicked : " << bg::dsv(clickedpos) << std::endl;
+            int count = 0;
+            for(auto frame : field.getFrame()){
+               polygon_i polygon = frame.getPolygon();
+               for(auto point : polygon.outer()){
+                 if(point.x() == clickedpos.x() || point.y() == clickedpos.y()){
+                     clicked_frame_point.at(count).push_back(true);
+                 }else{
+                     clicked_frame_point.at(count).push_back(false);
+                 }
+               }
+               count++;
+            }
+        }else if(event->type() == QEvent::MouseButtonRelease){
+            std::cout << "released : " << bg::dsv(clickedpos) << std::endl;
+
+            for(auto frame : field.getFrame()){
+                polygon_i polygon = frame.getPolygon();
+                for(auto point : polygon.outer()){
+//                    if(point == clickedpos)
+                }
+            }
+        }
     }
 }
 
