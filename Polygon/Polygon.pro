@@ -35,7 +35,8 @@ SOURCES += \
     neopolygonio.cpp \
     Evaluation/evaluate.cpp \
     Evaluation/evaluation.cpp \
-    Utils/polygonconnector.cpp
+    Utils/polygonconnector.cpp \
+    Evaluation/neoevaluate.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -55,7 +56,8 @@ HEADERS += \
     neopolygonio.h \
     Evaluation/evaluate.h \
     Evaluation/evaluation.h \
-    Utils/polygonconnector.h
+    Utils/polygonconnector.h \
+    Evaluation/neoevaluate.h
 
 LIBS += -lboost_system -lboost_thread
 LIBS += -L/usr/lib `pkg-config --libs opencv`
