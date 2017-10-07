@@ -201,8 +201,11 @@ void Kunugida::run()
         cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
         cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
 
-//        cv::Mat frame = cv::imread("/home/spc/workspace/build-procon2017-Desktop-Debug/Kunugida/Thu_Oct__5_19:53:38_2017_.png", 1);
-//        cv::Mat pieces = cv::imread("/home/spc/workspace/build-procon2017-Desktop-Debug/Kunugida/Thu_Oct__5_19:55:22_2017_.png", 1);
+//        cv::Mat frame = cv::imread("/home/spc/Downloads/Fri_Oct__6_18-54-13_2017_.png", 1);
+//        cv::Mat pieces = cv::imread("/home/spc/Downloads/Fri_Oct__6_18-56-31_2017_.png", 1);
+
+//        cv::Mat frame = cv::imread("/home/spc/Downloads/Fri_Oct__6_20-13-14_2017_.png", 1);
+//        cv::Mat pieces = cv::imread("/home/spc/Downloads/Fri_Oct__6_20-15-54_2017_.png", 1);
 
         field = imrec.run(frame, pieces);
 
@@ -298,6 +301,8 @@ void Kunugida::run()
     connect(solver, SIGNAL(requestCSV()), this, SLOT(getCSV()));
     connect(this, SIGNAL(requestCSVcomplete()), solver, SLOT(requestCSVcomplete()));
     solver->run(field,algorithm_number);
+
+    NeoPolygonIO::exportPolygon(field,"output.csv");
 
 #endif
 //    QRLibrary lib;
