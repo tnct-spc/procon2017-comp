@@ -588,18 +588,22 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
                  most_frame = frame_instance;
              }
         }
-        for(auto const neopiece : field.getPieces()){
-            polygon_i piece = neopiece.procon::NeoExpandedPolygon::getPolygon();
-            piece_instance = tool::polygondistance(piece);
-            if(most_piece < piece_instance){
-                most_piece = piece_instance;
+        for(unsigned int count=0;count<field.getElementaryPieces().size();++count){
+            if(!field.getIsPlaced().at(count)){//置かれてないなら
+                polygon_i poly = field.getElementaryPieces().at(count).getPolygon();
+                piece_instance = tool::polygondistance(poly);
+                if(most_piece < piece_instance){
+                    most_piece = piece_instance;
+                }
             }
         }
+  //      std::cout <<"frameの距離"<<most_frame<<std::endl;
+  //      std::cout <<"pieceの距離"<<most_piece<<std::endl;
         if(most_piece > most_frame){
-//            std::cout <<"対角線で枝きり"<<std::endl;
+  //          std::cout <<"対角線で枝きり"<<std::endl;
             return true;
         }
-//        std::cout <<"対角線では無理だった"<<std::endl;
+  //      std::cout <<"対角線では無理だった"<<std::endl;
         return false;
     };
 
@@ -842,16 +846,17 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         return false;
     };
     bool a = about_distance();
-    if(a)return a;
-//    bool b = about_angle();
-//    if(b)return b;
-//    bool c = about_framesize();
-//    if(c)return c;
-//    bool d = about_frameangle();
-//    if(d)return
-//    bool e = about_frameside();
-//      if(e) return e;
+    if(a)std::cout <<"a"<<std::endl;return a;
+    bool b = about_angle();
+    if(b)std::cout <<"b"<<std::endl;return b;
+    bool c = about_framesize();
+    if(c)std::cout <<"c"<<std::endl;return c;
+    bool d = about_frameangle();
+    if(d)std::cout <<"d"<<std::endl;return d;
+    bool e = about_frameside();
+    if(e)std::cout <<"e"<<std::endl;return e;
     //OKならfalseを返す
+    return false;
 }
 
 int BeamSearch::checkOddField(const procon::NeoField &field, const Connect &connector, const int field_frame_index, const int field_piece_index) //field_frame_indexはConnectクラスのindexで参照すべきframeのindex
