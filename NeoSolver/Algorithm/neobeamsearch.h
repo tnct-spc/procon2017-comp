@@ -35,6 +35,8 @@ private:
     std::vector<procon::NeoField> last_fields;
     bool answer_progress_enabled = true;
 
+    std::vector<std::vector<procon::NeoExpandedPolygon>> other_vectored_pieces;
+
     unsigned int cpu_num = 0;
     unsigned int beam_width = 20;
 
