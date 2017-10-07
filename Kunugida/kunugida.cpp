@@ -284,6 +284,7 @@ void Kunugida::run()
 
     if(ui->ServerModeCheckbox->isChecked()){
         std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
+        NeoPolygonIO::exportPolygon(nullfield, ANSWER_SAVE_PATH);
         NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
     }else{
     //    TODO: ここまでで各データソースから読み込むようにする
