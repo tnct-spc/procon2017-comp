@@ -27,6 +27,7 @@ public:
     std::vector<procon::ExpandedPolygon> getFrameForImage();
     std::vector<double> getErrors();
     std::vector<double> getRadians();
+    std::vector<std::vector<polygon_i>> getOtherPolygons();
 
     const cv::Mat& getRawPiecesPic(){
         return raw_colored_pic;
@@ -92,6 +93,8 @@ private:
     std::vector<std::pair<point_i,double>> length_table;
 
     std::vector<polygon_t> currentRawPolygons;
+
+    std::vector<std::vector<polygon_i>> otherPolygons;
 };
 
 #endif // IMAGERECOGNITION_H

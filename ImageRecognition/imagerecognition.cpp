@@ -48,10 +48,10 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // ベクター化
     std::vector<polygon_t> polygons = Vectored(pieces_lines);
 
-    // フレームのベクターの表示
-    procon::ExpandedPolygon frame;
-    frame.resetPolygonForce(polygons[0]);
-    PolygonViewer::getInstance().pushPolygon(frame, "frame");
+//    // フレームのベクターの表示
+//    procon::ExpandedPolygon frame;
+//    frame.resetPolygonForce(polygons[0]);
+//    PolygonViewer::getInstance().pushPolygon(frame, "frame");
 
     // フレームの回転角を計算
 
@@ -170,6 +170,8 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // fieldクラスのデータに変換
     procon::NeoField field = makeNeoField(pieces);
 
+    std::vector<std::vector<polygon_i>> a =  getOtherPolygons();
+
     return field;
 }
 
@@ -179,6 +181,7 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
     int count=0;
     errors.clear();
     radians.clear();
+    otherPolygons.clear();
 
     // change vector's scale to grid
     for (auto& piece : rawPolygons) {
@@ -1281,6 +1284,8 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             polygon_t shift;
             bg::transform(vertex, shift, translate);
 
+            std::vector<polygon_i> others;
+
             for (auto pi : first_point) {
 
                 // 回転
@@ -1313,8 +1318,19 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                 if (smallest_dif > dif) {
                     smallest_dif = dif;
                     smallest = pi;
+
+                    if (dif < 2.0) {
+                        polygon_i other;
+                        for (auto point : rotate.outer()) {
+                            other.outer().push_back(point_i(round(point.x()), round(point.y())));
+                        }
+                        others.push_back(other);
+                    }
+
                 }
             }
+
+            otherPolygons.push_back(others);
         }
     }
 
@@ -1741,4 +1757,9 @@ std::vector<double> ImageRecognition::getErrors()
 std::vector<double> ImageRecognition::getRadians()
 {
     return radians;
+}
+
+std::vector<std::vector<polygon_i>> ImageRecognition::getOtherPolygons()
+{
+    return otherPolygons;
 }
