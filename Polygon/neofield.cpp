@@ -49,6 +49,11 @@ void procon::NeoField::setElementaryPieces(std::vector<procon::NeoExpandedPolygo
     }
 }
 
+void procon::NeoField::setElementaryFrameInnerPieces(const std::vector<procon::NeoExpandedPolygon> &frame_inner_pieces)
+{
+    elementary_frame_inner_pieces = frame_inner_pieces;
+}
+
 void procon::NeoField::setIsPlaced(const std::array<bool,50> &IsPlaced)
 {
     isPlaced = IsPlaced;
@@ -57,6 +62,11 @@ void procon::NeoField::setIsPlaced(const std::array<bool,50> &IsPlaced)
 void procon::NeoField::setIsPlaced(int const& piece_id)
 {
     isPlaced.at(piece_id) = true;
+}
+
+void procon::NeoField::setIsPlaced(const int &piece_id, bool is_placed)
+{
+    isPlaced.at(piece_id) = is_placed;
 }
 
 void procon::NeoField::sumTotalEvaluation(const double &eva)
@@ -86,6 +96,10 @@ std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryFr
     return elementary_frame;
 }
 
+std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryFrameInnerPieces() const
+{
+    return elementary_frame_inner_pieces;
+}
 
 std::vector<procon::NeoExpandedPolygon> const& procon::NeoField::getElementaryPieces() const
 {

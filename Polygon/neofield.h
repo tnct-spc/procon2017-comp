@@ -2,6 +2,7 @@
 #define NEOFIELD_H
 
 #include "neoexpandedpolygon.h"
+#include "Evaluation/evaluate.h"
 
 namespace procon {
 class NeoField
@@ -15,7 +16,7 @@ private:
 
     //素のピース&フレーム
     std::vector<procon::NeoExpandedPolygon> elementary_frame;
-    std::vector<std::vector<procon::NeoExpandedPolygon>> elementary_frame_inner_pices;
+    std::vector<procon::NeoExpandedPolygon> elementary_frame_inner_pieces;
     std::vector<procon::NeoExpandedPolygon> elementary_pieces;
     std::vector<procon::NeoExpandedPolygon> elementary_inverse_pieces;
 
@@ -30,6 +31,7 @@ private:
     double total_evaluation = 0;
 
 public:
+    std::vector<Evaluate> evaluate_cache;
     //constructor
     NeoField();
 
@@ -40,10 +42,11 @@ public:
     void setPiece(procon::NeoExpandedPolygon piece,double x, double y);
     void setPiece(procon::NeoExpandedPolygon piece,int n,double x = 0,double y = 0);
     void setElementaryFrame(std::vector<procon::NeoExpandedPolygon> const& frame);
-    void setElementaryFrameInnerPieces(std::vector<std::vector<procon::NeoExpandedPolygon>> const& frame_inner_pices);
+    void setElementaryFrameInnerPieces(std::vector<procon::NeoExpandedPolygon> const& frame_inner_pieces);
     void setElementaryPieces(std::vector<procon::NeoExpandedPolygon> const& pieces);
     void setIsPlaced(std::array<bool,50> const& IsPlaced);
     void setIsPlaced(int const& piece_id);
+    void setIsPlaced(int const& piece_id,bool is_placed);
     void sumTotalEvaluation(double const& eva);
 
     //getter
@@ -51,7 +54,7 @@ public:
     procon::NeoExpandedPolygon const& getPiece(int const& n) const;
     std::vector<procon::NeoExpandedPolygon> const& getFrame() const;
     std::vector<procon::NeoExpandedPolygon> const& getElementaryFrame() const;
-    std::vector<procon::NeoExpandedPolygon> const& getElementaryFrameInnerPices() const;
+    std::vector<procon::NeoExpandedPolygon> const& getElementaryFrameInnerPieces() const;
     std::vector<procon::NeoExpandedPolygon> const& getElementaryPieces() const;
     std::vector<procon::NeoExpandedPolygon> const& getElementaryInversePieces() const;
     std::array<bool,50> const& getIsPlaced() const;

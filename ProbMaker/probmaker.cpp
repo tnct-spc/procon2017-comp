@@ -209,8 +209,8 @@ void ProbMaker::delaunay_triangulation()
 
 //    while()
 
-//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[0],"hogehoge")->show();
-//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[1],"fugapiyo")->show();
+//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[0],"hogehoge", false)->show();
+//    NeoSinglePolygonDisplay::createInstance(this->print_polygons[1],"fugapiyo", false)->show();
 //    for (unsigned int index = 1; index < this->print_polygons.size(); ++index) {
 //        boost::geometry::difference(out[0],this->print_polygons[index],out);
 //    }
@@ -344,6 +344,16 @@ ONCE_MORE:
         pieces.clear();
         std::copy(pieces_buf.begin(),pieces_buf.end(),std::back_inserter(pieces));
     }
+
+    auto delete_sample_slope_side = [](polygon_i & p){
+
+        auto calc_slope = [](point_i a,point_i b){
+            std::pair<int,int> slope;
+            slope.first = boost::math::gcd(std::abs(b.x()-a.x()),std::abs(b.y()-a.y()));
+//            slope.second = boos
+        };
+    };
+
 
     this->print_polygons.clear();
     std::copy(pieces.begin(),pieces.end(),std::back_inserter(this->print_polygons));
@@ -688,7 +698,7 @@ void ProbMaker::step()
 //    connect(this,&ProbMaker::nextLoop,&event,&QEventLoop::quit);
 //    event.exec();
 
-    
+
 
 }
 

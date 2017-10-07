@@ -9,10 +9,11 @@ int main(int argc, char *argv[])
     loggers.push_back(spdlog::stdout_color_mt("ImageRecognition"));
     loggers.push_back(spdlog::stdout_color_mt("Polygon"));
     loggers.push_back(spdlog::stdout_color_mt("Solver"));
-    loggers.push_back(spdlog::stdout_color_mt("beamsearch"));
+    loggers.push_back(spdlog::stdout_color_mt("BeamSearch"));
 
     for(auto logger : loggers){
         //configre loggers
+        logger->set_level(spdlog::level::warn);
     }
 
     unsigned int i = 100;

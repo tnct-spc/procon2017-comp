@@ -46,11 +46,14 @@ public:
     NeoExpandedPolygon(std::vector<int> multi_ids_);
     NeoExpandedPolygon(NeoExpandedPolygon const& p);
 
+    bool operator ==(NeoExpandedPolygon const& neoexpolygon);
+
     //getter
     int getSize() const;
     //int getInnerSize() const;
     std::vector<double> const& getSideLength() const;
     std::vector<double> const& getSideAngle() const;
+    std::vector<double> const getSideAngle_degree() const;
     std::vector<double> const& getSideSlope() const;
     //std::vector<std::vector<double>> const& getInnersSideLength() const;
     //std::vector<std::vector<double>> const& getInnersSideAngle() const;

@@ -31,7 +31,11 @@ SOURCES += \
     form.cpp \
     neofield.cpp \
     polygon.cpp \
-    complexangle.cpp
+    complexangle.cpp \
+    neopolygonio.cpp \
+    Evaluation/evaluate.cpp \
+    Evaluation/evaluation.cpp \
+    Utils/polygonconnector.cpp
 
 HEADERS += \
         polygon_global.h \
@@ -47,7 +51,11 @@ HEADERS += \
     form.h \
     neofield.h \
     polygon.h \
-    complexangle.h
+    complexangle.h \
+    neopolygonio.h \
+    Evaluation/evaluate.h \
+    Evaluation/evaluation.h \
+    Utils/polygonconnector.h
 
 LIBS += -lboost_system -lboost_thread
 LIBS += -L/usr/lib `pkg-config --libs opencv`
@@ -73,3 +81,6 @@ DEPENDPATH += $$PWD/../Utilities
 
 INCLUDEPATH += $$PWD/../spdlog/include
 DEPENDPATH += $$PWD/../spdlog/include
+
+INCLUDEPATH += $$PWD/../NeoSolver
+DEPENDPATH += $$PWD/../NeoSolver

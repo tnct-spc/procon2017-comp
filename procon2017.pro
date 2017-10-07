@@ -1,16 +1,19 @@
+CONFIG += ordered
+
 TEMPLATE = subdirs
 
 SUBDIRS += \
     Utilities\
     Polygon \
     ImageRecognition \
-    QRcode \
     DisplayAnswer \
+    QRcode \
     Solver \
     NeoSolver \
     ProbMaker \
     Hazama \
-    Test \
     Slave \
     Kunugida \
-    AbilityCheck
+    AbilityCheck \
+    Test \
+    FindBug
