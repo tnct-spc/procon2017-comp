@@ -119,7 +119,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // ポリゴンの各辺を伸ばす
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-//        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);// 0.115
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.15 / scale);// 0.115
     }
 
 //    for (int i=0; i<frame_num; i++) {
@@ -962,7 +962,7 @@ cv::Mat ImageRecognition::HSVDetection(cv::Mat src_image)
             int s = channels[1].at<uchar>(y, x);
             int v = channels[2].at<uchar>(y, x);
 
-            if ((s > 80) && (v > 120)) {// (s > 80) && (s < 200) && (v > 120) && (v < 200)
+            if ((s > 70) && (v > 100)) {// (s > 80) && (s < 200) && (v > 120) && (v < 200)
                 piece_image.at<uchar>(y, x) = 255;
             }
             else {
@@ -1173,7 +1173,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
             if (fabs(degree - M_PI * 0.5) < M_PI / 90) {
 
                 // ９０度角でも傾いている場合を考慮
-                if (fabs(hori - round(hori)) < 0.2) {
+                if (fabs(hori - round(hori)) < 0.1) {
 
                     polygon.pop_back();
                     polygon_t spin;

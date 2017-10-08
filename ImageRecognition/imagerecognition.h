@@ -88,7 +88,7 @@ private:
     std::vector<double> errors;
     std::vector<double> radians;
 
-    bool showImage = true;
+    bool showImage = false;
 
     std::vector<std::pair<point_i,double>> length_table;
 
