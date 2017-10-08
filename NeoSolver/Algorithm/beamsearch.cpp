@@ -189,6 +189,10 @@ BeamSearch::BeamSearch(int beamwidth, bool answerprogress_enabled)
     cpu_num = std::thread::hardware_concurrency();
 }
 
+void BeamSearch::setCheckCanPlume(bool isCheck){
+    isCheck = true;
+}
+
 void BeamSearch::setBeamWidth(int beamwidhth)
 {
     this->beam_width = beamwidhth;
@@ -845,16 +849,26 @@ bool BeamSearch::checkCanPrune(const procon::NeoField &field)
         //枝切りできないならfalse
         return false;
     };
+    if(frameside){
     bool e = about_frameside();
     if(e)std::cout <<"枠の辺で"<<std::endl;return e;
+    }
+    if(distance){
     bool a = about_distance();
     if(a)std::cout <<"対角線でえだきり"<<std::endl;return a;
+    }
+    if(angle){
     bool b = about_angle();
     if(b)std::cout <<"角でえだきり"<<std::endl;return b;
+    }
+    if(framesize){
     bool c = about_framesize();
     if(c)std::cout <<"枠の大きさでえだきり"<<std::endl;return c;
+    }
+    if(frameside){
     bool d = about_frameangle();
     if(d)std::cout <<"枠の角度でえだきり"<<std::endl;return d;
+    }
     //OKならfalseを返す
     return false;
 }

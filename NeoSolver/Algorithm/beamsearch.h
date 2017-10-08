@@ -40,13 +40,14 @@ public:
     void evaluateNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations);
     bool checkCanPrune(procon::NeoField const& field);
     int checkOddField(const procon::NeoField &field, const Connect &connector, const int field_frame_index, const int field_piece_index);
+    void setCheckCanPlume(bool isCheck);
 
     std::vector<procon::NeoField> debug_field;
 
     static std::string hashField(const procon::NeoField& field);
 
     void setBeamWidth(int beamwidth);
-
+    bool frameside = false,distance = false,angle = false,framesize = false,frameangle = false;
 private:
     std::shared_ptr<spdlog::logger> logger;
     std::shared_ptr<NeoAnswerDock> dock;

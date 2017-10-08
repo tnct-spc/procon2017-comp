@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>879</width>
-    <height>410</height>
+    <width>983</width>
+    <height>403</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,6 +92,102 @@
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string>Algorithm</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QRadioButton" name="test_algorithm_button">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>TestA&amp;lgorithm</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="beamsearch_button">
+           <property name="text">
+            <string>BeamSearch</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="beamwidth">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="frameside">
+           <property name="text">
+            <string>about_frameside</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="distance">
+           <property name="text">
+            <string>about_distance</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="angle">
+           <property name="text">
+            <string>about_anle</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="framesize">
+           <property name="text">
+            <string>about_framesize</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="frameangle">
+           <property name="text">
+            <string>about_frameangle</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="answer_progress">
+           <property name="text">
+            <string>AnswerProgress</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="0" column="3">
@@ -145,52 +241,6 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="2">
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="title">
-       <string>Algorithm</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QRadioButton" name="test_algorithm_button">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>TestA&amp;lgorithm</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="beamsearch_button">
-         <property name="text">
-          <string>BeamSearch</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="beamwidth">
-         <property name="maximum">
-          <number>1000</number>
-         </property>
-         <property name="value">
-          <number>100</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="answer_progress">
-         <property name="text">
-          <string>AnswerProgress</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -198,8 +248,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>879</width>
-     <height>19</height>
+     <width>983</width>
+     <height>17</height>
     </rect>
    </property>
   </widget>
