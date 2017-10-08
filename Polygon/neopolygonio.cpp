@@ -98,6 +98,7 @@ void NeoPolygonIO::exportPolygon(procon::NeoField field, std::string file_path)
     for(auto e : field.evaluate_cache){
         exportEvaluateFile(6,e);
     }
+    output.close();
 }
 
 procon::NeoField NeoPolygonIO::importField(std::string file_path)
