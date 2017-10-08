@@ -919,30 +919,44 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
         int pointy = clickedposition.y() - top_bottom_margin;
 
         point_i clickedpos( pointx / grid_size - 8, pointy / grid_size - 8);
-
-        if(event->type() == QEvent::MouseButtonPress){
-            std::cout << "clicked : " << bg::dsv(clickedpos) << std::endl;
-            int count = 0;
-            for(auto frame : field.getFrame()){
-               polygon_i polygon = frame.getPolygon();
-               for(auto point : polygon.outer()){
-                 if(point.x() == clickedpos.x() || point.y() == clickedpos.y()){
-                     clicked_frame_point.at(count).push_back(true);
-                 }else{
-                     clicked_frame_point.at(count).push_back(false);
-                 }
+        std::cout << "clicked : " << bg::dsv(clickedpos) << std::endl;
+        std::vector<bool> save;
+        for(auto frame : field.getFrame()){
+           polygon_i polygon = frame.getPolygon();
+           for(auto point : polygon.outer()){
+               if(point.x() == clickedpos.x() || point.y() == clickedpos.y()){
+                   save.push_back(true);
+               }else{
+                   save.push_back(false);
                }
-               count++;
-            }
-        }else if(event->type() == QEvent::MouseButtonRelease){
-            std::cout << "released : " << bg::dsv(clickedpos) << std::endl;
+           }
+           clicked_frame_point.push_back(save);
+        }
+    }
+}
 
-            for(auto frame : field.getFrame()){
-                polygon_i polygon = frame.getPolygon();
-                for(auto point : polygon.outer()){
-//                    if(point == clickedpos)
-                }
-            }
+void NeoAnswerBoard::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::MouseButton::RightButton && this->select_frame_point_mode){
+        QPointF clickedposition = event->pos();
+        //QPointF→point_iへの変換
+
+        int pointx = clickedposition.x() - left_right_margin;
+        int pointy = clickedposition.y() - top_bottom_margin;
+
+        point_i clickedpos( pointx / grid_size - 8, pointy / grid_size - 8);
+        std::cout << "released : " << bg::dsv(clickedpos) << std::endl;
+        std::vector<bool> save;
+        for(auto frame : field.getFrame()){
+           polygon_i polygon = frame.getPolygon();
+           for(auto point : polygon.outer()){
+               if(point.x() == clickedpos.x() || point.y() == clickedpos.y()){
+                   save.push_back(true);
+               }else{
+                   save.push_back(false);
+               }
+           }
+           clicked_frame_point.push_back(save);
         }
     }
 }
@@ -950,4 +964,12 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 std::vector<int> NeoAnswerBoard::getSelectedPieceId()
 {
     return clicked_piece_id;
+}
+
+void NeoAnswerBoard::correctFrame()
+{
+    std::vector<procon::NeoExpandedPolygon> save;
+    for(auto frame : field.getFrame()){
+        save.push_back(frame);
+    }
 }
