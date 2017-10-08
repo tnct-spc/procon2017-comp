@@ -715,8 +715,12 @@ int ProbMaker::retRnd(int num){
     return rnd(mt);
 }
 void ProbMaker::makeHint(procon::NeoField field){
-    double mostinstanceHintsNumber = print_polygons.size() * 0.9;
-    double miminstanceHintsNumber = print_polygons.size() * 0.8;
+    std::vector<polygon_i> piece;
+    for(procon::NeoExpandedPolygon neopiece : field.getElementaryPieces()){
+        piece.push_back(neopiece.getPolygon());
+    }
+    double mostinstanceHintsNumber = piece.size() * 0.9;
+    double miminstanceHintsNumber = piece.size() * 0.8;
 
     int mostHintsNumber = mostinstanceHintsNumber;
     int mimHintsNumber = miminstanceHintsNumber;
@@ -768,10 +772,6 @@ void ProbMaker::makeHint(procon::NeoField field){
     }while(mostHintsNumber < count || mimHintsNumber > count);
     std::cout<<"ink"<<std::endl;
     */
-    std::vector<polygon_i> piece;
-    for(procon::NeoExpandedPolygon neopiece : field.getElementaryPieces()){
-        piece.push_back(neopiece.getPolygon());
-    }
     std::vector<polygon_i> apiece = piece;
     int HintsNumber1,HintsNumber2,HintsNumber3,HintsNumber4;
     do{
@@ -872,7 +872,7 @@ void ProbMaker::makeHint(procon::NeoField field){
            }
                 }
 
-    std::cout<<piece.size()<<" "<<mostHintsNumber<<" "<<mimHintsNumber<<std::endl;
+    std::cout<<apiece.size()<<" "<<mostHintsNumber<<" "<<mimHintsNumber<<std::endl;
     std::cout<<HintsNumber1<<" "<<HintsNumber2<<" "<<HintsNumber3<<" "<<HintsNumber4<<" "<< HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4 <<std::endl;
     std::cout <<disposition1<<std::endl;
     std::cout <<disposition2<<std::endl;
