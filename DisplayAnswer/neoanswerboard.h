@@ -50,6 +50,8 @@ private:
     int frame_margin;
 //    int clickedpiece_id=-1;
     std::vector<int> clicked_piece_id;
+    std::vector<std::vector<bool>> clicked_frame_point;
+    bool select_frame_point_mode = false;
 
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
@@ -86,6 +88,7 @@ private:
     bool selecter;//true = left, false = right
     bool pre = false;
     bool paintif = false;
+    void correctFrame();
 
     QString output_string;//ここのメンバ変数に入ってる文字列をAnswerBoardの画面下に表示するようにする
 
@@ -100,6 +103,7 @@ protected:
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif // NEOANSWERBOARD_H
