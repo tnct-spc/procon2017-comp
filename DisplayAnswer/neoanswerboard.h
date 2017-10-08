@@ -50,6 +50,7 @@ private:
     int frame_margin;
 //    int clickedpiece_id=-1;
     std::vector<int> clicked_piece_id;
+    std::vector<int> clicked_move_piece_id;
 
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);
@@ -92,6 +93,8 @@ private:
     bool isemptycolorfill = false;
     bool is_select_good_asnwer_mode = false;
 
+    bool isEraseMode = false;
+
 signals:
     void selectedField(procon::NeoField field);
 
@@ -100,6 +103,8 @@ protected:
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif // NEOANSWERBOARD_H
