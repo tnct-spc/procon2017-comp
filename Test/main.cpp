@@ -11,12 +11,17 @@
 #include "testevaluation.h"
 #include "testpolygonconnector.h"
 #include "testcheckoddfield.h"
+#include "testcheckcanprume.h"
+#include "testqrtranslatetopolygon.h"
+#include "testimagerecognitionwithhumanpower.h"
+#include "testsinglepolygondock.h"
 
 int Test()
 {
     int ERROR_CNT = 0;
 
     std::vector<TesterWraper*> TESTER;
+//    TESTER.push_back(new TestNeoExpandedPolygon)
 //    TESTER.push_back(new TestNeoExpandedPolygon);
 //    TESTER.push_back(new TesterWraper);
 //    TESTER.push_back(new TestDisplayAnswer);
@@ -25,7 +30,12 @@ int Test()
 //    TESTER.push_back(new TestAlgorithmWrapper);
 //    TESTER.push_back(new TestEvaluation);
 //    TESTER.push_back(new TestPolygonConnector);
-    TESTER.push_back(new testCheckOddField);
+//    TESTER.push_back(new testCheckOddField);
+//    TESTER.push_back(new TestCheckCanPrume);
+//    TESTER.push_back(new testCheckOddField);
+//    TESTER.push_back(new TestQrTranslateToPolygon);
+    TESTER.push_back(new TestImageRecognitionWithHumanPower);
+//    TESTER.push_back(new TestSinglePolygonDock);
 
     for(auto tester : TESTER){
         if(!tester->run()){

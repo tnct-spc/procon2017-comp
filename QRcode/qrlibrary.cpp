@@ -1,3 +1,4 @@
+//旧世代
 #include "qrtranslatetopolygon.h"
 #include "qrlibrary.h"
 
@@ -9,17 +10,22 @@ QRLibrary::QRLibrary()
     std::cout << "QR Libruary initialized" << std::endl;
 }
 
-std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
+std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRLibrary::Decoder(bool s, bool is_hint)
 {
-    int resizedW;
-    std::string code = {""};
-    std::string type = {""};
-    VideoCapture cap(0); // open the video camera no. 0
-
+    VideoCapture cap(0);
     if (!cap.isOpened())  // if not success, exit program
     {
         std::cout << "Cannot open the video cam" << std::endl;
+        while(!cap.isOpened()){
+
+        }
     }
+
+    int resizedW;
+    std::pair<std::vector<polygon_i>,std::vector<polygon_i>> decoded_polygons;
+    std::string code = {""};
+    std::string bcode = {"."};
+    std::string type = {""};
 
     ImageScanner scanner;
     scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
@@ -31,12 +37,10 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
 
     resizedW = (dWidth - dHeight) / 2;
 
-    namedWindow("Press Esc to exit",CV_WINDOW_NORMAL);
-    if(dHeight < 600){
-        resizeWindow("Press Esc to exit", 600, 600);
-    }
-
-    std::pair<std::vector<polygon_i>,polygon_i> decoded_polygons;
+//    namedWindow("Press Esc to exit",CV_WINDOW_NORMAL);
+//    if(dHeight < 600){
+//        resizeWindow("Press Esc to exit", 600, 600);
+//    }
 
     while (1)
     {
@@ -66,6 +70,7 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             ++symbol) {
             std::vector<Point> vp;
             // do something useful with results
+            bcode = code;
             code = symbol->get_data();
             type = symbol->get_type_name();
             std::cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< std::endl;
@@ -81,34 +86,38 @@ std::pair<std::vector<polygon_i>,polygon_i> QRLibrary::Decoder(bool s)
             }
             std::cout << "Angle: " << r.angle << std::endl;
             QrTranslateToPolygon qrtrans(code);
-            for(unsigned int tes=0;tes<qrtrans.getPieceData().size();tes++){
-                std::cout << "polygon:" << bg::dsv(qrtrans.getPieceData()[tes]) << std::endl;
-            }
-            std::cout << "frame" << bg::dsv(qrtrans.getFrameData()) << std::endl;
+            is_multi = qrtrans.getIsMultiQr();
+            if(bcode != code){
+                std::vector<polygon_i> pieceData = qrtrans.getPieceData();
+                std::vector<polygon_i> frameData = qrtrans.getFrameData();
+                for(auto p : pieceData){
+                    decoded_polygons.first.push_back(p);
+                    std::cout << "piece: " << decoded_polygons.first.size() << std::endl;
+                }
 
-            for(auto polygon : qrtrans.getPieceData()){
-                decoded_polygons.first.push_back(polygon);
-            }
-            for(auto point: qrtrans.getFrameData().outer()){
-                decoded_polygons.second.outer().push_back(point);
+                for(auto f : frameData){
+                    decoded_polygons.second.push_back(f);
+                    std::cout << "frame: " << decoded_polygons.second.size() << std::endl;
+                }
             }
         }
 
-        imshow("Press esc key to exit", frame);
+        imshow("QR", frame);
 
-        int key = waitKey(30);
+        int key = waitKey(1);
         if(code.length() > 2 && s){
-            std::cout << "QRCode detected" << std::endl;
-            break;
-        }
-        if(key == 27){
-            std::cout << "Esc key was pressed" << std::endl;
-            break;
+            if(!is_multi){
+                std::cout << "QRCode detected" << std::endl;
+                if(!read) QrTranslateToPolygon::translateToCSV(decoded_polygons, false);
+                read = true;
+                std::cout << "a: " << decoded_polygons.first.size() << std::endl;
+                std::cout << "b: " << decoded_polygons.second.size() << std::endl;
+                destroyAllWindows();
+                break;
+            }
         }
     }
-
 //    code = "Type: " + type + "\n\n\"" + code + "\"";
 //    return code;
     return decoded_polygons;
 }
-

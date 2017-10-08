@@ -27,7 +27,11 @@ SOURCES += main.cpp\
     testpolygonconnector.cpp \
     testalgorithmwrapper.cpp \
     testevaluation.cpp \
-    testcheckoddfield.cpp
+    testcheckoddfield.cpp \
+    testqrtranslatetopolygon.cpp \
+    testimagerecognitionwithhumanpower.cpp \
+    testsinglepolygondock.cpp \
+    testcheckcanprume.cpp
 
 HEADERS += testdisplayanswer.h\
     testjoinpolygon.h \
@@ -37,11 +41,22 @@ HEADERS += testdisplayanswer.h\
     testpolygonconnector.h \
     testalgorithmwrapper.h \
     testevaluation.h \
-    testcheckoddfield.h
+    testcheckoddfield.h \
+    testqrtranslatetopolygon.h \
+    testimagerecognitionwithhumanpower.h \
+    testsinglepolygondock.h \
+    testcheckcanprume.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
 INCLUDEPATH += $$PWD/../Polygon
 DEPENDPATH += $$PWD/../Polygon
+
+INCLUDEPATH += $$PWD/../ProbMaker
+DEPENDPATH += $$PWD/../ProbMaker
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../PeobMaker/release/ -lProbMaker
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/debug/ -lProbMaker
+else:unix: LIBS += -L$$OUT_PWD/../ProbMaker/ -lProbMaker
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../DisplayAnswer/release/ -lDisplayAnswer
@@ -76,3 +91,19 @@ else:unix: LIBS += -L$$OUT_PWD/../NeoSolver/ -lNeoSolver
 
 INCLUDEPATH += $$PWD/../NeoSolver
 DEPENDPATH += $$PWD/../NeoSolver
+INCLUDEPATH += $$PWD/../ProbMaker
+DEPENDPATH += $$PWD/../ProbMaker
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../PeobMaker/release/ -lProbMaker
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ProbMaker/debug/ -lProbMaker
+else:unix: LIBS += -L$$OUT_PWD/../ProbMaker/ -lProbMaker
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QRcode/release/ -lQRcode
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QRcode/debug/ -lQRcode
+else:unix: LIBS += -L$$OUT_PWD/../QRcode/ -lQRcode
+
+INCLUDEPATH += $$PWD/../QRcode
+DEPENDPATH += $$PWD/../QRcode
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include

@@ -2,6 +2,7 @@
 
 #include "utilities.h"
 #include "utility"
+#include "complexangle.h"
 
 //-------------------constructor--------------------
 procon::NeoExpandedPolygon::NeoExpandedPolygon(int id_)
@@ -90,14 +91,13 @@ void procon::NeoExpandedPolygon::calcSideAngle()
     for(int i = 0; i < size; ++i) {
         p = outer.at(i);
 
-        p1 = (i == 0) ? outer.at(size - 1) : outer.at(i - 1);
-        std::complex<double> cp1(static_cast<double> (p1.x() - p.x()), static_cast<double> (p1.y() - p.y()));
+        p1 = outer.at((i == 0) ? size - 1 : i - 1);
+        ComplexAngle cp1(p1.x() - p.x(), p1.y() - p.y());
 
         p2 = outer.at(i + 1);
-        std::complex<double> cp2(static_cast<double> (p2.x() - p.x()), static_cast<double> (p2.y() - p.y()));
+        ComplexAngle cp2(p2.x() - p.x(), p2.y() - p.y());
 
-        double arg = std::arg(cp2 / cp1);
-        side_angle.push_back((signbit(arg)) ? M_PI * 2 + arg : arg);
+        side_angle.push_back(ComplexAngle::angle(cp2 / cp1));
     }
 
     /*
@@ -239,6 +239,15 @@ std::vector<double> const& procon::NeoExpandedPolygon::getSideLength() const
 std::vector<double> const& procon::NeoExpandedPolygon::getSideAngle() const
 {
     return side_angle;
+}
+
+std::vector<double> const procon::NeoExpandedPolygon::getSideAngle_degree() const
+{
+    std::vector<double> side_angle_degree;
+    for(const double angle : this->side_angle) {
+        side_angle_degree.push_back((angle / M_PI) * 180);
+    }
+    return side_angle_degree;
 }
 
 std::vector<double> const& procon::NeoExpandedPolygon::getSideSlope() const
@@ -494,4 +503,27 @@ void procon::NeoExpandedPolygon::sortJointedPieces()
     };
 
     std::sort(jointed_pieces.begin(),jointed_pieces.end(),lambda);
+}
+
+bool procon::NeoExpandedPolygon::operator ==(procon::NeoExpandedPolygon const& neoexpolygon){
+    auto is_equal_polygon = [](polygon_i r,polygon_i l){
+        if(r.outer().size() != l.outer().size()){
+            return false;
+        }
+
+        for(unsigned int index = 0;index < r.outer().size(); ++index){
+            if(r.outer()[index].x() != r.outer()[index].x() || l.outer()[index].y() != l.outer()[index].y()){
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+
+    if(is_equal_polygon(this->polygon,neoexpolygon.getPolygon()) && this->id == neoexpolygon.getId()){
+        return true;
+    }
+
+    return false;
 }

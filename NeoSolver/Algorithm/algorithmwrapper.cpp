@@ -2,7 +2,7 @@
 
 AlgorithmWrapper::AlgorithmWrapper()
 {
-
+    logger = spdlog::get("AlgorithmWrapper");
 }
 
 
@@ -30,3 +30,24 @@ void AlgorithmWrapper::submitAnswer(procon::NeoField field)
     QTimer::singleShot(1, &loop, SLOT(quit()));
     loop.exec();
 }
+
+void AlgorithmWrapper::getCSV()
+{
+    emit requestCSV();
+}
+
+void AlgorithmWrapper::requestCSVcomplete()
+{
+    logger->info("success");
+}
+
+void AlgorithmWrapper::postCSV()
+{
+    emit requestpostCSV();
+}
+
+void AlgorithmWrapper::requestpostCSVcomplete()
+{
+    logger->info("success");
+}
+
