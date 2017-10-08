@@ -156,7 +156,7 @@
     <item row="1" column="0">
      <widget class="QLineEdit" name="ip_address">
       <property name="text">
-       <string>192.168.100.55:8016</string>
+       <string>192.168.10.1:8016</string>
       </property>
      </widget>
     </item>
