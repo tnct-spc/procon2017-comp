@@ -119,7 +119,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // ポリゴンの各辺を伸ばす
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);// 0.115
+//        polygons.at(i) = expandPolygon(polygons.at(i), 0.115 / scale);// 0.115
     }
 
 //    for (int i=0; i<frame_num; i++) {
