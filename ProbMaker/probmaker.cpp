@@ -772,6 +772,7 @@ void ProbMaker::makeHint(procon::NeoField field){
     for(procon::NeoExpandedPolygon neopiece : field.getElementaryPieces()){
         piece.push_back(neopiece.getPolygon());
     }
+    std::vector<polygon_i> apiece = piece;
     int HintsNumber1,HintsNumber2,HintsNumber3,HintsNumber4;
     do{
     HintsNumber1 = retRnd(100) + 1;
@@ -882,10 +883,10 @@ void ProbMaker::makeHint(procon::NeoField field){
     //ここから形状情報
     std::vector<polygon_i> shapepiece;
     polygon_i neoframe;
-    shapeHints += std::to_string(piece.size());
+    shapeHints += std::to_string(apiece.size());
     polygon_i polygon2;
     bool result;
-    for(polygon_i shape : piece){
+    for(polygon_i shape : apiece){
         polygon2.clear();
         int random_x = retRnd(1000000);
         int random_y = retRnd(1000000);
