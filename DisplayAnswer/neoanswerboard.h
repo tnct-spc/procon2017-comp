@@ -29,6 +29,7 @@ class NeoAnswerBoard : public QWidget
 {
     Q_OBJECT
 
+
 public:
     explicit NeoAnswerBoard(QWidget *parent = 0);
     ~NeoAnswerBoard();
@@ -41,7 +42,12 @@ public:
 
     void setShowUnplacedPieces(bool input);
 
+    void setZoomMode(bool inp);
+
     std::vector<int> getSelectedPieceId();
+signals:
+    void zoom_In();
+    void zoom_Out();
 
 private:
     int frame_margin;
@@ -67,6 +73,7 @@ private:
     int piece_size = 1;
     bool allif = true;
     bool select_piece_mode = false;
+    bool zoom_mode = false;
  //   bool showunplacedpieces = false;
 
     //make id_list

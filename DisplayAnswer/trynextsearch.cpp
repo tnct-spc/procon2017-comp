@@ -4,6 +4,7 @@
 #include "neopolygonviewer.h"
 
 #include <QLayout>
+#include <QGraphicsView>
 
 TryNextSearch::TryNextSearch(QWidget *parent) :
     QWidget(parent),
@@ -19,15 +20,29 @@ TryNextSearch::TryNextSearch(QWidget *parent) :
 
 //    board->setShowUnplacedPieces(true);
     board->setSelectPieceMode(true);
+    board->setZoomMode(true);
 
     go_button = new QPushButton();
     go_button->setText("RUN BEAMSEARCH");
 
     connect(go_button,&QPushButton::clicked,this,&TryNextSearch::clickedGoButton);
 
-    ui->gridLayout->addWidget(board,0,0,1,10);
+
+    QGraphicsScene *scene = new QGraphicsScene();
+    view = new QGraphicsView();
+
+    scene->addWidget(board);
+    view->setScene(scene);
+    view->scale(zoom,zoom);
+    ui->gridLayout->addWidget(view,0,0,1,10);
+
+  //  ui->gridLayout->addWidget(board,0,0,1,10);
     ui->gridLayout->addWidget(dock,0,10,1,2);
     ui->gridLayout->addWidget(go_button,1,0,1,0);
+
+    connect(this->board,SIGNAL(zoom_In()),this,SLOT(_zoom_In()));
+    connect(this->board,SIGNAL(zoom_Out()),this,SLOT(_zoom_Out()));
+
 }
 
 TryNextSearch::~TryNextSearch()
@@ -164,4 +179,25 @@ bool TryNextSearch::checkFloatPiece(std::vector<polygon_i> frames){
     }
 
     return false;//問題ないならfalse
+}
+
+void TryNextSearch::_zoom_In(){
+    view->update();
+    double value = zoom+0.5;
+    if(!(value>99 || value<0.5)){
+    double zoom_ = value / zoom;
+    zoom = value;
+    view->scale(zoom_,zoom_);
+    view->update();
+    }
+}
+
+void TryNextSearch::_zoom_Out(){
+    double value = zoom-0.5;
+    if(!(value>99 || value<0.5)){
+    double zoom_ = value / zoom;
+    zoom = value;
+    view->scale(zoom_,zoom_);
+    view->update();
+    }
 }

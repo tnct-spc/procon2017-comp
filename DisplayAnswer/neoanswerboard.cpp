@@ -466,8 +466,14 @@ void NeoAnswerBoard::keyPressEvent(QKeyEvent *event)
         if(event->key() == Qt::Key_L && blue_id!=sorted_poly.size() - 1){
             ++blue_id;
         }
+
+
     }
 
+    if(zoom_mode){
+        if(event->key() == Qt::Key_Z)emit zoom_In();
+        if(event->key() == Qt::Key_X)emit zoom_Out();
+    }
 
     this->update();
 
@@ -692,4 +698,8 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
 std::vector<int> NeoAnswerBoard::getSelectedPieceId()
 {
     return clicked_piece_id;
+}
+
+void NeoAnswerBoard::setZoomMode(bool inp){
+    zoom_mode = inp;
 }
