@@ -272,6 +272,7 @@ std::string BeamSearch::hashField(const procon::NeoField& field){
 void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vector<Evaluate> & evaluations)
 {
     std::vector<procon::NeoField> next_field;
+    std::vector<std::string> next_field_hash;
 
 #ifdef DEBUG_MODE
     auto makeNextFieldFromEvaluate = [&](Evaluate eval){
@@ -364,10 +365,10 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
                 evaluations.pop_back();
 
                 ++evaluate_counter;
-                logger->info("evaluate counter:" + std::to_string(evaluate_counter));
+                //logger->info("evaluate counter:" + std::to_string(evaluate_counter));
             }
 
-            logger->info("evaluating");
+            //logger->info("evaluating");
 
             procon::NeoField field_buf;
             {
@@ -403,9 +404,9 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
                 {
                     const std::string now_hash = hashField(field_buf);
                     std::lock_guard<decltype(mtx)> lock(mtx);
-                    std::for_each(next_field.begin(),next_field.end(),[&](const procon::NeoField& f){
+                    std::for_each(next_field_hash.begin(),next_field_hash.end(),[&](const std::string& f){
                         if(!flag){
-                            if(now_hash == hashField(f)){
+                            if(now_hash == f){
                                 flag = true;
                             }
                         }
@@ -417,6 +418,7 @@ void BeamSearch::makeNextState(std::vector<procon::NeoField> & fields,std::vecto
                         {
                             std::lock_guard<decltype(mtx)> lock(mtx);
                             field_buf.evaluate_cache.push_back(eval);
+                            next_field_hash.push_back(hashField(field_buf));
                             next_field.push_back(field_buf);
                         }
                     }
@@ -1128,7 +1130,7 @@ void BeamSearch::run(procon::NeoField field)
 
         bool flag = false;
         for(auto const& _field : state){
-            dock->addAnswer(_field);
+            if(this->answer_progress_enabled) dock->addAnswer(_field);
             if(!flag){
                 submitAnswer(_field);
                 flag = true;
