@@ -78,8 +78,8 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
 {
     QEventLoop eventloop;
 
-    //Display answer
-    board->setField(field);
+    this->board->setField(field);
+    this->board->update();
 
     //io
     NeoPolygonIO::exportPolygon(field,SAVE_ANSWER_PATH);
@@ -103,6 +103,7 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
     std::cout<<"send ok"<<std::endl;
 
     ui->state->setText(QString::fromStdString(std::string(postreply->readAll().constData())));
+    this->board->setDrawVertexMode(ui->draw_vertex->isChecked());
     this->board->setField(field);
     this->board->update();
 

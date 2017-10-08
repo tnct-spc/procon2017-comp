@@ -138,39 +138,39 @@
     <rect>
      <x>340</x>
      <y>160</y>
-     <width>171</width>
-     <height>121</height>
+     <width>181</width>
+     <height>109</height>
     </rect>
    </property>
    <property name="title">
     <string>Settings</string>
    </property>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>141</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Please set IP address</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="ip_address">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>151</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>192.168.100.55:8016</string>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Please set IP address</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLineEdit" name="ip_address">
+      <property name="text">
+       <string>192.168.100.55:8016</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QCheckBox" name="draw_vertex">
+      <property name="text">
+       <string>DrawVertex</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

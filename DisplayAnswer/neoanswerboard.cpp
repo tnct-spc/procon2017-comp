@@ -298,7 +298,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     };
     //頂点番号を描画
     auto drawPolygonPointNum = [&]{
-        if(single_mode){
+        if(single_mode && drawVertexMode){
         painter.setFont(QFont("Decorative", grid_size*2, QFont::Thin)); // text font
         painter.setBackgroundMode(Qt::OpaqueMode);
         painter.setBackground(QBrush(QColor(255, 255, 255, 100)));
@@ -981,4 +981,9 @@ void NeoAnswerBoard::correctFrame()
     for(auto frame : field.getFrame()){
         save.push_back(frame);
     }
+}
+
+void NeoAnswerBoard::setDrawVertexMode(bool mode)
+{
+    drawVertexMode = mode;
 }

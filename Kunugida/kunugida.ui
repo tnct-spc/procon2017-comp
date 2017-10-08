@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>879</width>
+    <width>858</width>
     <height>410</height>
    </rect>
   </property>
@@ -143,6 +143,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="draw_vertex">
+        <property name="text">
+         <string>DrawVertex</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="0" column="2">
@@ -198,7 +208,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>879</width>
+     <width>858</width>
      <height>19</height>
     </rect>
    </property>

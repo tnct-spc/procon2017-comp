@@ -41,6 +41,7 @@ public:
     void setIsEmptyColorFill(bool inp);
     void setSelectPieceMode(bool mode);
     void setGoodAnswerSelectMode(bool mode);
+    void setDrawVertexMode(bool mode);
 
     void setShowUnplacedPieces(bool input);
 
@@ -52,6 +53,7 @@ private:
     std::vector<int> clicked_piece_id;
     std::vector<std::vector<bool>> clicked_frame_point;
     bool select_frame_point_mode = false;
+    bool drawVertexMode;
 
     Ui::NeoAnswerBoard *ui;
     QPointF getPiecePosition(point_i point);

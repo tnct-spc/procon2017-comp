@@ -325,6 +325,7 @@ void Kunugida::emitAnswer(procon::NeoField field)
 {
    logger->info("emitted answer");
    std::cout << field.getPieces().size() << std::endl;
+   this->board->setDrawVertexMode(ui->draw_vertex->isChecked());
    this->board->setField(field);
    this->board->update();
 }
