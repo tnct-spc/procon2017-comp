@@ -19,7 +19,7 @@ QRCode::~QRCode()
 
 std::pair<std::vector<polygon_i>,std::vector<polygon_i>> QRCode::Decoder(bool s, bool is_hint, bool hint_multi, int how_qr)
 {
-    VideoCapture cap(0);
+    VideoCapture cap(1);
     if (!cap.isOpened())  // if not success, exit program
     {
         std::cout << "Cannot open the video cam" << std::endl;

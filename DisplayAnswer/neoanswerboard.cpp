@@ -219,7 +219,7 @@ void NeoAnswerBoard::paintEvent(QPaintEvent *event)
     //ピースIdを描画
     auto drawPieceId = [&](procon::NeoExpandedPolygon expanded_poly){
         painter.setFont(QFont("Decorative", grid_size*3, QFont::Thin)); // text font
-        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackgroundMode(Qt::TransparentMode);
         painter.setBackground(QBrush(QColor(list[expanded_poly.getId()])));
         painter.setPen(QPen(QBrush(Qt::white), 0.3));
         point_i center;
