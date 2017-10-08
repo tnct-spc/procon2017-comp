@@ -201,11 +201,11 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-//        cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
-//        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
+        cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
+        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
 
-        cv::Mat frame = cv::imread("/home/spc/Pictures/Sun_Oct__8_10:26:52_2017_.png", 1);
-        cv::Mat pieces = cv::imread("/home/spc/Pictures/Sun_Oct__8_10:28:28_2017_.png", 1);
+//        cv::Mat frame = cv::imread("/home/spc/Pictures/Sun_Oct__8_10:26:52_2017_.png", 1);
+//        cv::Mat pieces = cv::imread("/home/spc/Pictures/Sun_Oct__8_10:28:28_2017_.png", 1);
 
 //        cv::Mat frame = cv::imread("/home/spc/Downloads/Fri_Oct__6_20-13-14_2017_.png", 1);
 //        cv::Mat pieces = cv::imread("//home/spc/Downloads/Fri_Oct__6_20-15-54_2017_.png", 1);
@@ -223,8 +223,6 @@ void Kunugida::run()
         //CSV date
         std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
         field = NeoPolygonIO::importField(path);
-
-
 
         std::vector<polygon_i> poly_pieces;
         std::vector<int> id_list;

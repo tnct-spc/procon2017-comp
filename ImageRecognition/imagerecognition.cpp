@@ -240,7 +240,7 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
     count = 0;
     for (auto& polygon : rawPolygons) {
         pieces.push_back((placeGrid(polygon)));
-//        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
         count++;
     }
 
@@ -1451,8 +1451,6 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
         procon::NeoExpandedPolygon polygon(i);
         polygon.resetPolygonForce(pieces[i]);
         neo_pieces.push_back(polygon);
-
-//        field.setPiece(polygon);
     }
 
     field.setElementaryPieces(neo_pieces);
@@ -1467,8 +1465,13 @@ procon::NeoField ImageRecognition::makeNeoField(std::vector<polygon_i> pieces)
         polygon_i frame;
 
         if (box.max_corner().x() - box.min_corner().x() < 90) {
-            trans::rotate_transformer<bg::radian,double,2,2> rad(M_PI * 0.5);
-            bg::transform(pieces.at(pieces_num - 1 - i), frame, rad);
+
+            for (auto point : pieces.at(pieces_num - 1 - i).outer()) {
+                frame.outer().push_back(point_i(-point.y(), point.x()));
+            }
+
+//            trans::rotate_transformer<bg::degree,double,2,2> rad(90);
+//            bg::transform(pieces.at(pieces_num - 1 - i), frame, rad);
         } else {
             frame = pieces.at(pieces_num - 1 - i);
         }
