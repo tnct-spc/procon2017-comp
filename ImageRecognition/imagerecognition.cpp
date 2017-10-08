@@ -119,7 +119,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
 
     // ポリゴンの各辺を伸ばす
     for (unsigned int i=0; i<polygons.size()-frame_num; i++) {
-        polygons.at(i) = expandPolygon(polygons.at(i), 0.1 / scale);// 0.115
+        polygons.at(i) = expandPolygon(polygons.at(i), 0.15 / scale);// 0.115
     }
 
 //    for (int i=0; i<frame_num; i++) {
@@ -140,7 +140,7 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
         pos.resetPolygonForce(polygons[i]);
         position.push_back(pos);
 
-//        if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
+        if (showImage) PolygonViewer::getInstance().pushPolygon(pos,std::to_string(i));
     }
 
     for (int i=0; i<frame_num; i++) {
@@ -206,8 +206,6 @@ procon::NeoField ImageRecognition::run(cv::Mat raw_frame_image, cv::Mat raw_piec
     // fieldクラスのデータに変換
     procon::NeoField field = makeNeoField(pieces);
 
-    std::vector<std::vector<polygon_i>> a =  getOtherPolygons();
-
     return field;
 }
 
@@ -218,6 +216,7 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
     errors.clear();
     radians.clear();
     otherPolygons.clear();
+    grid_polygons.clear();
 
     // change vector's scale to grid
     for (auto& piece : rawPolygons) {
@@ -235,14 +234,15 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
 
     // Gridに乗せる
     std::vector<polygon_i> pieces;
-    double error;
     pieces_num = rawPolygons.size();
     count = 0;
+
     for (auto& polygon : rawPolygons) {
         pieces.push_back((placeGrid(polygon)));
-        NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
+        if (showImage) NeoPolygonViewer::getInstance().displayPolygon(pieces[count], std::to_string(count), false);
         count++;
     }
+
 
     // correct vector
     for(auto& p : pieces){
@@ -251,7 +251,18 @@ std::vector<polygon_i> ImageRecognition::rawPolygonsToGridedPolygons(std::vector
         }
     }
 
-    error = getError(pieces);
+//    double frame_area = 0;
+//    for (int i=0; i<frame_num; i++) {
+//        frame_area += bg::area(pieces.at(pieces.size() - 1 - i));
+//    }
+//    bool check = areaCombination(otherPolygons, 0, 0, frame_area);
+
+//    if (check) {
+//        std::reverse(std::begin(grid_polygons), std::end(grid_polygons));
+//        for (int i=0; i<frame_num; i++) {
+//            grid_polygons.push_back(pieces.at(pieces.size() - 1 - i));
+//        }
+//    }
 
     return std::move(pieces);
 }
@@ -1368,7 +1379,7 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                     smallest_dif = dif;
                     smallest = pi;
 
-                    if (dif < 2.0) {
+                    if (dif < 0.5) {
                         polygon_i other;
                         for (auto point : rotate.outer()) {
                             other.outer().push_back(point_i(round(point.x()), round(point.y())));
@@ -1377,9 +1388,9 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
                     }
                 }
             }
-
-            otherPolygons.push_back(others);
-
+            if (!frame) {
+                otherPolygons.push_back(others);
+            }
     }
 
     errors.push_back(smallest_dif);
@@ -1407,6 +1418,18 @@ polygon_i ImageRecognition::placeGrid(polygon_t vertex)
 
     for (auto po : to_grid.outer()) {
         grid_piece.outer().push_back(point_i(round(po.x()), round(po.y())));
+    }
+
+    if (right_angle) {
+        std::vector<polygon_i> p;
+        p.push_back(grid_piece);
+        otherPolygons.push_back(p);
+    }
+
+    if (otherPolygons.at(otherPolygons.size()-1).size() == 0) {
+        std::vector<polygon_i> p;
+        p.push_back(grid_piece);
+        otherPolygons.at(otherPolygons.size()-1) = p;
     }
 
     return grid_piece;
@@ -1824,4 +1847,20 @@ std::vector<double> ImageRecognition::getRadians()
 std::vector<std::vector<polygon_i>> ImageRecognition::getOtherPolygons()
 {
     return otherPolygons;
+}
+
+bool ImageRecognition::areaCombination(std::vector<std::vector<polygon_i>> polygons, int n, double sum, double frame)
+{
+    if ((fabs(frame - sum) < 1) && (n == polygons.size())) return true;
+    else if ((n >= polygons.size()) || (sum > frame)) return false;
+
+    for (auto polygon : polygons.at(n)) {
+        bool check = areaCombination(polygons, n+1, sum+bg::area(polygon), frame);
+        if (check) {
+            grid_polygons.push_back(polygon);
+            return true;
+        }
+    }
+
+    return false;
 }

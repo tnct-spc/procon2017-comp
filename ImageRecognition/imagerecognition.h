@@ -68,6 +68,7 @@ private:
 //    std::vector<procon::ExpandedPolygon> getPolygonPosition();
     void makeTable();
     std::vector<polygon_i> rawPolygonsToGridedPolygons(std::vector<polygon_t> rawPolygons);
+    bool areaCombination(std::vector<std::vector<polygon_i>> polygons, int n, double sum, double frame);
 
     cv::Mat raw_pieces_pic;
     cv::Mat raw_colored_pic;
@@ -95,6 +96,8 @@ private:
     std::vector<polygon_t> currentRawPolygons;
 
     std::vector<std::vector<polygon_i>> otherPolygons;
+
+    std::vector<polygon_i> grid_polygons;
 };
 
 #endif // IMAGERECOGNITION_H
