@@ -87,8 +87,9 @@ void Kunugida::run()
         logger->info("Selected ImageData DataSource");
 
     }
-//    TODO: ここまでで各データソースから読み込むようにする
-
+//    TODO: ここまでで各データソースから読み込むようにす
+    ProbMaker *prob = new ProbMaker;
+    prob->makeHint(field);
     int algorithm_number = 0;
 
     if(ui->test_algorithm_button->isChecked()){

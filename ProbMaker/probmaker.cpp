@@ -1,7 +1,8 @@
 #include "probmaker.h"
 #include "ui_probmaker.h"
 #include "neopolygonviewer.h"
-
+#include "neofield.h"
+#include "neoexpandedpolygon.h"
 #include <boost/geometry/geometry.hpp>
 #include <boost/math/tools/fraction.hpp>
 #include <boost/math/common_factor_rt.hpp>
@@ -102,7 +103,6 @@ ProbMaker::ProbMaker(QWidget *parent) :
     //ドロネーの三角形分割
     delaunay_triangulation();
     GA();
-    makeHint();
 }
 
 ProbMaker::~ProbMaker()
@@ -715,8 +715,7 @@ int ProbMaker::retRnd(int num){
     std::uniform_int_distribution<int> rnd(0,num-1);//randomを返すだけ
     return rnd(mt);
 }
-void ProbMaker::makeHint(){
-    //std::cout << "nngo"<<std::endl;
+void ProbMaker::makeHint(procon::NeoField field){
     double mostinstanceHintsNumber = print_polygons.size() * 0.9;
     double miminstanceHintsNumber = print_polygons.size() * 0.8;
 
@@ -770,7 +769,10 @@ void ProbMaker::makeHint(){
     }while(mostHintsNumber < count || mimHintsNumber > count);
     std::cout<<"ink"<<std::endl;
     */
-    std::vector<polygon_i> piece = print_polygons;
+    std::vector<polygon_i> piece;
+    for(procon::NeoExpandedPolygon neopiece : field.getElementaryPieces()){
+        piece.push_back(neopiece.getPolygon());
+    }
     int HintsNumber1,HintsNumber2,HintsNumber3,HintsNumber4;
     do{
     HintsNumber1 = retRnd(100) + 1;
@@ -780,7 +782,8 @@ void ProbMaker::makeHint(){
     }while((HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4) < mimHintsNumber || (HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4) > mostHintsNumber);
     std::string example = std::to_string(HintsNumber1);
     disposition1 += example;
-    //ヒント一段階目
+    //ヒント一段階
+    //std::cout <<"pieceのかず"<<piece.size()<<std::endl;
     for(int i = 0; i < HintsNumber1;i++){
         int rnd = retRnd(piece.size());
        polygon_i instancepiece = piece.at(rnd);
@@ -801,7 +804,7 @@ void ProbMaker::makeHint(){
            }
                 }
 
-    //ヒント二段階目
+    std::cout <<"ヒント二段階目"<<std::endl;
     example = std::to_string(HintsNumber2);
     disposition2 += example;
     for(int a = 0; a < HintsNumber2;a++){
@@ -869,18 +872,21 @@ void ProbMaker::makeHint(){
            }
                 }
 
-    std::cout<<print_polygons.size()<<" "<<mimHintsNumber<<std::endl;
+    std::cout<<piece.size()<<" "<<mostHintsNumber<<" "<<mimHintsNumber<<std::endl;
     std::cout<<HintsNumber1<<" "<<HintsNumber2<<" "<<HintsNumber3<<" "<<HintsNumber4<<" "<< HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4 <<std::endl;
+    std::cout <<disposition1<<std::endl;
+    std::cout <<disposition2<<std::endl;
+    std::cout <<disposition3<<std::endl;
     std::cout <<disposition4<<std::endl;
 
 
     //ここから形状情報
     std::vector<polygon_i> shapepiece;
     polygon_i neoframe;
-    shapeHints += std::to_string(print_polygons.size());
+    shapeHints += std::to_string(piece.size());
     polygon_i polygon2;
     bool result;
-    for(polygon_i shape : print_polygons){
+    for(polygon_i shape : piece){
         polygon2.clear();
         int random_x = retRnd(1000000);
         int random_y = retRnd(1000000);
@@ -920,11 +926,13 @@ void ProbMaker::makeHint(){
     }
     //std::cout<<"あはは二段階目クリアだよ"<<std::endl;
     bool result_moke = false;
+    for(procon::NeoExpandedPolygon moke_frame : field.getElementaryFrame()){
+        polygon_i hoge_frame = moke_frame.getPolygon();
     do{
         int random_x = retRnd(1000000);
         int random_y = retRnd(1000000);
         neoframe.clear();
-    for(point_i framepoint : frame.outer()){
+    for(point_i framepoint : hoge_frame.outer()){
         neoframe.outer().push_back(point_i(framepoint.x() + random_x ,framepoint.y() + random_y ));
         }
     for(polygon_i poly2 : shapepiece){
@@ -941,19 +949,23 @@ void ProbMaker::makeHint(){
             shapeHints += std::to_string(point.x());
             shapeHints += " ";
             shapeHints += std::to_string(point.y());
-        }
+            }
         counter++;
+        }
     }
     std::cout <<shapeHints<<std::endl;
+    /*
     for(std::string st :disposition){
         std::cout<< st <<std::endl;
         st.erase();
     }
-    std::cout <<print_polygons.size()<<" "<<mostHintsNumber<<" "<<mimHintsNumber<<" "<<count<<std::endl;
+    */
+    //std::cout <<print_polygons.size()<<" "<<mostHintsNumber<<" "<<mimHintsNumber<<" "<<counter<<std::endl;
 }
 
-void ProbMaker::paintEvent(QPaintEvent *)
-{
+
+
+void ProbMaker::paintEvent(QPaintEvent *){
     QPainter painter(this);
     painter.setPen(QPen(QColor("#000000")));
     constexpr int grid_size = 10;

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "neoexpandedpolygon.h"
+#include "neofield.h"
 
 namespace Ui {
 class ProbMaker;
@@ -19,7 +20,7 @@ public:
     void GA();
     std::vector<polygon_i> getPieces();
     polygon_i getFrame();
-    void makeHint();
+    void makeHint(procon::NeoField field);
     std::string  shapeHints; //形状情報
     std::string disposition1,disposition2,disposition3,disposition4; //配置情報
     std::vector<std::string> disposition;
