@@ -727,6 +727,7 @@ void ProbMaker::makeHint(){
     int count = 0;
     std::string str;
     //std::cout<<"tango2"<<std::endl;
+    /*
     do{
         count = 0;
         std::vector<polygon_i> piece = print_polygons;
@@ -768,7 +769,8 @@ void ProbMaker::makeHint(){
     }
     }while(mostHintsNumber < count || mimHintsNumber > count);
     std::cout<<"ink"<<std::endl;
-    /*
+    */
+    std::vector<polygon_i> piece = print_polygons;
     int HintsNumber1,HintsNumber2,HintsNumber3,HintsNumber4;
     do{
     HintsNumber1 = retRnd(100) + 1;
@@ -870,7 +872,7 @@ void ProbMaker::makeHint(){
     std::cout<<print_polygons.size()<<" "<<mimHintsNumber<<std::endl;
     std::cout<<HintsNumber1<<" "<<HintsNumber2<<" "<<HintsNumber3<<" "<<HintsNumber4<<" "<< HintsNumber1 + HintsNumber2 + HintsNumber3 + HintsNumber4 <<std::endl;
     std::cout <<disposition4<<std::endl;
-    */
+
 
     //ここから形状情報
     std::vector<polygon_i> shapepiece;
