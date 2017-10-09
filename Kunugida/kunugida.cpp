@@ -257,6 +257,7 @@ void Kunugida::run()
         bool is_hint = false;
         bool is_multi = false;
         int how_qr = 1;
+        board->setSingleMode(true);
         if(ui->is_hint->isChecked()) is_hint = true;
         if(ui->is_multi->isChecked()){
             is_multi = true;
