@@ -31,6 +31,8 @@ Kunugida::Kunugida(QWidget *parent) :
     ui->setupUi(this);
     logger = spdlog::get("Kunugida");
 
+    QDir("../../procon2017-comp").mkdir("CSV");
+
     //    imageRecognitonTest();
 
     connect(ui->RunButton, &QPushButton::clicked, this, &Kunugida::clickedRunButton);
@@ -43,10 +45,14 @@ Kunugida::Kunugida(QWidget *parent) :
     board->show();
     board->showMaximized();
 
-    //Server
-    QObject::connect(&request_mapper,SIGNAL(getAnswer(QString)),this,SLOT(acceptAnswer(QString)));
     //    board->setSingleMode(true);
     //    board->setSingleMode(true);
+
+    // Replace field by HumanPower
+    connect(&imrec, SIGNAL(updateField(procon::NeoField const&)), this, SLOT(replaceField(procon::NeoField const&)));
+
+    // Server
+    QObject::connect(&request_mapper,SIGNAL(getAnswer()),this,SLOT(acceptAnswer()));
 
     //スキャナのデバイス名を取得
     char command[256]="sh ../../procon2017-comp/Kunugida/getdevicename.sh";
@@ -188,7 +194,6 @@ void Kunugida::run()
             }
         }
 
-        ImageRecognition imrec;
         field = imrec.run(first_scan,second_scan);
         board->setScannedPieces(imrec.getPolygonPosition());
 
@@ -196,18 +201,21 @@ void Kunugida::run()
         //selected image
         logger->info("Selected ImageData DataSource");
 
-        cv::Mat frame = cv::imread("../../procon2017-comp/sample/frame.png", 1);
-        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/pices.png", 1);
+        cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
+        cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
 
-        ImageRecognition imrec;
+//        cv::Mat frame = cv::imread("/home/spc/workspace/build-procon2017-Desktop-Debug/Kunugida/Thu_Oct__5_19:53:38_2017_.png", 1);
+//        cv::Mat pieces = cv::imread("/home/spc/workspace/build-procon2017-Desktop-Debug/Kunugida/Thu_Oct__5_19:55:22_2017_.png", 1);
+
         field = imrec.run(frame, pieces);
 
-        //        imageRecognitonTest();
-//        ImageRecognition imrec;
-//        field = imrec.run(frame, pieces);
         board->setScannedPieces(imrec.getPolygonPosition());
 
-        //        imageRecognitonTest();
+//        std::vector<cv::Mat> images = imrec.getPiecesImages(pieces);
+//        std::vector<procon::ExpandedPolygon> polygons = imrec.getPolygonForImage();
+//        ImageRecognition imrec;
+//        field = imrec.run(frame, pieces);
+
     }else if(ui->csv_button->isChecked()){
         //CSV date
         std::string path = QFileDialog::getOpenFileName(this,"SELECT CSV","./../../procon2017-comp/DebugFieldCsv",tr("Text files(*.csv)")).toStdString();
@@ -275,10 +283,9 @@ void Kunugida::run()
     }
 
     if(ui->ServerModeCheckbox->isChecked()){
-        std::string PROBLEM_SAVE_PATH = "../../procon2017-comp/CSV/problem.csv";
         std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
+        NeoPolygonIO::exportPolygon(nullfield, ANSWER_SAVE_PATH);
         NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
-
     }else{
     //    TODO: ここまでで各データソースから読み込むようにする
 
@@ -338,11 +345,12 @@ void Kunugida::imageRecognitonTest()
 {
     std::cout << "Hello ImageRecogniton Test" << std::endl;
 
-    cv::Mat nocframe = cv::imread("./../../procon2017-comp/sample/sample_frame_3.JPG", 1);
-    cv::Mat nocpieces = cv::imread("/home/spc/ダウンロード/real_piece5", 1);
+    cv::Mat nocframe = cv::imread("../../procon2017-comp/real_frame_200.png", 1);
+    cv::Mat nocpieces = cv::imread("../../procon2017-comp/real_piece_200.png", 1);
 
-    ImageRecognition imrec;
     procon::NeoField PDATA = imrec.run(nocframe, nocpieces);
+
+    return;
 }
 
 void Kunugida::getCSV()
@@ -381,6 +389,12 @@ void Kunugida::replyFinished(QNetworkReply *reply)
     emit requestCSVcomplete();
 }
 
+void Kunugida::replaceField(procon::NeoField const& field)
+{
+    std::cout << "Save problem in : " << PROBLEM_SAVE_PATH << std::endl;
+    NeoPolygonIO::exportPolygon(field, PROBLEM_SAVE_PATH);
+}
+
 cv::Mat Kunugida::scanImage()
 {
     time_t t = time(NULL);
@@ -403,4 +417,15 @@ cv::Mat Kunugida::scanImage()
         std::cout<<"スキャンできない"<<std::endl;
     }
     return mat;
+}
+
+void Kunugida::acceptAnswer()
+{
+   procon::NeoField field = NeoPolygonIO::importField("../../procon2017-comp/CSV/answer.csv");
+//   cv::Mat frame = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:33:57_2017_.png", 1);
+//   cv::Mat pieces = cv::imread("../../procon2017-comp/sample/Wed_Oct__4_18:35:21_2017_.png", 1);
+//   field = imrec.run(frame, pieces);
+//   board->setScannedPieces(imrec.getPolygonPosition());
+   board->setField(field);
+   board->update();
 }

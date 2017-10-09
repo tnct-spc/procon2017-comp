@@ -16,5 +16,5 @@ SUBDIRS += \
     Kunugida \
     AbilityCheck \
     Test \
-    FindBug
-
+    FindBug \
+    ManPowerProb

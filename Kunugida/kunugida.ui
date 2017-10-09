@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
+    <width>879</width>
     <height>410</height>
    </rect>
   </property>
@@ -138,6 +138,9 @@
         <property name="text">
          <string>Server Mode</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -181,7 +184,7 @@
        <item>
         <widget class="QCheckBox" name="answer_progress">
          <property name="text">
-          <string>AnswewrProgress</string>
+          <string>AnswerProgress</string>
          </property>
         </widget>
        </item>
@@ -195,7 +198,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>867</width>
+     <width>879</width>
      <height>19</height>
     </rect>
    </property>
