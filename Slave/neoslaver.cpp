@@ -78,6 +78,7 @@ bool NeoSlaver::emitAnswer(procon::NeoField field)
 {
     QEventLoop eventloop;
 
+    this->board->setDrawVertexMode(ui->draw_vertex->isChecked());
     this->board->setField(field);
     this->board->update();
 
