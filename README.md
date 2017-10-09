@@ -34,7 +34,7 @@ Slave ... 複数台運用向け問題解答専用クライアント
 | ./DisplayAnswer | 解答表示プログラム |
 | ./Hazama | 昨年度の本体 |
 | ./ImageRecognition | 画像処理プログラム |
-| ./FindBug | バグとはなんですか？ |
+| ./FindBug | バ↑グ↓ってなんですか？ |
 | ./Polygon | ピースクラスなど |
 | ./ProbMaker | 問題自動生成機 |
 | ./ManPowerProb | 人力問題生成器 |
