@@ -51,6 +51,10 @@ QrTranslateToPolygon::QrTranslateToPolygon(std::string qrinp)
     }
 }
 
+QrTranslateToPolygon::QrTranslateToPolygon()
+{
+
+}
 
 void QrTranslateToPolygon::inpToVector(){
 
