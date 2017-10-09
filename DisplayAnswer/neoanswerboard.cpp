@@ -877,6 +877,8 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     }
 #endif
     if(event->button() == Qt::MouseButton::LeftButton && this->select_piece_mode){
+        isEraseMode = true;
+        clicked_move_piece_id.clear();
 //        clickedpiece_id = -1;
         QPointF clickedposition = event->pos();
         //QPointF→point_iへの変換
@@ -897,6 +899,12 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
                 }else{
                     this->clicked_piece_id.erase(index);
                 }
+                index = std::find(clicked_move_piece_id.begin(),clicked_move_piece_id.end(),piece.getId());
+                if(index == clicked_move_piece_id.end()){
+                    this->clicked_move_piece_id.push_back(piece.getId());
+                }else{
+                    this->clicked_move_piece_id.erase(index);
+                }
             }
         }
         this->update();
@@ -905,6 +913,44 @@ void NeoAnswerBoard::mousePressEvent(QMouseEvent *event)
     if(this->is_select_good_asnwer_mode){
         emit selectedField(this->field);
     }
+}
+
+void NeoAnswerBoard::mouseMoveEvent(QMouseEvent *event)
+{
+    if(isEraseMode){
+        isEraseMode = true;
+//        clickedpiece_id = -1;
+        QPointF clickedposition = event->pos();
+        //QPointF→point_iへの変換
+
+        int pointx = clickedposition.x() - left_right_margin;
+        int pointy = clickedposition.y() - top_bottom_margin;
+
+        point_i clickedpos( pointx / grid_size - 8, pointy / grid_size - 8);
+        std::cout << "clicked : " << bg::dsv(clickedpos) << std::endl;
+
+        for(auto piece : field.getPieces()){
+            if(bg::intersects(piece.getPolygon() , clickedpos)){
+                std::cout << "piece id :" << piece.getId() << std::endl;
+
+                auto index = std::find(clicked_move_piece_id.begin(),clicked_move_piece_id.end(),piece.getId());
+                if(index == clicked_move_piece_id.end()){
+                    this->clicked_move_piece_id.push_back(piece.getId());
+                    this->clicked_piece_id.push_back(piece.getId());
+                }
+            }
+        }
+        this->update();
+    }
+
+    if(this->is_select_good_asnwer_mode){
+        emit selectedField(this->field);
+    }
+}
+
+void NeoAnswerBoard::mouseReleaseEvent(QMouseEvent *event)
+{
+    isEraseMode = false;
 }
 
 std::vector<int> NeoAnswerBoard::getSelectedPieceId()
