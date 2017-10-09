@@ -2,14 +2,10 @@
 
 RequestMapper::RequestMapper(QObject *parent) : QObject(parent)
 {
-
-    QDir().mkdir("docroot");
-    QDir().mkdir("docroot/answer");
-
     QHttpServer *server = new QHttpServer;
     QObject::connect(server, SIGNAL(newRequest(QHttpRequest*,QHttpResponse*)), this, SLOT(service(QHttpRequest*,QHttpResponse*)));
 
-    QObject::connect(&P_answer_page, SIGNAL(getAnswer(QString)), this, SLOT(acceptAnswer(QString)));
+    QObject::connect(&P_answer_page, SIGNAL(getAnswer()), this, SLOT(acceptAnswer()));
 
     server->listen(8016);
 }
@@ -38,7 +34,7 @@ void RequestMapper::service(QHttpRequest* request, QHttpResponse* response)
     }
 }
 
-void RequestMapper::acceptAnswer(QString file_path)
+void RequestMapper::acceptAnswer()
 {
-    emit getAnswer(file_path);
+    emit getAnswer();
 }

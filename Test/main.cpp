@@ -13,6 +13,8 @@
 #include "testcheckoddfield.h"
 #include "testcheckcanprume.h"
 #include "testqrtranslatetopolygon.h"
+#include "testimagerecognitionwithhumanpower.h"
+#include "testsinglepolygondock.h"
 
 int Test()
 {
@@ -26,12 +28,14 @@ int Test()
 //    TESTER.push_back(new TestJoinPolygon);
 //    TESTER.push_back(new testSearchSameLength);
 //    TESTER.push_back(new TestAlgorithmWrapper);
-    TESTER.push_back(new TestEvaluation);
+//    TESTER.push_back(new TestEvaluation);
 //    TESTER.push_back(new TestPolygonConnector);
 //    TESTER.push_back(new testCheckOddField);
 //    TESTER.push_back(new TestCheckCanPrume);
 //    TESTER.push_back(new testCheckOddField);
-    TESTER.push_back(new TestQrTranslateToPolygon);
+//    TESTER.push_back(new TestQrTranslateToPolygon);
+    TESTER.push_back(new TestImageRecognitionWithHumanPower);
+//    TESTER.push_back(new TestSinglePolygonDock);
 
     for(auto tester : TESTER){
         if(!tester->run()){

@@ -16,19 +16,16 @@ public:
     QString SimulateAnswerPoint(QString answer_file_name);
 
 private slots:
-    void ServiceRequestCompleted(QByteArray lowdata);
 
 signals:
-    void getAnswer(QString file_path);
+    void getAnswer();
 
 private:
-    QHttpResponse *new_response_;
-
     //put a stone on stage
     bool PutStone();
 
     //pass
-    QString AnswerFolderName=QCoreApplication::applicationDirPath()+"/docroot/answer/";
+    QString AnswerFolderName="../../procon2017-comp/CSV/answer.csv";
 
     //stage data
     int stage_state_[48][48];//0=empty;1=block;2=answer_block
@@ -38,8 +35,6 @@ private:
     int answer_flow_[256][4];
     int answer_num_;
     int stone_flow_count_;
-
-
 };
 
 #endif // ANSWERFORM_H

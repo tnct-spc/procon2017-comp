@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>854</width>
+    <width>879</width>
     <height>410</height>
    </rect>
   </property>
@@ -85,7 +85,7 @@
          <item>
           <widget class="QRadioButton" name="chinochan_button">
            <property name="text">
-            <string>チノちゃん</string>
+            <string>&amp;QRcode</string>
            </property>
           </widget>
          </item>
@@ -97,9 +97,49 @@
     <item row="0" column="3">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
+         <string>QRcode option</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="is_multi">
+           <property name="text">
+            <string>MultiQR</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="is_hint">
+           <property name="text">
+            <string>hintQR</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QSpinBox" name="how_qr">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="ImageRecognitonTestCheckBox">
         <property name="text">
          <string>ImageRecognitonTest</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="ServerModeCheckbox">
+        <property name="text">
+         <string>Server Mode</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -113,6 +153,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QRadioButton" name="test_algorithm_button">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>TestA&amp;lgorithm</string>
          </property>
@@ -122,6 +165,26 @@
         <widget class="QRadioButton" name="beamsearch_button">
          <property name="text">
           <string>BeamSearch</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="beamwidth">
+         <property name="maximum">
+          <number>1000</number>
+         </property>
+         <property name="value">
+          <number>100</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="answer_progress">
+         <property name="text">
+          <string>AnswerProgress</string>
          </property>
         </widget>
        </item>
@@ -135,8 +198,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>854</width>
-     <height>25</height>
+     <width>879</width>
+     <height>19</height>
     </rect>
    </property>
   </widget>

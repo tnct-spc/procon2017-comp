@@ -28,7 +28,9 @@ SOURCES += main.cpp\
     testalgorithmwrapper.cpp \
     testevaluation.cpp \
     testcheckoddfield.cpp \
-    testqrtranslatetopolygon.cpp
+    testqrtranslatetopolygon.cpp \
+    testimagerecognitionwithhumanpower.cpp \
+    testsinglepolygondock.cpp \
     testcheckcanprume.cpp
 
 HEADERS += testdisplayanswer.h\
@@ -40,7 +42,9 @@ HEADERS += testdisplayanswer.h\
     testalgorithmwrapper.h \
     testevaluation.h \
     testcheckoddfield.h \
-    testqrtranslatetopolygon.h
+    testqrtranslatetopolygon.h \
+    testimagerecognitionwithhumanpower.h \
+    testsinglepolygondock.h \
     testcheckcanprume.h
 
 unix:!macx: LIBS += -L$$OUT_PWD/../Polygon/ -lPolygon
@@ -100,3 +104,6 @@ else:unix: LIBS += -L$$OUT_PWD/../QRcode/ -lQRcode
 
 INCLUDEPATH += $$PWD/../QRcode
 DEPENDPATH += $$PWD/../QRcode
+
+INCLUDEPATH += $$PWD/../spdlog/include
+DEPENDPATH += $$PWD/../spdlog/include

@@ -64,6 +64,21 @@ void SinglePolygonDisplay::paintEvent(QPaintEvent *)
         for(int count=0; count<size;++count){
             painter.drawText(draw_point[count], QString::number(count));
         }
+
+        for(int cnt = 0; cnt < (size - 1); cnt++){
+            double dx = points[cnt].x() - points[cnt + 1].x();
+            double dy = points[cnt].y() - points[cnt + 1].y();
+            double distance = std::sqrt(dx * dx + dy * dy);
+
+            double draw_dx = draw_point[cnt + 1].x() - draw_point[cnt].x();
+            draw_dx = draw_dx / 2;
+            double draw_dy = draw_point[cnt + 1].y() - draw_point[cnt].y();
+            draw_dy = draw_dy / 2;
+
+            QPointF drawing_point(draw_point[cnt].x() + draw_dx ,draw_point[cnt].y() + draw_dy);
+
+            painter.drawText(drawing_point,QString::fromStdString(std::to_string( distance )));
+        }
         delete[] draw_point;
     };
 
