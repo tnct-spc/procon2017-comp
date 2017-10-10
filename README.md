@@ -16,10 +16,14 @@ Cult of the Party Parrot
 ## 開発環境
 ArchLinux
 
+ArchLinuxA Archiveを利用して、2017.05.01のスナップショットを用いて、各位の環境を統一
+https://archive.archlinux.org/repos/2017/05/01/$repo/os/$arch
+
 - Gcc 6.3.1
 - Boost C++ Libraries 1.63.0
 - Qt5.8.0
 - OpenCV 3.2.0
+- Zbar 0.1.0
 
 ## 実行方法
 
